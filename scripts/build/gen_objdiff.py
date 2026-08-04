@@ -20,7 +20,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from lib.project import ASM_DIR, CONFIG_DIR, ROOT, SRC_DIR  # noqa: E402
+from lib.project import ASM_DIR, CONFIG_DIR, ROOT, symbol_sources  # noqa: E402
 
 _GLABEL = re.compile(r"^\s*glabel\s+(\S+)\s*$", re.MULTILINE)
 _FUNC = re.compile(
@@ -86,25 +86,18 @@ def function_sizes() -> dict[str, int]:
     }
 
 
-def source_for(stem: str, symbols: set[str]) -> Path | None:
+def source_for(symbols: set[str]) -> Path | None:
     """La source qui reconstruit cette unité, si elle existe.
 
-    Deux conventions la désignent : un fichier qui porte le nom de l'unité, ou
-    un fichier qui définit l'un de ses symboles. La seconde couvre le cas où
-    l'unité de traduction a retrouvé son nom d'origine.
+    Une source appartient à l'unité dont elle définit des symboles, ce que la
+    table tirée des objets compilés établit — le texte d'une source ne porte pas
+    les noms manglés que le binaire emploie.
     """
-    if not SRC_DIR.is_dir():
-        return None
-
-    for suffix in (".cpp", ".c"):
-        direct = SRC_DIR / f"{stem}{suffix}"
-        if direct.exists():
-            return direct
-
-    for path in sorted(list(SRC_DIR.rglob("*.cpp")) + list(SRC_DIR.rglob("*.c"))):
-        text = path.read_text(encoding="utf-8", errors="replace")
-        if any(symbol in text for symbol in symbols):
-            return path
+    table = symbol_sources()
+    for symbol in sorted(symbols):
+        found = table.get(symbol)
+        if found is not None:
+            return found
     return None
 
 
@@ -133,7 +126,7 @@ def main() -> int:
             totals[sector] = totals.get(sector, 0) + octets
         sector = max(weight, key=lambda k: weight[k]) if weight else "game"
 
-        source = source_for(asm.stem, symbols)
+        source = source_for(symbols)
 
         unit: dict[str, object] = {
             "name": str(relative.with_suffix("")).replace("\\", "/"),

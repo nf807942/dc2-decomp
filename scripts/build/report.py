@@ -43,14 +43,27 @@ def generate_report() -> dict:
 
 
 def measure(node: dict, key: str, default: float = 0.0) -> float:
-    """Une mesure absente vaut zéro : objdiff omet ce qui n'a rien apparié."""
-    value = node.get("measures", {}).get(key, default)
+    """Une mesure absente vaut zéro : objdiff omet ce qui n'a rien apparié.
+
+    Un rapport range les mesures d'une unité sous `measures`, mais celles d'une
+    fonction à sa racine ; ne regarder qu'à un endroit rend zéro sur l'autre.
+    """
+    holder = node.get("measures")
+    if isinstance(holder, dict) and key in holder:
+        value = holder[key]
+    elif key in node:
+        value = node[key]
+    else:
+        return default
     return float(value) if value is not None else default
 
 
 def as_int(node: dict, key: str) -> int:
     # Les tailles voyagent en chaînes : elles dépassent ce que JSON garantit.
-    value = node.get("measures", {}).get(key, 0)
+    holder = node.get("measures")
+    value = (holder or {}).get(key) if isinstance(holder, dict) else None
+    if value is None:
+        value = node.get(key)
     return int(value) if value else 0
 
 
@@ -76,15 +89,16 @@ def compact(report: dict) -> dict:
 
     for unit in report.get("units", []):
         code = as_int(unit, "total_code")
-        # `complete_code_percent` est la part appariée à l'octet ; le flou, lui,
-        # récompense une ressemblance, ce qui n'est pas le critère du projet.
-        done_share = measure(unit, "complete_code_percent")
+        # `matched_code_percent` est la part que l'appariement retient ;
+        # `complete_code_percent` n'est renseigné que pour les données et pour
+        # les unités déclarées complètes, donc le lire ici rendrait zéro partout.
+        done_share = measure(unit, "matched_code_percent")
 
         function_list = []
         for fn in unit.get("functions", []):
             name = fn.get("name", "?")
             size = int(fn.get("size") or 0)
-            share = measure(fn, "complete_code_percent")
+            share = measure(fn, "fuzzy_match_percent")
             sector = sector_of(name)
             done = round(size * share / 100)
 

@@ -39,6 +39,58 @@ class Location:
         return BUILD_DIR / self.source_file.relative_to(ROOT).with_suffix(".o")
 
 
+def sources() -> list[Path]:
+    """Les unités de traduction du projet, celles qu'on écrit."""
+    if not SRC_DIR.is_dir():
+        return []
+    return sorted(list(SRC_DIR.rglob("*.cpp")) + list(SRC_DIR.rglob("*.c")))
+
+
+_SYMBOL_SOURCES: dict[str, Path] | None = None
+
+
+def symbol_sources(build: bool = True) -> dict[str, Path]:
+    """La source qui définit chaque symbole de texte, par son nom manglé.
+
+    La question se tranche sur les objets compilés, non sur le texte des
+    sources : une source écrit `CGamePad::Close` et le binaire porte
+    `Close__8CGamePadFv`. Seul le compilateur connaît la correspondance, et le
+    mangling Metrowerks ne se devine pas assez sûrement pour s'en passer.
+
+    La table est calculée une fois : l'établir par symbole relirait chaque objet
+    autant de fois qu'il y a de fonctions.
+    """
+    global _SYMBOL_SOURCES
+    if _SYMBOL_SOURCES is not None:
+        return _SYMBOL_SOURCES
+
+    table: dict[str, Path] = {}
+    for path in sources():
+        obj = BUILD_DIR / path.relative_to(ROOT).with_suffix(".o")
+        if build and not obj.exists():
+            run(["make", str(obj.relative_to(ROOT))],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        if not obj.exists():
+            continue
+        listing = run(["mips-ps2-decompals-nm", "--defined-only", str(obj)],
+                      capture_output=True, text=True)
+        if listing.returncode != 0:
+            continue
+        for line in listing.stdout.splitlines():
+            parts = line.split()
+            # « adresse type nom » ; `t`/`T` désigne le texte.
+            if len(parts) == 3 and parts[1] in "tT":
+                table.setdefault(parts[2], path)
+
+    _SYMBOL_SOURCES = table
+    return table
+
+
+def source_defining(symbol: str, build: bool = True) -> Path | None:
+    """La source qui définit ce symbole, s'il en existe une."""
+    return symbol_sources(build).get(symbol)
+
+
 def find_symbol(symbol: str) -> Location:
     """Trouve le fichier de désassemblage qui définit un symbole.
 
@@ -60,20 +112,7 @@ def find_symbol(symbol: str) -> Location:
         names = ", ".join(str(p.relative_to(ROOT)) for p in matches)
         raise SystemExit(f"{symbol} défini dans plusieurs fichiers : {names}")
 
-    asm_file = matches[0]
-
-    # Une source porte le nom de l'unité de traduction qu'elle reconstruit ;
-    # tant qu'aucune ne couvre cette fonction, seul le désassemblage existe.
-    source = None
-    for candidate in (SRC_DIR.rglob("*.cpp"), SRC_DIR.rglob("*.c")):
-        for path in candidate:
-            if symbol in path.read_text(encoding="utf-8", errors="replace"):
-                source = path
-                break
-        if source:
-            break
-
-    return Location(symbol, asm_file, source)
+    return Location(symbol, matches[0], source_defining(symbol))
 
 
 def run(command: list[str], **kwargs) -> subprocess.CompletedProcess:

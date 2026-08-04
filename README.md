@@ -19,12 +19,13 @@ binaire lui-même.
 | | |
 |---|---|
 | Construction identique au disque | **oui** — 2 608 512 octets, sha1 `eca0c93d5d6a25fcbf8f1fa41aa811a6f4b7aca8` |
-| Code reconstruit en C++ | 0 sur 2 215 100 octets (7 837 fonctions) |
+| Code reconstruit en C++ | 52 octets sur 2 209 044 — 1 fonction sur 7 792 |
+| Compilateur | `mwcps2-3.0.1-020123`, `-O4,p` — 100 % sur la première fonction |
 | Découpage | 192 unités de texte, 92 de données, 6 blocs vectoriels |
 
-La construction part aujourd'hui du désassemblage entier et le réassemble.
-C'est l'état de départ voulu : à partir de là, chaque unité de traduction
-passée en C++ doit laisser la construction identique.
+La construction part du désassemblage entier et le réassemble ; chaque fonction
+passée en C++ en remplace une part, et la construction doit rester identique.
+`CGamePad::Close` est la première, appariée instruction pour instruction.
 
 ## Prérequis
 
@@ -39,6 +40,7 @@ passée en C++ doit laisser la construction identique.
 git clone --recurse-submodules <ce dépôt> && cd darkcloud2
 cp "Dark Chronicle (Europe).iso" rom/
 
+scripts/host/dc2 make tools    # installe le compilateur Metrowerks
 scripts/host/dc2 make setup    # extrait le disque, écrit la config, désassemble
 scripts/host/dc2 make build    # assemble, lie, compare au disque
 ```
@@ -56,6 +58,33 @@ scripts/host/dc2 make diff      S=Close__8CGamePadFv   # verdict contre le comme
 Les symboles s'écrivent manglés, comme le binaire les porte —
 `Close__8CGamePadFv` est `CGamePad::Close(void)`. `config/elf_symbol_addrs.txt`
 les liste tous.
+
+`make diff` affiche les deux suites d'instructions côte à côte et le taux
+d'appariement qu'objdiff calcule ; `100 %` veut dire que la fonction est
+reconstruite.
+
+Le reste de l'unité n'a pas à attendre : `INCLUDE_ASM` garde une fonction sous
+sa forme d'origine à l'intérieur d'une source par ailleurs compilée.
+
+```cpp
+#include "common.h"
+
+INCLUDE_ASM("text/0012C1A8", UpDate__8CGamePadFv);   // pas encore reconstruite
+
+void CGamePad::Close() {                              // celle-ci l'est
+    scePadPortClose(0, 0);
+    scePadPortClose(1, 0);
+    scePadEnd();
+}
+```
+
+MWCC émet le texte d'une unité d'un seul bloc et n'accepte d'assembleur
+qu'entièrement défini : une fonction non reconstruite ne peut donc pas venir
+d'un objet voisin. [mwccgap][mwccgap] la remplace par autant de `nop`, assemble
+le `.s` de référence à part, puis greffe le résultat en réparant les
+relocations. C'est ce qui rend le remplacement fonction par fonction possible.
+
+[mwccgap]: https://github.com/mkst/mwccgap
 
 ## Voir l'avancement
 
@@ -81,10 +110,17 @@ des 49 unités de traduction du jeu ne sont pas encore retrouvées.
 
 decomp.dev [s'auto-héberge][ddsrc] — Rust, npm, SQLite, sur `localhost:3000` —,
 mais c'est un **bot GitHub** avant d'être un site : un projet y est désigné par
-l'identifiant numérique de son dépôt GitHub, et les rapports sont récupérés
-dans les **artefacts de GitHub Actions**. Aucune route ne permet d'en déposer
-un ; un dépôt git local n'a pas d'identifiant GitHub, et un workflow Actions ne
-pourrait pas construire, faute de disque et de compilateur. D'où cette page.
+l'identifiant numérique de son dépôt GitHub, les rapports sont lus dans les
+**artefacts de GitHub Actions**, et aucune route n'accepte qu'on lui en remette
+un. Un dépôt git local n'a pas d'identifiant GitHub.
+
+Ce n'est pas le disque qui manquerait : un rapport objdiff compare des objets,
+donc le désassemblage et les sources y suffisent. [DCDecomp][dc1] produit ainsi
+le sien en intégration continue — au prix de versionner son désassemblage et
+son compilateur, ce que ce dépôt ne fait pas. La même voie nous demanderait de
+publier soit le désassemblage entier, soit le seul `report.json`, qui ne porte
+que des noms de fonctions et des tailles. Le choix reste ouvert ; en attendant,
+la page locale ne demande rien.
 
 ### L'interface objdiff, pour le travail à la fonction
 
@@ -96,24 +132,22 @@ d'ensemble.
 
 ## Le compilateur
 
-Le binaire porte `MW MIPS C Compiler (2.4.1.01)`. Cette chaîne vient de
-**MWLD**, pas du compilateur : deux versions de CodeWarrior — R3.01 et R3.04 —
-l'écrivent à l'identique alors que leurs `mwccps2.exe` diffèrent (1 413 120 et
-1 638 400 octets). Laquelle a servi reste à établir en faisant compiler
-quelques fonctions connues.
+`make tools` l'installe depuis [`decompme/compilers`][compilers], le dépôt qui
+alimente decomp.me : ces paquets portent le gestionnaire de licence qui laisse
+`mwccps2.exe` démarrer, là où l'installateur d'origine réclame une licence
+FLEXlm et refuse de compiler sans elle.
 
-Les deux sont installées sous `tools/compilers/mw/{3.01,3.04}/`, hors git.
-Elles réclament une licence FLEXlm que l'archive d'origine accompagne d'un
-`license.dat` ; posez-le à côté des exécutables et le compilateur démarre :
+Le binaire porte `MW MIPS C Compiler (2.4.1.01)`, mais cette chaîne est écrite
+par **MWLD** et plusieurs versions l'écrivent à l'identique. La mesure a
+tranché : sur `CGamePad::Close`, les trois versions 3.0.x rendent **100 %** avec
+`-O4,p`, la 2.4 seulement 77 %, et tout autre niveau d'optimisation tombe sous
+50 %. La 2.4 y sauve `$ra` par `sq` là où le binaire emploie `sd`, et met à zéro
+par `paddub` au lieu de `daddu`.
 
-```sh
-cp <archive>/crack/license.dat  tools/compilers/mw/3.01/
-cp <archive>/crack/lmgr326b.dll tools/compilers/mw/3.01/
-```
+`make tools TOOLS_ARGS=--all` installe les quatre candidates ;
+`MWCC_VERSION=mwcps2-3.0.3-020716 make …` en choisit une autre.
 
-Sans lui, `mwccps2.exe` refuse de compiler — « License check failed ». Tout le
-reste du projet fonctionne : le désassemblage, la construction identique au
-disque et `make decompile` n'en dépendent pas.
+[compilers]: https://github.com/decompme/compilers
 
 ## Ce que le binaire donne, et qui change tout
 

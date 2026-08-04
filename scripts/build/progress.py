@@ -10,11 +10,12 @@ from __future__ import annotations
 
 import json
 import re
+import subprocess
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from lib.project import ASM_DIR, CONFIG_DIR, ROOT, SRC_DIR  # noqa: E402
+from lib.project import BUILD_DIR, CONFIG_DIR, ROOT, run, sources  # noqa: E402
 
 _SYMBOL = re.compile(r"^(\S+)\s*=\s*0x([0-9A-Fa-f]+);.*?type:func(?:.*?size:0x([0-9A-Fa-f]+))?",
                      re.MULTILINE)
@@ -23,16 +24,31 @@ _SYMBOL = re.compile(r"^(\S+)\s*=\s*0x([0-9A-Fa-f]+);.*?type:func(?:.*?size:0x([
 def decompiled_symbols() -> set[str]:
     """Les symboles qu'une source du projet définit.
 
-    Une fonction compte pour reconstruite dès qu'une source la nomme :
-    l'exactitude, elle, est le verdict de `make build`, qui compare tout le
-    binaire.
+    La question se tranche sur les objets compilés : une source écrit
+    `CGamePad::Close` et le binaire porte `Close__8CGamePadFv`. Chercher le
+    symbole dans le texte rendrait zéro à tout coup.
+
+    Une fonction compte pour reconstruite dès qu'une source la définit ;
+    l'exactitude est le verdict de `make build`, qui compare tout le binaire,
+    et `make report` la donne fonction par fonction.
     """
     names: set[str] = set()
-    if not SRC_DIR.is_dir():
-        return names
-    for path in list(SRC_DIR.rglob("*.cpp")) + list(SRC_DIR.rglob("*.c")):
-        text = path.read_text(encoding="utf-8", errors="replace")
-        names.update(re.findall(r"\b([A-Za-z_]\w*__\w+)\s*\(", text))
+    for path in sources():
+        obj = BUILD_DIR / path.relative_to(ROOT).with_suffix(".o")
+        if not obj.exists():
+            run(["make", str(obj.relative_to(ROOT))],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        if not obj.exists():
+            continue
+        listing = run(["mips-ps2-decompals-nm", "--defined-only", str(obj)],
+                      capture_output=True, text=True)
+        if listing.returncode != 0:
+            continue
+        for line in listing.stdout.splitlines():
+            parts = line.split()
+            # « adresse type nom » ; `t`/`T` désigne le texte.
+            if len(parts) == 3 and parts[1] in "tT":
+                names.add(parts[2])
     return names
 
 

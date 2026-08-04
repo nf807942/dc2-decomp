@@ -11,9 +11,10 @@
 BASENAME  := SCES_511.90
 VERSION   := pal
 
-BUILD_DIR := build
-ASM_DIR   := asm
-SRC_DIR   := src
+BUILD_DIR   := build
+ASM_DIR     := asm
+SRC_DIR     := src
+INCLUDE_DIR := include
 CONFIG    := config/splat.yaml
 LD_SCRIPT := linker_scripts/$(BASENAME).ld
 
@@ -37,6 +38,40 @@ SPLAT     := $(PYTHON) -m splat split
 # rien ne migre en sdata de la seule décision de l'assembleur : la place de
 # chaque objet est déjà fixée par le binaire.
 ASFLAGS   := -EL -march=r5900 -mabi=eabi -G0 -mno-pdr -non_shared -I include -I $(ASM_DIR)
+
+# Le compilateur d'époque. Quelle version a produit le binaire reste à établir :
+# la chaîne `2.4.1.01` vient de l'éditeur de liens, et plusieurs versions
+# l'écrivent. `make tools` les installe, MWCC_VERSION choisit.
+MWCC_VERSION ?= mwcps2-3.0.1-020123
+MWCC_DIR  := tools/compilers/$(MWCC_VERSION)
+MWCC      := $(MWCC_DIR)/mwccps2.exe
+
+# `MWCIncludes` est la liste que MWCC consulte pour les `<...>` ; `-i` ne
+# nourrit que celle des `"..."`. C'est par là que les déclarations du projet
+# remplacent celles du SDK absent.
+MWCC_ENV  := MWCIncludes=$(INCLUDE_DIR)
+
+# -char unsigned et -str readonly : le R5900 ne signe pas ses `char` par défaut
+# dans ce compilateur, et les littéraux du binaire sont en lecture seule.
+# -Cpp_exceptions off parce que le binaire n'en porte aucune trace.
+# `-c` n'y est pas : mwccgap l'ajoute lui-même devant ces drapeaux.
+CFLAGS    ?= -O4,p -char unsigned -str readonly -Cpp_exceptions off \
+             -sym on -i $(INCLUDE_DIR) -i $(SRC_DIR)
+
+# mwccgap greffe l'assembleur de référence dans l'objet compilé : MWCC émet le
+# texte d'une unité d'un seul bloc, donc une fonction non encore reconstruite ne
+# peut pas venir d'un objet voisin.
+#
+# `--as-flags` prend un nombre libre d'arguments, donc il avale tout ce qui le
+# suit : placé avant les drapeaux du compilateur, il emporte `-O4,p` et la
+# compilation retombe silencieusement en `-O0`. Il vient donc en dernier, après
+# les drapeaux destinés à MWCC.
+MWCCGAP      := $(PYTHON) tools/mwccgap/mwccgap.py
+MWCCGAP_ARGS := --mwcc-path $(MWCC) --as-path $(AS) --use-wibo \
+                --macro-inc-path $(INCLUDE_DIR)/macro.inc \
+                --asm-dir-prefix $(ASM_DIR) \
+                --as-march r5900 --as-mabi eabi
+MWCCGAP_TAIL := --as-flags -EL -G0 -mno-pdr -non_shared
 # Les symboles que rien n'implante — 2 502 objets du bss et des fenêtres
 # matérielles — sont donnés par leur adresse absolue, dans les scripts que le
 # découpage engendre.
@@ -56,7 +91,8 @@ S_FILES   := $(shell find $(ASM_DIR) -name '*.s' 2>/dev/null)
 BIN_FILES := $(shell find bin -name '*.bin' 2>/dev/null)
 O_FILES   := $(addprefix $(BUILD_DIR)/, $(S_FILES:.s=.o) $(BIN_FILES:.bin=.o))
 
-.PHONY: all setup split build check diff decompile clean distclean progress report
+.PHONY: all setup tools split build check diff decompile clean distclean \
+        progress report
 
 all: build
 
@@ -87,6 +123,22 @@ $(BUILD_DIR)/%.o: %.s
 $(BUILD_DIR)/%.o: %.bin
 	@mkdir -p $(dir $@)
 	$(OBJCOPY) -I binary -O elf32-littlemips -B mips:5900 $< $@
+
+# Une unité reconstruite passe par mwccgap, qui appelle MWCC puis greffe
+# l'assembleur des fonctions encore marquées `INCLUDE_ASM`.
+$(BUILD_DIR)/%.o: %.cpp
+	@mkdir -p $(dir $@)
+	@test -f $(MWCC) || { echo "$(MWCC) absent — lancez \`make tools\`" >&2; exit 1; }
+	$(MWCC_ENV) $(MWCCGAP) $< $@ $(MWCCGAP_ARGS) $(CFLAGS) $(MWCCGAP_TAIL)
+
+$(BUILD_DIR)/%.o: %.c
+	@mkdir -p $(dir $@)
+	@test -f $(MWCC) || { echo "$(MWCC) absent — lancez \`make tools\`" >&2; exit 1; }
+	$(MWCC_ENV) $(MWCCGAP) $< $@ $(MWCCGAP_ARGS) $(CFLAGS) $(MWCCGAP_TAIL)
+
+# Le compilateur, depuis les paquets de decompme/compilers.
+tools:
+	@$(PYTHON) scripts/setup/get_tools.py $(TOOLS_ARGS)
 
 $(ELF): $(O_FILES) $(LD_SCRIPT)
 	@mkdir -p $(dir $@)
