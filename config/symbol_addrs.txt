@@ -1,0 +1,2 @@
+// Symboles nommés à la main. Ce fichier est lu après
+// elf_symbol_addrs.txt et le corrige.

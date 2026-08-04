@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# Dernière barrière avant que quoi que ce soit de dérivé du jeu n'entre dans
+# l'historique. Le .gitignore couvre le cas ordinaire ; ce hook couvre le
+# `git add -f` et les extensions qu'on n'a pas prévues.
+#
+# Installation : git config core.hooksPath .githooks
+set -euo pipefail
+
+fail() {
+    echo "pre-commit : $1" >&2
+    echo "Rien de dérivé du jeu n'entre dans git. Voir .gitignore." >&2
+    exit 1
+}
+
+# Fichiers ajoutés ou modifiés par ce commit.
+files=$(git diff --cached --name-only --diff-filter=ACMR)
+[ -z "$files" ] && exit 0
+
+while IFS= read -r f; do
+    [ -z "$f" ] && continue
+
+    case "$f" in
+        rom/*|asm/*|build/*|linker_scripts/*|tools/compilers/*|tools/bin/*)
+            fail "$f est engendré ou téléchargé, pas versionné" ;;
+        *.iso|*.ISO|*.bin|*.cue|*.img|*.IMG|*.DAT|*.dat|*.PSS|*.pss|*.IRX|*.irx)
+            fail "$f porte une extension d'asset du jeu" ;;
+        SCES_*|SCUS_*|SLES_*|SLUS_*|SCPS_*|SLPS_*)
+            fail "$f est un exécutable PS2" ;;
+        *.exe|*.dll|*.DLL)
+            fail "$f est un binaire tiers, à installer par make tools" ;;
+    esac
+
+    # Un fichier volumineux dans un dépôt de source est un dump qui s'ignore.
+    if [ -f "$f" ]; then
+        size=$(wc -c < "$f")
+        if [ "$size" -gt 1048576 ]; then
+            fail "$f fait $((size / 1024)) Kio — trop gros pour une source"
+        fi
+    fi
+done <<< "$files"
+
+exit 0

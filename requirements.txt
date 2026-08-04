@@ -1,0 +1,20 @@
+# Le désassembleur et son décodeur d'instructions. La ligne 1.x de spimdisasm
+# est celle que splat64 emploie ; rabbitizer y apporte le jeu R5900 de
+# l'Emotion Engine, MMI et COP2 compris.
+splat64[mips]>=0.50.0,<1.0.0
+spimdisasm>=1.42.0,<2.0.0
+rabbitizer>=1.16.0,<2.0.0
+
+# Lecture de l'ELF de référence : table des symboles, relocations, sections.
+pyelftools>=0.31
+
+# Lecture de la carte d'implantation produite par l'éditeur de liens.
+mapfile-parser>=2.3.2,<3.0.0
+
+# m2c produit le premier jet de C d'une fonction désassemblée.
+pycparser>=2.21
+
+# Le permutateur cherche les réécritures qui font converger un objet.
+attrs>=23.1.0
+Levenshtein>=0.21.0
+toml>=0.10.2

@@ -1,0 +1,82 @@
+# ---------------------------------------------------------------------------
+# Rien de dérivé du jeu n'entre dans l'historique git. Un push accidentel est
+# irréversible. Ce fichier est doublé par .githooks/pre-commit.
+#
+# Ce qui se versionne : le code source reconstruit, les en-têtes, la
+# configuration écrite à la main, l'outillage. Ce qui ne se versionne pas :
+# l'image disque, l'exécutable, le désassemblage de référence, les données
+# extraites, les tables de symboles tirées du binaire — tout cela se régénère
+# par `make setup` depuis le disque de l'utilisateur.
+# ---------------------------------------------------------------------------
+
+# Images disque et exécutable PS2
+/rom/
+*.iso
+*.ISO
+*.bin
+*.cue
+*.img
+*.IMG
+SCES_*
+SCUS_*
+SLES_*
+SLUS_*
+SCPS_*
+SLPS_*
+
+# Archives et assets du jeu
+*.DAT
+*.dat
+*.HD3
+*.HD4
+*.hd3
+*.hd4
+*.PSS
+*.pss
+*.IRX
+*.irx
+*.CNF
+
+# Sorties de `make setup` : désassemblage de référence, tables tirées de l'ELF,
+# découpage et scripts de lien engendrés. Tout se reconstruit depuis le disque.
+# Seule `config/main.sha1` reste : une empreinte n'est pas un contenu.
+/asm/
+/bin/
+/linker_scripts/
+/build/
+/config/splat.yaml
+/config/elf_symbol_addrs.txt
+/config/elf_sections.txt
+/config/undefined_syms_auto.txt
+
+# Contexte que le désassembleur écrit pour lui-même : la table des symboles du
+# binaire, sous une autre forme.
+/.splat/
+
+# macro.inc vient du désassembleur, pas de nous.
+/include/macro.inc
+
+# Outillage tiers, téléchargé par `make tools` : compilateur Metrowerks (sous
+# copyright, non redistribuable), binutils, wibo, objdiff.
+/tools/compilers/
+/tools/bin/
+
+# Rapports de progression, regénérés à chaque construction
+/progress/
+
+# Python
+**/__pycache__/
+*.pyc
+.venv/
+
+# Éditeurs et bases d'analyse
+.idea/
+*.i64
+*.idb
+*.id0
+*.id1
+*.id2
+*.nam
+*.til
+ctx.c
+ctx.cpp
