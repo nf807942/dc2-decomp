@@ -44,11 +44,22 @@ def decompiled_symbols() -> set[str]:
                       capture_output=True, text=True)
         if listing.returncode != 0:
             continue
+
+        defined: set[str] = set()
         for line in listing.stdout.splitlines():
             parts = line.split()
             # « adresse type nom » ; `t`/`T` désigne le texte.
             if len(parts) == 3 and parts[1] in "tT":
-                names.add(parts[2])
+                defined.add(parts[2])
+
+        # Une fonction greffée est définie dans l'objet comme une fonction
+        # compilée : c'est bien son but. Le désassemblage lui donne un alias
+        # `.NON_MATCHING`, et c'est le seul signe qui les sépare — sans quoi
+        # une unité ouverte compterait pour reconstruite dès son ouverture.
+        grafted = {n[:-len(".NON_MATCHING")] for n in defined
+                   if n.endswith(".NON_MATCHING")}
+        names |= {n for n in defined
+                  if not n.endswith(".NON_MATCHING") and n not in grafted}
     return names
 
 

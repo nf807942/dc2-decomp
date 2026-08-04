@@ -19,7 +19,15 @@ void CGamePad::Close() {
 INCLUDE_ASM("nonmatchings/gamepad", pad_button_read__FP10PAD_STATUSii);
 INCLUDE_ASM("nonmatchings/gamepad", read_pad__FP10PAD_STATUSii);
 INCLUDE_ASM("nonmatchings/gamepad", WaitEnable__8CGamePadFv);
-INCLUDE_ASM("nonmatchings/gamepad", Connect__8CGamePadFv);
+/* La manette répond-elle ? Deux états du port valent oui : la liaison
+ * établie, et le port qui vient de reconnaître un contrôleur. */
+int CGamePad::Connect() {
+    int state = scePadGetState(0, 0);
+    if (state == scePadStateStable) {
+        return 1;
+    }
+    return state == scePadStateFindCTP1;
+}
 INCLUDE_ASM("nonmatchings/gamepad", UpDate__8CGamePadFv);
 INCLUDE_ASM("nonmatchings/gamepad", Step__8CGamePadFi);
 INCLUDE_ASM("nonmatchings/gamepad", AxisCalibration__Fi);
