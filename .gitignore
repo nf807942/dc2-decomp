@@ -41,10 +41,12 @@ SLPS_*
 # découpage et scripts de lien engendrés. Tout se reconstruit depuis le disque.
 # Seule `config/main.sha1` reste : une empreinte n'est pas un contenu.
 /asm/
+/ref/
 /bin/
 /linker_scripts/
 /build/
 /config/splat.yaml
+/config/splat.ref.yaml
 /config/elf_symbol_addrs.txt
 /config/elf_sections.txt
 /config/undefined_syms_auto.txt

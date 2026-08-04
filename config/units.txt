@@ -1,0 +1,22 @@
+# Les unités de traduction que le projet reconstruit.
+#
+#   <début> <fin> <nom>
+#
+# Chaque ligne découpe une plage du binaire et la confie à `src/<nom>.cpp`.
+# Le désassemblage de la plage est alors écrit par fonction, sous
+# `asm/nonmatchings/<nom>/`, et c'est ce que `INCLUDE_ASM` reprend tant qu'une
+# fonction n'est pas écrite.
+#
+# Les frontières des 49 unités d'origine ne sont pas dans le binaire : deux
+# objets y portent 91 % du code. Une plage se délimite donc par ce que les
+# symboles montrent — une classe et les fonctions libres qui l'accompagnent —
+# et le binaire reste identique tant que l'ordre des fonctions est conservé,
+# ce que `make build` vérifie.
+#
+# Une plage commence et finit sur une frontière de fonction. `make units`
+# les liste avec leur contenu.
+
+# CGamePad et ses fonctions libres : la manette, de son initialisation à ses
+# répétitions automatiques. `pad_button_read` compose l'état des boutons,
+# `read_pad` parle au SDK, `AxisCalibration` centre les manches.
+0x0014A650 0x0014B500 gamepad

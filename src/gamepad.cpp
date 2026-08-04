@@ -1,14 +1,31 @@
 /* CGamePad — la manette, telle que le jeu la voit.
  *
- * Première unité reconstruite du projet. Tout ce qui n'est pas encore écrit
- * reste l'assembleur du disque, greffé par mwccgap.
+ * Première unité reconstruite. Les fonctions encore intactes gardent les
+ * instructions du disque, que mwccgap greffe dans cet objet ; elles sont
+ * données dans l'ordre des adresses, celui que l'éditeur de liens attend.
  */
 
 #include "common.h"
 #include "gamepad.hpp"
+
+INCLUDE_ASM("nonmatchings/gamepad", Init__8CGamePadFv);
 
 void CGamePad::Close() {
     scePadPortClose(0, 0);
     scePadPortClose(1, 0);
     scePadEnd();
 }
+
+INCLUDE_ASM("nonmatchings/gamepad", pad_button_read__FP10PAD_STATUSii);
+INCLUDE_ASM("nonmatchings/gamepad", read_pad__FP10PAD_STATUSii);
+INCLUDE_ASM("nonmatchings/gamepad", WaitEnable__8CGamePadFv);
+INCLUDE_ASM("nonmatchings/gamepad", Connect__8CGamePadFv);
+INCLUDE_ASM("nonmatchings/gamepad", UpDate__8CGamePadFv);
+INCLUDE_ASM("nonmatchings/gamepad", Step__8CGamePadFi);
+INCLUDE_ASM("nonmatchings/gamepad", AxisCalibration__Fi);
+INCLUDE_ASM("nonmatchings/gamepad", GetRX__8CGamePadFv);
+INCLUDE_ASM("nonmatchings/gamepad", GetRY__8CGamePadFv);
+INCLUDE_ASM("nonmatchings/gamepad", GetLX__8CGamePadFv);
+INCLUDE_ASM("nonmatchings/gamepad", GetLY__8CGamePadFv);
+INCLUDE_ASM("nonmatchings/gamepad", GetRX2__8CGamePadFv);
+INCLUDE_ASM("nonmatchings/gamepad", CancelAutoRepeat__8CGamePadFi);

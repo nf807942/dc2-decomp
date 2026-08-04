@@ -21,7 +21,7 @@ binaire lui-même.
 | Construction identique au disque | **oui** — 2 608 512 octets, sha1 `eca0c93d5d6a25fcbf8f1fa41aa811a6f4b7aca8` |
 | Code reconstruit en C++ | 52 octets sur 2 209 044 — 1 fonction sur 7 792 |
 | Compilateur | `mwcps2-3.0.1-020123`, `-O4,p` — 100 % sur la première fonction |
-| Découpage | 192 unités de texte, 92 de données, 6 blocs vectoriels |
+| Découpage | 193 unités de texte, 92 de données, 6 blocs vectoriels, 1 unité ouverte |
 
 La construction part du désassemblage entier et le réassemble ; chaque fonction
 passée en C++ en remplace une part, et la construction doit rester identique.
@@ -63,13 +63,31 @@ les liste tous.
 d'appariement qu'objdiff calcule ; `100 %` veut dire que la fonction est
 reconstruite.
 
+### Ouvrir une unité
+
+Une unité de travail se déclare dans `config/units.txt` — début, fin, nom :
+
+```
+0x0014A650 0x0014B500 gamepad
+```
+
+`make setup` en fait alors un sous-segment confié à `src/gamepad.cpp`, écrit le
+désassemblage de la plage **par fonction** sous `asm/nonmatchings/gamepad/`, et
+fait attendre au script de lien l'objet compilé à la place de l'assemblé.
+
+Les frontières des 49 unités d'origine ne sont pas dans le binaire — deux objets
+y portent 91 % du code —, donc elles se décident : une plage se délimite par ce
+que les symboles montrent, une classe et les fonctions libres qui
+l'accompagnent. Le binaire reste identique tant que l'ordre des fonctions est
+conservé, ce que `make build` vérifie à chaque fois.
+
 Le reste de l'unité n'a pas à attendre : `INCLUDE_ASM` garde une fonction sous
 sa forme d'origine à l'intérieur d'une source par ailleurs compilée.
 
 ```cpp
 #include "common.h"
 
-INCLUDE_ASM("text/0012C1A8", UpDate__8CGamePadFv);   // pas encore reconstruite
+INCLUDE_ASM("nonmatchings/gamepad", UpDate__8CGamePadFv);  // pas encore reconstruite
 
 void CGamePad::Close() {                              // celle-ci l'est
     scePadPortClose(0, 0);
@@ -83,6 +101,17 @@ qu'entièrement défini : une fonction non reconstruite ne peut donc pas venir
 d'un objet voisin. [mwccgap][mwccgap] la remplace par autant de `nop`, assemble
 le `.s` de référence à part, puis greffe le résultat en réparant les
 relocations. C'est ce qui rend le remplacement fonction par fonction possible.
+
+Les fonctions sont données dans l'ordre des adresses : c'est celui que
+l'éditeur de liens attend.
+
+### Deux désassemblages, et pourquoi
+
+`ref/asm/` porte le binaire entier en assembleur, `asm/` seulement ce qui reste
+à faire. La raison est que le désassembleur cesse d'extraire une fonction dès
+qu'une source la définit : sans cette copie complète, une fonction reconstruite
+perdrait l'original contre lequel on la mesure. `ref/` est donc la cible
+d'objdiff, et `make reference` l'assemble.
 
 [mwccgap]: https://github.com/mkst/mwccgap
 

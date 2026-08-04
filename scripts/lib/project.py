@@ -12,6 +12,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 ASM_DIR = ROOT / "asm"
+# Le désassemblage de référence, complet : une unité passée en C++ n'est plus
+# extraite sous `asm/`, et c'est ici que la fonction reconstruite garde
+# l'original contre lequel on la mesure.
+REF_DIR = ROOT / "ref" / "asm"
 SRC_DIR = ROOT / "src"
 BUILD_DIR = ROOT / "build"
 CONFIG_DIR = ROOT / "config"
@@ -92,17 +96,18 @@ def source_defining(symbol: str, build: bool = True) -> Path | None:
 
 
 def find_symbol(symbol: str) -> Location:
-    """Trouve le fichier de désassemblage qui définit un symbole.
+    """Trouve le désassemblage de référence qui définit un symbole.
 
     La recherche passe par le contenu plutôt que par la table : un fichier
     porte le nom de son adresse de départ, et c'est l'étiquette qui dit ce
-    qu'il contient.
+    qu'il contient. Elle porte sur `ref/asm`, le désassemblage complet : c'est
+    le seul qui garde une fonction déjà reconstruite.
     """
-    if not ASM_DIR.is_dir():
-        raise SystemExit("asm/ absent — lancez `make setup`")
+    if not REF_DIR.is_dir():
+        raise SystemExit("ref/asm absent — lancez `make setup`")
 
     matches = [
-        path for path in sorted(ASM_DIR.rglob("*.s"))
+        path for path in sorted(REF_DIR.rglob("*.s"))
         if symbol in _GLABEL.findall(path.read_text(encoding="utf-8", errors="replace"))
     ]
 

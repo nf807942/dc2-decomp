@@ -15,7 +15,10 @@ BUILD_DIR   := build
 ASM_DIR     := asm
 SRC_DIR     := src
 INCLUDE_DIR := include
-CONFIG    := config/splat.yaml
+CONFIG     := config/splat.yaml
+# Le découpage de référence : tout en assembleur, sous ref/.
+CONFIG_REF := config/splat.ref.yaml
+REF_DIR    := ref/asm
 LD_SCRIPT := linker_scripts/$(BASENAME).ld
 
 ELF       := $(BUILD_DIR)/$(BASENAME).elf
@@ -54,8 +57,12 @@ MWCC_ENV  := MWCIncludes=$(INCLUDE_DIR)
 # -char unsigned et -str readonly : le R5900 ne signe pas ses `char` par défaut
 # dans ce compilateur, et les littéraux du binaire sont en lecture seule.
 # -Cpp_exceptions off parce que le binaire n'en porte aucune trace.
+#
+# -lang c++ parce que mwccgap donne son fichier intermédiaire l'extension `.c`,
+# dont MWCC déduirait le dialecte : le jeu est en C++, et son mangling le dit.
+#
 # `-c` n'y est pas : mwccgap l'ajoute lui-même devant ces drapeaux.
-CFLAGS    ?= -O4,p -char unsigned -str readonly -Cpp_exceptions off \
+CFLAGS    ?= -O4,p -lang c++ -char unsigned -str readonly -Cpp_exceptions off \
              -sym on -i $(INCLUDE_DIR) -i $(SRC_DIR)
 
 # mwccgap greffe l'assembleur de référence dans l'objet compilé : MWCC émet le
@@ -83,13 +90,23 @@ LDFLAGS   := -EL --no-check-sections --accept-unknown-input-arch \
              $(addprefix -T , $(AUTO_LD)) -T $(LD_SCRIPT) \
              -Map $(BUILD_DIR)/$(BASENAME).map
 
-S_FILES   := $(shell find $(ASM_DIR) -name '*.s' 2>/dev/null)
+# Seul le désassemblage des sous-segments encore intacts s'assemble : sous
+# `asm/nonmatchings/` vivent les fonctions d'une unité reconstruite, que
+# mwccgap greffe dans l'objet compilé — les assembler à part les livrerait deux
+# fois à l'éditeur de liens.
+S_FILES   := $(shell find $(ASM_DIR) -name '*.s' -not -path '$(ASM_DIR)/nonmatchings/*' 2>/dev/null)
 # Les microprogrammes des unités vectorielles restent des octets : leurs
 # instructions ne sont pas du MIPS, et aucun assembleur de la chaîne ne les
 # relit. Le désassembleur les dépose sous bin/, l'éditeur de liens les veut
 # en objets.
 BIN_FILES := $(shell find bin -name '*.bin' 2>/dev/null)
-O_FILES   := $(addprefix $(BUILD_DIR)/, $(S_FILES:.s=.o) $(BIN_FILES:.bin=.o))
+# Les unités que `config/units.txt` déclare, compilées depuis src/.
+SRC_FILES := $(shell find $(SRC_DIR) -name '*.cpp' -o -name '*.c' 2>/dev/null)
+# Le désassemblage de référence, assemblé pour qu'objdiff ait de quoi comparer.
+REF_S_FILES := $(shell find $(REF_DIR) -name '*.s' 2>/dev/null)
+REF_O_FILES := $(addprefix $(BUILD_DIR)/, $(REF_S_FILES:.s=.o))
+O_FILES   := $(addprefix $(BUILD_DIR)/, $(S_FILES:.s=.o) $(BIN_FILES:.bin=.o) \
+             $(addsuffix .o, $(basename $(SRC_FILES))))
 
 .PHONY: all setup tools split build check diff decompile clean distclean \
         progress report
@@ -105,8 +122,12 @@ setup: split
 config/splat.yaml:
 	$(PYTHON) scripts/setup/configure.py
 
+# Deux désassemblages : celui du travail, où une unité reconstruite laisse
+# place à ses seules fonctions restantes, et celui de référence, complet, qui
+# donne à objdiff l'objet contre lequel mesurer ce qui est déjà écrit.
 split: config/splat.yaml
 	$(SPLAT) $(CONFIG)
+	$(SPLAT) $(CONFIG_REF)
 
 # --------------------------------------------------------------------------
 # Construction
@@ -175,8 +196,12 @@ progress:
 objdiff.json: config/splat.yaml
 	@$(PYTHON) scripts/build/gen_objdiff.py
 
+# Les objets de référence, contre lesquels chaque fonction se mesure.
+reference: $(REF_O_FILES)
+
 # Rapport d'avancement en page web autonome, à ouvrir depuis le disque.
-report: objdiff.json
+# objdiff lit les objets de référence, donc ils doivent exister.
+report: objdiff.json reference
 	@$(PYTHON) scripts/build/report.py
 
 # --------------------------------------------------------------------------

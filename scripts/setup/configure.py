@@ -294,11 +294,48 @@ def write_symbol_addrs(elf: Elf, path: Path) -> tuple[int, int]:
     return len(lines), renamed
 
 
-def build_segments(elf: Elf, main: Section) -> list[tuple[int, str, str]]:
+def read_units() -> list[tuple[int, int, str]]:
+    """Les unités que le projet reconstruit, telles que `config/units.txt` les
+    déclare : début, fin, nom.
+
+    C'est la seule pièce du découpage qui s'écrit à la main, et la seule qui se
+    versionne : les frontières des 49 unités d'origine ne sont pas dans le
+    binaire, donc elles se décident.
+    """
+    path = CONFIG_DIR / "units.txt"
+    if not path.exists():
+        return []
+
+    units = []
+    for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        line = line.split("#", 1)[0].strip()
+        if not line:
+            continue
+        fields = line.split()
+        if len(fields) != 3:
+            raise SystemExit(f"config/units.txt ligne {number} : "
+                             f"attendu « début fin nom »")
+        start, end, name = int(fields[0], 16), int(fields[1], 16), fields[2]
+        if end <= start:
+            raise SystemExit(f"config/units.txt ligne {number} : "
+                             f"{name} finit avant de commencer")
+        units.append((start, end, name))
+
+    units.sort()
+    for (a_start, a_end, a_name), (b_start, _b_end, b_name) in zip(units, units[1:]):
+        if b_start < a_end:
+            raise SystemExit(f"config/units.txt : {a_name} et {b_name} se recouvrent")
+    return units
+
+
+def build_segments(elf: Elf, main: Section) -> tuple[list[tuple[int, str, str]], int]:
     """Découpe la section chargée en sous-segments splat.
 
-    Un sous-segment par contribution d'objet : c'est la granularité à laquelle
-    le projet remplacera plus tard un `.s` par un `.cpp`.
+    Un sous-segment par contribution d'objet, plus les plages que
+    `config/units.txt` réclame. Une plage déclarée devient un sous-segment de
+    type `c` : le désassembleur en écrit alors une fonction par fichier, sous
+    `asm/nonmatchings/`, et l'éditeur de liens y attend l'objet compilé depuis
+    `src/` à la place de l'assemblé.
     """
     starts = section_starts(elf)
 
@@ -320,20 +357,41 @@ def build_segments(elf: Elf, main: Section) -> list[tuple[int, str, str]]:
     if not boundaries or boundaries[0][0] != LOAD_VADDR:
         boundaries.insert(0, (LOAD_VADDR, ".text"))
 
+    # Une unité déclarée coupe la contribution qui la contient : sa borne de
+    # début lui appartient, et la borne de fin rouvre du désassemblage.
+    units = read_units()
+    named: dict[int, str] = {}
+    for start, end, name in units:
+        boundaries.append((start, ".text"))
+        boundaries.append((end, ".text"))
+        named[start] = name
+
     boundaries.sort()
+    # Deux frontières à la même adresse — une contribution d'objet qui commence
+    # là où une unité déclarée commence — ne font qu'un sous-segment.
+    unique: list[tuple[int, str]] = []
+    for entry in boundaries:
+        if not unique or unique[-1][0] != entry[0]:
+            unique.append(entry)
 
     file_end = main.addr + main.size
     segments = []
-    for addr, section_name in boundaries:
+    for addr, section_name in unique:
         if addr >= file_end:
             # Au-delà du contenu du fichier, c'est du bss : splat le décrit
             # par une taille, pas par des octets.
             continue
-        kind = splat_type.get(section_name, "data")
         rom_off = addr - main.addr
-        segments.append((rom_off, kind, f"{section_name.lstrip('.')}/{addr:08X}"))
+        if addr in named:
+            # Le type `cpp` de splat, non `c` : le jeu est en C++, et son
+            # mangling le dit. Le type `c` écrirait un `src/<nom>.c` à côté
+            # du `.cpp`, et le lien recevrait deux fois la même unité.
+            segments.append((rom_off, "cpp", named[addr]))
+        else:
+            kind = splat_type.get(section_name, "data")
+            segments.append((rom_off, kind, f"{section_name.lstrip('.')}/{addr:08X}"))
 
-    return segments
+    return segments, len(units)
 
 
 YAML_HEADER = """\
@@ -377,6 +435,19 @@ options:
   asm_function_macro: glabel
   asm_jtbl_label_macro: jlabel
   asm_data_macro: dlabel
+
+  # L'en-tête des fichiers qu'une source inclut. Le profil MWCCPS2 le laisse
+  # vide là où celui de GCC le renseigne : sans lui, l'assembleur réordonne et
+  # remplit les créneaux de délai, ce qui glisse un `nop` de plus dans chaque
+  # fonction greffée et décale toutes les cibles de branchement d'un mot.
+  #
+  # `macro.inc` y est aussi pour que chaque fichier s'assemble seul, ce dont
+  # `make diff` a besoin ; son garde interne le rend inoffensif quand mwccgap
+  # le préfixe déjà.
+  asm_inc_header: |
+    .include "macro.inc"
+    .set noat
+    .set noreorder
   mnemonic_ljust: 12
   rom_address_padding: True
   dump_symbols: True
@@ -404,12 +475,27 @@ segments:
 
 
 def write_yaml(path: Path, basename: str, sha1: str, main: Section,
-               bss_end: int, segments: list[tuple[int, str, str]]) -> None:
+               bss_end: int, segments: list[tuple[int, str, str]],
+               reference: bool = False) -> None:
     order = "\n".join(f"    - {name}" for name in SECTION_ORDER)
     body = YAML_HEADER.format(
         basename=basename, sha1=sha1, gp=GP_VALUE, vram=main.addr,
         bss_size=bss_end - (main.addr + main.size), section_order=order,
     )
+    if reference:
+        # Le désassemblage de référence sort ailleurs et ne touche ni les
+        # sources ni le script de lien du projet : il n'est là que pour donner
+        # à objdiff l'objet contre lequel comparer.
+        body = (body
+                .replace("asm_path: asm", "asm_path: ref/asm")
+                .replace("build_path: build", "build_path: build/ref")
+                .replace(f"ld_script_path: linker_scripts/{basename}.ld",
+                         f"ld_script_path: linker_scripts/ref/{basename}.ld")
+                .replace("undefined_syms_auto_path: linker_scripts/auto/",
+                         "undefined_syms_auto_path: linker_scripts/ref/auto/")
+                .replace("undefined_funcs_auto_path: linker_scripts/auto/",
+                         "undefined_funcs_auto_path: linker_scripts/ref/auto/"))
+
     lines = [f"      - [0x{off:X}, {kind}, {name}]" for off, kind, name in segments]
     # Le marqueur de fin se pose au niveau des segments : c'est de là que splat
     # tire la borne haute du dernier, et son absence lui fait chercher une
@@ -417,6 +503,22 @@ def write_yaml(path: Path, basename: str, sha1: str, main: Section,
     lines.append("")
     lines.append(f"  - [0x{main.size:X}]")
     path.write_text(body + "\n".join(lines) + "\n", encoding="utf-8")
+
+
+def as_reference(segments: list[tuple[int, str, str]]) -> list[tuple[int, str, str]]:
+    """Le même découpage, mais entièrement désassemblé.
+
+    Une unité passée en C++ n'est plus extraite : le désassembleur n'écrit
+    alors que les fonctions qu'un `INCLUDE_ASM` réclame, et la fonction
+    reconstruite perd la référence contre laquelle on la mesure. Ce second
+    découpage la garde — c'est la même voie que DCDecomp, dont le CMakeLists
+    assemble chaque dump « whether or not the link ends up using it ».
+    """
+    return [
+        (offset, "asm" if kind == "cpp" else kind,
+         f"text/{name}" if kind == "cpp" else name)
+        for offset, kind, name in segments
+    ]
 
 
 # --------------------------------------------------------------------------
@@ -466,10 +568,15 @@ def main() -> int:
     summary = ", ".join(f"{n} ×{len(v)}" for n, v in sorted(starts.items()))
     print(f"sections d'origine : {summary}")
 
-    segments = build_segments(elf, main_section)
+    segments, unit_count = build_segments(elf, main_section)
     write_yaml(CONFIG_DIR / "splat.yaml", BOOT_NAME, image_sha1,
                main_section, bss_end, segments)
-    print(f"découpage {len(segments)} sous-segments dans config/splat.yaml")
+    print(f"découpage {len(segments)} sous-segments dans config/splat.yaml,"
+          f" dont {unit_count} reconstruits depuis src/")
+
+    write_yaml(CONFIG_DIR / "splat.ref.yaml", BOOT_NAME, image_sha1,
+               main_section, bss_end, as_reference(segments), reference=True)
+    print("référence complète dans config/splat.ref.yaml")
 
     # Une table écrite à la main, où les corrections de nommage se posent.
     manual = CONFIG_DIR / "symbol_addrs.txt"

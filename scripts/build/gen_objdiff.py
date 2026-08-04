@@ -20,7 +20,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from lib.project import ASM_DIR, CONFIG_DIR, ROOT, symbol_sources  # noqa: E402
+from lib.project import CONFIG_DIR, REF_DIR, ROOT, symbol_sources  # noqa: E402
 
 _GLABEL = re.compile(r"^\s*glabel\s+(\S+)\s*$", re.MULTILINE)
 _FUNC = re.compile(
@@ -102,14 +102,16 @@ def source_for(symbols: set[str]) -> Path | None:
 
 
 def main() -> int:
-    if not ASM_DIR.is_dir():
-        raise SystemExit("asm/ absent — lancez `make setup`")
+    if not REF_DIR.is_dir():
+        raise SystemExit("ref/asm absent — lancez `make setup`")
 
     sizes = function_sizes()
     units = []
     totals: dict[str, int] = {}
 
-    for asm in sorted(ASM_DIR.rglob("*.s")):
+    # La cible est le désassemblage de référence : il couvre tout le binaire,
+    # y compris les unités qu'une source reconstruit déjà.
+    for asm in sorted(REF_DIR.rglob("*.s")):
         relative = asm.relative_to(ROOT)
         symbols = set(_GLABEL.findall(asm.read_text(encoding="utf-8", errors="replace")))
 
