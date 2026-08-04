@@ -61,8 +61,10 @@ SLPS_*
 /tools/compilers/
 /tools/bin/
 
-# Rapports de progression, regénérés à chaque construction
+# Rapports de progression et configuration objdiff, engendrés depuis le
+# découpage à chaque construction.
 /progress/
+/objdiff.json
 
 # Python
 **/__pycache__/

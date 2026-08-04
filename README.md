@@ -51,12 +51,48 @@ L'arbre est monté dans le conteneur, jamais copié.
 ```sh
 scripts/host/dc2 make decompile S=Close__8CGamePadFv   # premier jet de C++
 scripts/host/dc2 make diff      S=Close__8CGamePadFv   # verdict contre le commerce
-scripts/host/dc2 make progress                          # part reconstruite
 ```
 
 Les symboles s'écrivent manglés, comme le binaire les porte —
 `Close__8CGamePadFv` est `CGamePad::Close(void)`. `config/elf_symbol_addrs.txt`
 les liste tous.
+
+## Voir l'avancement
+
+```sh
+scripts/host/dc2 make report    # puis ouvrir progress/index.html
+```
+
+La même vue que [decomp.dev][dev] — carte du code proportionnelle aux octets,
+avancement par secteur, recherche par fonction — dans une page autonome de
+450 Kio qu'on ouvre depuis le disque. Aucun dépôt public, aucun service tiers,
+aucune requête sortante. La mesure vient d'`objdiff-cli report`, qui compare
+l'objet compilé à l'objet de référence fonction par fonction ; la page n'en
+change pas les chiffres, elle les rend lisibles.
+
+La carte se lit à deux échelles. **Par fonction** est celle qui sert : le
+binaire s'y répartit vraiment, et c'est l'unité de travail. **Par unité**
+montre pourquoi — deux objets portent 91 % du code, parce que les frontières
+des 49 unités de traduction du jeu ne sont pas encore retrouvées.
+
+`make progress` donne le même chiffre en une ligne, sans passer par objdiff.
+
+### Pourquoi une page à nous plutôt que decomp.dev
+
+decomp.dev [s'auto-héberge][ddsrc] — Rust, npm, SQLite, sur `localhost:3000` —,
+mais c'est un **bot GitHub** avant d'être un site : un projet y est désigné par
+l'identifiant numérique de son dépôt GitHub, et les rapports sont récupérés
+dans les **artefacts de GitHub Actions**. Aucune route ne permet d'en déposer
+un ; un dépôt git local n'a pas d'identifiant GitHub, et un workflow Actions ne
+pourrait pas construire, faute de disque et de compilateur. D'où cette page.
+
+### L'interface objdiff, pour le travail à la fonction
+
+`make objdiff` écrit `objdiff.json`, que lit l'[application objdiff][objdiff] —
+la même que tous les projets decomp emploient. Installée sur l'hôte, elle liste
+les unités et leur avancement, affiche le diff instruction par instruction, et
+reconstruit à chaque sauvegarde. C'est l'outil d'itération ; la page est la vue
+d'ensemble.
 
 ## Le compilateur
 
@@ -118,6 +154,7 @@ installez le hook par `git config core.hooksPath .githooks`.
 * [splat][splat], [spimdisasm][spim], [objdiff][objdiff], [m2c][m2c]
 
 [wiki]: https://decomp.wiki/
+[ddsrc]: https://github.com/encounter/decomp.dev
 [dev]: https://decomp.dev/
 [dc1]: https://github.com/Adubbz/DCDecomp
 [splat]: https://github.com/ethteck/splat

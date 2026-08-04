@@ -56,7 +56,7 @@ S_FILES   := $(shell find $(ASM_DIR) -name '*.s' 2>/dev/null)
 BIN_FILES := $(shell find bin -name '*.bin' 2>/dev/null)
 O_FILES   := $(addprefix $(BUILD_DIR)/, $(S_FILES:.s=.o) $(BIN_FILES:.bin=.o))
 
-.PHONY: all setup split build check diff decompile clean distclean progress
+.PHONY: all setup split build check diff decompile clean distclean progress report
 
 all: build
 
@@ -118,6 +118,14 @@ decompile:
 # Part des octets qui viennent de source compilée plutôt que du désassemblage.
 progress:
 	@$(PYTHON) scripts/build/progress.py
+
+# La configuration qu'objdiff lit : une unité par objet, avec son secteur.
+objdiff.json: config/splat.yaml
+	@$(PYTHON) scripts/build/gen_objdiff.py
+
+# Rapport d'avancement en page web autonome, à ouvrir depuis le disque.
+report: objdiff.json
+	@$(PYTHON) scripts/build/report.py
 
 # --------------------------------------------------------------------------
 
