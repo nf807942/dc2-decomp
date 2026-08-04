@@ -20,3 +20,5 @@
 # répétitions automatiques. `pad_button_read` compose l'état des boutons,
 # `read_pad` parle au SDK, `AxisCalibration` centre les manches.
 0x0014A650 0x0014B500 gamepad
+
+

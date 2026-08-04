@@ -119,13 +119,20 @@ all: build
 
 setup: split
 
-config/splat.yaml:
+# Le découpage se refait dès qu'une unité s'ouvre : `config/units.txt` en est
+# la seule pièce écrite à la main, et le désassembleur doit revoir la coupure.
+config/splat.yaml: config/units.txt scripts/setup/configure.py
 	$(PYTHON) scripts/setup/configure.py
 
 # Deux désassemblages : celui du travail, où une unité reconstruite laisse
 # place à ses seules fonctions restantes, et celui de référence, complet, qui
 # donne à objdiff l'objet contre lequel mesurer ce qui est déjà écrit.
+# Le désassemblage repart propre : une coupure déplacée laisse derrière elle le
+# fichier qu'elle a cessé de produire, et l'éditeur de liens reçoit alors les
+# mêmes fonctions deux fois — des milliers de définitions multiples, jusqu'à la
+# faute de segmentation. Tout ici est engendré, donc l'effacer ne coûte rien.
 split: config/splat.yaml
+	rm -rf $(ASM_DIR) $(REF_DIR) bin
 	$(SPLAT) $(CONFIG)
 	$(SPLAT) $(CONFIG_REF)
 
@@ -187,6 +194,16 @@ diff:
 decompile:
 	@test -n "$(S)" || { echo "usage : make decompile S=<symbole>" >&2; exit 1; }
 	@$(PYTHON) scripts/diff/decompile.py $(S)
+
+# Ouvre une unité : la déclare et écrit sa source, tout en INCLUDE_ASM.
+open:
+	@test -n "$(S)" || { echo "usage : make open S=<classe>" >&2; exit 1; }
+	@$(PYTHON) scripts/build/open_unit.py $(S) $(OPEN_ARGS)
+
+# Les unités de travail : celles qu'on peut ouvrir, et ce qu'elles contiennent.
+# `make units S=mgCFrame` détaille une classe.
+units:
+	@$(PYTHON) scripts/build/units.py $(S) $(UNITS_ARGS)
 
 # Part des octets qui viennent de source compilée plutôt que du désassemblage.
 progress:
