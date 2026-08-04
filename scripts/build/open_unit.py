@@ -68,10 +68,13 @@ def main() -> int:
     if source.exists() and not args.force:
         raise SystemExit(f"{source.relative_to(ROOT)} existe déjà")
 
-    # La borne haute s'arrête au début de ce qui suit : l'unité couvre les
-    # octets de ses fonctions, remplissage compris.
-    following = [f.address for f in functions if f.address >= group.end]
-    end = min(following) if following else group.end
+    # La borne haute est la fin de la dernière fonction, non le début de la
+    # suivante. Le remplissage qui les sépare appartient au sous-segment
+    # d'après : le compilateur ne le produit pas, et l'éditeur de liens ne le
+    # comble que si la section suivante s'aligne assez large — celle du gros
+    # bloc ne demande que quatre octets. L'inclure décale alors tout ce qui
+    # suit d'un mot, et le symptôme est un `jal` dont la cible perd 4 octets.
+    end = group.end
 
     for start, stop, existing in read_declared():
         if start < end and group.start < stop:

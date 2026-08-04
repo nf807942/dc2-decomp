@@ -65,11 +65,25 @@ make build     # doit rester « identique au disque »
 ```
 
 **Ce `make build` est le vrai test de l'ouverture.** Pas une ligne de C++ n'est
-écrite, donc le binaire doit être inchangé. S'il ne l'est pas, la plage est mal
-délimitée : la corriger dans `config/units.txt` et relancer `make setup`.
+écrite, donc le binaire doit être inchangé.
 
-> Une seule unité à la fois pour l'instant. Au-delà, l'éditeur de liens
-> s'arrête — voir *Ce qui reste ouvert* dans `CLAUDE.md`.
+S'il ne l'est pas, c'est presque toujours la **borne haute**. Elle vaut ce que
+l'objet produit : la fin de la dernière fonction quand celle-ci est écrite en
+C++, le début de la fonction suivante quand elle est encore greffée — le
+remplissage entre les deux n'appartient alors pas au même objet. `make open`
+propose la première ; si le binaire diffère, essayer la seconde. Le symptôme est
+franc : des `jal` dont la cible perd quatre octets, et des centaines de plages.
+
+**Vérifier d'abord les sauts indirects :**
+
+```sh
+grep -c jlabel ref/asm/text/<unité>.s
+```
+
+Autre chose que zéro veut dire qu'une table de saut, rangée dans un
+sous-segment `rodata`, pointe à l'intérieur d'une fonction de l'unité. Passée en
+objet compilé, celle-ci n'expose plus ses étiquettes locales et le lien s'arrête.
+Ces unités attendent — voir *Ce qui reste ouvert* dans `CLAUDE.md`.
 
 ---
 
@@ -123,8 +137,19 @@ Comment lire les écarts :
 
 Le premier écart est le seul qui compte : les suivants en découlent souvent.
 
-Quand une fonction résiste, `tools/decomp-permuter` cherche les réécritures qui
-convergent — il permute l'ordre des expressions, les temporaires, les casts.
+**Un créneau de délai vide** — un `nop` là où le commerce a une instruction utile
+— veut dire que la valeur n'est pas disponible assez tôt. L'avancer par une
+déclaration en tête déplace l'allocation des registres et empire souvent le
+résultat ; ce qui marche est de l'évaluer dans la condition elle-même :
+
+```cpp
+if (this->table == NULL || (i = 0, this->count) <= 0) {
+```
+
+**Quand une fonction plafonne**, écrire un script qui compile vingt variantes et
+rapporte leur taux tranche plus vite que les essais un par un : chaque palier
+désigne le fait suivant à corriger. `tools/decomp-permuter` fait ce travail
+automatiquement, mais il analyse du C pur et ne lit donc pas nos sources C++.
 
 ---
 

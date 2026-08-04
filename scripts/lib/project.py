@@ -71,7 +71,10 @@ def symbol_sources(build: bool = True) -> dict[str, Path]:
     table: dict[str, Path] = {}
     for path in sources():
         obj = BUILD_DIR / path.relative_to(ROOT).with_suffix(".o")
-        if build and not obj.exists():
+        # `make` décide seul si l'objet est périmé : se contenter de le
+        # construire quand il manque laisserait lire l'objet d'avant la
+        # dernière fonction écrite, qui ne la porte donc pas.
+        if build:
             run(["make", str(obj.relative_to(ROOT))],
                 stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         if not obj.exists():

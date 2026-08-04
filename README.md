@@ -19,14 +19,14 @@ binaire lui-même.
 | | |
 |---|---|
 | Construction identique au disque | **oui** — 2 608 512 octets, sha1 `eca0c93d5d6a25fcbf8f1fa41aa811a6f4b7aca8` |
-| Code reconstruit en C++ | 112 octets sur 2 209 044 — 2 fonctions sur 7 792 |
+| Code reconstruit en C++ | 620 octets sur 2 209 044 — 12 fonctions sur 7 792 |
 | Compilateur | `mwcps2-3.0.1-020123`, `-O4,p` — 100 % sur la première fonction |
 | Découpage | 193 unités de texte, 92 de données, 6 blocs vectoriels, 1 unité ouverte |
 
 La construction part du désassemblage entier et le réassemble ; chaque fonction
 passée en C++ en remplace une part, et la construction doit rester identique.
-`CGamePad::Close` et `CGamePad::Connect` sont les premières, appariées
-instruction pour instruction. La marche à suivre est dans
+Quatre unités sont ouvertes : `gamepad`, `dngfloormanager`, `dngfloorinfo` et
+`takephoto`. La marche à suivre est dans
 [docs/MARCHE_A_SUIVRE.md](docs/MARCHE_A_SUIVRE.md).
 
 ## Prérequis

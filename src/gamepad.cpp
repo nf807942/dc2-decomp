@@ -31,9 +31,19 @@ int CGamePad::Connect() {
 INCLUDE_ASM("nonmatchings/gamepad", UpDate__8CGamePadFv);
 INCLUDE_ASM("nonmatchings/gamepad", Step__8CGamePadFi);
 INCLUDE_ASM("nonmatchings/gamepad", AxisCalibration__Fi);
-INCLUDE_ASM("nonmatchings/gamepad", GetRX__8CGamePadFv);
-INCLUDE_ASM("nonmatchings/gamepad", GetRY__8CGamePadFv);
-INCLUDE_ASM("nonmatchings/gamepad", GetLX__8CGamePadFv);
-INCLUDE_ASM("nonmatchings/gamepad", GetLY__8CGamePadFv);
-INCLUDE_ASM("nonmatchings/gamepad", GetRX2__8CGamePadFv);
+int CGamePad::GetRX() {
+    return AxisCalibration(m_rx);
+}
+int CGamePad::GetRY() {
+    return AxisCalibration(m_ry);
+}
+int CGamePad::GetLX() {
+    return AxisCalibration(m_lx);
+}
+int CGamePad::GetLY() {
+    return AxisCalibration(m_ly);
+}
+int CGamePad::GetRX2() {
+    return AxisCalibration(m_rx2);
+}
 INCLUDE_ASM("nonmatchings/gamepad", CancelAutoRepeat__8CGamePadFi);

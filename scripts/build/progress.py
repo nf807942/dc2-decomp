@@ -17,6 +17,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from lib.project import BUILD_DIR, CONFIG_DIR, ROOT, run, sources  # noqa: E402
 
+# `INCLUDE_ASM("nonmatchings/<unite>", <symbole>);`
+_INCLUDE_ASM = re.compile(r'INCLUDE_ASM\s*\(\s*"[^"]*"\s*,\s*(\S+?)\s*\)')
+
 _SYMBOL = re.compile(r"^(\S+)\s*=\s*0x([0-9A-Fa-f]+);.*?type:func(?:.*?size:0x([0-9A-Fa-f]+))?",
                      re.MULTILINE)
 
@@ -53,11 +56,12 @@ def decompiled_symbols() -> set[str]:
                 defined.add(parts[2])
 
         # Une fonction greffée est définie dans l'objet comme une fonction
-        # compilée : c'est bien son but. Le désassemblage lui donne un alias
-        # `.NON_MATCHING`, et c'est le seul signe qui les sépare — sans quoi
-        # une unité ouverte compterait pour reconstruite dès son ouverture.
-        grafted = {n[:-len(".NON_MATCHING")] for n in defined
-                   if n.endswith(".NON_MATCHING")}
+        # compilée : c'est bien son but, et l'objet seul ne les distingue pas.
+        # C'est la source qui tranche, puisqu'elle nomme ce qu'elle laisse en
+        # assembleur — l'alias `.NON_MATCHING` y suffirait presque, mais les
+        # fonctions les plus courtes n'en reçoivent pas.
+        grafted = set(_INCLUDE_ASM.findall(
+            path.read_text(encoding="utf-8", errors="replace")))
         names |= {n for n in defined
                   if not n.endswith(".NON_MATCHING") and n not in grafted}
     return names

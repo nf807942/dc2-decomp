@@ -22,3 +22,20 @@
 0x0014A650 0x0014B500 gamepad
 
 
+
+# CDngFloorManager::GetSphedaPrize(int, int*, int*) seule : la classe est
+# entrecoupee, donc la plage se borne a cette fonction.
+# GetDngMapFloorGlidInfo jusqu'a IsClearMostFastDestroy. IsClearPractice, qui
+# suit, porte une table de saut que 00372BA0.rodata reference : elle reste en
+# assembleur, et coupe donc la classe en deux unites.
+0x002FE6C0 0x002FEB50 dngfloormanager
+
+# GetDngMapFloorInfo, apres IsClearPractice.
+0x002FEE80 0x002FEEC4 dngfloorinfo
+
+# EndTakePhoto seule : le bloc photo vit dans le gros bloc de code, et les
+# autres fonctions attendent d'etre ouvertes. Elle ne fait que revenir a
+# InitTakePhoto.
+0x00313A30 0x00313A38 takephoto
+
+

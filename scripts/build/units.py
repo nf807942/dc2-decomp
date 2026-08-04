@@ -169,11 +169,7 @@ def main() -> int:
     print(f"{len(clean)} classes occupent une plage que rien n'entrecoupe."
           f" À déclarer dans config/units.txt :\n")
     for group in clean[:args.limit]:
-        # La borne haute est exclusive et s'arrête au début de ce qui suit :
-        # une unité couvre les octets de ses fonctions, remplissage compris.
-        following = [f.address for f in functions if f.address >= group.end]
-        end = min(following) if following else group.end
-        print(f"0x{group.start:08X} 0x{end:08X} {group.name.lower()}"
+        print(f"0x{group.start:08X} 0x{group.end:08X} {group.name.lower()}"
               f"   # {len(group.functions)} méthodes, {group.own_bytes} octets")
 
     if args.all and mixed:
