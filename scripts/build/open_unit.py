@@ -92,18 +92,17 @@ def main() -> int:
             names = ", ".join(f.name for f in straddling[:3])
             raise SystemExit(f"la plage coupe {len(straddling)} fonctions "
                              f"en deux ({names}…)")
-        # Le compilateur aligne sur seize octets la section de chaque fonction,
-        # et l'éditeur de liens comble jusque-là. Une fonction que le binaire
-        # place ailleurs se retrouve donc poussée, et tout ce qui suit avec
-        # elle. Le code du jeu s'aligne ainsi de lui-même à 99 %.
+        # MWCC aligne sur seize octets la section de chaque fonction qu'il
+        # compile, et l'éditeur de liens comble jusque-là. mwccgap abaisse celle
+        # d'une fonction greffée à ce que son adresse demande, mais il ne connaît
+        # pas l'adresse de celles qu'on écrit : une fonction que le binaire place
+        # ailleurs devra donc rester greffée.
         misaligned = [f for f in held if f.address % 16]
         if misaligned:
             names = ", ".join(f"0x{f.address:08X} {f.name}" for f in misaligned[:3])
-            raise SystemExit(
-                f"{len(misaligned)} fonctions de la plage ne commencent pas sur "
-                f"un multiple de seize ({names}…).\n"
-                f"L'objet compilé les décalerait ; bornez l'unité avant."
-            )
+            print(f"{len(misaligned)} fonctions de la plage ne commencent pas sur "
+                  f"un multiple de seize ({names}…).\n"
+                  f"Elles s'ouvrent, mais ne pourront pas s'écrire en C++.")
         if not args.name:
             raise SystemExit("une plage demande --name")
         name, title = args.name, f"0x{start:08X} .. 0x{end:08X} — à décrire."

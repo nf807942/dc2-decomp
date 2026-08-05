@@ -1,0 +1,3 @@
+# `git apply` refuse un correctif dont les fins de ligne ont été traduites, et
+# l'hôte de ce projet est sous Windows.
+*.patch -text

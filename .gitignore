@@ -62,6 +62,8 @@ SLPS_*
 # copyright, non redistribuable), binutils, wibo, objdiff.
 /tools/compilers/
 /tools/bin/
+# Le témoin que `make patch` pose ; les correctifs, eux, se versionnent.
+/tools/.patched
 
 # Dossiers de travail du permuteur : une source par fonction, son objet de
 # reference et ce que l'outil en tire.

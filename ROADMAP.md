@@ -30,40 +30,50 @@ décompilation mais à ce qui reste adressé en dur.
 
 ```
 code reconstruit : 6 080 octets sur 2 215 100      0,275 %      32 fonctions
-unités ouvertes  : 72, 1 417 600 octets            64,0 %    5 072 fonctions
-code du jeu ouvert : 5 070 fonctions sur 6 847     74 %        69,9 % des octets
+unités ouvertes  : 93, 1 643 428 octets            74,2 %    5 776 fonctions
 ```
 
-Le découpage compte 213 sous-segments encore en assembleur, 72 confiés à une
-source, 87 `rodata`, 32 `data`, 27 plages de lecture seule migrées avec leur
-unité et 6 blocs d'octets vectoriels.
+Ce qui reste dehors : seize unités que leur plage de lecture seule retient, le
+code de bibliothèque, les microprogrammes vectoriels et les données.
 
 ---
 
 ## Jalon 1 — Finir le découpage du texte
 
-**Ce qui manque** : 26 % des fonctions du jeu et tout le code de bibliothèque.
+**Le compte passe de 72 unités à 93**, et `make build` rend les octets du disque.
+Quatre causes ont été levées : trois dans mwccgap, portées par
+`tools/patches/mwccgap-alignment.patch` — l'alignement d'une section greffée pris
+de l'adresse du symbole, l'ordre des tables de saut pris de leurs adresses, et la
+recherche d'une section par le symbole qui l'a déclarée —, et une dans le
+découpage, qui ignorait les frontières de contribution d'objet.
 
-- **25 unités que `make carve` écarte.** Leur plage de lecture seule ne tient
-  pas les conditions établies : symboles qui ne se touchent pas, tables rangées
-  à l'inverse des fonctions qu'elles servent. Deux voies, et la première est la
-  bonne : faire greffer à mwccgap le remplissage entre symboles migrés
-  (→ *Outillage*), ou couper l'unité plus finement pour qu'elle n'emmène qu'une
-  table. La seconde multiplie les unités sans rien apprendre.
-- **13 fonctions du jeu qu'un multiple de seize ne commence pas.** Elles restent
-  en assembleur entre deux unités. Écrites en C++, la contrainte tombe d'elle-même,
-  le compilateur ne s'alignant que sur ce qu'il produit. C'est donc un travail de
-  décompilation, non de découpage.
-- **Le code de bibliothèque** — 926 fonctions, dont 541 seulement alignées sur
-  seize. Peu découpable tant que l'alignement des sections de mwccgap n'est pas
-  réglé. À traiter après le jeu : c'est du code livré compilé, sans valeur de
-  compréhension pour le jeu lui-même.
+**Ce qui reste** :
+
+- **Seize unités**, dont la plage de lecture seule porte un symbole que le
+  désassembleur ne migrerait pas : sa règle veut qu'une seule fonction l'atteigne,
+  et une plage porte tout ce qui s'intercale entre sa première table et la dernière.
+  Le remède se déduit de la règle — une unité qui ne porte qu'une table a une plage
+  réduite à cette table, donc sûre. C'est une coupure plus fine, non un outil qui
+  manque ; ce qu'elle coûte en nombre d'unités reste à mesurer.
+- **Le code de bibliothèque** — 926 fonctions. L'alignement ne les borne plus,
+  mais **chacune est sa propre contribution d'objet**, et le désassembleur en fait
+  un sous-segment : une unité ne peut pas en réunir deux. Ce serait donc 926 unités
+  d'une fonction. Ce que le découpage y gagnerait est à peser avant de le faire ;
+  c'est du code livré compilé, sans valeur de compréhension pour le jeu.
 - **`.vutext`**, 18 208 octets de microprogrammes vectoriels en six blocs
   d'octets. Aucun assembleur de la chaîne ne les relit. Il faudrait un
   désassembleur VU dédié ; rien n'y oblige tant qu'on ne veut pas les modifier.
+- **Six unités d'une seule fonction**, laissées par le découpage entre deux
+  contributions dans les plages du jeu. Elles sont justes ; les réunir à leur
+  voisine ne tient qu'à la lisibilité de `config/units.txt`.
 
-**Critère de sortie** : chaque octet de `.text` appartient à une unité, et
-`make build` reste identique au disque.
+**Non résolu, et c'est une limite du jalon 4 plus que de celui-ci** : MWCC aligne
+sur seize octets la section de toute fonction qu'il *compile*, et mwccgap ne peut
+rien y faire faute de connaître son adresse. Les treize auxiliaires du runtime que
+les plages du jeu englobent — `__divdi3`, `fpmul`, `sitofp`, `__swsetup` — sont
+donc ouverts mais devront rester greffés.
+
+**Critère de sortie** : chaque octet de `.text` appartient à une unité.
 
 ---
 
@@ -189,12 +199,23 @@ Par ordre de ce que chacun débloque.
 
 | Chantier | Ce qu'il débloque |
 |---|---|
-| **mwccgap : rendre le remplissage entre symboles de lecture seule migrés** | les 25 unités écartées du jalon 1 |
-| **mwccgap : abaisser l'alignement des sections de fonction** | le code de bibliothèque, et les 13 fonctions du jeu |
+| **`make carve` : une table de saut par unité au plus** | les seize unités écartées du jalon 1 |
 | **Relever qui emploie chaque donnée, par les relocations** | le jalon 2 en entier |
-| **`make carve` : coupures plus fines autour des tables** | quelques unités du jalon 1, sans attendre mwccgap |
+| **mwccgap : abaisser l'alignement d'une fonction compilée** | les treize auxiliaires du runtime, qui ne peuvent qu'être greffés |
 | **Un test d'exécution en émulateur** | le critère de sortie du jalon 3 |
 | **Intégration continue** | la non-régression de `make build`, aujourd'hui vérifiée à la main |
+| **`make carve` : réunir une unité d'une fonction à sa voisine** | la lisibilité de `config/units.txt` |
+
+`tools/patches/` porte ce que le projet corrige dans les outils tiers, `make patch`
+le pose, et `make patch PATCH_ARGS=--update` le réécrit depuis l'état du
+sous-module. Un commit ne retient d'un sous-module que sa référence : le correctif
+est ce qui se versionne, et son en-tête dit ce qu'il y aurait à reverser en amont.
+
+Un prédicat sur ce que fait le désassembleur s'éprouve contre `asm/nonmatchings/`,
+non contre une reconstruction : la comparaison coûte une seconde là où
+`make setup && make build` en coûte un quart d'heure. C'est ce qui a trouvé le
+troisième terme de la règle de migration, et deux erreurs de lecture de la
+référence avec lui.
 
 `scripts/setup/normalize.py` est une rustine assumée : il corrige après coup ce
 que le désassembleur écrit autrement pour les fonctions greffées. Il disparaîtra
@@ -234,3 +255,7 @@ Les jalons 1 et 2 sont indépendants et peuvent avancer en parallèle. Le jalon 
 est le seul qui n'a pas de fin proche : il se mesure, il ne se planifie pas. Le
 jalon 3 est celui que vous visez, et il ne demande pas que tout soit recompilé —
 seulement que plus rien ne soit adressé en dur.
+
+Le jalon 1 borne de moins en moins le jalon 4 : une fonction qui vit dans une
+unité peut s'écrire sans que le découpage soit à refaire, et c'est le cas de la
+grande majorité de celles du jeu.

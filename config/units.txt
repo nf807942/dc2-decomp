@@ -38,7 +38,7 @@
 # objet : laissée dans 00372BA0.rodata, elle référençait des symboles que plus
 # aucun fichier ne définissait, et l'éditeur de liens s'arrêtait sur une faute
 # de segmentation.
-0x002FE6C0 0x002FEE80 dngfloormanager rodata:0x00377F10-0x00377F30
+0x002FE6C0 0x002FEE80 dngfloormanager rodata:0x00377F10-0x00377F2C
 
 # GetDngMapFloorInfo, apres IsClearPractice.
 0x002FEE80 0x002FEEC4 dngfloorinfo
@@ -270,3 +270,66 @@
 
 # CRandom, CQuestManager, CQuestData, CMonsterBook, CVillagerPlace : 74 fonctions, 24312 octets.
 0x0031FBA0 0x00325C60 crandom rodata:0x00379340-0x00379358
+
+# fonctions libres : 1 fonctions, 268 octets.
+0x0012C1A8 0x0012C2C0 text_0012C1A8
+
+# CEffectCtrl, CEffect, CEffectManager, CFadeInOut, COutLineDraw, CEffectList, mgC3DSprite : 106 fonctions, 28064 octets.
+0x0017D680 0x001846F0 ceffectctrl rodata:0x003684E0-0x00368518
+
+# CAquarium : 16 fonctions, 24372 octets.
+0x00214570 0x0021A510 caquarium rodata:0x0036F460-0x0036F4F8
+
+# CEohMother, CScreenEffect, CRaster, CEventScriptArg : 122 fonctions, 24576 octets.
+0x00260B80 0x00266E10 ceohmother rodata:0x00371BB0-0x00371BE8
+
+# fonctions libres : 1 fonctions, 1772 octets.
+0x00289E48 0x0028A538 text_00289E48
+
+# fonctions libres : 1 fonctions, 92 octets.
+0x0028A538 0x0028A598 text_0028A538
+
+# fonctions libres : 1 fonctions, 236 octets.
+0x0028A598 0x0028A688 text_0028A598
+
+# fonctions libres : 1 fonctions, 152 octets.
+0x0028A688 0x0028A720 text_0028A688
+
+# fonctions libres : 1 fonctions, 96 octets.
+0x0028AD88 0x0028ADE8 text_0028AD88
+
+# fonctions libres : 1 fonctions, 1488 octets.
+0x0028ADE8 0x0028B3B8 text_0028ADE8
+
+# fonctions libres : 1 fonctions, 1344 octets.
+0x0028B3B8 0x0028B8F8 text_0028B3B8
+
+# fonctions libres : 1 fonctions, 88 octets.
+0x0028C9C8 0x0028CA20 text_0028C9C8
+
+# fonctions libres : 1 fonctions, 500 octets.
+0x0028CA88 0x0028CC80 text_0028CA88
+
+# fonctions libres : 2 fonctions, 260 octets.
+0x0028CEF8 0x0028D000 text_0028CEF8
+
+# fonctions libres : 1 fonctions, 56 octets.
+0x0028D128 0x0028D160 text_0028D128
+
+# CEditInfoMngr, CEditMap : 61 fonctions, 17280 octets.
+0x002A5B10 0x002A9FF0 ceditinfomngr rodata:0x00373890-0x003739BC
+
+# CSaveMenuClass : 23 fonctions, 21660 octets.
+0x002C6E30 0x002CC360 csavemenuclass rodata:0x00375710-0x0037574C
+
+# CFont, COcclusion : 90 fonctions, 24920 octets.
+0x002D8EE0 0x002DF230 cfont rodata:0x003764A0-0x003765A8
+
+# CEditMap, CCameraControl, CEditEvent, CPadControl, CMenuSystemData : 70 fonctions, 22128 octets.
+0x002F0E80 0x002F6690 ceditmap_002F0E80 rodata:0x00377810-0x00377848
+
+# CMemoryCardManager, CSWordAfterEffect, CSaveData, CGeyserEffect, CSphidaData, CSaveDataDungeon, CDngFloorManager, CGyoRaceData, CSubGameData, GYORACE_DATA, CGeyserEffectPoint : 135 fonctions, 32036 octets.
+0x002F6690 0x002FE6C0 cmemorycardmanager rodata:0x00377B00-0x00377C08
+
+# CDngFloorManager, CStarEffect, CPlaceAnime, CPaintEffect : 68 fonctions, 24440 octets.
+0x002FEED0 0x00304FC0 cdngfloormanager rodata:0x003782B0-0x003782E8

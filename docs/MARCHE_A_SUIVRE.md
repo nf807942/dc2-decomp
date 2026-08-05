@@ -25,12 +25,19 @@ référence est cassée, il faut la réparer d'abord.
 
 ## 1. Choisir où travailler
 
+La plupart du code du jeu vit déjà dans une unité — 93 d'entre elles, 5 776
+fonctions —, et chacune attend dans un `src/*.cpp` sous `INCLUDE_ASM`. Les étapes
+1 et 2 servent donc surtout à retoucher une frontière que le découpage a décidée
+d'après la classe la plus lourde, et à ouvrir ce qu'il écarte. **Pour reconstruire
+une fonction déjà dans une unité, sauter à l'étape 3.**
+
 ```sh
+make report    # les fonctions par unité, la plus grosse d'abord
 make units
 ```
 
-Sort les classes dont la plage n'est traversée par aucune autre, la plus grosse
-d'abord, avec la ligne prête à coller :
+`make units` sort les classes dont la plage n'est traversée par aucune autre, la
+plus grosse d'abord, avec la ligne prête à coller :
 
 ```
 0x001D6D80 0x001DAF60 cautomapgen   # 28 méthodes, 16672 octets
@@ -82,8 +89,20 @@ grep -c jlabel ref/asm/text/<unité>.s
 
 Autre chose que zéro veut dire qu'une table de saut, rangée dans un
 sous-segment `rodata`, pointe à l'intérieur d'une fonction de l'unité. Passée en
-objet compilé, celle-ci n'expose plus ses étiquettes locales et le lien s'arrête.
-Ces unités attendent — voir *Ce qui reste ouvert* dans `CLAUDE.md`.
+objet compilé, celle-ci n'expose plus ses étiquettes locales et le lien s'arrête :
+il faut donc que la table voyage avec elle, ce que la plage `rodata:` du
+quatrième champ déclare et que `make open` déduit seul.
+
+**Et vérifier les frontières de contribution d'objet :**
+
+```sh
+grep -c "^\.text" config/elf_sections.txt
+```
+
+Le désassembleur fait un sous-segment de chacune, et il tronque sans un mot
+l'unité qui l'enjambe. Le symptôme est une source réclamant un `INCLUDE_ASM`
+dont le fichier n'existe pas. Les deux gros blocs du jeu n'en portent aucune à
+l'intérieur ; le code de bibliothèque en porte une par fonction.
 
 ---
 

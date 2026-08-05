@@ -74,6 +74,10 @@ CFLAGS    ?= -O4,p -lang c++ -char unsigned -str readonly -Cpp_exceptions off \
 # compilation retombe silencieusement en `-O0`. Il vient donc en dernier, après
 # les drapeaux destinés à MWCC.
 MWCCGAP      := $(PYTHON) tools/mwccgap/mwccgap.py
+# La greffe fait partie de la chaîne autant que le compilateur : ce qu'elle
+# change se voit dans l'objet, et sans cette dépendance une correction reste
+# invisible jusqu'au prochain effacement de `build/`.
+MWCCGAP_SRC  := $(wildcard tools/mwccgap/mwccgap/*.py)
 MWCCGAP_ARGS := --mwcc-path $(MWCC) --as-path $(AS) --use-wibo \
                 --macro-inc-path $(INCLUDE_DIR)/macro.inc \
                 --asm-dir-prefix $(ASM_DIR) \
@@ -112,8 +116,8 @@ REF_O_FILES := $(addprefix $(BUILD_DIR)/, $(REF_S_FILES:.s=.o))
 O_FILES   := $(addprefix $(BUILD_DIR)/, $(S_FILES:.s=.o) $(BIN_FILES:.bin=.o) \
              $(addsuffix .o, $(basename $(SRC_FILES))))
 
-.PHONY: all setup tools split build check diff decompile measure carve clean \
-        distclean progress report
+.PHONY: all setup tools patch split build check diff decompile measure carve \
+        clean distclean progress report
 
 all: build
 
@@ -159,19 +163,29 @@ $(BUILD_DIR)/%.o: %.bin
 
 # Une unité reconstruite passe par mwccgap, qui appelle MWCC puis greffe
 # l'assembleur des fonctions encore marquées `INCLUDE_ASM`.
-$(BUILD_DIR)/%.o: %.cpp $(HEADERS)
+$(BUILD_DIR)/%.o: %.cpp $(HEADERS) $(MWCCGAP_SRC) tools/.patched
 	@mkdir -p $(dir $@)
 	@test -f $(MWCC) || { echo "$(MWCC) absent — lancez \`make tools\`" >&2; exit 1; }
 	$(MWCC_ENV) $(MWCCGAP) $< $@ $(MWCCGAP_ARGS) $(CFLAGS) $(MWCCGAP_TAIL)
 
-$(BUILD_DIR)/%.o: %.c $(HEADERS)
+$(BUILD_DIR)/%.o: %.c $(HEADERS) $(MWCCGAP_SRC) tools/.patched
 	@mkdir -p $(dir $@)
 	@test -f $(MWCC) || { echo "$(MWCC) absent — lancez \`make tools\`" >&2; exit 1; }
 	$(MWCC_ENV) $(MWCCGAP) $< $@ $(MWCCGAP_ARGS) $(CFLAGS) $(MWCCGAP_TAIL)
 
 # Le compilateur, depuis les paquets de decompme/compilers.
-tools:
+tools: patch
 	@$(PYTHON) scripts/setup/get_tools.py $(TOOLS_ARGS)
+
+# Ce que le projet corrige dans les outils tiers. Un sous-module ne retient que
+# sa référence, donc le correctif est ce qui se versionne ; le témoin le fait
+# poser avant toute compilation, sans quoi l'écart n'apparaîtrait qu'au moment
+# de comparer au disque.
+patch: tools/.patched
+
+tools/.patched: $(wildcard tools/patches/*.patch) scripts/setup/patch_tools.py
+	@$(PYTHON) scripts/setup/patch_tools.py $(PATCH_ARGS)
+	@touch $@
 
 $(ELF): $(O_FILES) $(LD_SCRIPT)
 	@mkdir -p $(dir $@)

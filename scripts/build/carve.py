@@ -16,17 +16,21 @@ existe. Le découpage vise donc une taille, et choisit dans une fenêtre autour
 d'elle la frontière qui laisse le moins de classes à cheval — ce qui range les
 petites classes d'un seul tenant sans prétendre reconstituer les grandes.
 
-Deux choses la bornent :
+Deux choses la bornent encore.
 
-  * une unité commence sur un multiple de seize, et aucune de ses fonctions n'y
-    manque. Le compilateur aligne ainsi la section de chaque fonction, et
-    l'éditeur de liens comble jusque-là : une fonction que le binaire place
-    ailleurs serait poussée, avec tout ce qui la suit. Le code du jeu s'y
-    conforme à 99 %, et les rares fonctions qui n'y sont pas restent dehors, en
-    assembleur, entre deux unités ;
+Une frontière de contribution d'objet l'emporte sur une unité déclarée : le
+désassembleur en fait un sous-segment et tronque sans un mot celle qui l'enjambe.
+Le découpage y coupe donc.
 
-  * une fonction qui saute par table emmène celle-ci, qui vit en lecture seule
-    mais désigne des étiquettes de son corps.
+Et une fonction qui saute par table emmène celle-ci, qui vit en lecture seule
+mais désigne des étiquettes de son corps. La plage porte alors tout ce qui
+s'intercale entre la première table et la dernière, et le désassembleur ne migre
+d'un symbole que ce qu'une seule fonction atteint. Une plage n'est sûre que si
+chacun des siens est dans ce cas, et que cette fonction est dans l'unité.
+
+L'alignement des fonctions, lui, ne borne plus : mwccgap le prend de l'adresse
+que le désassemblage donne à chaque fonction greffée, là où MWCC demandait
+seize octets pour toutes.
 """
 
 from __future__ import annotations
@@ -38,12 +42,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from lib.project import CONFIG_DIR, ROOT, SRC_DIR  # noqa: E402
-from build.units import (Function, class_of, read_declared,  # noqa: E402
-                         read_functions, read_jump_tables,
-                         rodata_is_contiguous)
-
-# Le compilateur aligne la section de chaque fonction sur seize octets.
-ALIGN = 16
+from build.units import (Function, class_of, read_contributions,  # noqa: E402
+                         read_declared, read_functions, read_jump_tables,
+                         rodata_is_contiguous, rodata_is_migrable)
 
 
 @dataclass
@@ -117,28 +118,6 @@ def straddled(spans: dict[str, tuple[int, int]], cut: int) -> int:
     return sum(1 for low, high in spans.values() if low < cut < high)
 
 
-def runs(functions: list[Function],
-         limit: int) -> list[tuple[list[Function], int]]:
-    """Les suites de fonctions que seize octets alignent toutes, et leur borne.
-
-    Celles qui n'y sont pas restent en assembleur, entre deux unités : le
-    compilateur alignerait leur section, et tout ce qui suit se décalerait. La
-    borne d'une suite est donc l'adresse de la fonction écartée qui la ferme.
-    """
-    groups: list[tuple[list[Function], int]] = []
-    run: list[Function] = []
-    for function in functions:
-        if function.address % ALIGN:
-            if run:
-                groups.append((run, function.address))
-            run = []
-            continue
-        run.append(function)
-    if run:
-        groups.append((run, limit))
-    return groups
-
-
 def carve(functions: list[Function], limit: int, target: int) -> list[Unit]:
     """Découpe une suite de fonctions en unités d'environ `target` octets.
 
@@ -149,34 +128,33 @@ def carve(functions: list[Function], limit: int, target: int) -> list[Unit]:
     spans = class_spans(functions)
     units: list[Unit] = []
 
-    for group, group_end in runs(functions, limit):
-        start = 0
-        while start < len(group):
-            # Les bornes de la fenêtre, en nombre de fonctions : on avance
-            # jusqu'à ce que la tranche pèse assez, puis on cherche jusqu'à ce
-            # qu'elle pèse trop.
-            taken, low_index, high_index = 0, None, len(group)
-            for index in range(start, len(group)):
-                taken += group[index].size
-                if low_index is None and taken >= target * 0.6:
-                    low_index = index + 1
-                if taken >= target * 1.4:
-                    high_index = index + 1
-                    break
-            if low_index is None or high_index >= len(group):
-                cut = len(group)
-            else:
-                candidates = range(low_index, high_index + 1)
-                cut = min(candidates,
-                          key=lambda i: (straddled(spans, group[i].address),
-                                         abs(sum(f.size for f in group[start:i])
-                                             - target)))
+    group, start = functions, 0
+    while start < len(group):
+        # Les bornes de la fenêtre, en nombre de fonctions : on avance jusqu'à
+        # ce que la tranche pèse assez, puis on cherche jusqu'à ce qu'elle pèse
+        # trop.
+        taken, low_index, high_index = 0, None, len(group)
+        for index in range(start, len(group)):
+            taken += group[index].size
+            if low_index is None and taken >= target * 0.6:
+                low_index = index + 1
+            if taken >= target * 1.4:
+                high_index = index + 1
+                break
+        if low_index is None or high_index >= len(group):
+            cut = len(group)
+        else:
+            candidates = range(low_index, high_index + 1)
+            cut = min(candidates,
+                      key=lambda i: (straddled(spans, group[i].address),
+                                     abs(sum(f.size for f in group[start:i])
+                                         - target)))
 
-            # Ce qui suit dans le même groupe commence l'unité d'après ; à la
-            # fin du groupe, la borne est la fonction écartée qui le ferme.
-            end = group[cut].address if cut < len(group) else group_end
-            units.append(Unit(group[start:cut], end))
-            start = cut
+        # Ce qui suit commence l'unité d'après ; à la fin, la borne est celle
+        # que la plage donne.
+        end = group[cut].address if cut < len(group) else limit
+        units.append(Unit(group[start:cut], end))
+        start = cut
 
     # La borne d'une unité est le début de la suivante quand les deux se
     # touchent : le remplissage qui les sépare appartient au désassemblage de
@@ -198,6 +176,12 @@ def rodata_of(unit: Unit, tables) -> tuple[int, int] | None:
     # il disparaîtrait ; le remplissage qui suit revient de lui-même au voisin,
     # dont le contenu ne demande pas plus de quatre octets d'alignement.
     return min(t.address for t in held), max(t.end for t in held)
+
+
+def split_at(low: int, high: int, cuts: list[int]) -> list[tuple[int, int]]:
+    """Découpe une plage à chacune des adresses qui tombent dedans."""
+    edges = [low, *(c for c in cuts if low < c < high), high]
+    return list(zip(edges, edges[1:]))
 
 
 def gaps(low: int, high: int,
@@ -228,23 +212,6 @@ def keeps_its_tables(unit: Unit, tables) -> bool:
         return True
     return all(all(unit.start <= target < unit.end for target in table.targets)
                for table in tables if span[0] <= table.address < span[1])
-
-
-def tables_follow_text(unit: Unit, tables) -> bool:
-    """Dit si les tables de l'unité suivent l'ordre des fonctions qu'elles servent.
-
-    Chacune est migrée dans le désassemblage de sa fonction, et mwccgap les
-    concatène dans l'ordre des fonctions. Deux tables que le binaire range à
-    l'inverse de leurs corps se retrouvent donc échangées, et chaque saut mène
-    ailleurs.
-    """
-    span = rodata_of(unit, tables)
-    if span is None:
-        return True
-    held = sorted((t for t in tables if span[0] <= t.address < span[1]),
-                  key=lambda t: t.address)
-    targets = [min(t.targets) for t in held]
-    return targets == sorted(targets)
 
 
 def clashing_rodata(units: list[Unit], tables) -> int:
@@ -286,26 +253,28 @@ def main() -> int:
     declared = read_declared()
     taken_names = {name for _s, _e, name in declared}
 
+    contributions = read_contributions()
+
     units: list[Unit] = []
-    outside = 0
     for low, high in read_sectors():
         # Une unité déjà déclarée garde la main : le découpage la contourne, et
         # ce qui l'entoure se découpe de part et d'autre plutôt qu'à travers.
         for begin, stop in gaps(low, high, declared):
-            inside = [f for f in functions if begin <= f.address < stop]
-            if not inside:
-                continue
-            outside += sum(1 for f in inside if f.address % ALIGN)
-            units.extend(carve(inside, stop, args.target))
+            # Une frontière de contribution d'objet l'emporte sur une unité
+            # déclarée : le découpage y coupe plutôt que de se faire tronquer.
+            for start, end in split_at(begin, stop, contributions):
+                inside = [f for f in functions if start <= f.address < end]
+                if not inside:
+                    continue
+                units.extend(carve(inside, end, args.target))
 
-    # Une unité dont la plage de lecture seule perdrait son remplissage
-    # intérieur attend : elle demande une coupure que ce découpage ne sait pas
-    # encore choisir, et la déclarer décalerait tout ce qui la suit.
+    # Une unité dont la plage de lecture seule porte un symbole qu'aucune de ses
+    # fonctions n'atteint attend : le désassembleur ne l'écrirait nulle part.
     tassed = [u for u in units
               if ((span := rodata_of(u, tables))
-                  and not rodata_is_contiguous(*span))
-              or not keeps_its_tables(u, tables)
-              or not tables_follow_text(u, tables)]
+                  and not (rodata_is_contiguous(*span)
+                           and rodata_is_migrable(*span, u.functions)))
+              or not keeps_its_tables(u, tables)]
     units = [u for u in units if u not in tassed]
 
     kept = units
@@ -315,8 +284,8 @@ def main() -> int:
 
     print(f"{len(kept)} unités à ouvrir, {sum(u.size for u in kept)} octets, "
           f"{sum(len(u.functions) for u in kept)} fonctions")
-    print(f"{outside} fonctions restent dehors faute d'un début aligné, "
-          f"{len(tassed)} unités faute d'une plage de lecture seule d'un tenant")
+    print(f"{len(tassed)} unités attendent, faute d'une plage de lecture seule "
+          f"sûre")
 
     overlap = clashing_rodata(kept, tables)
     if overlap:

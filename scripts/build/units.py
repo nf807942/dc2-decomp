@@ -96,33 +96,200 @@ def read_sized_symbols() -> list[tuple[int, int]]:
                   for a, s in _SIZED.findall(table.read_text(encoding="utf-8")))
 
 
+def alignment_of(address: int) -> int:
+    """L'alignement que l'adresse d'un symbole de lecture seule impose.
+
+    Seize est le plafond : MWCC ne demande pas davantage pour une section de
+    lecture seule, et c'est ce que mwccgap reporte depuis l'adresse.
+    """
+    for align in (16, 8, 4):
+        if address % align == 0:
+            return align
+    return 4
+
+
 def rodata_is_contiguous(low: int, high: int) -> bool:
     """Dit si une plage de lecture seule peut voyager avec son unité.
 
     Le désassembleur migre vers la fonction chaque symbole de la plage, et
-    mwccgap en fait une section de sa taille propre. Ce qui les séparait dans le
-    binaire — le remplissage d'alignement — n'y est plus, et tout ce qui suit se
-    tasse d'autant. Une plage dont les symboles se touchent ne perd rien ; le
-    remplissage qui la termine, lui, revient de l'alignement du sous-segment
-    voisin.
+    mwccgap en fait une section à part. Ce qui les sépare dans le binaire n'y
+    revient donc que de l'alignement des sections, et une plage n'est sûre que
+    si chaque trou vaut exactement le remplissage que l'adresse du symbole
+    suivant réclame. Un trou plus large est autre chose — une donnée que le
+    désassembleur ne nomme pas —, et il serait perdu.
+
+    Le remplissage qui *termine* la plage, lui, revient de l'alignement du
+    sous-segment voisin.
+
+    Cette condition ne dit rien de ce que la plage porte : c'est
+    `rodata_is_migrable` qui tranche si chaque symbole suivra bien une fonction.
     """
     inside = [(start, end) for start, end in read_sized_symbols()
               if low <= start < high]
     if not inside or inside[0][0] != low:
         return False
-    return all(end == start for (_a, end), (start, _b) in zip(inside, inside[1:]))
+    return all(padded(end, alignment_of(start)) == start
+               for (_a, end), (start, _b) in zip(inside, inside[1:]))
 
 
-def rodata_holds_only(low: int, high: int, migrated: set[int]) -> bool:
-    """Dit si la plage ne contient que des symboles que le découpage y met.
+def padded(offset: int, align: int) -> int:
+    """L'adresse que l'alignement atteint depuis celle-ci."""
+    return offset + (-offset % align)
 
-    Le désassembleur ne verse dans le sous-segment d'une unité que ce qu'il
-    migre vers ses fonctions ; un symbole de la plage qu'il ne migre pas n'est
-    plus écrit nulle part, et l'éditeur de liens s'arrête sur une faute de
-    segmentation devant la référence qui lui reste.
+
+# Une référence à un symbole de lecture seule, telle que le désassembleur
+# l'écrit : `%hi(_2109)`, `%lo(_2109)`, ou le mot d'une table.
+_REFERENCE = re.compile(r"%(?:hi|lo|gp_rel)\(([A-Za-z_@$][\w@$]*)\)")
+_GLABEL_LINE = re.compile(r"^\s*glabel\s+(\S+)")
+
+_REFERENCED: dict[str, set[str]] | None = None
+
+
+def read_references() -> dict[str, set[str]]:
+    """Quelles fonctions atteignent chaque symbole, lu dans la référence.
+
+    C'est ce qui décide si une plage `rodata:` peut voyager avec une unité : le
+    désassembleur ne verse dans son sous-segment que ce qu'il migre vers ses
+    fonctions, et un symbole de la plage qu'il ne migre pas n'est plus écrit
+    nulle part. L'éditeur de liens s'arrête alors sur une faute de segmentation,
+    précédée de débordements `%gp_rel` — le contenu manquant ayant rapproché les
+    petites données de `_gp`, dont le plus proche symbole n'est déjà qu'à seize
+    octets de la limite des ±32 Kio.
     """
-    return all(start in migrated for start, _end in read_sized_symbols()
-               if low <= start < high)
+    global _REFERENCED
+    if _REFERENCED is not None:
+        return _REFERENCED
+
+    table: dict[str, set[str]] = {}
+    for path in sorted((REF_DIR / "text").glob("*.s")):
+        function = ""
+        for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+            label = _GLABEL_LINE.match(line)
+            if label:
+                function = label.group(1).rstrip(",")
+                continue
+            for name in _REFERENCE.findall(line):
+                table.setdefault(name, set()).add(function)
+
+    _REFERENCED = table
+    return table
+
+
+def rodata_is_migrable(low: int, high: int, functions: list[Function]) -> bool:
+    """Dit si chaque symbole de la plage suivra une fonction de l'unité.
+
+    La règle est celle de spimdisasm, `SymbolRodata.shouldMigrate`, à trois
+    termes : le symbole doit être d'une forme migrable, une seule fonction doit
+    l'atteindre, et cette fonction doit être dans l'unité. Un symbole que rien
+    n'atteint n'est emporté que s'il se trouve entre deux qui le sont, ce qui
+    dépend de l'ordre — on ne s'y fie pas.
+    """
+    inside = {f.name for f in functions}
+    referenced = read_references()
+    return all(symbol.migrable
+               and referenced.get(symbol.name, set()) <= inside
+               and len(referenced.get(symbol.name, set())) == 1
+               for symbol in rodata_symbols(low, high))
+
+
+@dataclass
+class RodataSymbol:
+    """Un symbole de lecture seule, et s'il peut suivre une fonction."""
+    address: int
+    name: str
+    migrable: bool
+
+
+_RODATA_LABEL = re.compile(r"^\s*(?:dlabel|glabel)\s+(\S+)")
+# `/* <offset> <vram> [<octets>] */ .word .L…` — la ligne d'un octet de donnée.
+# Les octets manquent sous une chaîne, que le désassembleur rend en clair.
+_RODATA_DATA = re.compile(
+    r"^\s*/\*\s+\S+\s+([0-9A-Fa-f]{8})(?:\s+\S+)?\s+\*/\s*\.(\w+)\s*(.*)$")
+
+_RODATA: list[RodataSymbol] | None = None
+
+
+def is_migrable(kind: str, operands: list[str]) -> bool:
+    """Dit si le désassembleur emporte ce symbole avec la fonction qui l'atteint.
+
+    `MWCCPS2` porte `allowRdataMigration = False` chez spimdisasm : ce qui passe
+    pour une constante ne bouge pas. Ne restent donc migrables qu'une chaîne, une
+    table de saut — trois étiquettes au moins — et un flottant dont la queue est
+    nulle, ce que `SymbolRodata.isMaybeConstVariable` écarte.
+    """
+    if kind in ("asciz", "ascii"):
+        return True
+    if kind == "word":
+        return len(operands) >= 3 and all(o.startswith(".L") for o in operands)
+    if kind in ("float", "double"):
+        head = 1 if kind == "float" else 2
+        return all(o in ("0", "0.0", "-0") for o in operands[head:])
+    return False
+
+
+def read_rodata() -> list[RodataSymbol]:
+    """Les symboles de lecture seule du binaire, lus dans la référence."""
+    global _RODATA
+    if _RODATA is not None:
+        return _RODATA
+
+    found: list[RodataSymbol] = []
+    for path in sorted((REF_DIR / "data" / "rodata").glob("*.s")):
+        name: str | None = None
+        address = 0
+        kind = ""
+        operands: list[str] = []
+
+        def close() -> None:
+            if name is not None:
+                found.append(RodataSymbol(address, name,
+                                          is_migrable(kind, operands)))
+
+        for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+            label = _RODATA_LABEL.match(line)
+            if label:
+                close()
+                name, kind, operands = label.group(1).rstrip(","), "", []
+                continue
+            # Le remplissage qui suit une fin de symbole n'en fait pas partie :
+            # l'y laisser fait passer une table de saut pour une donnée mêlée.
+            if name is not None and line.strip().startswith("enddlabel"):
+                close()
+                name = None
+                continue
+            data = _RODATA_DATA.match(line)
+            if name is not None and data:
+                if not kind:
+                    kind, address = data.group(2), int(data.group(1), 16)
+                operands.append(data.group(3).strip())
+        close()
+
+    _RODATA = sorted(found, key=lambda s: s.address)
+    return _RODATA
+
+
+def rodata_symbols(low: int, high: int) -> list[RodataSymbol]:
+    """Les symboles de lecture seule d'une plage."""
+    return [s for s in read_rodata() if low <= s.address < high]
+
+
+def read_contributions(section: str = ".text") -> list[int]:
+    """Les adresses où commence chaque contribution d'objet de la section.
+
+    Le désassembleur en fait un sous-segment chacune, et il l'emporte sur une
+    unité déclarée : celle qui enjambe une frontière se voit tronquée là, sans
+    un mot, et les fonctions qu'elle perd ne sont écrites nulle part — sa source
+    réclame alors un `INCLUDE_ASM` dont le fichier n'existe pas. Les deux gros
+    blocs du jeu n'en portent aucune à l'intérieur ; le code de bibliothèque en
+    porte une par fonction.
+    """
+    path = CONFIG_DIR / "elf_sections.txt"
+    if not path.exists():
+        raise SystemExit("config/elf_sections.txt absent — lancez `make setup`")
+    return sorted(int(fields[1], 16)
+                  for fields in (line.split() for line
+                                 in path.read_text(encoding="utf-8").splitlines())
+                  if len(fields) == 2 and fields[0] == section)
 
 
 def read_declared() -> list[tuple[int, int, str]]:

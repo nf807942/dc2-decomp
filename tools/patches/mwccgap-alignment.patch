@@ -1,0 +1,324 @@
+L'alignement des sections greffées, pris de l'adresse que le désassemblage
+donne au symbole, et l'ordre des sections de lecture seule.
+
+MWCC demande seize octets pour chaque section qu'il émet, et mwccgap ramenait
+celles de lecture seule à deux. Ni l'un ni l'autre ne convient : une fonction
+ou une table que le binaire place ailleurs se trouve poussée, et tout ce qui la
+suit avec elle. L'adresse est dans le désassemblage — mwccgap la lit.
+
+Et l'ordre : une unité de traduction ne range pas toujours ses tables de saut
+dans l'ordre des fonctions qu'elles servent, MWCC en émettant certaines suites
+à l'envers. Déclarées chacune près de sa fonction, elles s'échangent. Elles se
+déclarent donc groupées, dans l'ordre de leurs adresses, et chaque section se
+retrouve alors par le symbole qui l'a déclarée plutôt que par sa place.
+
+Mesuré sur Dark Chronicle (PS2 PAL) : sans cela, 25 des 90 unités que le
+découpage propose ne se lient pas à l'identique, et 13 fonctions restent hors
+de toute unité. À reverser en amont.
+
+diff --git a/mwccgap/mwccgap.py b/mwccgap/mwccgap.py
+index 536d385..c845a33 100755
+--- a/mwccgap/mwccgap.py
++++ b/mwccgap/mwccgap.py
+@@ -15,7 +15,7 @@ from .constants import (
+     IGNORED_RELOCATIONS,
+ )
+ from .elf import Elf, TextSection, Relocation
+-from .preprocessor import Preprocessor
++from .preprocessor import Preprocessor, alignment_of, text_address
+ 
+ 
+ def process_c_file(
+@@ -76,6 +76,12 @@ def process_c_file(
+ 
+     symbol_to_section_idx = {}
+     for symbol in compiled_elf.symtab.symbols:
++        # The name the preprocessor gave the symbol, before it is turned back
++        # into the one the disassembly carries: it is what a .rodata section is
++        # looked up by, since the sections are declared in the binary's order
++        # rather than next to the functions they belong to.
++        symbol_to_section_idx[symbol.name] = symbol.st_shndx
++
+         if symbol.name.startswith(FUNCTION_PREFIX):
+             symbol.name = symbol.name[len(FUNCTION_PREFIX) :]
+             symbol.st_name += len(FUNCTION_PREFIX)
+@@ -102,8 +108,9 @@ def process_c_file(
+         macro_inc_path=macro_inc_path,
+     )
+ 
+-    for asm_file, num_rodata_symbols in asm_files:
++    for asm_file, rodata_symbols in asm_files:
+         function = asm_file.stem
++        num_rodata_symbols = len(rodata_symbols)
+ 
+         asm_bytes = assembler.assemble_file(asm_file)
+         assembled_elf = Elf(asm_bytes)
+@@ -127,22 +134,16 @@ def process_c_file(
+             else:
+                 raise Exception(f"{function} not found in {c_file}")
+ 
+-            # assumption is that .rodata will immediately follow the .text section
++            # Each .rodata section is found by the symbol that declared it: they
++            # are grouped in the binary's own order, so the one belonging to this
++            # function no longer has to follow its .text section.
+             rodata_section_indices = []
+-            if num_rodata_symbols > 0:
+-                for i, section in enumerate(
+-                    compiled_elf.sections[text_section_index + 1 :]
+-                ):
+-                    if section.name == ".rodata":
+-                        # found some .rodata before another .text section
+-                        rodata_section_indices.append(text_section_index + 1 + i)
+-                        if len(rodata_section_indices) == num_rodata_symbols:
+-                            # reached end of rodata sections for this text section
+-                            break
+-
+-            assert num_rodata_symbols == len(
+-                rodata_section_indices
+-            ), ".rodata section count mismatch"
++            for symbol in rodata_symbols:
++                idx = symbol_to_section_idx.get(symbol.name)
++                assert (
++                    idx is not None
++                ), f"Could not find .rodata section for symbol '{symbol.name}'"
++                rodata_section_indices.append(idx)
+         else:
+             # this file only contains .rodata
+             assert (
+@@ -164,6 +165,13 @@ def process_c_file(
+ 
+             text_section.data = asm_text[:compiled_function_length]
+ 
++            # Take the alignment from the address the disassembly gives the
++            # function: mwcc asks 16 bytes for every function it emits, which
++            # pushes one the binary places on an 8- or 4-byte boundary, and
++            # everything after it with it.
++            if address := text_address(asm_file):
++                text_section.sh_addralign = alignment_of(address)
++
+         if num_rodata_symbols > 0:
+             assert (
+                 len(assembled_elf.rodata_sections) == 1
+@@ -172,17 +180,28 @@ def process_c_file(
+ 
+             offset = 0
+             rodata_section_offsets = []
+-            for idx in rodata_section_indices:
++            for idx, symbol in zip(rodata_section_indices, rodata_symbols):
++                if symbol.address:
++                    # Take the alignment from the symbol's own address rather
++                    # than mwcc's 16-byte default: the assembled .rodata carries
++                    # the padding the directives ask for, so a symbol sliced at
++                    # its unpadded offset would read the bytes of the one before.
++                    align = symbol.align
++                    offset += -offset % align
++                else:
++                    # A disassembly that states no address keeps the loose
++                    # alignment, and the packing, mwccgap used before.
++                    align = 2
++
+                 # copy slices of rodata from ASM object into each .rodata section
+                 data_len = len(compiled_elf.sections[idx].data)
+                 compiled_elf.sections[idx].data = asm_rodata.data[
+                     offset : offset + data_len
+                 ]
++                rodata_section_offsets.append((offset, offset + data_len))
+                 offset += data_len
+-                rodata_section_offsets.append(offset)
+ 
+-                # force 4-byte alignment for .rodata sections (defaults to 16-byte)
+-                compiled_elf.sections[idx].sh_addralign = 2  # 1 << 2 = 4
++                compiled_elf.sections[idx].sh_addralign = align
+ 
+             rel_rodata_sh_name = compiled_elf.add_sh_symbol(".rel.rodata")
+ 
+@@ -244,10 +263,13 @@ def process_c_file(
+                         [] for _ in rodata_section_indices
+                     ]
+                     for relocation in relocation_record.relocations:
+-                        for i in range(len(rodata_section_offsets)):
+-                            if relocation.r_offset < rodata_section_offsets[i]:
+-                                if i > 0:
+-                                    relocation.r_offset -= rodata_section_offsets[i - 1]
++                        for i, (start, end) in enumerate(rodata_section_offsets):
++                            if relocation.r_offset < end:
++                                # An offset is relative to the section it lands
++                                # in, so it loses that section's own start —
++                                # not the end of the one before, which the
++                                # alignment padding no longer meets.
++                                relocation.r_offset -= start
+                                 new_relocations[i].append(relocation)
+                                 break
+ 
+diff --git a/mwccgap/preprocessor.py b/mwccgap/preprocessor.py
+index 597dd53..b136742 100644
+--- a/mwccgap/preprocessor.py
++++ b/mwccgap/preprocessor.py
+@@ -31,12 +31,57 @@ C_MACRO_END = """
+ #endif
+ """.splitlines()
+ 
++# The address a data line carries: `/* <offset> <vram> [<bytes>] */ .word ...`.
++DATA_ADDRESS_REGEX = re.compile(r"^/\*\s+\S+\s+([0-9A-Fa-f]{8})\b")
++
++
++def alignment_of(address: int) -> int:
++    """The alignment an address satisfies, between 4 and 16.
++
++    mwcc asks 16 bytes for every section it emits, and the linker pads up to it.
++    A grafted symbol the binary places elsewhere would be pushed, along with
++    everything after it; taking the alignment from the address keeps it put.
++    """
++    align = 16
++    while align > 4 and address % align:
++        align //= 2
++    return align
++
++
++def text_address(asm_file: Path) -> int:
++    """The address the disassembly gives a function, from its first instruction.
++
++    The .text section is not necessarily the first one in the file: a function
++    that jumps through a table has that table migrated ahead of its body, and
++    the first address in the file would then be the table's. A file that names
++    no section at all is text throughout, which is the ordinary case.
++    """
++    in_text = True
++    with asm_file.open("r", encoding="utf-8") as handle:
++        for line in handle:
++            line = line.strip()
++            if line.startswith(".section"):
++                in_text = line.endswith(".text")
++            elif in_text and (match := DATA_ADDRESS_REGEX.match(line)):
++                return int(match.group(1), 16)
++    return 0
++
+ 
+ @dataclass
+ class Symbol:
+     name: str
+     size: int = 0
+     local: bool = False
++    # The address the disassembly gives the symbol, from the comment its first
++    # data line carries. Two symbols in the same .rodata range may be separated
++    # by alignment padding, which the disassembly states as a directive rather
++    # than as bytes; without the address, that padding has nowhere to come from
++    # and every symbol after the first lands short.
++    address: int = 0
++
++    @property
++    def align(self) -> int:
++        return alignment_of(self.address)
+ 
+ 
+ class Preprocessor:
+@@ -46,10 +91,21 @@ class Preprocessor:
+     ):
+         self.asm_dir_prefix = asm_dir_prefix
+ 
++    @staticmethod
++    def declare_rodata(symbol: Symbol) -> str:
++        """The array that makes mwcc emit a .rodata section for this symbol."""
++        static = "static " if symbol.local else ""
++        return (
++            f"{static}const unsigned char {symbol.name}[{symbol.size}] = {{"
++            + symbol.size * "0, "
++            + "};"
++        )
++
+     @staticmethod
+     def preprocess_s_file(
+         function_name: str,
+         textio: TextIO,
++        emit_rodata: bool = True,
+     ) -> tuple[list[str], Dict[str, Symbol]]:
+         # mwcc creates a .rodata section per rodata symbol so we need to track them individually
+         rodata_entries: Dict[str, Symbol] = {}
+@@ -91,6 +147,10 @@ class Preprocessor:
+                     )
+                     continue
+ 
++                entry = rodata_entries[current_symbol]
++                if entry.address == 0 and (match := DATA_ADDRESS_REGEX.match(line)):
++                    entry.address = int(match.group(1), 16)
++
+                 if " .byte " in line:
+                     rodata_entries[current_symbol].size += 1
+                     continue
+@@ -178,8 +238,6 @@ class Preprocessor:
+             c_lines.extend([f"asm void {function_name}() {{", *nops, "}"])
+ 
+         for symbol in rodata_entries.values():
+-            static = "static " if symbol.local else ""
+-
+             if symbol.name.startswith('"@') and symbol.name.endswith('"'):
+                 symbol.name = SYMBOL_AT + symbol.name.removeprefix('"@').removesuffix(
+                     '"'
+@@ -187,20 +245,18 @@ class Preprocessor:
+             elif DOLLAR_SIGN in symbol.name:
+                 symbol.name = symbol.name.replace(DOLLAR_SIGN, SYMBOL_DOLLAR)
+ 
+-            c_lines.append(
+-                f"{static}const unsigned char {symbol.name}[{symbol.size}] = {{"
+-                + symbol.size * "0, "
+-                + "};",
+-            )
++            if emit_rodata:
++                c_lines.append(Preprocessor.declare_rodata(symbol))
+ 
+         return (c_lines, rodata_entries)
+ 
+     def preprocess_c_file(
+         self,
+         textio: TextIO,
+-    ) -> tuple[list[str], list[tuple[Path, int]]]:
++    ) -> tuple[list[str], list[tuple[Path, list[Symbol]]]]:
+         out_lines: list[str] = []
+-        asm_files: list[tuple[Path, int]] = []
++        asm_files: list[tuple[Path, list[Symbol]]] = []
++        rodata_at: Optional[int] = None
+ 
+         for i, line in enumerate(textio):
+             line = line.rstrip()
+@@ -239,15 +295,40 @@ class Preprocessor:
+                         new_lines, rodata_entries = Preprocessor.preprocess_s_file(
+                             f"{FUNCTION_PREFIX}{asm_file.stem}",
+                             f,
++                            emit_rodata=False,
+                         )
+                 except Exception as e:
+                     raise Exception(f"Failed to preprocess {asm_file}: {e}") from None
+ 
+-                asm_files.append((asm_file, len(rodata_entries)))
++                asm_files.append((asm_file, list(rodata_entries.values())))
+                 out_lines += C_MACRO_START
+                 out_lines += new_lines
+                 out_lines += C_MACRO_END
++
++                if rodata_entries and rodata_at is None:
++                    rodata_at = len(out_lines)
+             else:
+                 out_lines.append(line)
+ 
++        # The linker takes an object's .rodata sections in the order the object
++        # presents them, which is the order they are declared. That order has to
++        # be the one the binary shows: a translation unit does not always lay its
++        # jump tables out in the order of the functions they serve — mwcc emits
++        # some runs of them backwards — and declaring each next to its own
++        # function would then swap them, sending every jump elsewhere.
++        #
++        # The addresses come from the disassembly, so the order is read rather
++        # than derived. Where the block sits in the file changes nothing between
++        # its own members; it goes where the first of them was. A disassembly
++        # that states no address keeps the order it was written in.
++        if rodata_at is not None:
++            symbols = [s for _f, entries in asm_files for s in entries]
++            if all(s.address for s in symbols):
++                symbols.sort(key=lambda s: s.address)
++            out_lines[rodata_at:rodata_at] = (
++                C_MACRO_START
++                + [Preprocessor.declare_rodata(s) for s in symbols]
++                + C_MACRO_END
++            )
++
+         return (out_lines, asm_files)

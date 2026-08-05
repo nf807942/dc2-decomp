@@ -207,6 +207,19 @@ def section_starts(elf: Elf) -> dict[str, list[int]]:
     return starts
 
 
+def write_sections(starts: dict[str, list[int]], path: Path) -> None:
+    """Écrit les frontières de contribution, pour ce qui décide un découpage.
+
+    Le désassembleur en fait un sous-segment chacune : une unité déclarée à
+    cheval sur l'une d'elles se voit tronquée sans un mot, et les fonctions
+    qu'elle perd ne sont écrites nulle part. `make carve` a besoin de les
+    connaître pour n'en proposer aucune.
+    """
+    lines = [f"{name} 0x{addr:08X}"
+             for name in sorted(starts) for addr in starts[name]]
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
 _ILLEGAL = str.maketrans({c: "_" for c in "@$<>.,:;\"'/\\|?*()[]{} +-!#%^&=~`"})
 
 
@@ -614,6 +627,8 @@ def main() -> int:
     starts = section_starts(elf)
     summary = ", ".join(f"{n} ×{len(v)}" for n, v in sorted(starts.items()))
     print(f"sections d'origine : {summary}")
+
+    write_sections(starts, CONFIG_DIR / "elf_sections.txt")
 
     segments, unit_count, dropped = build_segments(elf, main_section)
     write_yaml(CONFIG_DIR / "splat.yaml", BOOT_NAME, image_sha1,
