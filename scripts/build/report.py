@@ -88,12 +88,21 @@ def compact(report: dict) -> dict:
     units = []
     functions_all = []
     sectors: dict[str, dict[str, float]] = {
-        ident: {"code": 0, "done": 0, "functions": 0, "functions_done": 0}
+        ident: {"code": 0, "done": 0, "mapped": 0, "functions": 0, "functions_done": 0}
         for ident, _n, _p in SECTORS
     }
 
     for unit in report.get("units", []):
         code = as_int(unit, "total_code")
+        # Une unité sans code est une unité de données : rien à reconstruire,
+        # le contenu est déjà là, et objdiff la porte complète. La montrer à
+        # zéro la ferait passer pour en attente, d'où les deux centaines.
+        is_data = code == 0
+        # Une unité est mappée dès qu'une source la reconstruit : la plage
+        # qu'elle couvre est déclarée dans `config/units.txt`, même si chaque
+        # fonction y reste encore greffée. Une unité de données n'a rien à
+        # confier, et se compte donc pour complète.
+        unit_mapped = bool((unit.get("metadata") or {}).get("source_path")) or is_data
         # La part de l'unité se refait depuis ses fonctions : celle qu'objdiff
         # en donne compte les fonctions greffées, identiques par construction,
         # et une unité tout juste ouverte s'y afficherait déjà pleine.
@@ -110,15 +119,17 @@ def compact(report: dict) -> dict:
             done = round(size * share / 100)
 
             entry = sectors.setdefault(
-                sector, {"code": 0, "done": 0, "functions": 0, "functions_done": 0})
+                sector, {"code": 0, "done": 0, "mapped": 0,
+                         "functions": 0, "functions_done": 0})
             unit_done += done
             entry["code"] += size
             entry["done"] += done
+            entry["mapped"] += size if unit_mapped else 0
             entry["functions"] += 1
             entry["functions_done"] += 1 if share >= 99.999 else 0
 
-            function_list.append([name, size, round(share), sector])
-            functions_all.append([name, size, round(share), sector])
+            function_list.append([name, size, round(share), sector, unit_mapped])
+            functions_all.append([name, size, round(share), sector, unit_mapped])
 
         # De la plus grosse à la plus petite : c'est l'ordre dans lequel on
         # choisit la suivante à reconstruire.
@@ -129,13 +140,20 @@ def compact(report: dict) -> dict:
             "sector": (unit.get("metadata", {}).get("progress_categories")
                        or ["game"])[0],
             "code": code,
-            "share": round(100 * unit_done / code, 2) if code else 0.0,
+            "share": round(100 * unit_done / code, 2) if code else 100.0,
             "functions": len(function_list),
             "source": unit.get("metadata", {}).get("source_path"),
+            "mapped": unit_mapped,
             "fns": function_list,
         })
 
     functions_all.sort(key=lambda row: -row[1])
+
+    # Ce qui est confié à une unité de `src/` : elle porte une base dès qu'une
+    # source la reconstruit, même si tout y reste greffé. C'est le chantier
+    # d'ouverture, distinct de la reconstruction que mesure `done`.
+    mapped_code = sum(u["code"] for u in units if u["source"])
+    mapped_units = sum(1 for u in units if u["source"])
 
     total_code = as_int(report, "total_code")
     total_done = sum(s["done"] for s in sectors.values())
@@ -154,6 +172,8 @@ def compact(report: dict) -> dict:
             "data": as_int(report, "total_data"),
             "functions": int(measure(report, "total_functions")),
             "units": len(units),
+            "mapped": mapped_code,
+            "mapped_units": mapped_units,
         },
         "sectors": [
             {"id": ident, "name": sector_names.get(ident, ident), **sectors[ident]}
@@ -185,6 +205,9 @@ def main() -> int:
     share = 100 * total["done"] / total["code"] if total["code"] else 0
     print(f"code reconstruit : {total['done']} octets sur {total['code']}"
           f" ({share:.3f} %)")
+    mapped_share = 100 * total["mapped"] / total["code"] if total["code"] else 0
+    print(f"code mappé      : {total['mapped']} octets sur {total['code']}"
+          f" ({mapped_share:.3f} %), {total['mapped_units']} unités src/")
     for sector in data["sectors"]:
         part = 100 * sector["done"] / sector["code"] if sector["code"] else 0
         print(f"  {sector['name']:22s} {sector['done']:8d} / {sector['code']:8d}"

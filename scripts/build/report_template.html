@@ -11,7 +11,6 @@
     --dim: #6f6a62;
     --faint: #a09a90;
     --done: #3f8f5f;
-    --part: #d9a13b;
     --none: #d8d3ca;
     --accent: #2f6f9f;
     --shadow: 0 1px 2px rgba(35, 32, 28, .06), 0 4px 12px rgba(35, 32, 28, .04);
@@ -19,7 +18,7 @@
   @media (prefers-color-scheme: dark) {
     :root {
       --bg: #16181a; --panel: #1e2124; --line: #2f3338; --ink: #e6e3de;
-      --dim: #9a958d; --faint: #6b665f; --done: #58ad78; --part: #d4a350;
+      --dim: #9a958d; --faint: #6b665f; --done: #58ad78;
       --none: #34383d; --accent: #6aa9d8;
       --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.2);
     }
@@ -65,6 +64,12 @@
   }
   .bar > i { display: block; height: 100%; background: var(--done); }
 
+  /* Ce que les unités de src/ couvrent : le chantier d'ouverture, en deçà de
+     la reconstruction. La couleur d'accent le distingue de la barre de code. */
+  .headline.mapped { margin-top: 1.5rem; }
+  .headline.mapped .big { font-size: 1.9rem; }
+  .bar.map > i { background: var(--accent); }
+
   /* Secteurs */
   .sectors {
     display: grid; gap: .75rem; margin: 2rem 0;
@@ -79,6 +84,8 @@
   .card .pct { font-size: 1.5rem; font-weight: 620; letter-spacing: -.02em; }
   .card .meta { color: var(--faint); font-size: .78rem; margin: .1rem 0 .55rem;
                 font-variant-numeric: tabular-nums; }
+  .card .mapmeta { color: var(--faint); font-size: .72rem; margin: .55rem 0 .2rem;
+                   font-variant-numeric: tabular-nums; }
 
   /* Treemap */
   section { margin: 2.5rem 0; }
@@ -152,6 +159,12 @@
   </div>
   <div class="bar"><i id="mainbar" style="width:0"></i></div>
 
+  <div class="headline mapped">
+    <span class="big" id="mpct">—</span>
+    <span class="of" id="mof"></span>
+  </div>
+  <div class="bar map"><i id="mappedbar" style="width:0"></i></div>
+
   <div class="sectors" id="sectors"></div>
 
   <section>
@@ -194,7 +207,8 @@
           <th data-key="sector">Secteur</th>
           <th data-key="code" class="num">Octets</th>
           <th data-key="functions" class="num">Fonctions</th>
-          <th data-key="share" class="num">Fait</th>
+          <th data-key="mapped">Mappé</th>
+          <th data-key="share">Fait</th>
         </tr></thead>
         <tbody id="rows"></tbody>
       </table>
@@ -217,8 +231,10 @@ const pct = n => (Math.round(n * 100) / 100).toLocaleString('fr-FR',
   { minimumFractionDigits: n > 0 && n < 1 ? 2 : 1, maximumFractionDigits: 2 });
 
 // Une unité est identique, partielle, ou encore du désassemblage. Les seuils
-// sont ceux du verdict : 100 % veut dire tous les octets.
-const colour = s => s >= 99.999 ? 'var(--done)' : s > 0 ? 'var(--part)' : 'var(--none)';
+// sont ceux du verdict : 100 % veut dire tous les octets. Le bleu marque ce
+// qui est mappé dans une unité de src/ sans être encore identique au disque.
+const colour = (s, mapped) => s >= 99.999 ? 'var(--done)'
+             : mapped ? 'var(--accent)' : 'var(--none)';
 const state = s => s >= 99.999 ? 'done' : s > 0 ? 'wip' : 'todo';
 
 const sectorName = {};
@@ -235,14 +251,26 @@ document.getElementById('sub').innerHTML =
   `Dark Chronicle PAL <code>SCES_511.90</code> · section <code>main</code> `
   + `sha1 <code>${DATA.sha1.slice(0, 12)}…</code> · ${DATA.generated}`;
 
+// Ce que les unités de src/ couvrent, qu'elles soient reconstruites ou encore
+// greffées : l'ouverture, le chantier qui borne la reconstruction possible.
+const mappedShare = T.code ? 100 * T.mapped / T.code : 0;
+document.getElementById('mpct').textContent = pct(mappedShare) + ' %';
+document.getElementById('mof').innerHTML =
+  `mappés dans ${fmt(T.mapped_units)} unités de <code>src/</code> · `
+  + `${fmt(T.mapped)} sur ${fmt(T.code)} octets de code`;
+document.getElementById('mappedbar').style.width = Math.max(mappedShare, 0) + '%';
+
 /* -- secteurs ------------------------------------------------------------ */
 document.getElementById('sectors').innerHTML = DATA.sectors.map(s => {
   const p = s.code ? 100 * s.done / s.code : 0;
+  const mp = s.code ? 100 * s.mapped / s.code : 0;
   return `<div class="card">
     <h3>${s.name}</h3>
     <div class="pct">${pct(p)} %</div>
     <div class="meta">${fmt(s.done)} / ${fmt(s.code)} octets · ${fmt(s.functions)} fn</div>
     <div class="bar"><i style="width:${Math.max(p, 0)}%"></i></div>
+    <div class="mapmeta">mappé ${pct(mp)} %</div>
+    <div class="bar map"><i style="width:${Math.max(mp, 0)}%"></i></div>
   </div>`;
 }).join('');
 
@@ -295,17 +323,20 @@ function drawMap() {
   // portent 91 % du code, la carte le montre d'un coup d'œil.
   const items = byFunction
     ? DATA.functions.map(f => ({ value: f[1], label: f[0], share: f[2], sector: f[3],
-                                 note: `${fmt(f[1])} octets · ${pct(f[2])} %` }))
+                                 mapped: f[4],
+                                 note: `${fmt(f[1])} octets · ${pct(f[2])} % · `
+                                     + (f[4] ? 'mappé' : 'désassemblage') }))
     : DATA.units.filter(u => u.code > 0).map(u => ({
         value: u.code, label: u.name.replace(/^asm\/(text|data)\//, ''),
-        share: u.share, sector: u.sector,
-        note: `${fmt(u.code)} octets · ${u.functions} fn · ${pct(u.share)} %` }));
+        share: u.share, sector: u.sector, mapped: u.mapped,
+        note: `${fmt(u.code)} octets · ${u.functions} fn · ${pct(u.share)} % · `
+            + (u.mapped ? 'mappé' : 'désassemblage') }));
 
   const tiles = [];
   squarify(items, 0, 0, W, H, tiles);
 
   svg.innerHTML = tiles.map(t => {
-    const fill = bySector ? (SECTOR_COLOUR[t.sector] || 'var(--none)') : colour(t.share);
+    const fill = bySector ? (SECTOR_COLOUR[t.sector] || 'var(--none)') : colour(t.share, t.mapped);
     const opacity = bySector && t.share < 99.999 ? .5 : 1;
     const showText = t.w > 52 && t.h > 13;
     const label = escapeText(t.label);
@@ -314,8 +345,7 @@ ${t.note} · ${sectorName[t.sector] || t.sector}</title>`
       + `<rect x="${t.x.toFixed(2)}" y="${t.y.toFixed(2)}" width="${t.w.toFixed(2)}"`
       + ` height="${t.h.toFixed(2)}" fill="${fill}" fill-opacity="${opacity}"`
       + ` data-name="${label}"></rect>`
-      + (showText ? `<text x="${(t.x + 3).toFixed(1)}" y="${(t.y + 11).toFixed(1)}"`
-          + ` clip-path="inset(0 ${Math.max(0, t.w - 5).toFixed(1)}px 0 0)">${label}</text>` : '')
+      + (showText ? `<text x="${(t.x + 3).toFixed(1)}" y="${(t.y + 11).toFixed(1)}">${label}</text>` : '')
       + `</g>`;
   }).join('');
 
@@ -324,7 +354,7 @@ ${t.note} · ${sectorName[t.sector] || t.sector}</title>`
     ? DATA.sectors.map(s => `<span><i class="swatch" style="background:${SECTOR_COLOUR[s.id]}"></i> ${s.name}</span>`).join('')
       + `<span><i class="swatch" style="background:var(--faint)"></i> teinte pleine = identique au disque</span>`
     : `<span><i class="swatch" style="background:var(--done)"></i> identique</span>`
-      + `<span><i class="swatch" style="background:var(--part)"></i> partiel</span>`
+      + `<span><i class="swatch" style="background:var(--accent)"></i> mappé</span>`
       + `<span><i class="swatch" style="background:var(--none)"></i> désassemblage</span>`;
 
   document.getElementById('maphint').textContent = byFunction
@@ -370,7 +400,7 @@ function render() {
 
   const body = document.getElementById('rows');
   if (!rows.length) {
-    body.innerHTML = `<tr><td colspan="5" class="empty">Rien ne correspond.</td></tr>`;
+    body.innerHTML = `<tr><td colspan="6" class="empty">Rien ne correspond.</td></tr>`;
   } else {
     body.innerHTML = rows.map(u => {
       const label = u.name.replace(/^asm\/(text|data)\//, '');
@@ -380,14 +410,14 @@ function render() {
         <td><span class="tag">${sectorName[u.sector] || u.sector}</span></td>
         <td class="num">${fmt(u.code)}</td>
         <td class="num">${u.functions}</td>
-        <td class="num"><span class="minibar"><i style="width:${u.share}%;background:${colour(u.share)}"></i></span>
-            &nbsp;${pct(u.share)}</td></tr>`;
+        <td><span class="minibar"><i style="width:${u.mapped ? 100 : 0}%;background:var(--accent)"></i></span></td>
+        <td><span class="minibar"><i style="width:${u.share}%;background:${colour(u.share, u.mapped)}"></i></span></td></tr>`;
       if (open) {
         const list = u.fns.length
-          ? u.fns.map(f => `<div class="fn"><u style="background:${colour(f[2])}"></u>`
+          ? u.fns.map(f => `<div class="fn"><u style="background:${colour(f[2], f[4])}"></u>`
               + `<b title="${f[0]}">${f[0]}</b><s>${fmt(f[1])}</s></div>`).join('')
           : '<span class="hint">Aucune fonction — unité de données.</span>';
-        html += `<tr class="detail"><td colspan="5"><div class="fns">${list}</div></td></tr>`;
+        html += `<tr class="detail"><td colspan="6"><div class="fns">${list}</div></td></tr>`;
       }
       return html;
     }).join('');
