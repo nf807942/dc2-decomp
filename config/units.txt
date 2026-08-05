@@ -1,6 +1,10 @@
 # Les unités de traduction que le projet reconstruit.
 #
-#   <début> <fin> <nom>
+#   <début> <fin> <nom> [rodata:<début>-<fin>]
+#
+# La plage `rodata` est facultative : elle sert aux unités dont une fonction
+# saute par table, celle-ci vivant en lecture seule mais désignant des
+# étiquettes du corps. Les deux doivent finir dans le même objet.
 #
 # Chaque ligne découpe une plage du binaire et la confie à `src/<nom>.cpp`.
 # Le désassemblage de la plage est alors écrit par fonction, sous
@@ -26,12 +30,15 @@
 
 
 
-# CDngFloorManager::GetSphedaPrize(int, int*, int*) seule : la classe est
-# entrecoupee, donc la plage se borne a cette fonction.
-# GetDngMapFloorGlidInfo jusqu'a IsClearMostFastDestroy. IsClearPractice, qui
-# suit, porte une table de saut que 00372BA0.rodata reference : elle reste en
-# assembleur, et coupe donc la classe en deux unites.
-0x002FE6C0 0x002FEB4C dngfloormanager
+# GetDngMapFloorGlidInfo jusqu'à IsClearPractice, cette dernière comprise avec
+# le nop d'alignement qui la précède — MWCC le produit, aucun INCLUDE_ASM ne le
+# réclame.
+# La plage rodata porte la table de saut d'IsClearPractice. Elle désigne des
+# étiquettes du corps de la fonction, donc les deux doivent finir dans le même
+# objet : laissée dans 00372BA0.rodata, elle référençait des symboles que plus
+# aucun fichier ne définissait, et l'éditeur de liens s'arrêtait sur une faute
+# de segmentation.
+0x002FE6C0 0x002FEE80 dngfloormanager rodata:0x00377F10-0x00377F30
 
 # GetDngMapFloorInfo, apres IsClearPractice.
 0x002FEE80 0x002FEEC4 dngfloorinfo

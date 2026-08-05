@@ -1,2 +1,7 @@
 // Symboles nommés à la main. Ce fichier est lu après
 // elf_symbol_addrs.txt et le corrige.
+
+// La table de saut d'IsClearPractice. m2c refuse de lire un `jr` dont la table
+// ne porte pas un nom en « jtbl »/« jpt_ »/« lbl_ »/« jumptable_ » ; le nom que
+// Metrowerks lui a donné, `_1200_00377F10`, n'en est pas un.
+jtbl_00377F10 = 0x00377F10; // size:0x1C type:jtbl

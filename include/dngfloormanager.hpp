@@ -25,7 +25,18 @@ struct DngMapFloorInfo {
      * rendre. Huit bits signés, comme le `lb` qui le lit. */
     s8 geoStone;
     s8 subGame1;
-    u8 unknown_18[0x0C];
+    u8 unknown_18[2];
+    /* Le genre de la condition d'entraînement que l'étage porte, de 0 à 6 ;
+     * `IsClearPractice` en fait l'indice de sa table de saut. Négatif quand
+     * l'étage n'en porte aucune, ce que le `bgez` qui le lit tranche. */
+    s8 practiceKind;
+    u8 unknown_1B;
+    /* Le paramètre de cette condition. Son sens dépend du genre : une borne à
+     * ne pas dépasser pour le genre 0, un membre d'équipe pour les genres 1 à
+     * 4 — c'est de lui que viennent le bit `1 << practiceParam` et la ligne de
+     * `cbit_1158`. */
+    int practiceParam;
+    u8 unknown_20[4];
     s16 sphedaPrize[3];
     s8 sphedaCount[3];
 };
@@ -57,6 +68,11 @@ struct DngFloorSaveInfo {
 /* Le bit du masque de drapeaux qui lève le scellé d'un étage. */
 #define DNG_FLOOR_SEAL_OPENED 0x400
 
+/* Le bit qui retient qu'une condition d'entraînement a déjà été remplie sur
+ * l'étage : `IsClearPractice` le pose et s'en sert pour distinguer la première
+ * réussite des suivantes. */
+#define DNG_FLOOR_PRACTICE_DONE 0x8
+
 /* L'état de donjon que la sauvegarde porte : son premier mot indexe le tableau
  * qui suit. Les noms sont déduits de ce seul usage, et la longueur du tableau
  * reste à établir. */
@@ -76,11 +92,22 @@ public:
     void AddYarikomiMedal(int count);
 };
 
-/* La scène de combat en cours ; le temps y est compté depuis l'entrée. */
+/* La scène de combat en cours ; le temps y est compté depuis l'entrée. Les
+ * trois membres que `IsClearPractice` consulte n'ont que cet usage établi. */
 class CBattleAreaScene {
 public:
-    u8 unknown_00[0x90];
+    u8 unknown_00[0x10];
+    /* Ce que la condition de genre 0 compare à son paramètre. */
+    int unknown_10;
+    u8 unknown_14[0x48];
+    /* Les conditions des genres 0 à 4 ne comptent que s'il est non nul. */
+    int unknown_5C;
+    u8 unknown_60[0x30];
     int startTime;
+    u8 unknown_94[4];
+    /* Un masque, éprouvé bit à bit contre `check_bittable_1123` et
+     * `cbit_1158`, et contre `1 << practiceParam`. */
+    int unknown_98;
 };
 
 /* La sauvegarde entière. L'aire de donjon y est un membre, à 0x1C5B4 — c'est
@@ -113,6 +140,7 @@ public:
     int IsSealFloor(int floor);
     DngMapFloorInfo *GetActiveFloorInfo();
     int IsClearMostFastDestroy();
+    int IsClearPractice(int difficulty);
     /* L'étage se donne explicitement. */
     int GetSphedaPrize(int floor, int index, int *prize, int *count);
     /* L'étage vient de la sauvegarde. */

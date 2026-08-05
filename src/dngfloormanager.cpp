@@ -158,3 +158,159 @@ int CDngFloorManager::IsClearMostFastDestroy() {
     return result;
 }
 
+
+/* Les trois tables que la condition d'entraînement consulte. Elles vivent en
+ * `.data` de l'unité d'origine, donc sans qualificatif de constance, et leur
+ * contenu reste dans le désassemblage : seule leur forme est déduite, des
+ * tailles que la table des symboles donne et des décalages que le code lit.
+ *
+ * `diff_conditiontable_1102` fait 0xE octets, soit deux lignes de sept — une
+ * par difficulté, une colonne par genre de condition. `check_bittable_1123`
+ * fait 0x24, soit trois lignes de six demi-mots, et `cbit_1158` 0x28, soit
+ * quatre lignes de cinq. */
+extern s8 diff_conditiontable_1102[2][7];
+extern u16 check_bittable_1123[3][6];
+extern u16 cbit_1158[4][5];
+
+/* L'étage porte-t-il une condition d'entraînement, et vient-elle d'être
+ * remplie ? La condition tient en un genre — de 0 à 6, qui choisit l'épreuve —
+ * et un paramètre, et la difficulté demandée dit lesquels comptent.
+ *
+ * Rend 2 quand la condition est remplie pour la première fois, 3 quand elle
+ * l'était déjà, 1 pour le seul genre 5 qui distingue son échec, 0 sinon. Une
+ * première réussite vaut une médaille. */
+int CDngFloorManager::IsClearPractice(int difficulty) {
+    CSaveDataDungeon *dungeon = menu_GetSaveDataDungeon();
+    CBattleAreaScene *scene = menu_GetBattleAreaScene();
+    int floor = dungeon->floors[dungeon->current];
+    DngMapFloorInfo *info = GetDngMapFloorInfo(floor);
+    DngFloorSaveInfo *saved = dungeon->GetFloorInfoPtr(dungeon->current, floor);
+    if (info == NULL || saved == NULL || scene == NULL) {
+        return 0;
+    }
+
+    /* L'ordre de ces déclarations décide des registres : MWCC attribue dans cet
+     * ordre, non par usage. Il est mesuré, non choisi — 120 ordres éprouvés sur
+     * les cinq premières, et six places pour `r`.
+     *
+     * Chaque boucle porte son propre compteur. Un seul, réutilisé, échange le
+     * compteur et le décalage d'octets que la réduction de force en tire : le
+     * commerce tient le premier en `a4` et le second en `a5`, et l'inverse coûte
+     * dix-huit instructions. */
+    int result;
+    int mask;
+    int found;
+    int kind;
+    int active;
+    int r;
+    int i;
+    int j;
+    int k;
+    int l;
+    int m;
+
+    kind = info->practiceKind;
+    if (kind < 0) {
+        return 0;
+    }
+    active = scene->unknown_5C;
+    result = 0;
+    if (diff_conditiontable_1102[difficulty][kind] == 0) {
+        return 0;
+    }
+
+    mask = scene->unknown_98;
+
+    /* Une boucle de sept tours, sans corps, que le commerce émet bel et bien :
+     * incrémentation, comparaison, quatre créneaux vides, branchement. Ce que ce
+     * compte servait à l'origine ne se lit plus dans le binaire.
+     *
+     * L'incrémentation est dans la condition parce que c'est la seule forme que
+     * ce compilateur garde : écrite `for (j = 0; j < 7; j++) {}`, la boucle
+     * disparaît entièrement, et une trentaine de formes de corps mort n'y
+     * changent rien. Seuls le test `!=` et l'incrémentation portée dans la
+     * condition la retiennent, et cette dernière seule laisse le `slti` signé
+     * que le commerce porte. */
+    j = 0;
+    while (++j < 7) {
+    }
+
+    switch (kind) {
+    case 0:
+        if (active != 0) {
+            if (scene->unknown_10 < info->practiceParam) {
+                result = 2;
+            }
+        }
+        break;
+    case 1:
+    case 2:
+    case 3:
+    case 4:
+        if (active != 0) {
+            found = 0;
+            if (kind == 1) {
+                for (i = 0; i < 6; i++) {
+                    if (mask & check_bittable_1123[0][i]) {
+                        found = 1;
+                    }
+                }
+            }
+            if (kind == 3) {
+                for (k = 0; k < 6; k++) {
+                    if (mask & check_bittable_1123[1][k]) {
+                        found = 1;
+                    }
+                }
+            }
+            if (kind == 4) {
+                for (l = 0; l < 6; l++) {
+                    if (mask & check_bittable_1123[2][l]) {
+                        found = 1;
+                    }
+                }
+            }
+            if (kind == 2) {
+                if ((mask & 0x1) || (mask & 0x20) || (mask & 0x40)) {
+                    found = 1;
+                } else {
+                    /* L'indice de ligne se matérialise avant l'accès : le
+                     * commerce garde `practiceParam - 1` dans un registre et
+                     * l'emploie deux fois, là où l'indexation directe replie le
+                     * calcul dans l'adresse. */
+                    r = info->practiceParam - 1;
+                    for (m = 0; m < 5; m++) {
+                        if (mask & cbit_1158[r][m]) {
+                            found = 1;
+                        }
+                    }
+                }
+            }
+            if ((mask & (1 << info->practiceParam)) && found == 0) {
+                result = 2;
+            }
+        }
+        break;
+    case 5:
+        result = 2;
+        if (mask & 0x80) {
+            result = 1;
+        }
+        break;
+    case 6:
+        break;
+    }
+
+    if (result == 2) {
+        if (saved->flags & DNG_FLOOR_PRACTICE_DONE) {
+            result = 3;
+        }
+    }
+    if (result == 2 || result == 3) {
+        saved->flags |= DNG_FLOOR_PRACTICE_DONE;
+    }
+    if (result == 2) {
+        GetUserDataMan()->AddYarikomiMedal(1);
+    }
+    return result;
+}

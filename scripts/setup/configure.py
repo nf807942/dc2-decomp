@@ -294,13 +294,18 @@ def write_symbol_addrs(elf: Elf, path: Path) -> tuple[int, int]:
     return len(lines), renamed
 
 
-def read_units() -> list[tuple[int, int, str]]:
+def read_units() -> list[tuple[int, int, str, tuple[int, int] | None]]:
     """Les unités que le projet reconstruit, telles que `config/units.txt` les
-    déclare : début, fin, nom.
+    déclare : début, fin, nom, et la plage `.rodata` qui les accompagne.
 
     C'est la seule pièce du découpage qui s'écrit à la main, et la seule qui se
     versionne : les frontières des 49 unités d'origine ne sont pas dans le
     binaire, donc elles se décident.
+
+    La plage `.rodata` est facultative et s'écrit `rodata:<début>-<fin>`. Elle
+    sert aux unités dont une fonction saute par table : celle-ci vit en lecture
+    seule mais désigne des étiquettes du corps, et les deux doivent finir dans
+    le même objet.
     """
     path = CONFIG_DIR / "units.txt"
     if not path.exists():
@@ -312,17 +317,28 @@ def read_units() -> list[tuple[int, int, str]]:
         if not line:
             continue
         fields = line.split()
-        if len(fields) != 3:
+        if len(fields) not in (3, 4):
             raise SystemExit(f"config/units.txt ligne {number} : "
-                             f"attendu « début fin nom »")
+                             f"attendu « début fin nom [rodata:début-fin] »")
         start, end, name = int(fields[0], 16), int(fields[1], 16), fields[2]
         if end <= start:
             raise SystemExit(f"config/units.txt ligne {number} : "
                              f"{name} finit avant de commencer")
-        units.append((start, end, name))
+
+        rodata = None
+        if len(fields) == 4:
+            if not fields[3].startswith("rodata:") or "-" not in fields[3]:
+                raise SystemExit(f"config/units.txt ligne {number} : "
+                                 f"attendu « rodata:début-fin », lu « {fields[3]} »")
+            low, high = fields[3][len("rodata:"):].split("-", 1)
+            rodata = (int(low, 16), int(high, 16))
+            if rodata[1] <= rodata[0]:
+                raise SystemExit(f"config/units.txt ligne {number} : "
+                                 f"la plage rodata de {name} finit avant de commencer")
+        units.append((start, end, name, rodata))
 
     units.sort()
-    for (a_start, a_end, a_name), (b_start, _b_end, b_name) in zip(units, units[1:]):
+    for (a_start, a_end, a_name, _a), (b_start, _b_end, b_name, _b) in zip(units, units[1:]):
         if b_start < a_end:
             raise SystemExit(f"config/units.txt : {a_name} et {b_name} se recouvrent")
     return units
@@ -361,10 +377,22 @@ def build_segments(elf: Elf, main: Section) -> tuple[list[tuple[int, str, str]],
     # début lui appartient, et la borne de fin rouvre du désassemblage.
     units = read_units()
     named: dict[int, str] = {}
-    for start, end, name in units:
+    # Les plages `.rodata` qu'une unité réclame, et les frontières que leur
+    # ouverture crée. Le désassemblage de référence les ignore : il garde tout
+    # en assembleur, et une table de saut y reste avec le corps qu'elle
+    # désigne.
+    named_rodata: dict[int, str] = {}
+    unit_rodata: set[int] = set()
+    for start, end, name, rodata in units:
         boundaries.append((start, ".text"))
         boundaries.append((end, ".text"))
         named[start] = name
+        if rodata is not None:
+            low, high = rodata
+            boundaries.append((low, ".rodata"))
+            boundaries.append((high, ".rodata"))
+            named_rodata[low] = name
+            unit_rodata.update((low, high))
 
     boundaries.sort()
     # Deux frontières à la même adresse — une contribution d'objet qui commence
@@ -387,11 +415,17 @@ def build_segments(elf: Elf, main: Section) -> tuple[list[tuple[int, str, str]],
             # mangling le dit. Le type `c` écrirait un `src/<nom>.c` à côté
             # du `.cpp`, et le lien recevrait deux fois la même unité.
             segments.append((rom_off, "cpp", named[addr]))
+        elif addr in named_rodata:
+            # Le point devant `rodata` est ce que splat exige pour rattacher la
+            # plage au fichier de même nom : sans lui il en écrirait un second
+            # désassemblage, et le lien recevrait deux fois les mêmes symboles.
+            segments.append((rom_off, ".rodata", named_rodata[addr]))
         else:
             kind = splat_type.get(section_name, "data")
             segments.append((rom_off, kind, f"{section_name.lstrip('.')}/{addr:08X}"))
 
-    return segments, len(units)
+    dropped = {addr - main.addr for addr in unit_rodata}
+    return segments, len(units), dropped
 
 
 YAML_HEADER = """\
@@ -505,7 +539,8 @@ def write_yaml(path: Path, basename: str, sha1: str, main: Section,
     path.write_text(body + "\n".join(lines) + "\n", encoding="utf-8")
 
 
-def as_reference(segments: list[tuple[int, str, str]]) -> list[tuple[int, str, str]]:
+def as_reference(segments: list[tuple[int, str, str]],
+                 dropped: set[int]) -> list[tuple[int, str, str]]:
     """Le même découpage, mais entièrement désassemblé.
 
     Une unité passée en C++ n'est plus extraite : le désassembleur n'écrit
@@ -513,11 +548,17 @@ def as_reference(segments: list[tuple[int, str, str]]) -> list[tuple[int, str, s
     reconstruite perd la référence contre laquelle on la mesure. Ce second
     découpage la garde — c'est la même voie que DCDecomp, dont le CMakeLists
     assemble chaque dump « whether or not the link ends up using it ».
+
+    Les coupures que la plage `.rodata` d'une unité ouvre n'y sont pas
+    reportées : une table de saut désigne des étiquettes du corps qu'elle sert,
+    et les séparer laisserait l'assembleur devant un symbole qu'aucun fichier
+    ne définit.
     """
     return [
         (offset, "asm" if kind == "cpp" else kind,
          f"text/{name}" if kind == "cpp" else name)
         for offset, kind, name in segments
+        if offset not in dropped
     ]
 
 
@@ -568,14 +609,15 @@ def main() -> int:
     summary = ", ".join(f"{n} ×{len(v)}" for n, v in sorted(starts.items()))
     print(f"sections d'origine : {summary}")
 
-    segments, unit_count = build_segments(elf, main_section)
+    segments, unit_count, dropped = build_segments(elf, main_section)
     write_yaml(CONFIG_DIR / "splat.yaml", BOOT_NAME, image_sha1,
                main_section, bss_end, segments)
     print(f"découpage {len(segments)} sous-segments dans config/splat.yaml,"
           f" dont {unit_count} reconstruits depuis src/")
 
     write_yaml(CONFIG_DIR / "splat.ref.yaml", BOOT_NAME, image_sha1,
-               main_section, bss_end, as_reference(segments), reference=True)
+               main_section, bss_end, as_reference(segments, dropped),
+               reference=True)
     print("référence complète dans config/splat.ref.yaml")
 
     # Une table écrite à la main, où les corrections de nommage se posent.

@@ -112,8 +112,8 @@ REF_O_FILES := $(addprefix $(BUILD_DIR)/, $(REF_S_FILES:.s=.o))
 O_FILES   := $(addprefix $(BUILD_DIR)/, $(S_FILES:.s=.o) $(BIN_FILES:.bin=.o) \
              $(addsuffix .o, $(basename $(SRC_FILES))))
 
-.PHONY: all setup tools split build check diff decompile clean distclean \
-        progress report
+.PHONY: all setup tools split build check diff decompile measure clean \
+        distclean progress report
 
 all: build
 
@@ -204,6 +204,12 @@ decompile:
 permute:
 	@test -n "$(S)" || { echo "usage : make permute S=<symbole> [N=<essais>]" >&2; exit 1; }
 	@$(PYTHON) scripts/diff/permute.py $(S) $(if $(N),-n $(N)) $(PERMUTE_ARGS)
+
+# Éprouve un lot de formes sur un même fragment de source.
+# `make measure S=IsClearPractice__16CDngFloorManagerFi V=perm/boucle.py`
+measure:
+	@test -n "$(S)" -a -n "$(V)" || { echo "usage : make measure S=<symbole> V=<variantes.py>" >&2; exit 1; }
+	@$(PYTHON) scripts/diff/measure.py $(S) $(V)
 
 # Ouvre une unité : la déclare et écrit sa source, tout en INCLUDE_ASM.
 open:
