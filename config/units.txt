@@ -43,6 +43,12 @@
 # GetDngMapFloorInfo, apres IsClearPractice.
 0x002FEE80 0x002FEEC4 dngfloorinfo
 
+# Les trois accesseurs de la table d'avancement, adjacents : l'entrée d'un
+# indice, son chapitre, et le nombre d'entrées. `LoadGameInfo`, qui remplit la
+# table juste avant, reste en assembleur — elle appelle l'interpréteur de
+# script, dont rien n'est encore reconstruit.
+0x0031FB20 0x0031FB98 gameprogress
+
 # EndTakePhoto seule : le bloc photo vit dans le gros bloc de code, et les
 # autres fonctions attendent d'etre ouvertes. Elle ne fait que revenir a
 # InitTakePhoto.
