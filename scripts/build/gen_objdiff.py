@@ -68,6 +68,11 @@ def subject_of(symbol: str) -> str:
 
 
 def sector_of(symbol: str) -> str:
+    """Le secteur que le seul nom désigne.
+
+    Suffisant dans les unités du jeu, où le mangling porte la classe. Ailleurs
+    c'est l'emplacement qui tranche, et `sectors_by_symbol` s'en charge.
+    """
     subject = subject_of(symbol)
     for ident, _name, pattern in SECTORS:
         if pattern.match(subject):
@@ -77,13 +82,97 @@ def sector_of(symbol: str) -> str:
 
 def function_sizes() -> dict[str, int]:
     """Taille de chaque fonction, telle que le binaire la déclare."""
+    return {name: size for name, (_addr, size) in function_table().items()}
+
+
+def function_table() -> dict[str, tuple[int, int]]:
+    """Adresse et taille de chaque fonction, telles que le binaire les déclare."""
     table = CONFIG_DIR / "elf_symbol_addrs.txt"
     if not table.exists():
         raise SystemExit("config/elf_symbol_addrs.txt absent — lancez `make setup`")
     return {
-        name: int(size, 16) if size else 0
-        for name, _addr, size in _FUNC.findall(table.read_text(encoding="utf-8"))
+        name: (int(addr, 16), int(size, 16) if size else 0)
+        for name, addr, size in _FUNC.findall(table.read_text(encoding="utf-8"))
     }
+
+
+def game_ranges() -> list[tuple[int, int]]:
+    """Les plages où vit le code écrit pour le jeu, déclarées à la main."""
+    path = CONFIG_DIR / "sectors.txt"
+    if not path.exists():
+        return []
+    ranges = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.split("#", 1)[0].split()
+        if len(line) == 2:
+            ranges.append((int(line[0], 16), int(line[1], 16)))
+    return ranges
+
+
+def contributions() -> list[tuple[int, set[str]]]:
+    """Les contributions d'objet, par adresse croissante.
+
+    Un fichier du désassemblage de référence en est une : les symboles de
+    section les bornent, à raison d'une par unité de traduction que l'éditeur
+    de liens a reçue.
+    """
+    addresses = {name: addr for name, (addr, _s) in function_table().items()}
+    found = []
+    for asm in (REF_DIR / "text").rglob("*.s"):
+        symbols = set(_GLABEL.findall(asm.read_text(encoding="utf-8", errors="replace")))
+        here = [addresses[s] for s in symbols if s in addresses]
+        if here:
+            found.append((min(here), symbols))
+    return sorted(found)
+
+
+def sectors_by_symbol() -> dict[str, str]:
+    """Le secteur de chaque fonction, l'emplacement primant sur le nom.
+
+    Dans les unités du jeu, le nom décide : le middleware de Level-5 y est
+    dispersé, et sa classe le désigne. Ailleurs le nom se tait — le code de
+    bibliothèque de cette époque ne porte pas de préfixe d'éditeur —, mais la
+    contribution le dit : elle est d'un seul tenant, livrée par une seule
+    archive. Son secteur est celui que ses noms désignent, et celle qu'aucun ne
+    désigne hérite de sa voisine, l'éditeur de liens rangeant côte à côte les
+    membres d'une même archive.
+    """
+    addresses = {name: addr for name, (addr, _s) in function_table().items()}
+    sizes = {name: size for name, (_a, size) in function_table().items()}
+    ranges = game_ranges()
+
+    def in_game(addr: int) -> bool:
+        return any(low <= addr < high for low, high in ranges)
+
+    table: dict[str, str] = {}
+    library: list[tuple[int, set[str], str | None]] = []
+
+    for start, symbols in contributions():
+        if in_game(start) or not ranges:
+            for symbol in symbols:
+                table[symbol] = sector_of(symbol)
+            continue
+        # Le vote se fait sur les octets, non sur le compte : une contribution
+        # peut porter un nom trompeur sur une fonction minuscule.
+        votes: dict[str, int] = {}
+        for symbol in symbols:
+            named = sector_of(symbol)
+            if named != "game":
+                votes[named] = votes.get(named, 0) + sizes.get(symbol, 0)
+        library.append((start, symbols, max(votes, key=votes.get) if votes else None))
+
+    for i, (_start, symbols, decided) in enumerate(library):
+        if decided is None:
+            decided = next((s for _a, _y, s in reversed(library[:i]) if s), None)
+            decided = decided or next((s for _a, _y, s in library[i + 1:] if s), None)
+        for symbol in symbols:
+            # Un nom qui se désigne lui-même l'emporte sur le voisinage.
+            named = sector_of(symbol)
+            table[symbol] = named if named != "game" else (decided or "game")
+
+    for symbol in addresses:
+        table.setdefault(symbol, sector_of(symbol))
+    return table
 
 
 def source_for(symbols: set[str]) -> Path | None:
@@ -106,6 +195,7 @@ def main() -> int:
         raise SystemExit("ref/asm absent — lancez `make setup`")
 
     sizes = function_sizes()
+    sectors = sectors_by_symbol()
     units = []
     totals: dict[str, int] = {}
 
@@ -122,7 +212,7 @@ def main() -> int:
         # n'est jamais majoritaire, et le middleware l'est rarement.
         weight: dict[str, int] = {}
         for symbol in symbols:
-            sector = sector_of(symbol)
+            sector = sectors.get(symbol) or sector_of(symbol)
             octets = sizes.get(symbol, 0)
             weight[sector] = weight.get(sector, 0) + octets
             totals[sector] = totals.get(sector, 0) + octets

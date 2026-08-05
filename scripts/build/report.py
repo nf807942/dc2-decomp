@@ -20,7 +20,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from lib.project import CONFIG_DIR, ROOT  # noqa: E402
-from build.gen_objdiff import SECTORS, sector_of  # noqa: E402
+from build.gen_objdiff import SECTORS, sector_of, sectors_by_symbol  # noqa: E402
 
 PROGRESS_DIR = ROOT / "progress"
 REPORT_JSON = PROGRESS_DIR / "report.json"
@@ -79,6 +79,9 @@ def compact(report: dict) -> dict:
     Level-5 est dans ce cas : dispersé dans des unités que le jeu domine.
     """
     sector_names = {ident: name for ident, name, _ in SECTORS}
+    # Le secteur se prend d'abord de l'emplacement : hors des unités du jeu,
+    # le nom d'une fonction de bibliothèque ne désigne pas son éditeur.
+    by_symbol = sectors_by_symbol()
 
     units = []
     functions_all = []
@@ -99,7 +102,7 @@ def compact(report: dict) -> dict:
             name = fn.get("name", "?")
             size = int(fn.get("size") or 0)
             share = measure(fn, "fuzzy_match_percent")
-            sector = sector_of(name)
+            sector = by_symbol.get(name) or sector_of(name)
             done = round(size * share / 100)
 
             entry = sectors.setdefault(

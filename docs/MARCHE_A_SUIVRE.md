@@ -146,6 +146,15 @@ résultat ; ce qui marche est de l'évaluer dans la condition elle-même :
 if (this->table == NULL || (i = 0, this->count) <= 0) {
 ```
 
+**Un calcul que le commerce enchaîne dans le registre d'un paramètre** ne
+s'obtient qu'en écrivant dans ce paramètre. Une variable locale, même morte
+aussitôt, fait choisir un autre registre :
+
+```cpp
+mpeg = (sceMpeg *)mpeg->work;          // lw a0, 0x40(a0) — apparie
+sceMpegWork *work = mpeg->work;        // lw v0, 0x40(a0) — n'apparie pas
+```
+
 **Quand une fonction plafonne**, écrire un script qui compile vingt variantes et
 rapporte leur taux tranche plus vite que les essais un par un : chaque palier
 désigne le fait suivant à corriger.

@@ -19,7 +19,10 @@
 # CGamePad et ses fonctions libres : la manette, de son initialisation à ses
 # répétitions automatiques. `pad_button_read` compose l'état des boutons,
 # `read_pad` parle au SDK, `AxisCalibration` centre les manches.
-0x0014A650 0x0014B500 gamepad
+# La borne suit ce que l'objet produit : `CancelAutoRepeat`, derniere fonction
+# de la plage, est desormais compilee, donc les douze octets de remplissage qui
+# la separent de 0x0014B500 ne sont plus emis.
+0x0014A650 0x0014B4F4 gamepad
 
 
 
@@ -37,5 +40,14 @@
 # autres fonctions attendent d'etre ouvertes. Elle ne fait que revenir a
 # InitTakePhoto.
 0x00313A30 0x00313A38 takephoto
+
+# Les deux rappels que sceMpegInit installe par defaut pour suspendre et
+# reprendre le DMA autour du decodage. La plage est une contribution d'objet
+# entiere, que les symboles de section bornent : une unite de traduction
+# d'origine, non une tranche decidee.
+# La borne s'arrete a la fin de _defRestartDMA, non au debut de la
+# contribution suivante : les deux fonctions etant compilees, MWCC ne produit
+# pas les quatre octets de remplissage qui les separent de 0x0010F4E0.
+0x0010F4C0 0x0010F4DC mpegdma
 
 

@@ -199,6 +199,12 @@ decompile:
 	@test -n "$(S)" || { echo "usage : make decompile S=<symbole>" >&2; exit 1; }
 	@$(PYTHON) scripts/diff/decompile.py $(S)
 
+# Cherche par essais la forme qui apparie une fonction déjà proche.
+# `make permute S=UpDate__8CGamePadFv N=400`
+permute:
+	@test -n "$(S)" || { echo "usage : make permute S=<symbole> [N=<essais>]" >&2; exit 1; }
+	@$(PYTHON) scripts/diff/permute.py $(S) $(if $(N),-n $(N)) $(PERMUTE_ARGS)
+
 # Ouvre une unité : la déclare et écrit sa source, tout en INCLUDE_ASM.
 open:
 	@test -n "$(S)" || { echo "usage : make open S=<classe>" >&2; exit 1; }
