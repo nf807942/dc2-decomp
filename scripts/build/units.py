@@ -23,7 +23,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from lib.project import CONFIG_DIR  # noqa: E402
+from lib.project import CONFIG_DIR, REF_DIR  # noqa: E402
 
 _FUNC = re.compile(
     r"^(\S+)\s*=\s*0x([0-9A-Fa-f]+);.*?type:func(?:.*?size:0x([0-9A-Fa-f]+))?",
@@ -83,17 +83,122 @@ def read_functions() -> list[Function]:
     return sorted(rows, key=lambda f: f.address)
 
 
+_SIZED = re.compile(r"^\S+\s*=\s*0x([0-9A-Fa-f]+);.*?size:0x([0-9A-Fa-f]+)",
+                    re.MULTILINE)
+
+
+def read_sized_symbols() -> list[tuple[int, int]]:
+    """Les symboles que le binaire dimensionne : leur début et leur fin."""
+    table = CONFIG_DIR / "elf_symbol_addrs.txt"
+    if not table.exists():
+        raise SystemExit("config/elf_symbol_addrs.txt absent — lancez `make setup`")
+    return sorted((int(a, 16), int(a, 16) + int(s, 16))
+                  for a, s in _SIZED.findall(table.read_text(encoding="utf-8")))
+
+
+def rodata_is_contiguous(low: int, high: int) -> bool:
+    """Dit si une plage de lecture seule peut voyager avec son unité.
+
+    Le désassembleur migre vers la fonction chaque symbole de la plage, et
+    mwccgap en fait une section de sa taille propre. Ce qui les séparait dans le
+    binaire — le remplissage d'alignement — n'y est plus, et tout ce qui suit se
+    tasse d'autant. Une plage dont les symboles se touchent ne perd rien ; le
+    remplissage qui la termine, lui, revient de l'alignement du sous-segment
+    voisin.
+    """
+    inside = [(start, end) for start, end in read_sized_symbols()
+              if low <= start < high]
+    if not inside or inside[0][0] != low:
+        return False
+    return all(end == start for (_a, end), (start, _b) in zip(inside, inside[1:]))
+
+
+def rodata_holds_only(low: int, high: int, migrated: set[int]) -> bool:
+    """Dit si la plage ne contient que des symboles que le découpage y met.
+
+    Le désassembleur ne verse dans le sous-segment d'une unité que ce qu'il
+    migre vers ses fonctions ; un symbole de la plage qu'il ne migre pas n'est
+    plus écrit nulle part, et l'éditeur de liens s'arrête sur une faute de
+    segmentation devant la référence qui lui reste.
+    """
+    return all(start in migrated for start, _end in read_sized_symbols()
+               if low <= start < high)
+
+
 def read_declared() -> list[tuple[int, int, str]]:
+    """Les unités déjà déclarées : début, fin, nom.
+
+    Une ligne porte trois champs, ou quatre quand une plage `rodata:` accompagne
+    l'unité. Les compter à trois seulement rendait invisible toute unité à table
+    de saut, que `make units` reproposait alors comme si elle était libre.
+    """
     path = CONFIG_DIR / "units.txt"
     if not path.exists():
         return []
     declared = []
     for line in path.read_text(encoding="utf-8").splitlines():
-        line = line.split("#", 1)[0].strip()
-        if line and len(line.split()) == 3:
-            start, end, name = line.split()
-            declared.append((int(start, 16), int(end, 16), name))
+        fields = line.split("#", 1)[0].split()
+        if len(fields) >= 3:
+            declared.append((int(fields[0], 16), int(fields[1], 16), fields[2]))
     return declared
+
+
+@dataclass
+class JumpTable:
+    """Une table de saut : là où elle vit, et les étiquettes qu'elle désigne."""
+    name: str
+    address: int
+    size: int
+    targets: list[int]
+
+    @property
+    def end(self) -> int:
+        return self.address + self.size
+
+
+# Une table de saut se reconnaît à son contenu : des mots qui désignent des
+# étiquettes de code, que le désassembleur écrit `.L<adresse>`. Rien d'autre en
+# lecture seule n'a cette forme.
+_DLABEL = re.compile(r"^dlabel\s+(\S+)\s*$")
+_JUMP_WORD = re.compile(
+    r"/\*\s*\w+\s+([0-9A-Fa-f]{8})\s+\w+\s*\*/\s*\.word\s+\.L([0-9A-Fa-f]{8})")
+
+
+def read_jump_tables() -> list[JumpTable]:
+    """Les tables de saut du binaire, lues dans le désassemblage de référence.
+
+    Une fonction qui saute par table ne peut pas s'ouvrir sans elle : la table
+    vit en lecture seule mais désigne des étiquettes du corps, et l'objet doit
+    porter les deux. C'est ce que la plage `rodata:` de `config/units.txt`
+    déclare, et c'est d'ici qu'on la déduit.
+    """
+    rodata = REF_DIR / "data" / "rodata"
+    if not rodata.is_dir():
+        raise SystemExit("ref/asm absent — lancez `make setup`")
+
+    tables: list[JumpTable] = []
+    for path in sorted(rodata.glob("*.s")):
+        name: str | None = None
+        entries: list[tuple[int, int]] = []
+        for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+            label = _DLABEL.match(line.strip())
+            if label:
+                name, entries = label.group(1), []
+                continue
+            if name is None:
+                continue
+            word = _JUMP_WORD.search(line)
+            if word:
+                entries.append((int(word.group(1), 16), int(word.group(2), 16)))
+            elif line.strip().startswith("enddlabel"):
+                # Une table n'a que des étiquettes : un bloc qui en mêle
+                # d'autres mots est une donnée qui se trouve en contenir.
+                if entries:
+                    start = entries[0][0]
+                    tables.append(JumpTable(name, start, entries[-1][0] + 4 - start,
+                                            [t for _a, t in entries]))
+                name, entries = None, []
+    return tables
 
 
 def group_by_class(functions: list[Function]) -> dict[str, Group]:

@@ -469,6 +469,12 @@ options:
   asm_function_macro: glabel
   asm_jtbl_label_macro: jlabel
   asm_data_macro: dlabel
+  # Le marqueur qui précède un symbole encore en assembleur. mwccgap le
+  # rencontre dans la section `.rodata` d'une fonction greffée — une table de
+  # saut migrée avec son corps — et n'y reconnaît que ce nom-là ; sous celui
+  # que splat emploie par défaut, il s'arrête sur « Unexpected entry in
+  # .rodata section ».
+  asm_nonmatching_label_macro: nmlabel
 
   # L'en-tête des fichiers qu'une source inclut. Le profil MWCCPS2 le laisse
   # vide là où celui de GCC le renseigne : sans lui, l'assembleur réordonne et

@@ -19,15 +19,18 @@ binaire lui-même.
 | | |
 |---|---|
 | Construction identique au disque | **oui** — 2 608 512 octets, sha1 `eca0c93d5d6a25fcbf8f1fa41aa811a6f4b7aca8` |
-| Code reconstruit en C++ | 1 348 octets sur 2 209 044 — 16 fonctions sur 7 792 |
+| Code reconstruit en C++ | 6 080 octets sur 2 215 100 — 32 fonctions sur 7 837 |
 | Compilateur | `mwcps2-3.0-011126`, `-O4,p` — départagé en mesurant les 21 versions |
-| Découpage | 193 unités de texte, 92 de données, 6 blocs vectoriels, 1 unité ouverte |
+| Découpage | 72 unités ouvertes, 5 072 fonctions — 64 % des octets, 74 % des fonctions du jeu |
 
 La construction part du désassemblage entier et le réassemble ; chaque fonction
 passée en C++ en remplace une part, et la construction doit rester identique.
-Quatre unités sont ouvertes : `gamepad`, `dngfloormanager`, `dngfloorinfo` et
-`takephoto`. La marche à suivre est dans
-[docs/MARCHE_A_SUIVRE.md](docs/MARCHE_A_SUIVRE.md).
+Une unité ouverte n'est pas du code reconstruit : ses fonctions gardent les
+octets du disque jusqu'à ce qu'on les écrive, et c'est ce que les deux lignes
+ci-dessus distinguent. `make carve` découpe le reste du jeu d'un coup.
+
+La marche à suivre est dans [docs/MARCHE_A_SUIVRE.md](docs/MARCHE_A_SUIVRE.md),
+ce qui reste à faire dans [ROADMAP.md](ROADMAP.md).
 
 ## Prérequis
 
@@ -116,6 +119,29 @@ perdrait l'original contre lequel on la mesure. `ref/` est donc la cible
 d'objdiff, et `make reference` l'assemble.
 
 [mwccgap]: https://github.com/mkst/mwccgap
+
+## Retoucher une fonction sans toucher aux sources
+
+Quand on veut une version modifiée pour la jouer, pas une source qui rend les
+octets du disque, `make mod` patche l'exécutable construit sans rien écrire
+dans `src/` :
+
+```sh
+scripts/host/dc2 make mod M="IsLevelUp__13CGameDataUsedFv=1"
+scripts/host/dc2 make iso    # porte le résultat dans l'image
+```
+
+Chaque `SYMBOLE=VALEUR` remplace le corps de la fonction par un retour de la
+constante — un `jr $ra` suivi de `addiu $v0, $zero, valeur` — et le reste de la
+fonction devient du remplissage pour garder sa taille. On peut en donner
+plusieurs d'un coup, séparées par des espaces. Les symboles s'écrivent manglés,
+comme `make decompile` les attend.
+
+La taille reste constante par nécessité : les symboles du désassemblage sont
+placés à leur adresse absolue, et la moindre fonction plus grande décale les
+données sous les relocations `%gp_rel`. Ce qui vit dans `build/SCES_511.90`
+est un fichier produit, jamais versionné — `make build` repart du disque et
+l'efface.
 
 ## Voir l'avancement
 

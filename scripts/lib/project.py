@@ -50,6 +50,25 @@ def sources() -> list[Path]:
     return sorted(list(SRC_DIR.rglob("*.cpp")) + list(SRC_DIR.rglob("*.c")))
 
 
+# `INCLUDE_ASM("nonmatchings/<unite>", <symbole>);`
+_INCLUDE_ASM = re.compile(r'INCLUDE_ASM\s*\(\s*"[^"]*"\s*,\s*(\S+?)\s*\)')
+
+
+def grafted_symbols() -> set[str]:
+    """Les fonctions qu'une source laisse en assembleur.
+
+    mwccgap greffe leurs octets d'origine dans l'objet compilé : elles y sont
+    identiques à la référence, et tout ce qui compare les deux les donnerait
+    pour appariées. Ouvrir une unité afficherait alors ses fonctions comme
+    reconstruites sans qu'une ligne de C++ soit écrite.
+    """
+    names: set[str] = set()
+    for path in sources():
+        names |= set(_INCLUDE_ASM.findall(
+            path.read_text(encoding="utf-8", errors="replace")))
+    return names
+
+
 _SYMBOL_SOURCES: dict[str, Path] | None = None
 
 

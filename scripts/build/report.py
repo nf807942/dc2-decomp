@@ -19,7 +19,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from lib.project import CONFIG_DIR, ROOT  # noqa: E402
+from lib.project import CONFIG_DIR, ROOT, grafted_symbols  # noqa: E402
 from build.gen_objdiff import SECTORS, sector_of, sectors_by_symbol  # noqa: E402
 
 PROGRESS_DIR = ROOT / "progress"
@@ -83,6 +83,8 @@ def compact(report: dict) -> dict:
     # le nom d'une fonction de bibliothèque ne désigne pas son éditeur.
     by_symbol = sectors_by_symbol()
 
+    grafted = grafted_symbols()
+
     units = []
     functions_all = []
     sectors: dict[str, dict[str, float]] = {
@@ -92,21 +94,24 @@ def compact(report: dict) -> dict:
 
     for unit in report.get("units", []):
         code = as_int(unit, "total_code")
-        # `matched_code_percent` est la part que l'appariement retient ;
-        # `complete_code_percent` n'est renseigné que pour les données et pour
-        # les unités déclarées complètes, donc le lire ici rendrait zéro partout.
-        done_share = measure(unit, "matched_code_percent")
+        # La part de l'unité se refait depuis ses fonctions : celle qu'objdiff
+        # en donne compte les fonctions greffées, identiques par construction,
+        # et une unité tout juste ouverte s'y afficherait déjà pleine.
+        unit_done = 0
 
         function_list = []
         for fn in unit.get("functions", []):
             name = fn.get("name", "?")
             size = int(fn.get("size") or 0)
-            share = measure(fn, "fuzzy_match_percent")
+            # Une fonction greffée porte les octets du disque : l'appariement
+            # la rendrait à 100 % sans qu'une ligne de C++ soit écrite.
+            share = 0.0 if name in grafted else measure(fn, "fuzzy_match_percent")
             sector = by_symbol.get(name) or sector_of(name)
             done = round(size * share / 100)
 
             entry = sectors.setdefault(
                 sector, {"code": 0, "done": 0, "functions": 0, "functions_done": 0})
+            unit_done += done
             entry["code"] += size
             entry["done"] += done
             entry["functions"] += 1
@@ -124,7 +129,7 @@ def compact(report: dict) -> dict:
             "sector": (unit.get("metadata", {}).get("progress_categories")
                        or ["game"])[0],
             "code": code,
-            "share": round(done_share, 2),
+            "share": round(100 * unit_done / code, 2) if code else 0.0,
             "functions": len(function_list),
             "source": unit.get("metadata", {}).get("source_path"),
             "fns": function_list,

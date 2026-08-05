@@ -112,7 +112,7 @@ REF_O_FILES := $(addprefix $(BUILD_DIR)/, $(REF_S_FILES:.s=.o))
 O_FILES   := $(addprefix $(BUILD_DIR)/, $(S_FILES:.s=.o) $(BIN_FILES:.bin=.o) \
              $(addsuffix .o, $(basename $(SRC_FILES))))
 
-.PHONY: all setup tools split build check diff decompile measure clean \
+.PHONY: all setup tools split build check diff decompile measure carve clean \
         distclean progress report
 
 all: build
@@ -139,6 +139,7 @@ split: config/splat.yaml
 	rm -rf $(ASM_DIR) $(REF_DIR) bin
 	$(SPLAT) $(CONFIG)
 	$(SPLAT) $(CONFIG_REF)
+	@$(PYTHON) scripts/setup/normalize.py
 
 # --------------------------------------------------------------------------
 # Construction
@@ -230,6 +231,12 @@ mod: elf
 	@test -n "$(M)" || { echo 'usage : make mod M="SYMBOLE=VALEUR"' >&2; exit 1; }
 	@$(PYTHON) scripts/build/mod.py $(M)
 
+# Découpe tout le code du jeu en unités, d'un coup.
+#   make carve                      les plages proposées
+#   make carve CARVE_ARGS=--apply   les déclare et écrit leurs sources
+carve:
+	@$(PYTHON) scripts/build/carve.py $(CARVE_ARGS)
+
 # Les unités de travail : celles qu'on peut ouvrir, et ce qu'elles contiennent.
 # `make units S=mgCFrame` détaille une classe.
 units:
@@ -240,7 +247,12 @@ progress:
 	@$(PYTHON) scripts/build/progress.py
 
 # La configuration qu'objdiff lit : une unité par objet, avec son secteur.
-objdiff.json: config/splat.yaml
+#
+# Les sources en sont une dépendance autant que le découpage : c'est leur
+# présence qui donne à une unité son `base_path`, donc l'objet contre lequel
+# objdiff la mesure. Sans elles, une unité dont la source vient d'être écrite
+# reste sans base, et le rapport ne mesure aucune de ses fonctions.
+objdiff.json: config/splat.yaml $(SRC_FILES)
 	@$(PYTHON) scripts/build/gen_objdiff.py
 
 # Les objets de référence, contre lesquels chaque fonction se mesure.

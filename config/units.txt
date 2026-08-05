@@ -43,6 +43,20 @@
 # GetDngMapFloorInfo, apres IsClearPractice.
 0x002FEE80 0x002FEEC4 dngfloorinfo
 
+# CMenuInvent, le menu d'invention — première moitié. La classe va jusqu'à
+# 0x0020C158, mais quatre de ses fonctions sautent par table (IsCreateObject,
+# CalcCursorPosition, IsAskExtend, NextDifferentMode) et une fonction greffée
+# perd les étiquettes que sa table désigne. La plage s'arrête donc avant la
+# première d'entre elles ; ce n'est pas une frontière d'unité de traduction,
+# c'est ce que l'outillage sait porter aujourd'hui.
+0x00201EE0 0x00203E90 menuinvent
+
+# CGameDataUsed — un objet du jeu, arme, poisson ou pièce de robot — avec la
+# jauge COMMON_GAGE et les aides libres qui la précèdent. `GetMainCharaModelName`
+# tombe au milieu de la classe : c'est une fonction libre de la même unité, non
+# une frontière. Aucune fonction de la plage ne saute par table.
+0x001981B0 0x0019B680 gamedataused
+
 # Les trois accesseurs de la table d'avancement, adjacents : l'entrée d'un
 # indice, son chapitre, et le nombre d'entrées. `LoadGameInfo`, qui remplit la
 # table juste avant, reste en assembleur — elle appelle l'interpréteur de
@@ -64,3 +78,195 @@
 0x0010F4C0 0x0010F4DC mpegdma
 
 
+
+# 0x0012C2C0 .. 0x00131560 : 103 fonctions, 20428 octets.
+0x0012C2C0 0x00131560 mgmath
+
+# mgCFrame, mgCDrawPrim, mgCDrawManager, mgCMDTBuilder, mgCCamera, mgCCameraFollow, mgCObject, mgCVisual, mgCFrameAttr, mgCVisualMDT, mgCVisualFixMDT, mgCFrameBase : 209 fonctions, 29960 octets.
+0x00131560 0x00138EE0 mgcframe
+
+# mgCVisualMDT, mgCTextureAnime, mgRENDER_INFO, mgCShadowMDT, mgC3DSprite, mgCVisualFixMDT, mgCMemory, mgCSprite, mgCVisual, mgCDrawEnv, mgCVisualPrim, mgCTexAnimeData, mgCTextureManager, mgCVisualAttr, mgVu0FBOX, mgRect_i_, CList_15mgCTexAnimeData_ : 142 fonctions, 34396 octets.
+0x00138EE0 0x00141850 mgcvisualmdt rodata:0x00366D60-0x00366D78
+
+# CScriptInterpreter, input_str, mgCMemory, SPI_STACK : 124 fonctions, 23904 octets.
+0x00141850 0x00147890 cscriptinterpreter
+
+# CCollisionMDT, CColFrame, CCollision : 62 fonctions, 11300 octets.
+0x00147890 0x0014A650 ccollisionmdt
+
+# CGamePad : 69 fonctions, 24592 octets.
+0x0014B500 0x00151690 cgamepad
+
+# ClsMes, CMapFlagData : 52 fonctions, 24632 octets.
+0x00157790 0x0015D920 clsmes rodata:0x003673E0-0x00367440
+
+# CMap, CMapParts, CMapWater, CPartsGroup, CFuncPoint, CObjAnime, CList_14PartsGroupData_, CList_P9CMapParts_, CObject : 67 fonctions, 15988 octets.
+0x0015D920 0x00161970 cmap
+
+# CMapParts, CMap, CMapInfo, CMapTreasureBox, CCameraInfo, CMapLightingInfo, CObject, CMapPiece, CList_9CMapParts_, CList_9CMapPiece_, CFuncPoint, CObjectFrame, mgCObject, mgCFrame, CCameraDrawInfo, PieceMaterial, CCollision, CMapWater, CList_9CObjAnime_, CColFrame : 210 fonctions, 30988 octets.
+0x00161970 0x00169820 cmapparts
+
+# CActionChara, CMapPiece, CMdsListSet, CObject, CMdsList, CObjectFrame, CIMGList, CCharacter2, CMdsInfo : 111 fonctions, 25492 octets.
+0x00169820 0x0016FE00 cactionchara
+
+# CActionChara, CCharacter2 : 52 fonctions, 24508 octets.
+0x0016FE00 0x00175F10 cactionchara_0016FE00 rodata:0x00368040-0x0036805C
+
+# CCharacter2, CDynamicAnime, CDAColPipe, CObject, CDACollision, CCharaLOD : 136 fonctions, 29776 octets.
+0x00175F10 0x0017D680 ccharacter2
+
+# CSound, sndCSeSeq, sndPortInfo, CLoopSeMngr, sndCSeSeqData, sndTrack, sndBankInfo, SND_LOOP_SE_SEQ, sndSeInfo : 171 fonctions, 31624 octets.
+0x00189E30 0x00191DF0 csound rodata:0x00369370-0x003693A0
+
+# CUserDataManager, CBattleCharaInfo, CFishAquarium, MOS_CHANGE_PARAM, CMonsterBox, CFishingTournament, CFishingRecord, ROBO_DATA : 176 fonctions, 26552 octets.
+0x0019B680 0x001A2280 cuserdatamanager rodata:0x0036A3E0-0x0036A400
+
+# CEditCollision, CWaveTable : 64 fonctions, 23228 octets.
+0x001A2280 0x001A7EA0 ceditcollision
+
+# CActionChara : 22 fonctions, 18220 octets.
+0x001ACF40 0x001B16D0 cactionchara_001ACF40 rodata:0x0036AD10-0x0036AD28
+
+# CEditMap, CRocketLauncher, CEditParts, CEditPartsInfo, CEditHouse : 100 fonctions, 25496 octets.
+0x001B16D0 0x001B7C50 ceditmap
+
+# CPullItem, CLaserGun, CColPrim, CRoboVoiceSystem, CMachineGun, CColPrimMan, CRocketLauncherMan, CLaserGunMan, CPullItemManager, CTreasureBox : 63 fonctions, 23076 octets.
+0x001B7C50 0x001BD800 cpullitem rodata:0x0036BC60-0x0036BC80
+
+# CFireAfterHit, CChillAfterHit, CTornado : 19 fonctions, 16208 octets.
+0x001BD800 0x001C17C0 cfireafterhit
+
+# BattleEffectMan, CHitEffectImage, CDeadEffect, CMapEffect_Sprite, CThunder, CSWordAfterImage, CMapEffectsManeger, CHealingEffectMan, CPowerLine, CSparcEffect, CSwordLuminous, CFlushEffect, CAfterWire, CMiniEffPrim, CMiniEffPrimMan, CPalletAnime, CCharacter2 : 61 fonctions, 22208 octets.
+0x001C17C0 0x001C6FD0 battleeffectman rodata:0x0036BE90-0x0036BEAC
+
+# CWeaponElement, CEnemyLifeGage, CLevelupInfo, CPiyori, CGiftMark, CEnemyGekirin : 41 fonctions, 19680 octets.
+0x001C6FD0 0x001CBDA0 cweaponelement
+
+# CDamageScore, CLockOnModel, CWarningGage2, CDamageScore2, mgCCamera, CActiveMonster, CRedMarkModel, MoveCheckInfo : 27 fonctions, 23716 octets.
+0x001CBDA0 0x001D1AF0 cdamagescore
+
+# CMiniMapSymbol, CHealingPoint, CDamageScore, CThunder, CFireAfterHit, CChillAfterHit, CAfterWire : 34 fonctions, 20916 octets.
+0x001D1AF0 0x001D6D80 cminimapsymbol
+
+# CAutoMapGen, CActionChara, CActiveMonster, CMonsterLocateInfo : 37 fonctions, 21612 octets.
+0x001D6D80 0x001DC2F0 cautomapgen
+
+# CMonsterMan : 61 fonctions, 24536 octets.
+0x001DC2F0 0x001E2410 cmonsterman
+
+# fonctions libres : 137 fonctions, 24568 octets.
+0x001E2410 0x001E8790 text_001E2410
+
+# CDngFreeMap, CPreSprite : 73 fonctions, 33988 octets.
+0x001E8790 0x001F0E00 cdngfreemap rodata:0x0036D5C0-0x0036D5E4
+
+# CMenuTreeMap, ClsMes, CBaseMenuClass, mgRect_f_ : 29 fonctions, 24696 octets.
+0x001F0E00 0x001F6F40 cmenutreemap
+
+# CMenuGeorama : 36 fonctions, 25592 octets.
+0x001F6F40 0x001FD400 cmenugeorama rodata:0x0036DFC0-0x0036DFE4
+
+# CRemovalMenu, CInventUserData, CInventDataManage, CScoopDataManager, CDC2AlbumData, CCharaFrameMatching, CBaseMenuClass : 75 fonctions, 18696 octets.
+0x001FD400 0x00201EE0 cremovalmenu
+
+# CAquaMes, CAquaFish, CBubble, CFishFood, CAquaFishEff, CAquaFishActionParam : 63 fonctions, 24504 octets.
+0x0020E410 0x00214570 caquames rodata:0x0036F160-0x0036F188
+
+# CMenuPosDataForm : 39 fonctions, 23988 octets.
+0x00226B40 0x0022C990 cmenuposdataform
+
+# CPosDataManage, CMenuPosDataManage, CRepairManager, CLevelUpEffect, CEffVerticalLine, CRepairEffect, CLevelUpEffectManager, CStarDust : 93 fonctions, 21036 octets.
+0x0022C990 0x00231DD0 cposdatamanage
+
+# CMenuEffect : 52 fonctions, 23484 octets.
+0x00231DD0 0x00237AD0 cmenueffect rodata:0x0036FBE0-0x0036FC58
+
+# CBaseMenuClass, CMenuInter, CMENU_USERPARAM, MENU_ASKMODE_PARA, MENU_SWAPITEM_INFO : 65 fonctions, 24484 octets.
+0x00237AD0 0x0023DC00 cbasemenuclass rodata:0x00370140-0x0037016C
+
+# CMenuKeyFunc : 48 fonctions, 17548 octets.
+0x0023DC00 0x002421A0 cmenukeyfunc rodata:0x003701E0-0x0037020C
+
+# C3DSpline, CCameraPas, CCharaPas : 143 fonctions, 23780 octets.
+0x00254660 0x0025A670 c3dspline
+
+# CSceneCmrSeq, CSceneObjSeq, CEoh : 174 fonctions, 24600 octets.
+0x0025A670 0x00260B80 cscenecmrseq rodata:0x00371A50-0x00371A6C
+
+# fonctions libres : 137 fonctions, 24556 octets.
+0x00266E10 0x0026D190 text_00266E10 rodata:0x00371E30-0x00371E70
+
+# fonctions libres : 178 fonctions, 24560 octets.
+0x002734D0 0x002798A0 text_002734D0 rodata:0x00372110-0x00372128
+
+# fonctions libres : 178 fonctions, 24580 octets.
+0x002798A0 0x0027FCE0 text_002798A0 rodata:0x003721F0-0x00372270
+
+# CRipple, CRainDrop, CParticle, CObject : 75 fonctions, 24812 octets.
+0x0027FCE0 0x00285F50 cripple
+
+# CScene, CRain, CMap, SCN_LOADMAP_INFO2, CSceneMessage, CSceneCamera, CSceneSky, CSceneEffect, CSceneMap, CSceneCharacter, CSceneData, CSceneGameObj, mgCObjectStack_21CList_12EMAP_MESSAGE__ : 94 fonctions, 15700 octets.
+0x00285F50 0x00289E48 cscene rodata:0x00372820-0x00372840
+
+# fonctions libres : 1 fonctions, 1640 octets.
+0x0028A720 0x0028AD88 text_0028A720
+
+# fonctions libres : 3 fonctions, 976 octets.
+0x0028C5F0 0x0028C9C8 text_0028C5F0
+
+# fonctions libres : 1 fonctions, 100 octets.
+0x0028CA20 0x0028CA88 text_0028CA20
+
+# fonctions libres : 2 fonctions, 628 octets.
+0x0028CC80 0x0028CEF8 text_0028CC80
+
+# fonctions libres : 2 fonctions, 292 octets.
+0x0028D000 0x0028D128 text_0028D000
+
+# mgCVisualMotionMDT, CTreasureBoxManager, CStartupEpisodeTitle, CRandomCircle, MessageTaskManager, CGeoStone, CTreasureBox, CRedMarkModel, mgVertexWeight, CSound : 98 fonctions, 24196 octets.
+0x0028D160 0x002931B0 mgcvisualmotionmdt
+
+# CEditMap, CEditGrid, CMovie, CGridData : 111 fonctions, 24460 octets.
+0x00299620 0x0029F850 ceditmap_00299620
+
+# CScene, CEditMap, CEditData, EditAnalyzeSrc, EditAnalyzeDataSrc : 125 fonctions, 23632 octets.
+0x002A9FF0 0x002AFEE0 cscene_002A9FF0
+
+# CWorldMapMenu : 25 fonctions, 18828 octets.
+0x002AFEE0 0x002B4920 cworldmapmenu
+
+# CMenuChrCngMenu : 23 fonctions, 23472 octets.
+0x002B4920 0x002BA570 cmenuchrcngmenu
+
+# CMenuMosSelect : 31 fonctions, 24760 octets.
+0x002BA570 0x002C06D0 cmenumosselect rodata:0x00374BF0-0x00374C08
+
+# CMosBookMenu, CMenuCostumeSel, CManualMenu, CMenuOption, mgRect_s_ : 38 fonctions, 26188 octets.
+0x002C06D0 0x002C6E30 cmosbookmenu rodata:0x00374D50-0x00374D6C
+
+# fonctions libres : 99 fonctions, 23508 octets.
+0x002D3110 0x002D8EE0 text_002D3110 rodata:0x00375CF0-0x00375D10
+
+# MapJumpMapInfo : 45 fonctions, 23152 octets.
+0x002DF230 0x002E4DE0 mapjumpmapinfo rodata:0x00377100-0x00377130
+
+# CEffectScriptMan : 126 fonctions, 24516 octets.
+0x002E4DE0 0x002EB000 ceffectscriptman
+
+# FISH_PLACE_MAP, sgCPlayVoice : 55 fonctions, 23272 octets.
+0x00304FC0 0x0030AC00 fish_place_map
+
+# NowLoadingInfo : 28 fonctions, 19612 octets.
+0x0030AC00 0x0030F950 nowloadinginfo rodata:0x003787C0-0x003787D8
+
+# CNameRegiMenu : 33 fonctions, 16428 octets.
+0x0030F950 0x00313A30 cnameregimenu
+
+# CFishObj : 56 fonctions, 24056 octets.
+0x00313A40 0x00319990 cfishobj
+
+# CVillagerPlaceInfo, CVillagerInfo : 69 fonctions, 24488 octets.
+0x00319990 0x0031FB20 cvillagerplaceinfo rodata:0x00378ED0-0x00378F38
+
+# CRandom, CQuestManager, CQuestData, CMonsterBook, CVillagerPlace : 74 fonctions, 24312 octets.
+0x0031FBA0 0x00325C60 crandom rodata:0x00379340-0x00379358

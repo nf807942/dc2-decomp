@@ -16,6 +16,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from lib.project import BUILD_DIR, CONFIG_DIR, ROOT, run, sources  # noqa: E402
+from build.units import read_declared  # noqa: E402
 
 # `INCLUDE_ASM("nonmatchings/<unite>", <symbole>);`
 _INCLUDE_ASM = re.compile(r'INCLUDE_ASM\s*\(\s*"[^"]*"\s*,\s*(\S+?)\s*\)')
@@ -88,6 +89,17 @@ def main() -> int:
     share = 100 * done_bytes / total_bytes if total_bytes else 0.0
     print(f"code reconstruit : {done_bytes} octets sur {total_bytes} ({share:.3f} %)")
     print(f"fonctions        : {done_count} sur {total_count}")
+
+    # Ce qui est ouvert : les unités déclarées bornent ce qu'on peut
+    # reconstruire sans toucher au découpage. La part reconstruite ne peut pas
+    # dépasser celle-là, et l'écart dit ce qui reste à faire à découpage donné.
+    declared = read_declared()
+    opened = [size for _n, addr, size in functions
+              if any(low <= addr < high for low, high, _name in declared)]
+    if declared:
+        print(f"unités ouvertes  : {len(declared)}, "
+              f"{sum(opened)} octets ({100 * sum(opened) / total_bytes:.1f} %), "
+              f"{len(opened)} fonctions")
 
     # Le format que decomp.dev consomme.
     report = {
