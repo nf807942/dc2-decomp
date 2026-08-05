@@ -28,7 +28,7 @@
 # GetDngMapFloorGlidInfo jusqu'a IsClearMostFastDestroy. IsClearPractice, qui
 # suit, porte une table de saut que 00372BA0.rodata reference : elle reste en
 # assembleur, et coupe donc la classe en deux unites.
-0x002FE6C0 0x002FEB50 dngfloormanager
+0x002FE6C0 0x002FEB4C dngfloormanager
 
 # GetDngMapFloorInfo, apres IsClearPractice.
 0x002FEE80 0x002FEEC4 dngfloorinfo

@@ -63,6 +63,10 @@ SLPS_*
 /tools/compilers/
 /tools/bin/
 
+# Dossiers de travail du permuteur : une source par fonction, son objet de
+# reference et ce que l'outil en tire.
+/perm/
+
 # Rapports de progression et configuration objdiff, engendrés depuis le
 # découpage à chaque construction.
 /progress/

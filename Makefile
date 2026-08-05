@@ -45,7 +45,7 @@ ASFLAGS   := -EL -march=r5900 -mabi=eabi -G0 -mno-pdr -non_shared -I include -I 
 # Le compilateur d'époque. Quelle version a produit le binaire reste à établir :
 # la chaîne `2.4.1.01` vient de l'éditeur de liens, et plusieurs versions
 # l'écrivent. `make tools` les installe, MWCC_VERSION choisit.
-MWCC_VERSION ?= mwcps2-3.0.1-020123
+MWCC_VERSION ?= mwcps2-3.0-011126
 MWCC_DIR  := tools/compilers/$(MWCC_VERSION)
 MWCC      := $(MWCC_DIR)/mwccps2.exe
 
@@ -102,6 +102,10 @@ S_FILES   := $(shell find $(ASM_DIR) -name '*.s' -not -path '$(ASM_DIR)/nonmatch
 BIN_FILES := $(shell find bin -name '*.bin' 2>/dev/null)
 # Les unités que `config/units.txt` déclare, compilées depuis src/.
 SRC_FILES := $(shell find $(SRC_DIR) -name '*.cpp' -o -name '*.c' 2>/dev/null)
+# Une unité dépend des en-têtes qu'elle inclut : la disposition d'une structure
+# y est écrite, et la changer change le code émis. Les lister tous est plus
+# large que nécessaire, mais aucune modification ne peut alors passer inaperçue.
+HEADERS   := $(shell find $(INCLUDE_DIR) -name '*.h' -o -name '*.hpp' 2>/dev/null)
 # Le désassemblage de référence, assemblé pour qu'objdiff ait de quoi comparer.
 REF_S_FILES := $(shell find $(REF_DIR) -name '*.s' 2>/dev/null)
 REF_O_FILES := $(addprefix $(BUILD_DIR)/, $(REF_S_FILES:.s=.o))
@@ -154,12 +158,12 @@ $(BUILD_DIR)/%.o: %.bin
 
 # Une unité reconstruite passe par mwccgap, qui appelle MWCC puis greffe
 # l'assembleur des fonctions encore marquées `INCLUDE_ASM`.
-$(BUILD_DIR)/%.o: %.cpp
+$(BUILD_DIR)/%.o: %.cpp $(HEADERS)
 	@mkdir -p $(dir $@)
 	@test -f $(MWCC) || { echo "$(MWCC) absent — lancez \`make tools\`" >&2; exit 1; }
 	$(MWCC_ENV) $(MWCCGAP) $< $@ $(MWCCGAP_ARGS) $(CFLAGS) $(MWCCGAP_TAIL)
 
-$(BUILD_DIR)/%.o: %.c
+$(BUILD_DIR)/%.o: %.c $(HEADERS)
 	@mkdir -p $(dir $@)
 	@test -f $(MWCC) || { echo "$(MWCC) absent — lancez \`make tools\`" >&2; exit 1; }
 	$(MWCC_ENV) $(MWCCGAP) $< $@ $(MWCCGAP_ARGS) $(CFLAGS) $(MWCCGAP_TAIL)
@@ -199,6 +203,20 @@ decompile:
 open:
 	@test -n "$(S)" || { echo "usage : make open S=<classe>" >&2; exit 1; }
 	@$(PYTHON) scripts/build/open_unit.py $(S) $(OPEN_ARGS)
+
+# L'exécutable bootable, et l'image qui le porte : la construction rend le
+# contenu de la section chargée, non les en-têtes que la console lit.
+elf: build
+	@$(PYTHON) scripts/build/pack.py elf
+
+iso: build
+	@$(PYTHON) scripts/build/pack.py iso $(if $(ISO),--output $(ISO))
+
+# Retouche l'exécutable construit sans toucher aux sources :
+#   make mod M="IsGeoStone__16CDngFloorManagerFi=1"
+mod: elf
+	@test -n "$(M)" || { echo 'usage : make mod M="SYMBOLE=VALEUR"' >&2; exit 1; }
+	@$(PYTHON) scripts/build/mod.py $(M)
 
 # Les unités de travail : celles qu'on peut ouvrir, et ce qu'elles contiennent.
 # `make units S=mgCFrame` détaille une classe.

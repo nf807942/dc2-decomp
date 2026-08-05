@@ -19,8 +19,8 @@ binaire lui-même.
 | | |
 |---|---|
 | Construction identique au disque | **oui** — 2 608 512 octets, sha1 `eca0c93d5d6a25fcbf8f1fa41aa811a6f4b7aca8` |
-| Code reconstruit en C++ | 620 octets sur 2 209 044 — 12 fonctions sur 7 792 |
-| Compilateur | `mwcps2-3.0.1-020123`, `-O4,p` — 100 % sur la première fonction |
+| Code reconstruit en C++ | 1 348 octets sur 2 209 044 — 16 fonctions sur 7 792 |
+| Compilateur | `mwcps2-3.0-011126`, `-O4,p` — départagé en mesurant les 21 versions |
 | Découpage | 193 unités de texte, 92 de données, 6 blocs vectoriels, 1 unité ouverte |
 
 La construction part du désassemblage entier et le réassemble ; chaque fonction
@@ -170,13 +170,14 @@ FLEXlm et refuse de compiler sans elle.
 
 Le binaire porte `MW MIPS C Compiler (2.4.1.01)`, mais cette chaîne est écrite
 par **MWLD** et plusieurs versions l'écrivent à l'identique. La mesure a
-tranché : sur `CGamePad::Close`, les trois versions 3.0.x rendent **100 %** avec
-`-O4,p`, la 2.4 seulement 77 %, et tout autre niveau d'optimisation tombe sous
-50 %. La 2.4 y sauve `$ra` par `sq` là où le binaire emploie `sd`, et met à zéro
-par `paddub` au lieu de `daddu`.
+tranché : `mwcps2-3.0-011126` rend **100 %** sur les huit méthodes de
+`CDngFloorManager`, là où `3.0.1-020123` et `3.0.3` plafonnent à 97 et 98 %, les
+bêtas de 2003-2006 sous 85 %, et les 2.3.3 comme 2.4 à 77 %.
 
-`make tools TOOLS_ARGS=--all` installe les quatre candidates ;
-`MWCC_VERSION=mwcps2-3.0.3-020716 make …` en choisit une autre.
+`make tools TOOLS_ARGS=--all` installe les vingt et une versions publiées ;
+`MWCC_VERSION=mwcps2-3.0.3-020716 make …` en choisit une autre. Quand une
+fonction plafonne alors que sa taille est juste, les mesurer toutes est le
+réflexe qui tranche.
 
 [compilers]: https://github.com/decompme/compilers
 

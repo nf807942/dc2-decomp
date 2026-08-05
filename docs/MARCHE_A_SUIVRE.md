@@ -148,8 +148,15 @@ if (this->table == NULL || (i = 0, this->count) <= 0) {
 
 **Quand une fonction plafonne**, écrire un script qui compile vingt variantes et
 rapporte leur taux tranche plus vite que les essais un par un : chaque palier
-désigne le fait suivant à corriger. `tools/decomp-permuter` fait ce travail
-automatiquement, mais il analyse du C pur et ne lit donc pas nos sources C++.
+désigne le fait suivant à corriger.
+
+**Et si le plateau tient alors que la taille est déjà juste, changer de
+compilateur avant de réécrire.** Vingt et une versions s'installent par
+`make tools TOOLS_ARGS=--all` ; les mesurer toutes sur la fonction qui résiste
+prend une minute et tranche souvent d'un coup. `MWCC_VERSION=… make …` en
+choisit une. Ce qui reste à ce stade — un créneau de délai vide, un registre
+sauvé qui diffère — vient de la chaîne, pas de la source : ni le permuteur ni
+les pragmas ne le corrigent.
 
 ---
 
