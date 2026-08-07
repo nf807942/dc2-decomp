@@ -333,3 +333,156 @@
 
 # CDngFloorManager, CStarEffect, CPlaceAnime, CPaintEffect : 68 fonctions, 24440 octets.
 0x002FEED0 0x00304FC0 cdngfloormanager rodata:0x003782B0-0x003782E8
+
+# ClsMes : 29 fonctions, 8820 octets.
+0x00151690 0x00153980 clsmes_00151690 rodata:0x00367130-0x0036714C
+
+# ClsMes : 22 fonctions, 13416 octets.
+0x00153980 0x00156E60 clsmes_00153980 rodata:0x00367150-0x00367184
+
+# ClsMes : 3 fonctions, 2340 octets.
+0x00156E60 0x00157790 clsmes_00156E60 rodata:0x003673C0-0x003673DC
+
+# CWater, CMapSky, dbgCJISFont, CFireRaster, CRunScript, CWaterFrame, CThunderEffect : 72 fonctions, 16636 octets.
+0x001846F0 0x00188970 cwater rodata:0x00368800-0x00368900
+
+# CRunScript : 3 fonctions, 5304 octets.
+0x00188970 0x00189E30 crunscript rodata:0x00368CF0-0x00368DAC
+
+# CGameData, CUserDataManager, CEditData, CDataWeapon, CDataAttach, CDataBreedFish, CDataItem, CDataRoboPart : 120 fonctions, 21736 octets.
+0x00191DF0 0x001975D0 cgamedata rodata:0x003699A0-0x003699EC
+
+# CItemUseTarget : 9 fonctions, 1524 octets.
+0x001975D0 0x00197BF0 citemusetarget rodata:0x00369DA0-0x00369E30
+
+# fonctions libres : 8 fonctions, 1408 octets.
+0x00197BF0 0x001981B0 text_00197BF0 rodata:0x00369FB0-0x00369FC8
+
+# fonctions libres : 14 fonctions, 6400 octets.
+0x001A7EA0 0x001A9820 text_001A7EA0 rodata:0x0036A4F0-0x0036A528
+
+# CameraCtrlParam : 16 fonctions, 13996 octets.
+0x001A9820 0x001ACF40 cameractrlparam rodata:0x0036AA30-0x0036AA4C
+
+# CMenuInvent : 3 fonctions, 5980 octets.
+0x00203E90 0x00205600 cmenuinvent rodata:0x0036E950-0x0036E974
+
+# CMenuInvent : 4 fonctions, 8540 octets.
+0x00205600 0x00207770 cmenuinvent_00205600 rodata:0x0036E9D0-0x0036EA00
+
+# CMenuInvent, CStarDust : 17 fonctions, 18448 octets.
+0x00207770 0x0020C000 cmenuinvent_00207770 rodata:0x0036EC10-0x0036EC50
+
+# CMenuInvent : 1 fonctions, 344 octets.
+0x0020C000 0x0020C160 cmenuinvent_0020C000 rodata:0x0036EEE0-0x0036EF08
+
+# fonctions libres : 3 fonctions, 6776 octets.
+0x0020C160 0x0020DBE0 text_0020C160 rodata:0x0036F010-0x0036F070
+
+# fonctions libres : 1 fonctions, 2084 octets.
+0x0020DBE0 0x0020E410 text_0020DBE0 rodata:0x0036F110-0x0036F140
+
+# CGyoraceFishData : 39 fonctions, 8556 octets.
+0x0021A510 0x0021C790 cgyoracefishdata rodata:0x0036F5C0-0x0036F5E8
+
+# CDC2Mes, CMenuFont : 14 fonctions, 10944 octets.
+0x0021C790 0x0021F2B0 cdc2mes rodata:0x0036F760-0x0036F77C
+
+# CDC2Mes, CMenuMoveItem : 33 fonctions, 5108 octets.
+0x0021F2B0 0x00220740 cdc2mes_0021F2B0 rodata:0x0036F830-0x0036F880
+
+# CMenuItemUse : 59 fonctions, 23324 octets.
+0x00220740 0x002263C0 cmenuitemuse rodata:0x0036F8C0-0x0036F8DC
+
+# fonctions libres : 1 fonctions, 1920 octets.
+0x002263C0 0x00226B40 text_002263C0 rodata:0x0036FAB0-0x0036FAD8
+
+# CMenuItemInfo : 14 fonctions, 8928 octets.
+0x002421A0 0x002444C0 cmenuiteminfo rodata:0x003703F0-0x003704B0
+
+# CMenuItemInfo : 9 fonctions, 7540 octets.
+0x002444C0 0x00246280 cmenuiteminfo_002444C0 rodata:0x00370550-0x00370568
+
+# CMenuItemInfo, CBaseMenuClass : 4 fonctions, 7020 octets.
+0x00246280 0x00247E10 cmenuiteminfo_00246280 rodata:0x00370780-0x003707B8
+
+# fonctions libres : 1 fonctions, 5836 octets.
+0x00247E10 0x002494E0 text_00247E10 rodata:0x00370830-0x00370860
+
+# fonctions libres : 1 fonctions, 5028 octets.
+0x002494E0 0x0024A890 text_002494E0 rodata:0x00370DD0-0x00370E00
+
+# CMenuItemInfo : 10 fonctions, 15412 octets.
+0x0024A890 0x0024E500 cmenuiteminfo_0024A890 rodata:0x00370E70-0x00370ED0
+
+# CMenuItemInfo : 3 fonctions, 1396 octets.
+0x0024E500 0x0024EA80 cmenuiteminfo_0024E500 rodata:0x00371020-0x00371050
+
+# CMenuItemInfo : 2 fonctions, 1592 octets.
+0x0024EA80 0x0024F0D0 cmenuiteminfo_0024EA80 rodata:0x00371060-0x00371078
+
+# CMenuItemInfo : 4 fonctions, 3560 octets.
+0x0024F0D0 0x0024FEC0 cmenuiteminfo_0024F0D0 rodata:0x00371090-0x003710C8
+
+# CMenuItemInfo : 5 fonctions, 4308 octets.
+0x0024FEC0 0x00250FB0 cmenuiteminfo_0024FEC0 rodata:0x003710E0-0x00371100
+
+# fonctions libres : 1 fonctions, 1392 octets.
+0x00250FB0 0x00251520 text_00250FB0 rodata:0x00371140-0x0037117C
+
+# CItemSelect : 56 fonctions, 12288 octets.
+0x00251520 0x00254660 citemselect rodata:0x00371180-0x0037119C
+
+# fonctions libres : 8 fonctions, 2268 octets.
+0x0026D190 0x0026DAA0 text_0026D190 rodata:0x00371ED0-0x00371F50
+
+# fonctions libres : 2 fonctions, 728 octets.
+0x0026DAA0 0x0026DD80 text_0026DAA0 rodata:0x00371F50-0x00371F68
+
+# fonctions libres : 16 fonctions, 3136 octets.
+0x0026DD80 0x0026EA00 text_0026DD80 rodata:0x00371F70-0x00371F8C
+
+# fonctions libres : 57 fonctions, 9452 octets.
+0x0026EA00 0x00271030 text_0026EA00 rodata:0x00371FA0-0x00371FDC
+
+# fonctions libres : 8 fonctions, 1908 octets.
+0x00271030 0x002717C0 text_00271030 rodata:0x00372000-0x0037202C
+
+# fonctions libres : 65 fonctions, 7056 octets.
+0x002717C0 0x002734D0 text_002717C0 rodata:0x003720A0-0x003720C8
+
+# CShopMenu, CEventSprite2, CShop, CEventSprite, CEventSpriteMother, CMarker : 67 fonctions, 19360 octets.
+0x002931B0 0x00297F10 cshopmenu rodata:0x003732E0-0x00373300
+
+# CMenuQuestView, CShopMenu : 9 fonctions, 5852 octets.
+0x00297F10 0x00299620 cmenuquestview rodata:0x00373370-0x00373390
+
+# CFuncPointMngr, CObjAnime, CEditMap, CFuncPoint, CList_10CFuncPoint_ : 39 fonctions, 9504 octets.
+0x0029F850 0x002A1E80 cfuncpointmngr rodata:0x00373650-0x0037367C
+
+# CFuncPointMngr : 16 fonctions, 8040 octets.
+0x002A1E80 0x002A3E30 cfuncpointmngr_002A1E80 rodata:0x00373680-0x003736A4
+
+# fonctions libres : 1 fonctions, 2956 octets.
+0x002A3E30 0x002A49C0 text_002A3E30 rodata:0x003737F0-0x00373834
+
+# fonctions libres : 6 fonctions, 4388 octets.
+0x002A49C0 0x002A5B10 text_002A49C0 rodata:0x00373840-0x00373864
+
+# CScene, CPot, CBPot, CFragment, CVillagerMngr, CVillagerPlaceInfo, CVillagerData, CVil : 84 fonctions, 22980 octets.
+0x002CC360 0x002D1F20 cscene_002CC360 rodata:0x00375B90-0x00375BB4
+
+# CVillagerMngr : 33 fonctions, 4388 octets.
+0x002D1F20 0x002D3110 cvillagermngr rodata:0x00375CD0-0x00375CEC
+
+# CPowGage : 62 fonctions, 11640 octets.
+0x002EB000 0x002EDF20 cpowgage rodata:0x00377590-0x003775B4
+
+# CPowGage, CSphida : 6 fonctions, 2012 octets.
+0x002EDF20 0x002EE720 cpowgage_002EDF20 rodata:0x00377680-0x00377698
+
+# CSphida : 2 fonctions, 1396 octets.
+0x002EE720 0x002EECA0 csphida rodata:0x003776E0-0x003776FC
+
+# CSphida, CameraCtrlParam : 11 fonctions, 8620 octets.
+0x002EECA0 0x002F0E80 csphida_002EECA0 rodata:0x00377700-0x00377724

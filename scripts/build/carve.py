@@ -28,6 +28,11 @@ s'intercale entre la première table et la dernière, et le désassembleur ne mi
 d'un symbole que ce qu'une seule fonction atteint. Une plage n'est sûre que si
 chacun des siens est dans ce cas, et que cette fonction est dans l'unité.
 
+Ce qui ne l'est pas se resserre : redécoupée à une table par unité, la plage se
+réduit à cette table et rien d'étranger ne s'y intercale plus. La taille visée
+passe alors au second rang — c'est ce qui produit des unités d'une seule
+fonction —, et le resserrement n'a lieu que là où la coupure large échoue.
+
 L'alignement des fonctions, lui, ne borne plus : mwccgap le prend de l'adresse
 que le désassemblage donne à chaque fonction greffée, là où MWCC demandait
 seize octets pour toutes.
@@ -118,14 +123,38 @@ def straddled(spans: dict[str, tuple[int, int]], cut: int) -> int:
     return sum(1 for low, high in spans.values() if low < cut < high)
 
 
-def carve(functions: list[Function], limit: int, target: int) -> list[Unit]:
+def table_holders(functions: list[Function], tables) -> list[int]:
+    """Les indices des fonctions qu'une table de saut sert, en ordre croissant.
+
+    Une table désigne les étiquettes d'un seul corps ; c'est celui-ci qui la
+    tient, et c'est lui qui l'emmène quand l'unité s'ouvre.
+    """
+    held = set()
+    for table in tables:
+        for index, function in enumerate(functions):
+            if any(function.address <= target < function.end
+                   for target in table.targets):
+                held.add(index)
+                break
+    return sorted(held)
+
+
+def carve(functions: list[Function], limit: int, target: int,
+          tables=None) -> list[Unit]:
     """Découpe une suite de fonctions en unités d'environ `target` octets.
 
     La coupure se cherche dans une fenêtre autour de la taille visée, et va à
     la frontière qui laisse le moins de classes à cheval — à égalité, la plus
     proche de la cible.
+
+    `tables` plafonne la coupure à la deuxième fonction porteuse de table, de
+    sorte qu'une unité n'en tienne qu'une : sa plage de lecture seule se réduit
+    alors à cette table, et rien d'étranger ne s'y intercale. C'est le repli de
+    `main` quand la coupure large donne une plage que le désassembleur ne
+    migrerait pas ; la taille visée passe alors au second rang.
     """
     spans = class_spans(functions)
+    holders = table_holders(functions, tables) if tables is not None else []
     units: list[Unit] = []
 
     group, start = functions, 0
@@ -149,6 +178,12 @@ def carve(functions: list[Function], limit: int, target: int) -> list[Unit]:
                       key=lambda i: (straddled(spans, group[i].address),
                                      abs(sum(f.size for f in group[start:i])
                                          - target)))
+
+        remaining = [index for index in holders if index >= start]
+        if len(remaining) > 1:
+            # La deuxième porteuse ouvre l'unité suivante ; l'unité tient donc
+            # une fonction au moins, fût-elle seule à peser sa taille.
+            cut = max(min(cut, remaining[1]), start + 1)
 
         # Ce qui suit commence l'unité d'après ; à la fin, la borne est celle
         # que la plage donne.
@@ -214,6 +249,21 @@ def keeps_its_tables(unit: Unit, tables) -> bool:
                for table in tables if span[0] <= table.address < span[1])
 
 
+def is_safe(unit: Unit, tables) -> bool:
+    """Dit si l'unité peut s'ouvrir avec la plage de lecture seule qu'elle prend.
+
+    Trois conditions, toutes vérifiées contre le désassemblage de référence : la
+    plage n'a pas de trou qu'un alignement n'explique, chacun de ses symboles
+    suivra une fonction de l'unité, et aucune de ses tables ne sert un corps
+    resté dehors.
+    """
+    span = rodata_of(unit, tables)
+    if span is not None and not (rodata_is_contiguous(*span)
+                                 and rodata_is_migrable(*span, unit.functions)):
+        return False
+    return keeps_its_tables(unit, tables)
+
+
 def clashing_rodata(units: list[Unit], tables) -> int:
     """Les plages de lecture seule que deux unités se disputeraient.
 
@@ -266,15 +316,21 @@ def main() -> int:
                 inside = [f for f in functions if start <= f.address < end]
                 if not inside:
                     continue
-                units.extend(carve(inside, end, args.target))
+                for unit in carve(inside, end, args.target):
+                    # Une plage qui porte un symbole que le désassembleur ne
+                    # migrerait pas se resserre : redécoupée à une table par
+                    # unité, elle ne tient plus que celle-ci, et rien d'étranger
+                    # ne peut s'y intercaler.
+                    if is_safe(unit, tables):
+                        units.append(unit)
+                    else:
+                        units.extend(carve(unit.functions, unit.end,
+                                           args.target, tables))
 
-    # Une unité dont la plage de lecture seule porte un symbole qu'aucune de ses
-    # fonctions n'atteint attend : le désassembleur ne l'écrirait nulle part.
-    tassed = [u for u in units
-              if ((span := rodata_of(u, tables))
-                  and not (rodata_is_contiguous(*span)
-                           and rodata_is_migrable(*span, u.functions)))
-              or not keeps_its_tables(u, tables)]
+    # Ce qui résiste au resserrement attend encore : une fonction qui porte
+    # plusieurs tables les emmène toutes, et la plage reprend ce qu'elles
+    # encadrent.
+    tassed = [u for u in units if not is_safe(u, tables)]
     units = [u for u in units if u not in tassed]
 
     kept = units

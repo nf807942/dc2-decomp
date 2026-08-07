@@ -25,11 +25,11 @@ référence est cassée, il faut la réparer d'abord.
 
 ## 1. Choisir où travailler
 
-La plupart du code du jeu vit déjà dans une unité — 93 d'entre elles, 5 776
+Tout le code du jeu vit déjà dans une unité — 144 d'entre elles, 6 849
 fonctions —, et chacune attend dans un `src/*.cpp` sous `INCLUDE_ASM`. Les étapes
-1 et 2 servent donc surtout à retoucher une frontière que le découpage a décidée
-d'après la classe la plus lourde, et à ouvrir ce qu'il écarte. **Pour reconstruire
-une fonction déjà dans une unité, sauter à l'étape 3.**
+1 et 2 ne servent donc plus qu'à retoucher une frontière que le découpage a
+décidée d'après la classe la plus lourde. **Pour reconstruire une fonction déjà
+dans une unité, sauter à l'étape 3.**
 
 ```sh
 make report    # les fonctions par unité, la plus grosse d'abord

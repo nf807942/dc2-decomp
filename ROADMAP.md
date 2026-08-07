@@ -29,32 +29,33 @@ décompilation mais à ce qui reste adressé en dur.
 ## Où on en est
 
 ```
-code reconstruit : 6 080 octets sur 2 215 100      0,275 %      32 fonctions
-unités ouvertes  : 93, 1 643 428 octets            74,2 %    5 776 fonctions
+code reconstruit : 6 080 octets sur 2 215 100      0,274 %      32 fonctions
+unités ouvertes  : 144, 2 027 016 octets           91,5 %    6 849 fonctions
 ```
 
-Ce qui reste dehors : seize unités que leur plage de lecture seule retient, le
-code de bibliothèque, les microprogrammes vectoriels et les données.
+Ce qui reste dehors : le code de bibliothèque, les microprogrammes vectoriels et
+les données.
 
 ---
 
 ## Jalon 1 — Finir le découpage du texte
 
-**Le compte passe de 72 unités à 93**, et `make build` rend les octets du disque.
-Quatre causes ont été levées : trois dans mwccgap, portées par
+**Le compte passe de 72 unités à 144**, et `make build` rend les octets du disque.
+Cinq causes ont été levées : trois dans mwccgap, portées par
 `tools/patches/mwccgap-alignment.patch` — l'alignement d'une section greffée pris
 de l'adresse du symbole, l'ordre des tables de saut pris de leurs adresses, et la
-recherche d'une section par le symbole qui l'a déclarée —, et une dans le
-découpage, qui ignorait les frontières de contribution d'objet.
+recherche d'une section par le symbole qui l'a déclarée —, une dans le découpage,
+qui ignorait les frontières de contribution d'objet, et une dernière dans la
+largeur des plages de lecture seule.
+
+**Tout le code du jeu est ouvert** : les seize unités que leur plage retenait ont
+été redécoupées à une table de saut par unité, ce qui réduit chacune à sa seule
+table. Elles font 51 unités, 383 588 octets, et le prix de cette finesse est une
+médiane à 5 980 octets et six unités d'une seule fonction — mesuré, et payé en
+lisibilité de `config/units.txt`, non en exactitude.
 
 **Ce qui reste** :
 
-- **Seize unités**, dont la plage de lecture seule porte un symbole que le
-  désassembleur ne migrerait pas : sa règle veut qu'une seule fonction l'atteigne,
-  et une plage porte tout ce qui s'intercale entre sa première table et la dernière.
-  Le remède se déduit de la règle — une unité qui ne porte qu'une table a une plage
-  réduite à cette table, donc sûre. C'est une coupure plus fine, non un outil qui
-  manque ; ce qu'elle coûte en nombre d'unités reste à mesurer.
 - **Le code de bibliothèque** — 926 fonctions. L'alignement ne les borne plus,
   mais **chacune est sa propre contribution d'objet**, et le désassembleur en fait
   un sous-segment : une unité ne peut pas en réunir deux. Ce serait donc 926 unités
@@ -63,9 +64,10 @@ découpage, qui ignorait les frontières de contribution d'objet.
 - **`.vutext`**, 18 208 octets de microprogrammes vectoriels en six blocs
   d'octets. Aucun assembleur de la chaîne ne les relit. Il faudrait un
   désassembleur VU dédié ; rien n'y oblige tant qu'on ne veut pas les modifier.
-- **Six unités d'une seule fonction**, laissées par le découpage entre deux
-  contributions dans les plages du jeu. Elles sont justes ; les réunir à leur
-  voisine ne tient qu'à la lisibilité de `config/units.txt`.
+- **Vingt unités d'une seule fonction**, qu'une frontière de contribution isole
+  ou que le resserrement d'une plage de lecture seule a détachées. Elles sont
+  justes ; les réunir à leur voisine ne tient qu'à la lisibilité de
+  `config/units.txt`.
 
 **Non résolu, et c'est une limite du jalon 4 plus que de celui-ci** : MWCC aligne
 sur seize octets la section de toute fonction qu'il *compile*, et mwccgap ne peut
@@ -199,7 +201,6 @@ Par ordre de ce que chacun débloque.
 
 | Chantier | Ce qu'il débloque |
 |---|---|
-| **`make carve` : une table de saut par unité au plus** | les seize unités écartées du jalon 1 |
 | **Relever qui emploie chaque donnée, par les relocations** | le jalon 2 en entier |
 | **mwccgap : abaisser l'alignement d'une fonction compilée** | les treize auxiliaires du runtime, qui ne peuvent qu'être greffés |
 | **Un test d'exécution en émulateur** | le critère de sortie du jalon 3 |
