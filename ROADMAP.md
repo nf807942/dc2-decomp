@@ -87,28 +87,46 @@ aux initialiseurs statiques près — qui n'en sont pas.
 
 ## Jalon 2 — Découper les données
 
-C'est le jalon dont dépend la liberté de taille, et le seul dont l'ampleur n'a
-pas encore été mesurée.
+C'est le jalon dont dépend la liberté de taille. Son ampleur est désormais
+mesurée, et sa difficulté n'est pas celle qu'on croyait.
 
-- **2 448 symboles du bss sont donnés par adresse absolue** dans
-  `linker_scripts/auto/undefined_syms_auto.ld`. Tant qu'ils y sont, aucune
-  donnée ne peut bouger : le lien les place où le binaire d'origine les avait,
-  et un texte plus long viendrait les recouvrir. Il faut les faire définir par
-  des segments `bss` déclarés, ce que splat sait faire.
-- **87 sous-segments `rodata` et 32 `data`** vivent hors de toute unité. Chacun
-  devra rejoindre celle qui l'emploie, comme les 27 plages de lecture seule
-  déjà migrées — sans quoi une donnée renommée ou supprimée n'a pas de propriétaire.
-- **6 symboles sous l'adresse de chargement** sont des fenêtres matérielles
-  (`0xFFFF`, `0x12000`…). Ceux-là restent absolus : c'est leur nature.
-- **49 symboles hors des plages connues**, dont les points d'entrée `.vutext`.
-  À rattacher au fur et à mesure.
+**L'état, sur les 2 503 symboles que le lien reçoit par adresse absolue** :
 
-**Critère de sortie** : `undefined_syms_auto.ld` ne porte plus que les fenêtres
-matérielles.
+| Où ils tombent | Combien | Ce qu'il faut |
+|---|---:|---|
+| bss, au-delà du contenu du fichier | 2 457 | des sous-segments `bss` déclarés |
+| sous-segments `bin` — `.vutext`, `.vudata` | 30 | rien : ce sont des octets sans symbole |
+| dans `.rodata`, `.data` ou une unité | 10 | une adresse qui tombe au milieu d'un symbole |
+| sous l'adresse de chargement | 6 | rien : fenêtres matérielles, absolues par nature |
+
+**Ce qui est établi, et c'est l'essentiel** : le type `bss` de splat fonctionne —
+un sous-segment `{ start, type: bss, name, vram }` engendre son `.s` et sort ses
+symboles de `undefined_syms_auto.ld`, 236 d'un coup pour la seule dernière
+contribution. Mais **le placer seul ne suffit pas** : le script de lien concatène
+les `.bss` à la suite les uns des autres, et un segment isolé n'atterrit pas à son
+adresse. Éprouvé — 1 327 plages divergentes pour un seul segment déclaré.
+
+La couverture doit donc être exhaustive, et elle est atteignable : les symboles
+`OBJECT` **décrivent 99,9 % des 29 260 928 octets du bss**, en 553 trous dont 542
+de seize octets ou moins — de l'alignement. Un seul trou compte, 28 416 octets en
+`0x0037EFC0`, que des contributions `.bss` sans symbole occupent.
+
+- **95 sous-segments `.rodata`, 147 `rodata` et 32 `data`** vivent hors de toute
+  unité. Chacun devra rejoindre celle qui l'emploie, comme les plages de lecture
+  seule déjà migrées — sans quoi une donnée renommée ou supprimée n'a pas de
+  propriétaire.
+
+**Critère de sortie** : `undefined_syms_auto.ld` ne porte plus que les six
+fenêtres matérielles.
 
 **Non mesuré** : le coût de rattacher chaque donnée à son unité. Les 8 201
 symboles `OBJECT` du binaire disent leur taille, mais pas qui les emploie ;
 l'établir demande de lire les relocations, ce qui n'a pas encore été outillé.
+
+**Le point dur, et il est connu d'avance** : `_gp = 0x3846F0` tombe au milieu du
+bss, et les 15 869 relocations `GPREL16` n'ont que ±32 Kio de fenêtre. Déplacer
+la moindre petite donnée les casse, ce qui rattache ce jalon au verrou nº 2 du
+suivant.
 
 ---
 
