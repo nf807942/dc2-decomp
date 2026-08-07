@@ -97,18 +97,27 @@ devait être entière, le script de lien concaténant les `.bss` sans adresse : 
 segment isolé n'atterrissait pas à la sienne, et rendait 1 327 plages
 divergentes.
 
-**Ce qui reste, sur les 55** :
+**La queue de `.vutext` est rendue aux données.** Un bloc vectoriel n'a pas de
+symbole dimensionné, donc rien ne bornait son sous-segment : il courait jusqu'à la
+contribution suivante. La borne juste est le premier symbole dimensionné qui le
+suit — `0x0032A380` —, et le compte tombe à **51**.
+
+**Ce qui reste, sur les 51** :
 
 | Où ils tombent | Combien | Ce qu'il faut |
 |---|---:|---|
 | fenêtres matérielles, sous l'adresse de chargement ou au-delà du bss | 15 | rien : le critère de sortie les excepte |
-| dans un bloc d'octets `.vutext`/`.vudata` plus large que sa section | 30 | affiner la coupure |
+| queue du bloc `.vudata` | 24 | la même coupure, qui ne passe pas encore |
 | au milieu d'un symbole du fichier | 10 | décrire la donnée qui les contient |
+| un bloc `.vutext` désigné en entier | 2 | rien : c'est le bloc, non son contenu |
 
-Les 30 sont le lot corrigeable : les descripteurs RTTI de `0x00363580` à
-`0x003637F8` sont rangés avec le microprogramme vectoriel de `0x00363480` parce
-que le sous-segment couvre jusqu'au `.rodata` suivant, et un bloc d'octets n'a
-pas de symboles.
+**Le cas de `.vudata` est le prochain à traiter, et il est cerné.** Sa queue —
+`0x00363580` à `0x00363808` — porte des RTTI, des littéraux et quatre tables de
+saut qui servent `runtime/std`. La couper les révèle ; leur donner la plage
+`rodata:0x00363660-0x003637B0` les fait migrer, le prédicat l'acceptant sur les
+six symboles ; mais le lien tombe alors en faute de segmentation, précédée de
+`_47_00363630 … defined in discarded section .rodata`. La cause n'est pas
+établie, et la coupure attend qu'elle le soit.
 
 - **95 sous-segments `.rodata`, 147 `rodata` et 32 `data`** vivent hors de toute
   unité. Chacun devra rejoindre celle qui l'emploie, comme les plages de lecture

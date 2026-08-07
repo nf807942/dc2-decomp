@@ -357,6 +357,40 @@ def read_units() -> list[tuple[int, int, str, tuple[int, int] | None]]:
     return units
 
 
+def vu_tails(elf: Elf, boundaries: list[tuple[int, str]]) -> list[tuple[int, str]]:
+    """Les frontières qui rendent aux données ce qu'un bloc VU avale.
+
+    Un microprogramme vectoriel n'a pas de symbole dimensionné — seulement un
+    nom d'entrée, de taille nulle —, donc rien ne borne son sous-segment, qui
+    court jusqu'à la contribution suivante. Or celle-ci arrive après les
+    descripteurs RTTI et les littéraux que la section d'à côté porte : trente
+    symboles se retrouvaient ainsi dans un bloc d'octets, qui n'en définit
+    aucun, et le lien les recevait par leur adresse absolue.
+
+    La borne est le premier symbole dimensionné qui suit le début du bloc, et ce
+    qui reste prend le type de la section d'après — `.data` pour la queue de
+    `.vutext`, `.rodata` pour celle de `.vudata`, comme le binaire les range.
+    """
+    sized = sorted(s.value for s in elf.symbols
+                   if s.kind in (SYM_OBJECT, SYM_FUNC) and s.size and s.value)
+
+    order = {name: index for index, name in enumerate(SECTION_ORDER)}
+    added: list[tuple[int, str]] = []
+    for (start, section), (stop, _next) in zip(boundaries, boundaries[1:]):
+        if section not in (".vutext",):
+            continue
+        inside = [addr for addr in sized if start < addr < stop]
+        if not inside:
+            continue
+        # Le type de la queue est celui de la première section qui suit le bloc
+        # dans l'ordre où l'éditeur de liens les dispose.
+        following = next((name for name in SECTION_ORDER
+                          if order[name] > order[section]
+                          and name in (".data", ".rodata")), ".rodata")
+        added.append((min(inside), following))
+    return added
+
+
 def build_segments(elf: Elf, main: Section) -> tuple[list[tuple[int, str, str]], int]:
     """Découpe la section chargée en sous-segments splat.
 
@@ -385,6 +419,8 @@ def build_segments(elf: Elf, main: Section) -> tuple[list[tuple[int, str, str]],
     # par aucun : le fichier commence à l'adresse de chargement.
     if not boundaries or boundaries[0][0] != LOAD_VADDR:
         boundaries.insert(0, (LOAD_VADDR, ".text"))
+
+    boundaries += vu_tails(elf, sorted(boundaries))
 
     # Une unité déclarée coupe la contribution qui la contient : sa borne de
     # début lui appartient, et la borne de fin rouvre du désassemblage.
