@@ -90,26 +90,25 @@ aux initialiseurs statiques près — qui n'en sont pas.
 C'est le jalon dont dépend la liberté de taille. Son ampleur est désormais
 mesurée, et sa difficulté n'est pas celle qu'on croyait.
 
-**L'état, sur les 2 503 symboles que le lien reçoit par adresse absolue** :
+**Le bss est fait.** Un sous-segment unique — `bss/0037CD80`, de la fin du
+fichier à `0x01F64A00` — le couvre d'un seul tenant, et le compte des symboles
+que le lien reçoit par adresse absolue passe de **2 503 à 55**. La couverture
+devait être entière, le script de lien concaténant les `.bss` sans adresse : un
+segment isolé n'atterrissait pas à la sienne, et rendait 1 327 plages
+divergentes.
+
+**Ce qui reste, sur les 55** :
 
 | Où ils tombent | Combien | Ce qu'il faut |
 |---|---:|---|
-| bss, au-delà du contenu du fichier | 2 457 | des sous-segments `bss` déclarés |
-| sous-segments `bin` — `.vutext`, `.vudata` | 30 | rien : ce sont des octets sans symbole |
-| dans `.rodata`, `.data` ou une unité | 10 | une adresse qui tombe au milieu d'un symbole |
-| sous l'adresse de chargement | 6 | rien : fenêtres matérielles, absolues par nature |
+| fenêtres matérielles, sous l'adresse de chargement ou au-delà du bss | 15 | rien : le critère de sortie les excepte |
+| dans un bloc d'octets `.vutext`/`.vudata` plus large que sa section | 30 | affiner la coupure |
+| au milieu d'un symbole du fichier | 10 | décrire la donnée qui les contient |
 
-**Ce qui est établi, et c'est l'essentiel** : le type `bss` de splat fonctionne —
-un sous-segment `{ start, type: bss, name, vram }` engendre son `.s` et sort ses
-symboles de `undefined_syms_auto.ld`, 236 d'un coup pour la seule dernière
-contribution. Mais **le placer seul ne suffit pas** : le script de lien concatène
-les `.bss` à la suite les uns des autres, et un segment isolé n'atterrit pas à son
-adresse. Éprouvé — 1 327 plages divergentes pour un seul segment déclaré.
-
-La couverture doit donc être exhaustive, et elle est atteignable : les symboles
-`OBJECT` **décrivent 99,9 % des 29 260 928 octets du bss**, en 553 trous dont 542
-de seize octets ou moins — de l'alignement. Un seul trou compte, 28 416 octets en
-`0x0037EFC0`, que des contributions `.bss` sans symbole occupent.
+Les 30 sont le lot corrigeable : les descripteurs RTTI de `0x00363580` à
+`0x003637F8` sont rangés avec le microprogramme vectoriel de `0x00363480` parce
+que le sous-segment couvre jusqu'au `.rodata` suivant, et un bloc d'octets n'a
+pas de symboles.
 
 - **95 sous-segments `.rodata`, 147 `rodata` et 32 `data`** vivent hors de toute
   unité. Chacun devra rejoindre celle qui l'emploie, comme les plages de lecture

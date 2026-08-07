@@ -441,6 +441,26 @@ def build_segments(elf: Elf, main: Section) -> tuple[list[tuple[int, str, str]],
     return segments, len(units), dropped
 
 
+def bss_segments(main: Section, bss_end: int) -> list[tuple[int, str, str, int]]:
+    """Le bss, en sous-segments qui le couvrent de bout en bout.
+
+    Sans eux, les 2 457 symboles du bss arrivent au lien par leur adresse
+    absolue, et aucune donnée ne peut alors bouger. Le type `bss` de splat les
+    fait définir par une section.
+
+    La couverture doit être entière, et c'est le fait qui décide de la forme :
+    le script de lien range les `.bss` à la suite les uns des autres, sans
+    adresse, donc un segment déclaré seul n'atterrit pas où le binaire l'avait.
+    Ce n'est qu'en couvrant tout, dans l'ordre, que la concaténation retombe
+    juste.
+
+    L'offset ROM est celui de la fin du fichier : le bss n'occupe pas d'octets
+    sur le disque, et c'est le `vram` qui dit où il vit.
+    """
+    file_end = main.addr + main.size
+    return [(file_end - main.addr, "bss", f"bss/{file_end:08X}", file_end)]
+
+
 YAML_HEADER = """\
 # Découpage de {basename}, engendré par scripts/setup/configure.py.
 #
@@ -549,7 +569,16 @@ def write_yaml(path: Path, basename: str, sha1: str, main: Section,
                 .replace("undefined_funcs_auto_path: linker_scripts/auto/",
                          "undefined_funcs_auto_path: linker_scripts/ref/auto/"))
 
-    lines = [f"      - [0x{off:X}, {kind}, {name}]" for off, kind, name in segments]
+    # Un sous-segment du bss porte un quatrième champ, son adresse : n'occupant
+    # aucun octet du fichier, il partage l'offset ROM de la fin de celui-ci, et
+    # seule la forme longue permet de dire où il vit.
+    lines = [
+        (f"      - {{ start: 0x{entry[0]:X}, type: {entry[1]}, "
+         f"name: {entry[2]}, vram: 0x{entry[3]:08X} }}")
+        if len(entry) == 4 else
+        f"      - [0x{entry[0]:X}, {entry[1]}, {entry[2]}]"
+        for entry in segments
+    ]
     # Le marqueur de fin se pose au niveau des segments : c'est de là que splat
     # tire la borne haute du dernier, et son absence lui fait chercher une
     # adresse suivante qui n'existe pas.
@@ -574,10 +603,11 @@ def as_reference(segments: list[tuple[int, str, str]],
     ne définit.
     """
     return [
-        (offset, "asm" if kind == "cpp" else kind,
-         f"text/{name}" if kind == "cpp" else name)
-        for offset, kind, name in segments
-        if offset not in dropped
+        entry if len(entry) == 4 else
+        (entry[0], "asm" if entry[1] == "cpp" else entry[1],
+         f"text/{entry[2]}" if entry[1] == "cpp" else entry[2])
+        for entry in segments
+        if entry[0] not in dropped or len(entry) == 4
     ]
 
 
@@ -631,6 +661,7 @@ def main() -> int:
     write_sections(starts, CONFIG_DIR / "elf_sections.txt")
 
     segments, unit_count, dropped = build_segments(elf, main_section)
+    segments += bss_segments(main_section, bss_end)
     write_yaml(CONFIG_DIR / "splat.yaml", BOOT_NAME, image_sha1,
                main_section, bss_end, segments)
     print(f"découpage {len(segments)} sous-segments dans config/splat.yaml,"
