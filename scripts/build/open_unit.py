@@ -27,6 +27,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from lib.project import CONFIG_DIR, ROOT, SRC_DIR  # noqa: E402
+from build.carve import Unit, sector_dirs, sector_of_unit  # noqa: E402
+from build.gen_objdiff import sectors_by_symbol  # noqa: E402
 from build.units import (class_of, group_by_class, intruders,  # noqa: E402
                          read_declared, read_functions, read_jump_tables)
 
@@ -130,7 +132,15 @@ def main() -> int:
         name = args.name or args.symbol.lower()
         title, octets = f"{args.symbol} — à décrire.", group.own_bytes
 
+    # Une unité vit dans le dossier de son secteur : la provenance décide du
+    # travail à faire sur elle, et `src/` la range en conséquence. Un nom déjà
+    # qualifié est laissé tel quel, c'est ce qui permet de la ranger autrement.
+    if "/" not in name:
+        unit = Unit(sorted(held, key=lambda f: f.address), end)
+        name = f"{sector_dirs()[sector_of_unit(unit, sectors_by_symbol())]}/{name}"
+
     source = SRC_DIR / f"{name}.cpp"
+    source.parent.mkdir(parents=True, exist_ok=True)
     if source.exists() and not args.force:
         raise SystemExit(f"{source.relative_to(ROOT)} existe déjà")
 

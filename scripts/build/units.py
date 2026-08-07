@@ -123,7 +123,17 @@ def rodata_is_contiguous(low: int, high: int) -> bool:
 
     Cette condition ne dit rien de ce que la plage porte : c'est
     `rodata_is_migrable` qui tranche si chaque symbole suivra bien une fonction.
+
+    Une plage qui ne porte qu'un symbole n'a pas de trou à expliquer, et c'est
+    le seul cas où elle se juge sur ce que le désassembleur nomme plutôt que sur
+    ce que le binaire dimensionne : les tables de saut du code de bibliothèque
+    n'ont pas de symbole dans le binaire — splat les nomme lui-même `jtbl_…` —,
+    donc aucune taille ne les borne.
     """
+    named = rodata_symbols(low, high)
+    if len(named) == 1 and named[0].address == low:
+        return True
+
     inside = [(start, end) for start, end in read_sized_symbols()
               if low <= start < high]
     if not inside or inside[0][0] != low:
@@ -161,7 +171,10 @@ def read_references() -> dict[str, set[str]]:
         return _REFERENCED
 
     table: dict[str, set[str]] = {}
-    for path in sorted((REF_DIR / "text").glob("*.s")):
+    # Récursif : une unité rangée dans le dossier de son secteur donne au
+    # désassemblage de référence un sous-dossier de même nom, et une lecture
+    # plate n'y verrait plus aucune de ses fonctions.
+    for path in sorted((REF_DIR / "text").rglob("*.s")):
         function = ""
         for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
             label = _GLABEL_LINE.match(line)
@@ -216,11 +229,19 @@ def is_migrable(kind: str, operands: list[str]) -> bool:
     pour une constante ne bouge pas. Ne restent donc migrables qu'une chaîne, une
     table de saut — trois étiquettes au moins — et un flottant dont la queue est
     nulle, ce que `SymbolRodata.isMaybeConstVariable` écarte.
+
+    Une table peut finir sur des mots nuls sans cesser d'en être une :
+    `isJumpTable` répond du type que le `jr` a donné au symbole, non de son
+    contenu. Six tables du code de bibliothèque sont dans ce cas.
     """
     if kind in ("asciz", "ascii"):
         return True
     if kind == "word":
-        return len(operands) >= 3 and all(o.startswith(".L") for o in operands)
+        labels = [o for o in operands if o.startswith(".L")]
+        tail = operands[len(labels):]
+        return (len(labels) >= 3
+                and operands[:len(labels)] == labels
+                and all(o in ("0x00000000", "0") for o in tail))
     if kind in ("float", "double"):
         head = 1 if kind == "float" else 2
         return all(o in ("0", "0.0", "-0") for o in operands[head:])
@@ -329,6 +350,9 @@ class JumpTable:
 _DLABEL = re.compile(r"^dlabel\s+(\S+)\s*$")
 _JUMP_WORD = re.compile(
     r"/\*\s*\w+\s+([0-9A-Fa-f]{8})\s+\w+\s*\*/\s*\.word\s+\.L([0-9A-Fa-f]{8})")
+# Le mot nul dont certaines tables sont suivies, à l'intérieur du même symbole.
+_NULL_WORD = re.compile(
+    r"/\*\s*\w+\s+([0-9A-Fa-f]{8})\s+\w+\s*\*/\s*\.word\s+(?:0x0+|0)\s*$")
 
 
 def read_jump_tables() -> list[JumpTable]:
@@ -347,24 +371,34 @@ def read_jump_tables() -> list[JumpTable]:
     for path in sorted(rodata.glob("*.s")):
         name: str | None = None
         entries: list[tuple[int, int]] = []
+        last = 0
         for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
             label = _DLABEL.match(line.strip())
             if label:
-                name, entries = label.group(1), []
+                name, entries, last = label.group(1), [], 0
                 continue
             if name is None:
                 continue
             word = _JUMP_WORD.search(line)
+            null = _NULL_WORD.search(line)
             if word:
                 entries.append((int(word.group(1), 16), int(word.group(2), 16)))
+                last = entries[-1][0]
+            elif null and entries:
+                # La table s'arrête où son symbole s'arrête, non à sa dernière
+                # étiquette : six d'entre elles finissent sur un mot nul, et
+                # borner avant lui couperait le symbole que la plage doit porter
+                # entier.
+                last = int(null.group(1), 16)
             elif line.strip().startswith("enddlabel"):
-                # Une table n'a que des étiquettes : un bloc qui en mêle
-                # d'autres mots est une donnée qui se trouve en contenir.
+                # Une table n'a que des étiquettes, éventuellement suivies de
+                # mots nuls : un bloc qui en mêle d'autres est une donnée qui se
+                # trouve en contenir.
                 if entries:
                     start = entries[0][0]
-                    tables.append(JumpTable(name, start, entries[-1][0] + 4 - start,
+                    tables.append(JumpTable(name, start, last + 4 - start,
                                             [t for _a, t in entries]))
-                name, entries = None, []
+                name, entries, last = None, [], 0
     return tables
 
 

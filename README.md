@@ -21,7 +21,7 @@ binaire lui-même.
 | Construction identique au disque | **oui** — 2 608 512 octets, sha1 `eca0c93d5d6a25fcbf8f1fa41aa811a6f4b7aca8` |
 | Code reconstruit en C++ | 6 080 octets sur 2 215 100 — 32 fonctions sur 7 837 |
 | Compilateur | `mwcps2-3.0-011126`, `-O4,p` — départagé en mesurant les 21 versions |
-| Découpage | 144 unités, 6 849 fonctions — 91,5 % des octets de `.text`, et tout le code du jeu |
+| Découpage | 325 unités, 7 788 fonctions — 99,7 % des octets de `.text`, rangées par provenance |
 
 La construction part du désassemblage entier et le réassemble ; chaque fonction
 passée en C++ en remplace une part, et la construction doit rester identique.

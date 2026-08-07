@@ -25,11 +25,14 @@ référence est cassée, il faut la réparer d'abord.
 
 ## 1. Choisir où travailler
 
-Tout le code du jeu vit déjà dans une unité — 144 d'entre elles, 6 849
-fonctions —, et chacune attend dans un `src/*.cpp` sous `INCLUDE_ASM`. Les étapes
-1 et 2 ne servent donc plus qu'à retoucher une frontière que le découpage a
-décidée d'après la classe la plus lourde. **Pour reconstruire une fonction déjà
-dans une unité, sauter à l'étape 3.**
+Presque tout le binaire vit déjà dans une unité — 325 d'entre elles, 7 788
+fonctions, 99,7 % de `.text` —, et chacune attend dans un `src/*.cpp` sous
+`INCLUDE_ASM`. Les sources sont rangées par provenance : `src/game/` pour le code
+de Level-5, `src/sdk/` pour celui de Sony, `src/runtime/` pour Metrowerks et la
+bibliothèque C, `src/mglib/` pour le middleware `mg*`. Les étapes 1 et 2 ne
+servent donc plus qu'à retoucher une frontière ou un classement que le découpage
+a décidés. **Pour reconstruire une fonction déjà dans une unité, sauter à
+l'étape 3.**
 
 ```sh
 make report    # les fonctions par unité, la plus grosse d'abord

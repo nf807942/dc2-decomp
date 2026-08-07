@@ -30,52 +30,58 @@ décompilation mais à ce qui reste adressé en dur.
 
 ```
 code reconstruit : 6 080 octets sur 2 215 100      0,274 %      32 fonctions
-unités ouvertes  : 144, 2 027 016 octets           91,5 %    6 849 fonctions
+unités ouvertes  : 325, 2 208 852 octets           99,7 %    7 788 fonctions
 ```
 
-Ce qui reste dehors : le code de bibliothèque, les microprogrammes vectoriels et
-les données.
+Ce qui reste dehors : les 49 initialiseurs statiques, les microprogrammes
+vectoriels et les données.
 
 ---
 
 ## Jalon 1 — Finir le découpage du texte
 
-**Le compte passe de 72 unités à 144**, et `make build` rend les octets du disque.
-Cinq causes ont été levées : trois dans mwccgap, portées par
-`tools/patches/mwccgap-alignment.patch` — l'alignement d'une section greffée pris
-de l'adresse du symbole, l'ordre des tables de saut pris de leurs adresses, et la
-recherche d'une section par le symbole qui l'a déclarée —, une dans le découpage,
-qui ignorait les frontières de contribution d'objet, et une dernière dans la
-largeur des plages de lecture seule.
+**Le compte passe de 72 unités à 325**, et `make build` rend les octets du disque.
+`.text` est couvert à 99,7 % : il ne reste dehors que les 49 initialiseurs
+statiques, et ceux-là ne sont pas du texte.
 
-**Tout le code du jeu est ouvert** : les seize unités que leur plage retenait ont
-été redécoupées à une table de saut par unité, ce qui réduit chacune à sa seule
-table. Elles font 51 unités, 383 588 octets, et le prix de cette finesse est une
-médiane à 5 980 octets et six unités d'une seule fonction — mesuré, et payé en
-lisibilité de `config/units.txt`, non en exactitude.
+Le découpage ne s'arrête plus aux plages du jeu, et ce n'était pas un choix :
+**le remplacement fonction par fonction demande un sous-segment `cpp` et un
+`INCLUDE_ASM`, donc une fonction hors unité ne peut pas s'écrire en C++.** Le
+jalon 4 réclamant le SDK, le runtime et la bibliothèque C, leur découpage en
+était la condition. Le coût, mesuré, était bien moindre qu'estimé : les 988
+fonctions restantes n'occupaient que 182 contributions d'objet, non 926.
+
+`src/` se range désormais par provenance — `game/`, `sdk/`, `runtime/`,
+`mglib/` —, et le nom d'une unité porte son dossier.
 
 **Ce qui reste** :
 
-- **Le code de bibliothèque** — 926 fonctions. L'alignement ne les borne plus,
-  mais **chacune est sa propre contribution d'objet**, et le désassembleur en fait
-  un sous-segment : une unité ne peut pas en réunir deux. Ce serait donc 926 unités
-  d'une fonction. Ce que le découpage y gagnerait est à peser avant de le faire ;
-  c'est du code livré compilé, sans valeur de compréhension pour le jeu.
+- **Les 49 initialiseurs statiques `__sinit_*`**, 6 248 octets. Ce sont des
+  `FUNC`, mais elles vivent après les données, en `0x00379680` : ouvertes en
+  unité, le script de lien rangerait leur `.text` avec celui du jeu et tout ce
+  qui les sépare des données glisserait. Le remède tient au jalon 3, où leur
+  parcours par le runtime est déjà à établir.
 - **`.vutext`**, 18 208 octets de microprogrammes vectoriels en six blocs
   d'octets. Aucun assembleur de la chaîne ne les relit. Il faudrait un
   désassembleur VU dédié ; rien n'y oblige tant qu'on ne veut pas les modifier.
-- **Vingt unités d'une seule fonction**, qu'une frontière de contribution isole
-  ou que le resserrement d'une plage de lecture seule a détachées. Elles sont
-  justes ; les réunir à leur voisine ne tient qu'à la lisibilité de
-  `config/units.txt`.
+- **Le classement par dossier est une heuristique** : il vote sur le poids des
+  octets, et `cscriptinterpreter` rangé au middleware ou `csound` au SDK sont à
+  revoir. `config/units.txt` est fait pour être corrigé à la main.
+- **Les unités d'une seule fonction**, qu'une frontière de contribution isole ou
+  que le resserrement d'une plage de lecture seule a détachées — 124 des 182
+  contributions de bibliothèque sont dans ce cas, et c'est leur nature. Les
+  réunir ne tient qu'à la lisibilité de `config/units.txt`.
 
 **Non résolu, et c'est une limite du jalon 4 plus que de celui-ci** : MWCC aligne
 sur seize octets la section de toute fonction qu'il *compile*, et mwccgap ne peut
 rien y faire faute de connaître son adresse. Les treize auxiliaires du runtime que
 les plages du jeu englobent — `__divdi3`, `fpmul`, `sitofp`, `__swsetup` — sont
-donc ouverts mais devront rester greffés.
+donc ouverts mais devront rester greffés. La mesure vaut plus largement : **92 des
+182 contributions de bibliothèque seulement commencent sur un multiple de seize**,
+donc les 90 autres s'ouvrent sans pouvoir s'écrire tant que ce point tient.
 
-**Critère de sortie** : chaque octet de `.text` appartient à une unité.
+**Critère de sortie** : chaque octet de `.text` appartient à une unité. Atteint,
+aux initialiseurs statiques près — qui n'en sont pas.
 
 ---
 
@@ -126,7 +132,11 @@ Restent trois verrous, dans l'ordre où ils se lèveront :
 3. **Les 49 initialiseurs statiques `__sinit_*`** occupent une plage contiguë de
    `0x00379680` à `0x0037AFDC`. Comment le runtime les parcourt — table de
    pointeurs, bornes de section, suite d'appels — n'est pas établi. À trancher
-   avant de supprimer ou d'ajouter une unité de traduction.
+   avant de supprimer ou d'ajouter une unité de traduction. C'est aussi ce qui
+   les tient hors du jalon 1 : ce sont des `FUNC` situées après les données, et
+   le script de lien range tous les `.text` ensemble — les ouvrir en unité y
+   ferait glisser tout ce qui les sépare des données, jusqu'au débordement
+   `%gp_rel`. Mesuré, non supposé.
 
 **Critère de sortie**, et c'est une mesure, non un raisonnement : faire grossir
 une fonction d'une instruction, reconstruire, et vérifier que le jeu tourne dans

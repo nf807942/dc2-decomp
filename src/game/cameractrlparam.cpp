@@ -1,0 +1,26 @@
+/* CameraCtrlParam
+ *
+ * Unité découpée par `make carve` : 16 fonctions, 13996 octets, de
+ * 0x001A9820 à 0x001ACF40. Chacune garde les instructions du disque
+ * jusqu'à ce qu'elle soit écrite en C++, et l'ordre est celui des adresses,
+ * que l'éditeur de liens attend.
+ */
+
+#include "common.h"
+
+INCLUDE_ASM("nonmatchings/game/cameractrlparam", LightingEdit__FP6CScene);
+INCLUDE_ASM("nonmatchings/game/cameractrlparam", tagGyoFish__FP9SPI_STACKi);
+INCLUDE_ASM("nonmatchings/game/cameractrlparam", LoadGyorace__Fv);
+INCLUDE_ASM("nonmatchings/game/cameractrlparam", GetUserData__Fv_001AAEF0);
+INCLUDE_ASM("nonmatchings/game/cameractrlparam", InitLockCharaCtrl__Fv);
+INCLUDE_ASM("nonmatchings/game/cameractrlparam", LockCharaCtrl__Fv);
+INCLUDE_ASM("nonmatchings/game/cameractrlparam", UnLockCharaCtrl__Fv);
+INCLUDE_ASM("nonmatchings/game/cameractrlparam", IsEditMode__Fv);
+INCLUDE_ASM("nonmatchings/game/cameractrlparam", InitEditModeChg__Fv);
+INCLUDE_ASM("nonmatchings/game/cameractrlparam", NowEditModeChg__Fv);
+INCLUDE_ASM("nonmatchings/game/cameractrlparam", EditModeChg__Fi);
+INCLUDE_ASM("nonmatchings/game/cameractrlparam", EditModeChgStep__FP6CScene);
+INCLUDE_ASM("nonmatchings/game/cameractrlparam", SetDataPacket__Fi);
+INCLUDE_ASM("nonmatchings/game/cameractrlparam", PreExitLoop__FP6CScene);
+INCLUDE_ASM("nonmatchings/game/cameractrlparam", EditInit__F13INIT_LOOP_ARG);
+INCLUDE_ASM("nonmatchings/game/cameractrlparam", __as__15CameraCtrlParamFRC15CameraCtrlParam);

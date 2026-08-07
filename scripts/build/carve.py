@@ -41,12 +41,14 @@ seize octets pour toutes.
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from lib.project import CONFIG_DIR, ROOT, SRC_DIR  # noqa: E402
+from build.gen_objdiff import sectors_by_symbol  # noqa: E402
 from build.units import (Function, class_of, read_contributions,  # noqa: E402
                          read_declared, read_functions, read_jump_tables,
                          rodata_is_contiguous, rodata_is_migrable)
@@ -91,9 +93,28 @@ class Unit:
         Une unité en porte souvent plusieurs — c'est ce que le binaire fait de
         son côté —, et rien ne dit laquelle l'a nommée. Celle qui pèse le plus
         est le choix le moins arbitraire ; les autres restent en commentaire.
+
+        Le code de bibliothèque n'a pas de classe : ses contributions portent
+        une poignée de fonctions libres, et c'est la plus lourde qui nomme
+        l'unité. `sceGsResetPath` vaut mieux que son adresse.
         """
         ordered = self.classes
-        return ordered[0].lower() if ordered else f"text_{self.start:08X}"
+        if ordered:
+            return ordered[0].lower()
+        heaviest = max(self.functions, key=lambda f: (f.size, f.name))
+        return file_name(heaviest.name) or f"text_{self.start:08X}"
+
+
+# Ce qu'un nom de fichier accepte. Le mangling Metrowerks porte des chiffres de
+# longueur, des chevrons et des `$` qu'aucun système de fichiers ne veut, et le
+# nom sert ici de chemin autant que d'étiquette.
+_UNSAFE = re.compile(r"[^a-z0-9_]+")
+
+
+def file_name(symbol: str) -> str:
+    """Un nom de fichier tiré d'un symbole, assaini et borné en longueur."""
+    cleaned = _UNSAFE.sub("_", symbol.lower()).strip("_")
+    return cleaned[:48]
 
 
 def read_sectors() -> list[tuple[int, int]]:
@@ -104,6 +125,51 @@ def read_sectors() -> list[tuple[int, int]]:
         if len(fields) == 2:
             sectors.append((int(fields[0], 16), int(fields[1], 16)))
     return sectors
+
+
+def text_span(functions: list[Function]) -> tuple[int, int]:
+    """De la première fonction de `.text` à la fin de la section.
+
+    Le découpage couvre tout le texte, non les seules plages du jeu : une
+    fonction hors unité ne peut pas s'écrire en C++, le remplacement fonction
+    par fonction demandant un sous-segment `cpp` et un `INCLUDE_ASM`. Le code de
+    bibliothèque n'y échappe donc pas, même livré compilé.
+
+    La borne haute est le début de `.vutext`, non la dernière fonction du
+    binaire : les 49 initialiseurs statiques `__sinit_*` sont des `FUNC` mais
+    vivent après les données, en `0x00379680`. Les prendre pour du texte fait
+    d'eux une unité dont le script de lien range le `.text` avec celui du jeu,
+    et tout ce qui les sépare des données glisse — le symptôme est un
+    débordement `%gp_rel`, les petites données s'étant éloignées de `_gp`.
+    """
+    return functions[0].address, read_contributions(".vutext")[0]
+
+
+def sector_dirs() -> dict[str, str]:
+    """Le dossier de `src/` où chaque secteur range ses unités.
+
+    La provenance est ce qui décide du travail à faire : le SDK Sony a ses
+    prototypes dans `ps2sdk`, le middleware ses signatures dans DCDecomp, le
+    runtime Metrowerks ses sources dans l'installateur CodeWarrior, et le jeu
+    n'a que le binaire. Les séparer dans l'arborescence rend cette différence
+    lisible d'un coup d'œil.
+    """
+    return {"sdk": "sdk", "middleware": "mglib", "runtime": "runtime",
+            "game": "game"}
+
+
+def sector_of_unit(unit: Unit, sectors: dict[str, str]) -> str:
+    """Le secteur d'une unité : celui qui pèse le plus d'octets.
+
+    Une unité en mêle souvent deux — le middleware est dispersé dans les
+    plages du jeu —, et le vote se fait sur les octets plutôt que sur le compte,
+    une contribution pouvant porter un nom trompeur sur une fonction minuscule.
+    """
+    weight: dict[str, int] = {}
+    for function in unit.functions:
+        key = sectors.get(function.name, "game")
+        weight[key] = weight.get(key, 0) + function.size
+    return max(weight, key=lambda k: (weight[k], k)) if weight else "game"
 
 
 def class_spans(functions: list[Function]) -> dict[str, tuple[int, int]]:
@@ -306,7 +372,7 @@ def main() -> int:
     contributions = read_contributions()
 
     units: list[Unit] = []
-    for low, high in read_sectors():
+    for low, high in [text_span(functions)]:
         # Une unité déjà déclarée garde la main : le découpage la contourne, et
         # ce qui l'entoure se découpe de part et d'autre plutôt qu'à travers.
         for begin, stop in gaps(low, high, declared):
@@ -347,27 +413,36 @@ def main() -> int:
     if overlap:
         print(f"attention : {overlap} plages de lecture seule se recouvrent")
 
-    if not args.apply:
-        for unit in kept[:30]:
-            span = rodata_of(unit, tables)
-            suffix = f" rodata:0x{span[0]:08X}-0x{span[1]:08X}" if span else ""
-            print(f"0x{unit.start:08X} 0x{unit.end:08X} {unit.name}{suffix}"
-                  f"   # {len(unit.functions)} fonctions, {unit.size} octets")
-        if len(kept) > 30:
-            print(f"… et {len(kept) - 30} autres (--apply les déclare toutes)")
-        return 0
-
-    SRC_DIR.mkdir(exist_ok=True)
-    lines: list[str] = []
+    # Chaque unité se range dans le dossier de son secteur, la provenance
+    # décidant du travail à faire sur elle.
+    symbol_sectors = sectors_by_symbol()
+    dirs = sector_dirs()
+    named = []
     for unit in kept:
-        name = unit.name
+        folder = dirs[sector_of_unit(unit, symbol_sectors)]
+        name = f"{folder}/{unit.name}"
         # Deux unités peuvent porter la même classe dominante ; l'adresse les
         # départage, comme elle départage les symboles homonymes.
         if name in taken_names:
             name = f"{name}_{unit.start:08X}"
         taken_names.add(name)
+        named.append((unit, name))
 
+    if not args.apply:
+        for unit, name in named[:30]:
+            span = rodata_of(unit, tables)
+            suffix = f" rodata:0x{span[0]:08X}-0x{span[1]:08X}" if span else ""
+            print(f"0x{unit.start:08X} 0x{unit.end:08X} {name}{suffix}"
+                  f"   # {len(unit.functions)} fonctions, {unit.size} octets")
+        if len(named) > 30:
+            print(f"… et {len(named) - 30} autres (--apply les déclare toutes)")
+        return 0
+
+    SRC_DIR.mkdir(exist_ok=True)
+    lines: list[str] = []
+    for unit, name in named:
         source = SRC_DIR / f"{name}.cpp"
+        source.parent.mkdir(parents=True, exist_ok=True)
         body = TEMPLATE.format(
             classes=", ".join(unit.classes) or "Fonctions libres — à décrire.",
             count=len(unit.functions), octets=unit.size,

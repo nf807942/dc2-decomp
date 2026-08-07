@@ -26,7 +26,10 @@
 # La borne suit ce que l'objet produit : `CancelAutoRepeat`, derniere fonction
 # de la plage, est desormais compilee, donc les douze octets de remplissage qui
 # la separent de 0x0014B500 ne sont plus emis.
-0x0014A650 0x0014B4F4 gamepad
+0x0014A650 0x0014B4F4 game/gamepad
+# sceGsResetPath — essai du code de bibliothèque : une contribution,
+# une fonction.
+0x001027D0 0x00102838 sdk/scegsresetpath
 
 
 
@@ -38,10 +41,10 @@
 # objet : laissée dans 00372BA0.rodata, elle référençait des symboles que plus
 # aucun fichier ne définissait, et l'éditeur de liens s'arrêtait sur une faute
 # de segmentation.
-0x002FE6C0 0x002FEE80 dngfloormanager rodata:0x00377F10-0x00377F2C
+0x002FE6C0 0x002FEE80 game/dngfloormanager rodata:0x00377F10-0x00377F2C
 
 # GetDngMapFloorInfo, apres IsClearPractice.
-0x002FEE80 0x002FEEC4 dngfloorinfo
+0x002FEE80 0x002FEEC4 game/dngfloorinfo
 
 # CMenuInvent, le menu d'invention — première moitié. La classe va jusqu'à
 # 0x0020C158, mais quatre de ses fonctions sautent par table (IsCreateObject,
@@ -49,24 +52,24 @@
 # perd les étiquettes que sa table désigne. La plage s'arrête donc avant la
 # première d'entre elles ; ce n'est pas une frontière d'unité de traduction,
 # c'est ce que l'outillage sait porter aujourd'hui.
-0x00201EE0 0x00203E90 menuinvent
+0x00201EE0 0x00203E90 game/menuinvent
 
 # CGameDataUsed — un objet du jeu, arme, poisson ou pièce de robot — avec la
 # jauge COMMON_GAGE et les aides libres qui la précèdent. `GetMainCharaModelName`
 # tombe au milieu de la classe : c'est une fonction libre de la même unité, non
 # une frontière. Aucune fonction de la plage ne saute par table.
-0x001981B0 0x0019B680 gamedataused
+0x001981B0 0x0019B680 game/gamedataused
 
 # Les trois accesseurs de la table d'avancement, adjacents : l'entrée d'un
 # indice, son chapitre, et le nombre d'entrées. `LoadGameInfo`, qui remplit la
 # table juste avant, reste en assembleur — elle appelle l'interpréteur de
 # script, dont rien n'est encore reconstruit.
-0x0031FB20 0x0031FB98 gameprogress
+0x0031FB20 0x0031FB98 game/gameprogress
 
 # EndTakePhoto seule : le bloc photo vit dans le gros bloc de code, et les
 # autres fonctions attendent d'etre ouvertes. Elle ne fait que revenir a
 # InitTakePhoto.
-0x00313A30 0x00313A38 takephoto
+0x00313A30 0x00313A38 game/takephoto
 
 # Les deux rappels que sceMpegInit installe par defaut pour suspendre et
 # reprendre le DMA autour du decodage. La plage est une contribution d'objet
@@ -75,414 +78,973 @@
 # La borne s'arrete a la fin de _defRestartDMA, non au debut de la
 # contribution suivante : les deux fonctions etant compilees, MWCC ne produit
 # pas les quatre octets de remplissage qui les separent de 0x0010F4E0.
-0x0010F4C0 0x0010F4DC mpegdma
+0x0010F4C0 0x0010F4DC sdk/mpegdma
 
 
 
 # 0x0012C2C0 .. 0x00131560 : 103 fonctions, 20428 octets.
-0x0012C2C0 0x00131560 mgmath
+0x0012C2C0 0x00131560 mglib/mgmath
 
 # mgCFrame, mgCDrawPrim, mgCDrawManager, mgCMDTBuilder, mgCCamera, mgCCameraFollow, mgCObject, mgCVisual, mgCFrameAttr, mgCVisualMDT, mgCVisualFixMDT, mgCFrameBase : 209 fonctions, 29960 octets.
-0x00131560 0x00138EE0 mgcframe
+0x00131560 0x00138EE0 mglib/mgcframe
 
 # mgCVisualMDT, mgCTextureAnime, mgRENDER_INFO, mgCShadowMDT, mgC3DSprite, mgCVisualFixMDT, mgCMemory, mgCSprite, mgCVisual, mgCDrawEnv, mgCVisualPrim, mgCTexAnimeData, mgCTextureManager, mgCVisualAttr, mgVu0FBOX, mgRect_i_, CList_15mgCTexAnimeData_ : 142 fonctions, 34396 octets.
-0x00138EE0 0x00141850 mgcvisualmdt rodata:0x00366D60-0x00366D78
+0x00138EE0 0x00141850 mglib/mgcvisualmdt rodata:0x00366D60-0x00366D78
 
 # CScriptInterpreter, input_str, mgCMemory, SPI_STACK : 124 fonctions, 23904 octets.
-0x00141850 0x00147890 cscriptinterpreter
+0x00141850 0x00147890 mglib/cscriptinterpreter
 
 # CCollisionMDT, CColFrame, CCollision : 62 fonctions, 11300 octets.
-0x00147890 0x0014A650 ccollisionmdt
+0x00147890 0x0014A650 game/ccollisionmdt
 
 # CGamePad : 69 fonctions, 24592 octets.
-0x0014B500 0x00151690 cgamepad
+0x0014B500 0x00151690 game/cgamepad
 
 # ClsMes, CMapFlagData : 52 fonctions, 24632 octets.
-0x00157790 0x0015D920 clsmes rodata:0x003673E0-0x00367440
+0x00157790 0x0015D920 game/clsmes rodata:0x003673E0-0x00367440
 
 # CMap, CMapParts, CMapWater, CPartsGroup, CFuncPoint, CObjAnime, CList_14PartsGroupData_, CList_P9CMapParts_, CObject : 67 fonctions, 15988 octets.
-0x0015D920 0x00161970 cmap
+0x0015D920 0x00161970 game/cmap
 
 # CMapParts, CMap, CMapInfo, CMapTreasureBox, CCameraInfo, CMapLightingInfo, CObject, CMapPiece, CList_9CMapParts_, CList_9CMapPiece_, CFuncPoint, CObjectFrame, mgCObject, mgCFrame, CCameraDrawInfo, PieceMaterial, CCollision, CMapWater, CList_9CObjAnime_, CColFrame : 210 fonctions, 30988 octets.
-0x00161970 0x00169820 cmapparts
+0x00161970 0x00169820 game/cmapparts
 
 # CActionChara, CMapPiece, CMdsListSet, CObject, CMdsList, CObjectFrame, CIMGList, CCharacter2, CMdsInfo : 111 fonctions, 25492 octets.
-0x00169820 0x0016FE00 cactionchara
+0x00169820 0x0016FE00 game/cactionchara
 
 # CActionChara, CCharacter2 : 52 fonctions, 24508 octets.
-0x0016FE00 0x00175F10 cactionchara_0016FE00 rodata:0x00368040-0x0036805C
+0x0016FE00 0x00175F10 game/cactionchara_0016FE00 rodata:0x00368040-0x0036805C
 
 # CCharacter2, CDynamicAnime, CDAColPipe, CObject, CDACollision, CCharaLOD : 136 fonctions, 29776 octets.
-0x00175F10 0x0017D680 ccharacter2
+0x00175F10 0x0017D680 game/ccharacter2
 
 # CSound, sndCSeSeq, sndPortInfo, CLoopSeMngr, sndCSeSeqData, sndTrack, sndBankInfo, SND_LOOP_SE_SEQ, sndSeInfo : 171 fonctions, 31624 octets.
-0x00189E30 0x00191DF0 csound rodata:0x00369370-0x003693A0
+0x00189E30 0x00191DF0 sdk/csound rodata:0x00369370-0x003693A0
 
 # CUserDataManager, CBattleCharaInfo, CFishAquarium, MOS_CHANGE_PARAM, CMonsterBox, CFishingTournament, CFishingRecord, ROBO_DATA : 176 fonctions, 26552 octets.
-0x0019B680 0x001A2280 cuserdatamanager rodata:0x0036A3E0-0x0036A400
+0x0019B680 0x001A2280 game/cuserdatamanager rodata:0x0036A3E0-0x0036A400
 
 # CEditCollision, CWaveTable : 64 fonctions, 23228 octets.
-0x001A2280 0x001A7EA0 ceditcollision
+0x001A2280 0x001A7EA0 game/ceditcollision
 
 # CActionChara : 22 fonctions, 18220 octets.
-0x001ACF40 0x001B16D0 cactionchara_001ACF40 rodata:0x0036AD10-0x0036AD28
+0x001ACF40 0x001B16D0 game/cactionchara_001ACF40 rodata:0x0036AD10-0x0036AD28
 
 # CEditMap, CRocketLauncher, CEditParts, CEditPartsInfo, CEditHouse : 100 fonctions, 25496 octets.
-0x001B16D0 0x001B7C50 ceditmap
+0x001B16D0 0x001B7C50 game/ceditmap
 
 # CPullItem, CLaserGun, CColPrim, CRoboVoiceSystem, CMachineGun, CColPrimMan, CRocketLauncherMan, CLaserGunMan, CPullItemManager, CTreasureBox : 63 fonctions, 23076 octets.
-0x001B7C50 0x001BD800 cpullitem rodata:0x0036BC60-0x0036BC80
+0x001B7C50 0x001BD800 game/cpullitem rodata:0x0036BC60-0x0036BC80
 
 # CFireAfterHit, CChillAfterHit, CTornado : 19 fonctions, 16208 octets.
-0x001BD800 0x001C17C0 cfireafterhit
+0x001BD800 0x001C17C0 game/cfireafterhit
 
 # BattleEffectMan, CHitEffectImage, CDeadEffect, CMapEffect_Sprite, CThunder, CSWordAfterImage, CMapEffectsManeger, CHealingEffectMan, CPowerLine, CSparcEffect, CSwordLuminous, CFlushEffect, CAfterWire, CMiniEffPrim, CMiniEffPrimMan, CPalletAnime, CCharacter2 : 61 fonctions, 22208 octets.
-0x001C17C0 0x001C6FD0 battleeffectman rodata:0x0036BE90-0x0036BEAC
+0x001C17C0 0x001C6FD0 game/battleeffectman rodata:0x0036BE90-0x0036BEAC
 
 # CWeaponElement, CEnemyLifeGage, CLevelupInfo, CPiyori, CGiftMark, CEnemyGekirin : 41 fonctions, 19680 octets.
-0x001C6FD0 0x001CBDA0 cweaponelement
+0x001C6FD0 0x001CBDA0 game/cweaponelement
 
 # CDamageScore, CLockOnModel, CWarningGage2, CDamageScore2, mgCCamera, CActiveMonster, CRedMarkModel, MoveCheckInfo : 27 fonctions, 23716 octets.
-0x001CBDA0 0x001D1AF0 cdamagescore
+0x001CBDA0 0x001D1AF0 game/cdamagescore
 
 # CMiniMapSymbol, CHealingPoint, CDamageScore, CThunder, CFireAfterHit, CChillAfterHit, CAfterWire : 34 fonctions, 20916 octets.
-0x001D1AF0 0x001D6D80 cminimapsymbol
+0x001D1AF0 0x001D6D80 game/cminimapsymbol
 
 # CAutoMapGen, CActionChara, CActiveMonster, CMonsterLocateInfo : 37 fonctions, 21612 octets.
-0x001D6D80 0x001DC2F0 cautomapgen
+0x001D6D80 0x001DC2F0 game/cautomapgen
 
 # CMonsterMan : 61 fonctions, 24536 octets.
-0x001DC2F0 0x001E2410 cmonsterman
+0x001DC2F0 0x001E2410 game/cmonsterman
 
 # fonctions libres : 137 fonctions, 24568 octets.
-0x001E2410 0x001E8790 text_001E2410
+0x001E2410 0x001E8790 game/text_001E2410
 
 # CDngFreeMap, CPreSprite : 73 fonctions, 33988 octets.
-0x001E8790 0x001F0E00 cdngfreemap rodata:0x0036D5C0-0x0036D5E4
+0x001E8790 0x001F0E00 game/cdngfreemap rodata:0x0036D5C0-0x0036D5E4
 
 # CMenuTreeMap, ClsMes, CBaseMenuClass, mgRect_f_ : 29 fonctions, 24696 octets.
-0x001F0E00 0x001F6F40 cmenutreemap
+0x001F0E00 0x001F6F40 game/cmenutreemap
 
 # CMenuGeorama : 36 fonctions, 25592 octets.
-0x001F6F40 0x001FD400 cmenugeorama rodata:0x0036DFC0-0x0036DFE4
+0x001F6F40 0x001FD400 game/cmenugeorama rodata:0x0036DFC0-0x0036DFE4
 
 # CRemovalMenu, CInventUserData, CInventDataManage, CScoopDataManager, CDC2AlbumData, CCharaFrameMatching, CBaseMenuClass : 75 fonctions, 18696 octets.
-0x001FD400 0x00201EE0 cremovalmenu
+0x001FD400 0x00201EE0 game/cremovalmenu
 
 # CAquaMes, CAquaFish, CBubble, CFishFood, CAquaFishEff, CAquaFishActionParam : 63 fonctions, 24504 octets.
-0x0020E410 0x00214570 caquames rodata:0x0036F160-0x0036F188
+0x0020E410 0x00214570 game/caquames rodata:0x0036F160-0x0036F188
 
 # CMenuPosDataForm : 39 fonctions, 23988 octets.
-0x00226B40 0x0022C990 cmenuposdataform
+0x00226B40 0x0022C990 game/cmenuposdataform
 
 # CPosDataManage, CMenuPosDataManage, CRepairManager, CLevelUpEffect, CEffVerticalLine, CRepairEffect, CLevelUpEffectManager, CStarDust : 93 fonctions, 21036 octets.
-0x0022C990 0x00231DD0 cposdatamanage
+0x0022C990 0x00231DD0 game/cposdatamanage
 
 # CMenuEffect : 52 fonctions, 23484 octets.
-0x00231DD0 0x00237AD0 cmenueffect rodata:0x0036FBE0-0x0036FC58
+0x00231DD0 0x00237AD0 game/cmenueffect rodata:0x0036FBE0-0x0036FC58
 
 # CBaseMenuClass, CMenuInter, CMENU_USERPARAM, MENU_ASKMODE_PARA, MENU_SWAPITEM_INFO : 65 fonctions, 24484 octets.
-0x00237AD0 0x0023DC00 cbasemenuclass rodata:0x00370140-0x0037016C
+0x00237AD0 0x0023DC00 game/cbasemenuclass rodata:0x00370140-0x0037016C
 
 # CMenuKeyFunc : 48 fonctions, 17548 octets.
-0x0023DC00 0x002421A0 cmenukeyfunc rodata:0x003701E0-0x0037020C
+0x0023DC00 0x002421A0 game/cmenukeyfunc rodata:0x003701E0-0x0037020C
 
 # C3DSpline, CCameraPas, CCharaPas : 143 fonctions, 23780 octets.
-0x00254660 0x0025A670 c3dspline
+0x00254660 0x0025A670 game/c3dspline
 
 # CSceneCmrSeq, CSceneObjSeq, CEoh : 174 fonctions, 24600 octets.
-0x0025A670 0x00260B80 cscenecmrseq rodata:0x00371A50-0x00371A6C
+0x0025A670 0x00260B80 game/cscenecmrseq rodata:0x00371A50-0x00371A6C
 
 # fonctions libres : 137 fonctions, 24556 octets.
-0x00266E10 0x0026D190 text_00266E10 rodata:0x00371E30-0x00371E70
+0x00266E10 0x0026D190 game/text_00266E10 rodata:0x00371E30-0x00371E70
 
 # fonctions libres : 178 fonctions, 24560 octets.
-0x002734D0 0x002798A0 text_002734D0 rodata:0x00372110-0x00372128
+0x002734D0 0x002798A0 game/text_002734D0 rodata:0x00372110-0x00372128
 
 # fonctions libres : 178 fonctions, 24580 octets.
-0x002798A0 0x0027FCE0 text_002798A0 rodata:0x003721F0-0x00372270
+0x002798A0 0x0027FCE0 game/text_002798A0 rodata:0x003721F0-0x00372270
 
 # CRipple, CRainDrop, CParticle, CObject : 75 fonctions, 24812 octets.
-0x0027FCE0 0x00285F50 cripple
+0x0027FCE0 0x00285F50 game/cripple
 
 # CScene, CRain, CMap, SCN_LOADMAP_INFO2, CSceneMessage, CSceneCamera, CSceneSky, CSceneEffect, CSceneMap, CSceneCharacter, CSceneData, CSceneGameObj, mgCObjectStack_21CList_12EMAP_MESSAGE__ : 94 fonctions, 15700 octets.
-0x00285F50 0x00289E48 cscene rodata:0x00372820-0x00372840
+0x00285F50 0x00289E48 game/cscene rodata:0x00372820-0x00372840
 
 # fonctions libres : 1 fonctions, 1640 octets.
-0x0028A720 0x0028AD88 text_0028A720
+0x0028A720 0x0028AD88 runtime/text_0028A720
 
 # fonctions libres : 3 fonctions, 976 octets.
-0x0028C5F0 0x0028C9C8 text_0028C5F0
+0x0028C5F0 0x0028C9C8 game/text_0028C5F0
 
 # fonctions libres : 1 fonctions, 100 octets.
-0x0028CA20 0x0028CA88 text_0028CA20
+0x0028CA20 0x0028CA88 game/text_0028CA20
 
 # fonctions libres : 2 fonctions, 628 octets.
-0x0028CC80 0x0028CEF8 text_0028CC80
+0x0028CC80 0x0028CEF8 game/text_0028CC80
 
 # fonctions libres : 2 fonctions, 292 octets.
-0x0028D000 0x0028D128 text_0028D000
+0x0028D000 0x0028D128 game/text_0028D000
 
 # mgCVisualMotionMDT, CTreasureBoxManager, CStartupEpisodeTitle, CRandomCircle, MessageTaskManager, CGeoStone, CTreasureBox, CRedMarkModel, mgVertexWeight, CSound : 98 fonctions, 24196 octets.
-0x0028D160 0x002931B0 mgcvisualmotionmdt
+0x0028D160 0x002931B0 game/mgcvisualmotionmdt
 
 # CEditMap, CEditGrid, CMovie, CGridData : 111 fonctions, 24460 octets.
-0x00299620 0x0029F850 ceditmap_00299620
+0x00299620 0x0029F850 game/ceditmap_00299620
 
 # CScene, CEditMap, CEditData, EditAnalyzeSrc, EditAnalyzeDataSrc : 125 fonctions, 23632 octets.
-0x002A9FF0 0x002AFEE0 cscene_002A9FF0
+0x002A9FF0 0x002AFEE0 game/cscene_002A9FF0
 
 # CWorldMapMenu : 25 fonctions, 18828 octets.
-0x002AFEE0 0x002B4920 cworldmapmenu
+0x002AFEE0 0x002B4920 game/cworldmapmenu
 
 # CMenuChrCngMenu : 23 fonctions, 23472 octets.
-0x002B4920 0x002BA570 cmenuchrcngmenu
+0x002B4920 0x002BA570 game/cmenuchrcngmenu
 
 # CMenuMosSelect : 31 fonctions, 24760 octets.
-0x002BA570 0x002C06D0 cmenumosselect rodata:0x00374BF0-0x00374C08
+0x002BA570 0x002C06D0 game/cmenumosselect rodata:0x00374BF0-0x00374C08
 
 # CMosBookMenu, CMenuCostumeSel, CManualMenu, CMenuOption, mgRect_s_ : 38 fonctions, 26188 octets.
-0x002C06D0 0x002C6E30 cmosbookmenu rodata:0x00374D50-0x00374D6C
+0x002C06D0 0x002C6E30 game/cmosbookmenu rodata:0x00374D50-0x00374D6C
 
 # fonctions libres : 99 fonctions, 23508 octets.
-0x002D3110 0x002D8EE0 text_002D3110 rodata:0x00375CF0-0x00375D10
+0x002D3110 0x002D8EE0 game/text_002D3110 rodata:0x00375CF0-0x00375D10
 
 # MapJumpMapInfo : 45 fonctions, 23152 octets.
-0x002DF230 0x002E4DE0 mapjumpmapinfo rodata:0x00377100-0x00377130
+0x002DF230 0x002E4DE0 game/mapjumpmapinfo rodata:0x00377100-0x00377130
 
 # CEffectScriptMan : 126 fonctions, 24516 octets.
-0x002E4DE0 0x002EB000 ceffectscriptman
+0x002E4DE0 0x002EB000 game/ceffectscriptman
 
 # FISH_PLACE_MAP, sgCPlayVoice : 55 fonctions, 23272 octets.
-0x00304FC0 0x0030AC00 fish_place_map
+0x00304FC0 0x0030AC00 game/fish_place_map
 
 # NowLoadingInfo : 28 fonctions, 19612 octets.
-0x0030AC00 0x0030F950 nowloadinginfo rodata:0x003787C0-0x003787D8
+0x0030AC00 0x0030F950 game/nowloadinginfo rodata:0x003787C0-0x003787D8
 
 # CNameRegiMenu : 33 fonctions, 16428 octets.
-0x0030F950 0x00313A30 cnameregimenu
+0x0030F950 0x00313A30 game/cnameregimenu
 
 # CFishObj : 56 fonctions, 24056 octets.
-0x00313A40 0x00319990 cfishobj
+0x00313A40 0x00319990 game/cfishobj
 
 # CVillagerPlaceInfo, CVillagerInfo : 69 fonctions, 24488 octets.
-0x00319990 0x0031FB20 cvillagerplaceinfo rodata:0x00378ED0-0x00378F38
+0x00319990 0x0031FB20 game/cvillagerplaceinfo rodata:0x00378ED0-0x00378F38
 
 # CRandom, CQuestManager, CQuestData, CMonsterBook, CVillagerPlace : 74 fonctions, 24312 octets.
-0x0031FBA0 0x00325C60 crandom rodata:0x00379340-0x00379358
+0x0031FBA0 0x00325C60 game/crandom rodata:0x00379340-0x00379358
 
 # fonctions libres : 1 fonctions, 268 octets.
-0x0012C1A8 0x0012C2C0 text_0012C1A8
+0x0012C1A8 0x0012C2C0 runtime/text_0012C1A8
 
 # CEffectCtrl, CEffect, CEffectManager, CFadeInOut, COutLineDraw, CEffectList, mgC3DSprite : 106 fonctions, 28064 octets.
-0x0017D680 0x001846F0 ceffectctrl rodata:0x003684E0-0x00368518
+0x0017D680 0x001846F0 game/ceffectctrl rodata:0x003684E0-0x00368518
 
 # CAquarium : 16 fonctions, 24372 octets.
-0x00214570 0x0021A510 caquarium rodata:0x0036F460-0x0036F4F8
+0x00214570 0x0021A510 game/caquarium rodata:0x0036F460-0x0036F4F8
 
 # CEohMother, CScreenEffect, CRaster, CEventScriptArg : 122 fonctions, 24576 octets.
-0x00260B80 0x00266E10 ceohmother rodata:0x00371BB0-0x00371BE8
+0x00260B80 0x00266E10 game/ceohmother rodata:0x00371BB0-0x00371BE8
 
 # fonctions libres : 1 fonctions, 1772 octets.
-0x00289E48 0x0028A538 text_00289E48
+0x00289E48 0x0028A538 runtime/text_00289E48
 
 # fonctions libres : 1 fonctions, 92 octets.
-0x0028A538 0x0028A598 text_0028A538
+0x0028A538 0x0028A598 runtime/text_0028A538
 
 # fonctions libres : 1 fonctions, 236 octets.
-0x0028A598 0x0028A688 text_0028A598
+0x0028A598 0x0028A688 runtime/text_0028A598
 
 # fonctions libres : 1 fonctions, 152 octets.
-0x0028A688 0x0028A720 text_0028A688
+0x0028A688 0x0028A720 runtime/text_0028A688
 
 # fonctions libres : 1 fonctions, 96 octets.
-0x0028AD88 0x0028ADE8 text_0028AD88
+0x0028AD88 0x0028ADE8 runtime/text_0028AD88
 
 # fonctions libres : 1 fonctions, 1488 octets.
-0x0028ADE8 0x0028B3B8 text_0028ADE8
+0x0028ADE8 0x0028B3B8 runtime/text_0028ADE8
 
 # fonctions libres : 1 fonctions, 1344 octets.
-0x0028B3B8 0x0028B8F8 text_0028B3B8
+0x0028B3B8 0x0028B8F8 runtime/text_0028B3B8
 
 # fonctions libres : 1 fonctions, 88 octets.
-0x0028C9C8 0x0028CA20 text_0028C9C8
+0x0028C9C8 0x0028CA20 game/text_0028C9C8
 
 # fonctions libres : 1 fonctions, 500 octets.
-0x0028CA88 0x0028CC80 text_0028CA88
+0x0028CA88 0x0028CC80 game/text_0028CA88
 
 # fonctions libres : 2 fonctions, 260 octets.
-0x0028CEF8 0x0028D000 text_0028CEF8
+0x0028CEF8 0x0028D000 game/text_0028CEF8
 
 # fonctions libres : 1 fonctions, 56 octets.
-0x0028D128 0x0028D160 text_0028D128
+0x0028D128 0x0028D160 runtime/text_0028D128
 
 # CEditInfoMngr, CEditMap : 61 fonctions, 17280 octets.
-0x002A5B10 0x002A9FF0 ceditinfomngr rodata:0x00373890-0x003739BC
+0x002A5B10 0x002A9FF0 game/ceditinfomngr rodata:0x00373890-0x003739BC
 
 # CSaveMenuClass : 23 fonctions, 21660 octets.
-0x002C6E30 0x002CC360 csavemenuclass rodata:0x00375710-0x0037574C
+0x002C6E30 0x002CC360 game/csavemenuclass rodata:0x00375710-0x0037574C
 
 # CFont, COcclusion : 90 fonctions, 24920 octets.
-0x002D8EE0 0x002DF230 cfont rodata:0x003764A0-0x003765A8
+0x002D8EE0 0x002DF230 game/cfont rodata:0x003764A0-0x003765A8
 
 # CEditMap, CCameraControl, CEditEvent, CPadControl, CMenuSystemData : 70 fonctions, 22128 octets.
-0x002F0E80 0x002F6690 ceditmap_002F0E80 rodata:0x00377810-0x00377848
+0x002F0E80 0x002F6690 game/ceditmap_002F0E80 rodata:0x00377810-0x00377848
 
 # CMemoryCardManager, CSWordAfterEffect, CSaveData, CGeyserEffect, CSphidaData, CSaveDataDungeon, CDngFloorManager, CGyoRaceData, CSubGameData, GYORACE_DATA, CGeyserEffectPoint : 135 fonctions, 32036 octets.
-0x002F6690 0x002FE6C0 cmemorycardmanager rodata:0x00377B00-0x00377C08
+0x002F6690 0x002FE6C0 game/cmemorycardmanager rodata:0x00377B00-0x00377C08
 
 # CDngFloorManager, CStarEffect, CPlaceAnime, CPaintEffect : 68 fonctions, 24440 octets.
-0x002FEED0 0x00304FC0 cdngfloormanager rodata:0x003782B0-0x003782E8
+0x002FEED0 0x00304FC0 game/cdngfloormanager rodata:0x003782B0-0x003782E8
 
 # ClsMes : 29 fonctions, 8820 octets.
-0x00151690 0x00153980 clsmes_00151690 rodata:0x00367130-0x0036714C
+0x00151690 0x00153980 game/clsmes_00151690 rodata:0x00367130-0x0036714C
 
 # ClsMes : 22 fonctions, 13416 octets.
-0x00153980 0x00156E60 clsmes_00153980 rodata:0x00367150-0x00367184
+0x00153980 0x00156E60 game/clsmes_00153980 rodata:0x00367150-0x00367184
 
 # ClsMes : 3 fonctions, 2340 octets.
-0x00156E60 0x00157790 clsmes_00156E60 rodata:0x003673C0-0x003673DC
+0x00156E60 0x00157790 game/clsmes_00156E60 rodata:0x003673C0-0x003673DC
 
 # CWater, CMapSky, dbgCJISFont, CFireRaster, CRunScript, CWaterFrame, CThunderEffect : 72 fonctions, 16636 octets.
-0x001846F0 0x00188970 cwater rodata:0x00368800-0x00368900
+0x001846F0 0x00188970 game/cwater rodata:0x00368800-0x00368900
 
 # CRunScript : 3 fonctions, 5304 octets.
-0x00188970 0x00189E30 crunscript rodata:0x00368CF0-0x00368DAC
+0x00188970 0x00189E30 game/crunscript rodata:0x00368CF0-0x00368DAC
 
 # CGameData, CUserDataManager, CEditData, CDataWeapon, CDataAttach, CDataBreedFish, CDataItem, CDataRoboPart : 120 fonctions, 21736 octets.
-0x00191DF0 0x001975D0 cgamedata rodata:0x003699A0-0x003699EC
+0x00191DF0 0x001975D0 game/cgamedata rodata:0x003699A0-0x003699EC
 
 # CItemUseTarget : 9 fonctions, 1524 octets.
-0x001975D0 0x00197BF0 citemusetarget rodata:0x00369DA0-0x00369E30
+0x001975D0 0x00197BF0 game/citemusetarget rodata:0x00369DA0-0x00369E30
 
 # fonctions libres : 8 fonctions, 1408 octets.
-0x00197BF0 0x001981B0 text_00197BF0 rodata:0x00369FB0-0x00369FC8
+0x00197BF0 0x001981B0 game/text_00197BF0 rodata:0x00369FB0-0x00369FC8
 
 # fonctions libres : 14 fonctions, 6400 octets.
-0x001A7EA0 0x001A9820 text_001A7EA0 rodata:0x0036A4F0-0x0036A528
+0x001A7EA0 0x001A9820 game/text_001A7EA0 rodata:0x0036A4F0-0x0036A528
 
 # CameraCtrlParam : 16 fonctions, 13996 octets.
-0x001A9820 0x001ACF40 cameractrlparam rodata:0x0036AA30-0x0036AA4C
+0x001A9820 0x001ACF40 game/cameractrlparam rodata:0x0036AA30-0x0036AA4C
 
 # CMenuInvent : 3 fonctions, 5980 octets.
-0x00203E90 0x00205600 cmenuinvent rodata:0x0036E950-0x0036E974
+0x00203E90 0x00205600 game/cmenuinvent rodata:0x0036E950-0x0036E974
 
 # CMenuInvent : 4 fonctions, 8540 octets.
-0x00205600 0x00207770 cmenuinvent_00205600 rodata:0x0036E9D0-0x0036EA00
+0x00205600 0x00207770 game/cmenuinvent_00205600 rodata:0x0036E9D0-0x0036EA00
 
 # CMenuInvent, CStarDust : 17 fonctions, 18448 octets.
-0x00207770 0x0020C000 cmenuinvent_00207770 rodata:0x0036EC10-0x0036EC50
+0x00207770 0x0020C000 game/cmenuinvent_00207770 rodata:0x0036EC10-0x0036EC50
 
 # CMenuInvent : 1 fonctions, 344 octets.
-0x0020C000 0x0020C160 cmenuinvent_0020C000 rodata:0x0036EEE0-0x0036EF08
+0x0020C000 0x0020C160 game/cmenuinvent_0020C000 rodata:0x0036EEE0-0x0036EF08
 
 # fonctions libres : 3 fonctions, 6776 octets.
-0x0020C160 0x0020DBE0 text_0020C160 rodata:0x0036F010-0x0036F070
+0x0020C160 0x0020DBE0 game/text_0020C160 rodata:0x0036F010-0x0036F070
 
 # fonctions libres : 1 fonctions, 2084 octets.
-0x0020DBE0 0x0020E410 text_0020DBE0 rodata:0x0036F110-0x0036F140
+0x0020DBE0 0x0020E410 game/text_0020DBE0 rodata:0x0036F110-0x0036F140
 
 # CGyoraceFishData : 39 fonctions, 8556 octets.
-0x0021A510 0x0021C790 cgyoracefishdata rodata:0x0036F5C0-0x0036F5E8
+0x0021A510 0x0021C790 game/cgyoracefishdata rodata:0x0036F5C0-0x0036F5E8
 
 # CDC2Mes, CMenuFont : 14 fonctions, 10944 octets.
-0x0021C790 0x0021F2B0 cdc2mes rodata:0x0036F760-0x0036F77C
+0x0021C790 0x0021F2B0 game/cdc2mes rodata:0x0036F760-0x0036F77C
 
 # CDC2Mes, CMenuMoveItem : 33 fonctions, 5108 octets.
-0x0021F2B0 0x00220740 cdc2mes_0021F2B0 rodata:0x0036F830-0x0036F880
+0x0021F2B0 0x00220740 game/cdc2mes_0021F2B0 rodata:0x0036F830-0x0036F880
 
 # CMenuItemUse : 59 fonctions, 23324 octets.
-0x00220740 0x002263C0 cmenuitemuse rodata:0x0036F8C0-0x0036F8DC
+0x00220740 0x002263C0 game/cmenuitemuse rodata:0x0036F8C0-0x0036F8DC
 
 # fonctions libres : 1 fonctions, 1920 octets.
-0x002263C0 0x00226B40 text_002263C0 rodata:0x0036FAB0-0x0036FAD8
+0x002263C0 0x00226B40 game/text_002263C0 rodata:0x0036FAB0-0x0036FAD8
 
 # CMenuItemInfo : 14 fonctions, 8928 octets.
-0x002421A0 0x002444C0 cmenuiteminfo rodata:0x003703F0-0x003704B0
+0x002421A0 0x002444C0 game/cmenuiteminfo rodata:0x003703F0-0x003704B0
 
 # CMenuItemInfo : 9 fonctions, 7540 octets.
-0x002444C0 0x00246280 cmenuiteminfo_002444C0 rodata:0x00370550-0x00370568
+0x002444C0 0x00246280 game/cmenuiteminfo_002444C0 rodata:0x00370550-0x00370568
 
 # CMenuItemInfo, CBaseMenuClass : 4 fonctions, 7020 octets.
-0x00246280 0x00247E10 cmenuiteminfo_00246280 rodata:0x00370780-0x003707B8
+0x00246280 0x00247E10 game/cmenuiteminfo_00246280 rodata:0x00370780-0x003707B8
 
 # fonctions libres : 1 fonctions, 5836 octets.
-0x00247E10 0x002494E0 text_00247E10 rodata:0x00370830-0x00370860
+0x00247E10 0x002494E0 game/text_00247E10 rodata:0x00370830-0x00370860
 
 # fonctions libres : 1 fonctions, 5028 octets.
-0x002494E0 0x0024A890 text_002494E0 rodata:0x00370DD0-0x00370E00
+0x002494E0 0x0024A890 game/text_002494E0 rodata:0x00370DD0-0x00370E00
 
 # CMenuItemInfo : 10 fonctions, 15412 octets.
-0x0024A890 0x0024E500 cmenuiteminfo_0024A890 rodata:0x00370E70-0x00370ED0
+0x0024A890 0x0024E500 game/cmenuiteminfo_0024A890 rodata:0x00370E70-0x00370ED0
 
 # CMenuItemInfo : 3 fonctions, 1396 octets.
-0x0024E500 0x0024EA80 cmenuiteminfo_0024E500 rodata:0x00371020-0x00371050
+0x0024E500 0x0024EA80 game/cmenuiteminfo_0024E500 rodata:0x00371020-0x00371050
 
 # CMenuItemInfo : 2 fonctions, 1592 octets.
-0x0024EA80 0x0024F0D0 cmenuiteminfo_0024EA80 rodata:0x00371060-0x00371078
+0x0024EA80 0x0024F0D0 game/cmenuiteminfo_0024EA80 rodata:0x00371060-0x00371078
 
 # CMenuItemInfo : 4 fonctions, 3560 octets.
-0x0024F0D0 0x0024FEC0 cmenuiteminfo_0024F0D0 rodata:0x00371090-0x003710C8
+0x0024F0D0 0x0024FEC0 game/cmenuiteminfo_0024F0D0 rodata:0x00371090-0x003710C8
 
 # CMenuItemInfo : 5 fonctions, 4308 octets.
-0x0024FEC0 0x00250FB0 cmenuiteminfo_0024FEC0 rodata:0x003710E0-0x00371100
+0x0024FEC0 0x00250FB0 game/cmenuiteminfo_0024FEC0 rodata:0x003710E0-0x00371100
 
 # fonctions libres : 1 fonctions, 1392 octets.
-0x00250FB0 0x00251520 text_00250FB0 rodata:0x00371140-0x0037117C
+0x00250FB0 0x00251520 game/text_00250FB0 rodata:0x00371140-0x0037117C
 
 # CItemSelect : 56 fonctions, 12288 octets.
-0x00251520 0x00254660 citemselect rodata:0x00371180-0x0037119C
+0x00251520 0x00254660 game/citemselect rodata:0x00371180-0x0037119C
 
 # fonctions libres : 8 fonctions, 2268 octets.
-0x0026D190 0x0026DAA0 text_0026D190 rodata:0x00371ED0-0x00371F50
+0x0026D190 0x0026DAA0 game/text_0026D190 rodata:0x00371ED0-0x00371F50
 
 # fonctions libres : 2 fonctions, 728 octets.
-0x0026DAA0 0x0026DD80 text_0026DAA0 rodata:0x00371F50-0x00371F68
+0x0026DAA0 0x0026DD80 game/text_0026DAA0 rodata:0x00371F50-0x00371F68
 
 # fonctions libres : 16 fonctions, 3136 octets.
-0x0026DD80 0x0026EA00 text_0026DD80 rodata:0x00371F70-0x00371F8C
+0x0026DD80 0x0026EA00 game/text_0026DD80 rodata:0x00371F70-0x00371F8C
 
 # fonctions libres : 57 fonctions, 9452 octets.
-0x0026EA00 0x00271030 text_0026EA00 rodata:0x00371FA0-0x00371FDC
+0x0026EA00 0x00271030 game/text_0026EA00 rodata:0x00371FA0-0x00371FDC
 
 # fonctions libres : 8 fonctions, 1908 octets.
-0x00271030 0x002717C0 text_00271030 rodata:0x00372000-0x0037202C
+0x00271030 0x002717C0 game/text_00271030 rodata:0x00372000-0x0037202C
 
 # fonctions libres : 65 fonctions, 7056 octets.
-0x002717C0 0x002734D0 text_002717C0 rodata:0x003720A0-0x003720C8
+0x002717C0 0x002734D0 game/text_002717C0 rodata:0x003720A0-0x003720C8
 
 # CShopMenu, CEventSprite2, CShop, CEventSprite, CEventSpriteMother, CMarker : 67 fonctions, 19360 octets.
-0x002931B0 0x00297F10 cshopmenu rodata:0x003732E0-0x00373300
+0x002931B0 0x00297F10 game/cshopmenu rodata:0x003732E0-0x00373300
 
 # CMenuQuestView, CShopMenu : 9 fonctions, 5852 octets.
-0x00297F10 0x00299620 cmenuquestview rodata:0x00373370-0x00373390
+0x00297F10 0x00299620 game/cmenuquestview rodata:0x00373370-0x00373390
 
 # CFuncPointMngr, CObjAnime, CEditMap, CFuncPoint, CList_10CFuncPoint_ : 39 fonctions, 9504 octets.
-0x0029F850 0x002A1E80 cfuncpointmngr rodata:0x00373650-0x0037367C
+0x0029F850 0x002A1E80 game/cfuncpointmngr rodata:0x00373650-0x0037367C
 
 # CFuncPointMngr : 16 fonctions, 8040 octets.
-0x002A1E80 0x002A3E30 cfuncpointmngr_002A1E80 rodata:0x00373680-0x003736A4
+0x002A1E80 0x002A3E30 game/cfuncpointmngr_002A1E80 rodata:0x00373680-0x003736A4
 
 # fonctions libres : 1 fonctions, 2956 octets.
-0x002A3E30 0x002A49C0 text_002A3E30 rodata:0x003737F0-0x00373834
+0x002A3E30 0x002A49C0 game/text_002A3E30 rodata:0x003737F0-0x00373834
 
 # fonctions libres : 6 fonctions, 4388 octets.
-0x002A49C0 0x002A5B10 text_002A49C0 rodata:0x00373840-0x00373864
+0x002A49C0 0x002A5B10 game/text_002A49C0 rodata:0x00373840-0x00373864
 
 # CScene, CPot, CBPot, CFragment, CVillagerMngr, CVillagerPlaceInfo, CVillagerData, CVil : 84 fonctions, 22980 octets.
-0x002CC360 0x002D1F20 cscene_002CC360 rodata:0x00375B90-0x00375BB4
+0x002CC360 0x002D1F20 game/cscene_002CC360 rodata:0x00375B90-0x00375BB4
 
 # CVillagerMngr : 33 fonctions, 4388 octets.
-0x002D1F20 0x002D3110 cvillagermngr rodata:0x00375CD0-0x00375CEC
+0x002D1F20 0x002D3110 game/cvillagermngr rodata:0x00375CD0-0x00375CEC
 
 # CPowGage : 62 fonctions, 11640 octets.
-0x002EB000 0x002EDF20 cpowgage rodata:0x00377590-0x003775B4
+0x002EB000 0x002EDF20 game/cpowgage rodata:0x00377590-0x003775B4
 
 # CPowGage, CSphida : 6 fonctions, 2012 octets.
-0x002EDF20 0x002EE720 cpowgage_002EDF20 rodata:0x00377680-0x00377698
+0x002EDF20 0x002EE720 game/cpowgage_002EDF20 rodata:0x00377680-0x00377698
 
 # CSphida : 2 fonctions, 1396 octets.
-0x002EE720 0x002EECA0 csphida rodata:0x003776E0-0x003776FC
+0x002EE720 0x002EECA0 game/csphida rodata:0x003776E0-0x003776FC
 
 # CSphida, CameraCtrlParam : 11 fonctions, 8620 octets.
-0x002EECA0 0x002F0E80 csphida_002EECA0 rodata:0x00377700-0x00377724
+0x002EECA0 0x002F0E80 game/csphida_002EECA0 rodata:0x00377700-0x00377724
+
+# std : 40 fonctions, 9308 octets.
+0x001000D0 0x00102630 runtime/std
+
+# fonctions libres : 2 fonctions, 412 octets.
+0x00102630 0x001027D0 sdk/scegsresetgraph
+
+# fonctions libres : 1 fonctions, 624 octets.
+0x00102838 0x00102AA8 sdk/scegssetdefdispenv
+
+# fonctions libres : 1 fonctions, 188 octets.
+0x00102AA8 0x00102B68 sdk/scegsputdispenv
+
+# fonctions libres : 1 fonctions, 200 octets.
+0x00102B68 0x00102C30 sdk/scegszbufaddr
+
+# fonctions libres : 1 fonctions, 484 octets.
+0x00102C30 0x00102E18 sdk/scegssetdefdrawenv
+
+# fonctions libres : 1 fonctions, 260 octets.
+0x00102E18 0x00102F20 sdk/scegssetdefclear
+
+# fonctions libres : 1 fonctions, 232 octets.
+0x00102F20 0x00103008 sdk/scegsputdrawenv
+
+# fonctions libres : 1 fonctions, 664 octets.
+0x00103008 0x001032A0 sdk/scegssetdefdbuff
+
+# fonctions libres : 1 fonctions, 92 octets.
+0x001032A0 0x00103300 sdk/scegsswapdbuff
+
+# fonctions libres : 1 fonctions, 148 octets.
+0x00103300 0x00103398 sdk/scegssyncv
+
+# fonctions libres : 1 fonctions, 788 octets.
+0x00103398 0x001036B0 sdk/scegssyncpath
+
+# fonctions libres : 1 fonctions, 484 octets.
+
+# fonctions libres : 1 fonctions, 320 octets.
+0x00103898 0x001039D8 sdk/scegssetdefstoreimage
+
+# fonctions libres : 1 fonctions, 380 octets.
+0x001039D8 0x00103B58 sdk/scegsexecloadimage
+
+# fonctions libres : 1 fonctions, 1676 octets.
+
+# fonctions libres : 1 fonctions, 160 octets.
+0x001041E8 0x00104288 sdk/scegssyncvcallback
+
+# fonctions libres : 17 fonctions, 2736 octets.
+0x00104288 0x00104D58 sdk/scedmaputenv
+
+# fonctions libres : 33 fonctions, 6292 octets.
+0x00104D58 0x00106630 sdk/scedevconsprintf
+
+# fonctions libres : 1 fonctions, 16 octets.
+0x00106630 0x00106640 sdk/scegifpkinit
+
+# fonctions libres : 1 fonctions, 16 octets.
+0x00106640 0x00106650 sdk/scegifpkreset
+
+# fonctions libres : 1 fonctions, 88 octets.
+0x00106650 0x001066A8 sdk/scegifpkterminate
+
+# fonctions libres : 1 fonctions, 116 octets.
+0x001066A8 0x00106720 sdk/scegifpkcnt
+
+# fonctions libres : 1 fonctions, 152 octets.
+0x00106720 0x001067B8 sdk/scegifpkref
+
+# fonctions libres : 1 fonctions, 116 octets.
+0x001067B8 0x00106830 sdk/scegifpkend
+
+# fonctions libres : 1 fonctions, 20 octets.
+0x00106830 0x00106848 sdk/scegifpkreserve
+
+# fonctions libres : 1 fonctions, 24 octets.
+0x00106848 0x00106860 sdk/scegifpkopengiftag
+
+# fonctions libres : 1 fonctions, 164 octets.
+0x00106860 0x00106908 sdk/scegifpkclosegiftag
+
+# fonctions libres : 1 fonctions, 40 octets.
+0x00106908 0x00106930 sdk/scegifpkaddgsdata
+
+# fonctions libres : 1 fonctions, 36 octets.
+0x00106930 0x00106958 sdk/scegifpkaddgsad
+
+# fonctions libres : 1 fonctions, 16 octets.
+0x00106958 0x00106968 sdk/scevif1pkinit
+
+# fonctions libres : 1 fonctions, 16 octets.
+0x00106968 0x00106978 sdk/scevif1pkreset
+
+# fonctions libres : 1 fonctions, 88 octets.
+0x00106978 0x001069D0 sdk/scevif1pkterminate
+
+# fonctions libres : 1 fonctions, 88 octets.
+0x001069D0 0x00106A28 sdk/scevif1pkcnt
+
+# fonctions libres : 1 fonctions, 112 octets.
+0x00106A28 0x00106A98 sdk/scevif1pkcall
+
+# fonctions libres : 1 fonctions, 88 octets.
+0x00106A98 0x00106AF0 sdk/scevif1pkend
+
+# fonctions libres : 1 fonctions, 88 octets.
+0x00106AF0 0x00106B48 sdk/scevif1pkopendirectcode
+
+# fonctions libres : 1 fonctions, 44 octets.
+0x00106B48 0x00106B78 sdk/scevif1pkclosedirectcode
+
+# fonctions libres : 1 fonctions, 24 octets.
+0x00106B78 0x00106B90 sdk/scevif1pkopengiftag
+
+# fonctions libres : 1 fonctions, 164 octets.
+0x00106B90 0x00106C38 sdk/scevif1pkclosegiftag
+
+# fonctions libres : 1 fonctions, 20 octets.
+0x00106C38 0x00106C50 sdk/scevif1pkreserve
+
+# fonctions libres : 1 fonctions, 124 octets.
+0x00106C50 0x00106CD0 sdk/scevif1pkalign
+
+# fonctions libres : 1 fonctions, 48 octets.
+0x00106CD0 0x00106D00 sdk/scevif1pkaddgsad
+
+# fonctions libres : 42 fonctions, 3312 octets.
+0x00106D00 0x00107A50 sdk/scevu0dropshadowmatrix
+
+# fonctions libres : 65 fonctions, 19412 octets.
+0x00107A50 0x0010C6B0 sdk/getallrefs
+
+# fonctions libres : 5 fonctions, 1972 octets.
+0x0010C6B0 0x0010CE70 sdk/csc_storerefimage
+
+# fonctions libres : 7 fonctions, 504 octets.
+0x0010CE70 0x0010D080 sdk/sysbitflush
+
+# fonctions libres : 8 fonctions, 3580 octets.
+0x0010D080 0x0010DE88 sdk/pes_packet
+
+# fonctions libres : 35 fonctions, 2808 octets.
+
+# fonctions libres : 19 fonctions, 2744 octets.
+0x0010E9D8 0x0010F4C0 sdk/initseq
+
+# fonctions libres : 5 fonctions, 868 octets.
+0x0010F4E0 0x0010F850 sdk/sceipurestartdma
+
+# fonctions libres : 2 fonctions, 668 octets.
+0x0010F850 0x0010FB00 sdk/sceipuinit
+
+# fonctions libres : 138 fonctions, 2208 octets.
+0x0010FB00 0x001103A0 sdk/scesifstopdma
+
+# fonctions libres : 16 fonctions, 952 octets.
+0x001103A0 0x00110770 sdk/sbrk
+
+# fonctions libres : 6 fonctions, 616 octets.
+0x00110770 0x001109F0 sdk/scesdc
+
+# fonctions libres : 14 fonctions, 876 octets.
+0x001109F0 0x00110D60 sdk/initalarm
+
+# fonctions libres : 5 fonctions, 852 octets.
+0x00110D60 0x001110C0 sdk/topthread
+
+# fonctions libres : 10 fonctions, 448 octets.
+0x001110C0 0x001112A0 sdk/scedeci2open
+
+# fonctions libres : 7 fonctions, 1292 octets.
+0x001112A0 0x001117C0 sdk/scettyhandler
+
+# fonctions libres : 8 fonctions, 2420 octets.
+
+# fonctions libres : 16 fonctions, 1828 octets.
+0x00112138 0x00112880 sdk/scesifinitcmd
+
+# fonctions libres : 22 fonctions, 3892 octets.
+0x00112880 0x001137E0 sdk/scesifcallrpc
+
+# fonctions libres : 40 fonctions, 13888 octets.
+
+# fonctions libres : 6 fonctions, 764 octets.
+0x00116E78 0x00117178 sdk/scesifloadiopheap
+
+# fonctions libres : 18 fonctions, 3388 octets.
+0x00117178 0x00117ED8 sdk/scesifloadmodule
+
+# fonctions libres : 4 fonctions, 684 octets.
+0x00117ED8 0x00118188 sdk/scesifresetiop
+
+# fonctions libres : 19 fonctions, 1268 octets.
+0x00118188 0x001186C0 sdk/inittlb32mb
+
+# fonctions libres : 3 fonctions, 812 octets.
+0x001186C0 0x00118A20 sdk/ktlbexception
+
+# fonctions libres : 2 fonctions, 96 octets.
+0x00118A20 0x00118A80 sdk/dintr
+
+# fonctions libres : 7 fonctions, 304 octets.
+0x00118A80 0x00118BC0 sdk/supplement_crt0
+
+# fonctions libres : 6 fonctions, 380 octets.
+0x00118BC0 0x00118D40 sdk/initexecps2
+
+# fonctions libres : 5 fonctions, 268 octets.
+0x00118D40 0x00118E50 sdk/execps2
+
+# fonctions libres : 4 fonctions, 808 octets.
+0x00118E50 0x00119180 sdk/scesdremote
+
+# fonctions libres : 1 fonctions, 820 octets.
+0x00119180 0x001194B8 runtime/ieee754_atan2
+
+# fonctions libres : 1 fonctions, 3368 octets.
+0x001194B8 0x0011A1E0 runtime/ieee754_pow
+
+# fonctions libres : 1 fonctions, 1308 octets.
+0x0011A1E0 0x0011A700 runtime/ieee754_rem_pio2
+
+# fonctions libres : 1 fonctions, 772 octets.
+0x0011A700 0x0011AA08 runtime/ieee754_sqrt
+
+# fonctions libres : 1 fonctions, 1072 octets.
+0x0011AA08 0x0011AE38 runtime/ieee754_acosf
+
+# fonctions libres : 1 fonctions, 744 octets.
+0x0011AE38 0x0011B120 runtime/ieee754_atan2f
+
+# fonctions libres : 1 fonctions, 992 octets.
+0x0011B120 0x0011B500 runtime/ieee754_rem_pio2f
+
+# fonctions libres : 1 fonctions, 312 octets.
+0x0011B500 0x0011B638 runtime/ieee754_sqrtf
+
+# fonctions libres : 1 fonctions, 588 octets.
+0x0011B638 0x0011B888 runtime/kernel_cos
+
+# fonctions libres : 1 fonctions, 2920 octets.
+0x0011B888 0x0011C3F0 runtime/kernel_rem_pio2
+
+# fonctions libres : 1 fonctions, 468 octets.
+0x0011C3F0 0x0011C5C8 runtime/kernel_sin
+
+# fonctions libres : 1 fonctions, 344 octets.
+0x0011C5C8 0x0011C720 runtime/kernel_cosf
+
+# fonctions libres : 1 fonctions, 2380 octets.
+0x0011C720 0x0011D070 runtime/kernel_rem_pio2f
+
+# fonctions libres : 1 fonctions, 260 octets.
+0x0011D070 0x0011D178 runtime/kernel_sinf
+
+# fonctions libres : 1 fonctions, 660 octets.
+0x0011D178 0x0011D410 runtime/kernel_tanf
+
+# fonctions libres : 1 fonctions, 1036 octets.
+0x0011D410 0x0011D820 runtime/atan
+
+# fonctions libres : 1 fonctions, 68 octets.
+0x0011D820 0x0011D868 runtime/copysign
+
+# fonctions libres : 1 fonctions, 264 octets.
+0x0011D868 0x0011D970 runtime/cos
+
+# fonctions libres : 1 fonctions, 52 octets.
+0x0011D970 0x0011D9A8 runtime/fabs
+
+# fonctions libres : 1 fonctions, 32 octets.
+0x0011D9A8 0x0011D9C8 runtime/finite
+
+# fonctions libres : 1 fonctions, 472 octets.
+0x0011D9C8 0x0011DBA0 runtime/floor
+
+# fonctions libres : 1 fonctions, 72 octets.
+0x0011DBA0 0x0011DBE8 runtime/isinf
+
+# fonctions libres : 1 fonctions, 56 octets.
+0x0011DBE8 0x0011DC20 runtime/isnan
+
+# fonctions libres : 1 fonctions, 36 octets.
+0x0011DC20 0x0011DC48 runtime/matherr
+
+# fonctions libres : 1 fonctions, 508 octets.
+0x0011DC48 0x0011DE48 runtime/rint
+
+# fonctions libres : 1 fonctions, 436 octets.
+0x0011DE48 0x0011E000 runtime/scalbn
+
+# fonctions libres : 1 fonctions, 244 octets.
+0x0011E000 0x0011E0F8 runtime/sin
+
+# fonctions libres : 1 fonctions, 680 octets.
+0x0011E0F8 0x0011E3A0 runtime/atanf
+
+# fonctions libres : 1 fonctions, 48 octets.
+0x0011E3A0 0x0011E3D0 runtime/copysignf
+
+# fonctions libres : 1 fonctions, 232 octets.
+0x0011E3D0 0x0011E4B8 runtime/cosf
+
+# fonctions libres : 1 fonctions, 28 octets.
+0x0011E4B8 0x0011E4D8 runtime/fabsf
+
+# fonctions libres : 1 fonctions, 228 octets.
+0x0011E4D8 0x0011E5C0 runtime/floorf
+
+# fonctions libres : 1 fonctions, 36 octets.
+0x0011E5C0 0x0011E5E8 runtime/isnanf
+
+# fonctions libres : 1 fonctions, 352 octets.
+0x0011E5E8 0x0011E748 runtime/scalbnf
+
+# fonctions libres : 1 fonctions, 240 octets.
+0x0011E748 0x0011E838 runtime/sinf
+
+# fonctions libres : 1 fonctions, 136 octets.
+0x0011E838 0x0011E8C0 runtime/tanf
+
+# fonctions libres : 1 fonctions, 280 octets.
+0x0011E8C0 0x0011E9D8 runtime/atan2
+
+# fonctions libres : 1 fonctions, 1072 octets.
+0x0011E9D8 0x0011EE08 runtime/pow
+
+# fonctions libres : 1 fonctions, 268 octets.
+0x0011EE08 0x0011EF18 runtime/sqrt
+
+# fonctions libres : 1 fonctions, 252 octets.
+0x0011EF18 0x0011F018 runtime/acosf
+
+# fonctions libres : 1 fonctions, 296 octets.
+0x0011F018 0x0011F140 runtime/atan2f
+
+# fonctions libres : 1 fonctions, 276 octets.
+0x0011F140 0x0011F258 runtime/sqrtf
+
+# fonctions libres : 21 fonctions, 4844 octets.
+0x0011F258 0x00120570 sdk/scecdsearchfile
+
+# fonctions libres : 1 fonctions, 480 octets.
+0x00120570 0x00120750 sdk/scecdread
+
+# fonctions libres : 1 fonctions, 204 octets.
+0x00120750 0x00120820 sdk/scecdseek
+
+# fonctions libres : 1 fonctions, 152 octets.
+0x00120820 0x001208B8 sdk/scecdgeterror
+
+# fonctions libres : 1 fonctions, 184 octets.
+0x001208B8 0x00120970 sdk/scecdbreak
+
+# fonctions libres : 10 fonctions, 1228 octets.
+0x00120970 0x00120E50 sdk/scecdstread
+
+# fonctions libres : 30 fonctions, 4952 octets.
+0x00120E50 0x001221E8 sdk/scepadportopen
+
+# fonctions libres : 28 fonctions, 6188 octets.
+0x001221E8 0x00123A50 sdk/scemcsetfileinfo
+
+# fonctions libres : 7 fonctions, 660 octets.
+0x00123A50 0x00123CE8 sdk/scemsin_putmsg
+
+# fonctions libres : 1 fonctions, 32 octets.
+0x00123CE8 0x00123D08 runtime/abort
+
+# fonctions libres : 1 fonctions, 20 octets.
+0x00123D08 0x00123D20 runtime/abs
+
+# fonctions libres : 1 fonctions, 28 octets.
+0x00123D20 0x00123D40 runtime/atof
+
+# fonctions libres : 1 fonctions, 40 octets.
+0x00123D40 0x00123D68 runtime/atoi
+
+# fonctions libres : 1 fonctions, 188 octets.
+0x00123D68 0x00123E28 runtime/calloc_r
+
+# fonctions libres : 1 fonctions, 88 octets.
+0x00123E28 0x00123E80 runtime/close_r
+
+# fonctions libres : 2 fonctions, 5088 octets.
+
+# fonctions libres : 1 fonctions, 12 octets.
+0x00125268 0x00125278 runtime/errno
+
+# fonctions libres : 1 fonctions, 176 octets.
+0x00125278 0x00125328 runtime/exit
+
+# fonctions libres : 1 fonctions, 260 octets.
+0x00125328 0x00125430 runtime/fflush
+
+# fonctions libres : 6 fonctions, 588 octets.
+0x00125430 0x00125688 runtime/sfp
+
+# fonctions libres : 1 fonctions, 52 octets.
+0x00125688 0x001256C0 runtime/fprintf
+
+# fonctions libres : 2 fonctions, 1160 octets.
+0x001256C0 0x00125B50 runtime/free_r
+
+# fonctions libres : 1 fonctions, 92 octets.
+0x00125B50 0x00125BB0 runtime/fstat_r
+
+# fonctions libres : 1 fonctions, 984 octets.
+0x00125BB0 0x00125F88 runtime/sfvwrite
+
+# fonctions libres : 1 fonctions, 148 octets.
+0x00125F88 0x00126020 runtime/fwalk
+
+# fonctions libres : 1 fonctions, 28 octets.
+0x00126020 0x00126040 runtime/index
+
+# fonctions libres : 4 fonctions, 224 octets.
+0x00126040 0x00126130 runtime/setlocale_r
+
+# fonctions libres : 1 fonctions, 96 octets.
+0x00126130 0x00126190 runtime/lseek_r
+
+# fonctions libres : 1 fonctions, 336 octets.
+0x00126190 0x001262E0 runtime/smakebuf
+
+# fonctions libres : 2 fonctions, 56 octets.
+0x001262E0 0x00126318 runtime/malloc
+
+# fonctions libres : 2 fonctions, 2508 octets.
+0x00126318 0x00126CE8 runtime/malloc_r
+
+# fonctions libres : 1 fonctions, 60 octets.
+0x00126CE8 0x00126D28 runtime/mbtowc_r
+
+# fonctions libres : 1 fonctions, 224 octets.
+0x00126D28 0x00126E08 runtime/memchr
+
+# fonctions libres : 1 fonctions, 148 octets.
+0x00126E08 0x00126EA0 runtime/memcmp
+
+# fonctions libres : 1 fonctions, 176 octets.
+0x00126EA0 0x00126F50 runtime/memcpy
+
+# fonctions libres : 1 fonctions, 260 octets.
+0x00126F50 0x00127058 runtime/memmove
+
+# fonctions libres : 1 fonctions, 192 octets.
+0x00127058 0x00127118 runtime/memset
+
+# fonctions libres : 2 fonctions, 16 octets.
+0x00127118 0x00127128 runtime/malloc_unlock
+
+# fonctions libres : 17 fonctions, 4100 octets.
+0x00127128 0x00128148 runtime/multiply
+
+# fonctions libres : 2 fonctions, 140 octets.
+0x00128148 0x001281D8 runtime/printf
+
+# fonctions libres : 2 fonctions, 64 octets.
+0x001281D8 0x00128218 runtime/rand
+
+# fonctions libres : 1 fonctions, 96 octets.
+0x00128218 0x00128278 runtime/read_r
+
+# fonctions libres : 1 fonctions, 92 octets.
+0x00128278 0x001282D8 runtime/sbrk_r
+
+# fonctions libres : 8 fonctions, 836 octets.
+0x001282D8 0x00128628 runtime/raise_r
+
+# fonctions libres : 2 fonctions, 120 octets.
+0x00128628 0x001286A8 runtime/kill_r
+
+# fonctions libres : 2 fonctions, 216 octets.
+0x001286A8 0x00128780 runtime/sprintf
+
+# fonctions libres : 4 fonctions, 364 octets.
+0x00128780 0x001288F0 runtime/swrite
+
+# fonctions libres : 1 fonctions, 180 octets.
+0x001288F0 0x001289A8 runtime/strcasecmp
+
+# fonctions libres : 1 fonctions, 300 octets.
+0x001289A8 0x00128AD8 runtime/strcat
+
+# fonctions libres : 1 fonctions, 400 octets.
+0x00128AD8 0x00128C68 runtime/strchr
+
+# fonctions libres : 1 fonctions, 324 octets.
+0x00128C68 0x00128DB0 runtime/strcmp
+
+# fonctions libres : 1 fonctions, 276 octets.
+0x00128DB0 0x00128EC8 runtime/strcpy
+
+# fonctions libres : 1 fonctions, 312 octets.
+0x00128EC8 0x00129000 runtime/strlen
+
+# fonctions libres : 1 fonctions, 428 octets.
+0x00129000 0x001291B0 runtime/strncat
+
+# fonctions libres : 1 fonctions, 440 octets.
+0x001291B0 0x00129368 runtime/strncmp
+
+# fonctions libres : 1 fonctions, 444 octets.
+0x00129368 0x00129528 runtime/strncpy
+
+# fonctions libres : 1 fonctions, 80 octets.
+0x00129528 0x00129578 runtime/strrchr
+
+# fonctions libres : 1 fonctions, 108 octets.
+0x00129578 0x001295E8 runtime/strstr
+
+# fonctions libres : 3 fonctions, 3920 octets.
+
+# fonctions libres : 2 fonctions, 620 octets.
+0x0012A540 0x0012A7B0 runtime/strtol_r
+
+# fonctions libres : 1 fonctions, 32 octets.
+0x0012A7B0 0x0012A7D0 runtime/toupper
+
+# fonctions libres : 6 fonctions, 6424 octets.
+
+# fonctions libres : 1 fonctions, 84 octets.
+0x0012C0F0 0x0012C148 runtime/vsprintf
+
+# fonctions libres : 1 fonctions, 96 octets.
+0x0012C148 0x0012C1A8 runtime/write_r
+
+# fonctions libres : 15 fonctions, 3288 octets.
+0x0028B8F8 0x0028C5F0 runtime/dpmul
+
+# fonctions libres : 49 fonctions, 6248 octets.
+
+
+# fonctions libres : 1 fonctions, 484 octets.
+0x001036B0 0x00103898 sdk/scegssetdefloadimage rodata:0x00363A30-0x00363B20
+
+# fonctions libres : 1 fonctions, 1676 octets.
+0x00103B58 0x001041E8 sdk/scegsexecstoreimage rodata:0x00363C40-0x00363D30
+
+# fonctions libres : 35 fonctions, 2808 octets.
+0x0010DE88 0x0010E9D8 sdk/scempegcreate rodata:0x00365110-0x00365128
+
+# fonctions libres : 8 fonctions, 2420 octets.
+0x001117C0 0x00112138 sdk/printf rodata:0x00365340-0x00365470
+
+# fonctions libres : 40 fonctions, 13888 octets.
+0x001137E0 0x00116E78 sdk/scefs_rcv_intr rodata:0x00365470-0x003654D8
+
+# fonctions libres : 2 fonctions, 5088 octets.
+0x00123E80 0x00125268 runtime/dtoa_r rodata:0x00366840-0x00366858
+
+# fonctions libres : 3 fonctions, 3920 octets.
+0x001295E8 0x0012A540 runtime/strtod_r rodata:0x003669D0-0x00366A88
+
+# fonctions libres : 6 fonctions, 6424 octets.
+0x0012A7D0 0x0012C0F0 runtime/vfprintf_r rodata:0x00366B40-0x00366CB0
