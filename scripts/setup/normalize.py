@@ -70,6 +70,45 @@ def normalize(text: str) -> str:
     return "\n".join(out) + "\n"
 
 
+_DLABEL = re.compile(r"^\s*(?:dlabel|glabel|jlabel)\s+(\S+)", re.MULTILINE)
+_ASSIGNMENT = re.compile(r"^(\S+)\s*=\s*0x[0-9A-Fa-f]+;")
+
+
+def drop_defined_undefined_syms() -> int:
+    """Retire du script des symboles absolus ceux qu'une section définit.
+
+    splat écrit dans `undefined_syms_auto.ld` tout symbole référencé que son
+    attribut `defined` ne marque pas — c'est la règle de
+    `write_undefined_syms_auto`. Or spimdisasm en écrit certains sans que splat
+    l'enregistre : les dix `CHA_DEV_FONT_PIECE_*`, d'un octet chacun, reçoivent
+    bien leur `dlabel` une fois typés, et l'affectation absolue qui subsiste les
+    fixerait alors à une adresse que leur section dément.
+
+    Le lien tranche : un symbole retiré à tort n'est plus défini nulle part, et
+    l'éditeur de liens le dit.
+    """
+    script = ROOT / "linker_scripts" / "auto" / "undefined_syms_auto.ld"
+    if not script.exists():
+        return 0
+
+    defined = set()
+    for path in (ROOT / "asm").rglob("*.s"):
+        defined.update(_DLABEL.findall(path.read_text(encoding="utf-8",
+                                                      errors="replace")))
+
+    kept, dropped = [], 0
+    for line in script.read_text(encoding="utf-8").splitlines():
+        match = _ASSIGNMENT.match(line.strip())
+        if match and match.group(1) in defined:
+            dropped += 1
+            continue
+        kept.append(line)
+
+    if dropped:
+        script.write_text("\n".join(kept) + "\n", encoding="utf-8")
+    return dropped
+
+
 def main() -> int:
     if not ASM_DIR.is_dir():
         return 0
@@ -84,6 +123,10 @@ def main() -> int:
 
     if touched:
         print(f"{touched} fonctions greffées normalisées")
+
+    dropped = drop_defined_undefined_syms()
+    if dropped:
+        print(f"{dropped} symboles absolus retirés, leur section les définit")
     return 0
 
 

@@ -269,6 +269,15 @@ def write_symbol_addrs(elf: Elf, path: Path) -> tuple[int, int]:
     for name in candidate.values():
         counts[name] = counts.get(name, 0) + 1
 
+    # Les objets qu'il faut typer pour que le désassembleur les nomme : ceux
+    # d'un ou deux octets qu'aucun multiple de quatre ne porte, et ceux qui
+    # partagent leur mot — mêler l'octet et le mot dans un même mot laisserait
+    # le désassembleur devant deux découpages inconciliables.
+    small = {addr: sym.size for addr, sym in chosen.items()
+             if sym.kind == SYM_OBJECT and sym.size in (1, 2)}
+    words = {addr & ~3 for addr, size in small.items() if addr % 4}
+    byte_sized = {addr for addr in small if (addr & ~3) in words}
+
     lines: list[str] = []
     renamed = 0
     for addr in sorted(chosen):
@@ -286,11 +295,20 @@ def write_symbol_addrs(elf: Elf, path: Path) -> tuple[int, int]:
         # pour une donnée qu'un type précis — `u32`, `asciz`… — que le binaire
         # ne porte pas. La taille suffit à en borner l'étendue, et ce que
         # chaque objet contient se décidera à mesure qu'on le décompilera.
+        #
+        # Une exception, que le binaire fonde : un objet d'un ou deux octets
+        # posé hors d'un multiple de quatre ne peut pas être étiqueté dans une
+        # section que le désassembleur rend en mots, et le lien le reçoit alors
+        # par son adresse absolue. Sa taille dit son type, et les dix
+        # `CHA_DEV_FONT_PIECE_*` sont les seuls du binaire dans ce cas.
         entry = f"{name} = 0x{sym.value:08X};"
         if sym.kind == SYM_FUNC:
             entry += " // type:func"
             if sym.size:
                 entry += f" size:0x{sym.size:X}"
+        elif sym.value in byte_sized:
+            entry += (f" // type:{'u8' if sym.size == 1 else 'u16'}"
+                      f" size:0x{sym.size:X}")
         elif sym.size:
             entry += f" // size:0x{sym.size:X}"
 
