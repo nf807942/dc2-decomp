@@ -161,14 +161,22 @@ $(BUILD_DIR)/%.o: %.bin
 	@mkdir -p $(dir $@)
 	$(OBJCOPY) -I binary -O elf32-littlemips -B mips:5900 $< $@
 
+# Ce qui décide du découpage décide aussi de ce que mwccgap greffe : changer la
+# plage `rodata:` d'une unité change les sections de son objet sans toucher à sa
+# source, et l'objet resterait alors celui d'avant. Le symptôme n'est pas une
+# divergence mais une faute de segmentation au lien — l'objet n'a plus la section
+# que le script attend, et les symboles qu'elle définissait manquent. Mesuré sur
+# `runtime/std`, dont l'objet a gagné six sections `.rodata` une fois refait.
+UNITS := config/units.txt scripts/setup/configure.py
+
 # Une unité reconstruite passe par mwccgap, qui appelle MWCC puis greffe
 # l'assembleur des fonctions encore marquées `INCLUDE_ASM`.
-$(BUILD_DIR)/%.o: %.cpp $(HEADERS) $(MWCCGAP_SRC) tools/.patched
+$(BUILD_DIR)/%.o: %.cpp $(HEADERS) $(MWCCGAP_SRC) $(UNITS) tools/.patched
 	@mkdir -p $(dir $@)
 	@test -f $(MWCC) || { echo "$(MWCC) absent — lancez \`make tools\`" >&2; exit 1; }
 	$(MWCC_ENV) $(MWCCGAP) $< $@ $(MWCCGAP_ARGS) $(CFLAGS) $(MWCCGAP_TAIL)
 
-$(BUILD_DIR)/%.o: %.c $(HEADERS) $(MWCCGAP_SRC) tools/.patched
+$(BUILD_DIR)/%.o: %.c $(HEADERS) $(MWCCGAP_SRC) $(UNITS) tools/.patched
 	@mkdir -p $(dir $@)
 	@test -f $(MWCC) || { echo "$(MWCC) absent — lancez \`make tools\`" >&2; exit 1; }
 	$(MWCC_ENV) $(MWCCGAP) $< $@ $(MWCCGAP_ARGS) $(CFLAGS) $(MWCCGAP_TAIL)

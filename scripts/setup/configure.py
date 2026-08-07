@@ -395,7 +395,7 @@ def vu_tails(elf: Elf, boundaries: list[tuple[int, str]]) -> list[tuple[int, str
     order = {name: index for index, name in enumerate(SECTION_ORDER)}
     added: list[tuple[int, str]] = []
     for (start, section), (stop, _next) in zip(boundaries, boundaries[1:]):
-        if section not in (".vutext",):
+        if section not in (".vutext", ".vudata"):
             continue
         inside = [addr for addr in sized if start < addr < stop]
         if not inside:

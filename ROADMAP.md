@@ -108,25 +108,25 @@ rend une section en mots : `type:u8` les fait rendre en `.byte`, chacun sous son
 `dlabel`. Sept seulement des 8 201 objets du binaire étaient dans ce cas.
 `normalize.py` retire ensuite du script les symboles qu'une section définit —
 splat les y laissait, sa règle étant `not s.defined` là où spimdisasm les écrit.
-Le compte tombe à **43**.
 
-**Ce qui reste, sur les 43** :
+**Les deux queues de blocs vectoriels sont rendues aux données**, `.vutext` en
+`0x0032A380` et `.vudata` en `0x00363580`, cette dernière emmenant quatre tables
+de saut que la plage `rodata:0x00363660-0x003637B0` rend à `runtime/std`.
 
-| Où ils tombent | Combien | Ce qu'il faut |
+Le compte tombe à **20, dont 15 fenêtres matérielles**.
+
+**Ce qui reste, sur les 20** :
+
+| Ce que c'est | Combien | Ce qu'il faut |
 |---|---:|---|
 | fenêtres matérielles, sous l'adresse de chargement ou au-delà du bss | 15 | rien : le critère de sortie les excepte |
-| queue du bloc `.vudata` | 24 | la même coupure, qui ne passe pas encore |
-| un bloc `.vutext` désigné en entier | 2 | rien : c'est le bloc, non son contenu |
+| début d'un bloc d'octets `.vutext` ou `.vudata` | 3 | un `bin` n'a pas de symbole ; c'est le bloc qui est nommé |
 | `_xlaunch`, étiquette interne à `_kTLBException` | 1 | une étiquette au milieu d'une fonction |
 | `_1200_00377F10`, la table que m2c a fait renommer | 1 | reverser le nom une fois la fonction écrite |
 
-**Le cas de `.vudata` reste le prochain, et il résiste.** Sa queue —
-`0x00363580` à `0x00363808` — porte des RTTI, des littéraux et quatre tables de
-saut qui servent `runtime/std`. La couper les révèle ; leur donner la plage
-`rodata:0x00363660-0x003637B0` les fait migrer, le prédicat l'acceptant sur les
-six symboles ; mais `ld` plante alors **sans un mot**. Ce n'est pas un symbole
-manquant — c'est un défaut de l'éditeur de liens, et il faudra l'attaquer par
-là.
+Le critère de sortie est donc **à cinq symboles**, et aucun des cinq ne tient au
+découpage : deux sont des noms qu'un autre porte déjà, trois désignent un bloc
+d'octets dont le contenu n'a pas de symbole.
 
 - **95 sous-segments `.rodata`, 147 `rodata` et 32 `data`** vivent hors de toute
   unité. Chacun devra rejoindre celle qui l'emploie, comme les plages de lecture

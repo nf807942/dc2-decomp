@@ -491,7 +491,7 @@
 0x002EECA0 0x002F0E80 game/csphida_002EECA0 rodata:0x00377700-0x00377724
 
 # std : 40 fonctions, 9308 octets.
-0x001000D0 0x00102630 runtime/std
+0x001000D0 0x00102630 runtime/std rodata:0x00363660-0x003637B0
 
 # fonctions libres : 2 fonctions, 412 octets.
 0x00102630 0x001027D0 sdk/scegsresetgraph
