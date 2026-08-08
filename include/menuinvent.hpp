@@ -2,6 +2,7 @@
 #define MENUINVENT_HPP
 
 #include "types.h"
+#include "menu.hpp"
 
 /* L'état de menu que la sauvegarde retient d'une session à l'autre :
  * `GetMenuSysData` le rend, à 0x640C0 de la sauvegarde. Seuls les champs
@@ -32,48 +33,6 @@ public:
 };
 
 extern CInventUserData *InventUserDataPtr;
-
-/* Un panneau de menu, avec le script qui l'anime. `SetAction` lui donne la
- * suite à jouer, désignée par son nom. */
-class CMenuPosDataForm {
-public:
-    void SetAction(char *action);
-};
-
-/* Les neuf panneaux de message que les menus se partagent. Le binaire leur
- * donne 0x24 octets en 0x01EFBB30, et `NextDifferentMode` n'atteint que le
- * premier. C'est cette taille qui décide de l'adressage : au-delà du seuil des
- * petites données, MWCC passe par `%hi`/`%lo` et non par `$gp`. */
-extern CMenuPosDataForm *MenuMesForm[9];
-
-/* Ce que tous les menus ont en commun, atteint par un pointeur que `$gp`
- * adresse. Seul le demi-mot que `NextDifferentMode` consulte est établi : il
- * décide si le passage au mode 2 est permis. */
-struct MENU_COMMON_INFO {
-    u8 unknown_00[0xC2];
-    s16 unknown_C2;
-};
-
-extern MENU_COMMON_INFO *MenuCommonInfo;
-
-void MenuSePlay(int se);
-
-/* La base de tous les menus. Elle exécute les scripts qui les animent, chacun
- * désigné par son nom — en japonais dans le binaire.
- *
- * Sa taille n'est pas établie : les tampons la portent jusqu'au premier champ
- * que `CMenuInvent` expose, ce qui suffit à placer ceux-là et ne prétend rien
- * de ce qu'ils recouvrent. */
-class CBaseMenuClass {
-public:
-    void ExeScript(char *script);
-
-    u8 unknown_00[0x14];
-    /* Le mode courant du menu, que `NextDifferentMode` relit avant de le
-     * remplacer. */
-    s16 mode;
-    u8 unknown_16[0x114 - 0x16];
-};
 
 /* Le menu d'invention. Les dix champs déclarés sont ceux qu'`ExitEnd` reverse
  * dans la sauvegarde, plus un onzième bien plus loin. Ils tiennent sur trente
