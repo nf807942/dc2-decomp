@@ -33,47 +33,71 @@ public:
 
 extern CInventUserData *InventUserDataPtr;
 
+/* Un panneau de menu, avec le script qui l'anime. `SetAction` lui donne la
+ * suite à jouer, désignée par son nom. */
+class CMenuPosDataForm {
+public:
+    void SetAction(char *action);
+};
+
+/* Les neuf panneaux de message que les menus se partagent. Le binaire leur
+ * donne 0x24 octets en 0x01EFBB30, et `NextDifferentMode` n'atteint que le
+ * premier. C'est cette taille qui décide de l'adressage : au-delà du seuil des
+ * petites données, MWCC passe par `%hi`/`%lo` et non par `$gp`. */
+extern CMenuPosDataForm *MenuMesForm[9];
+
+/* Ce que tous les menus ont en commun, atteint par un pointeur que `$gp`
+ * adresse. Seul le demi-mot que `NextDifferentMode` consulte est établi : il
+ * décide si le passage au mode 2 est permis. */
+struct MENU_COMMON_INFO {
+    u8 unknown_00[0xC2];
+    s16 unknown_C2;
+};
+
+extern MENU_COMMON_INFO *MenuCommonInfo;
+
+void MenuSePlay(int se);
+
 /* La base de tous les menus. Elle exécute les scripts qui les animent, chacun
  * désigné par son nom — en japonais dans le binaire.
  *
- * Sa taille n'est pas établie : le tampon la porte jusqu'au premier champ que
- * `CMenuInvent` expose, ce qui suffit à placer ceux-là et ne prétend rien de
- * ce qu'il recouvre. */
+ * Sa taille n'est pas établie : les tampons la portent jusqu'au premier champ
+ * que `CMenuInvent` expose, ce qui suffit à placer ceux-là et ne prétend rien
+ * de ce qu'ils recouvrent. */
 class CBaseMenuClass {
 public:
     void ExeScript(char *script);
 
-    u8 unknown_00[0x114];
+    u8 unknown_00[0x14];
+    /* Le mode courant du menu, que `NextDifferentMode` relit avant de le
+     * remplacer. */
+    s16 mode;
+    u8 unknown_16[0x114 - 0x16];
 };
 
-/* Le menu d'invention. Les champs déclarés sont ceux qu'`ExitEnd` reverse dans
- * la sauvegarde : dix demi-mots espacés de quatre octets, plus un onzième bien
- * plus loin. Ce que chacun désigne reste à établir — leur seul usage connu est
- * d'être rangés à la fermeture du menu. */
+/* Le menu d'invention. Les dix champs déclarés sont ceux qu'`ExitEnd` reverse
+ * dans la sauvegarde, plus un onzième bien plus loin. Ils tiennent sur trente
+ * -deux bits : `NextDifferentMode` les lit et les écrit par mots entiers, et le
+ * produit qu'elle range en 0x11C déborde le demi-mot. `ExitEnd`, qui n'en garde
+ * que la moitié basse, ne pouvait pas trancher.
+ *
+ * Ce que chacun désigne reste à établir. */
 class CMenuInvent : public CBaseMenuClass {
 public:
     void ExitEnd();
+    void CreateModeSwapForm(int side);
+    void NextDifferentMode(int next, int arg);
 
-    s16 unknown_114;
-    s16 unknown_116;
-    s16 unknown_118;
-    s16 unknown_11A;
-    s16 unknown_11C;
-    s16 unknown_11E;
-    s16 unknown_120;
-    s16 unknown_122;
-    s16 unknown_124;
-    s16 unknown_126;
-    s16 unknown_128;
-    s16 unknown_12A;
-    s16 unknown_12C;
-    s16 unknown_12E;
-    s16 unknown_130;
-    s16 unknown_132;
-    s16 unknown_134;
-    s16 unknown_136;
-    s16 unknown_138;
-    s16 unknown_13A;
+    s32 unknown_114;
+    s32 unknown_118;
+    s32 unknown_11C;
+    s32 unknown_120;
+    s32 unknown_124;
+    s32 unknown_128;
+    s32 unknown_12C;
+    s32 unknown_130;
+    s32 unknown_134;
+    s32 unknown_138;
     u8 unknown_13C[0x392 - 0x13C];
     s16 unknown_392;
 };
