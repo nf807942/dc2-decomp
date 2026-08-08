@@ -1,5 +1,6 @@
 L'alignement des sections greffées, pris de l'adresse que le désassemblage
-donne au symbole, et l'ordre des sections de lecture seule.
+donne au symbole, l'ordre des sections de lecture seule, et l'assemblage des
+fonctions greffées en parallèle.
 
 MWCC demande seize octets pour chaque section qu'il émet, et mwccgap ramenait
 celles de lecture seule à deux. Ni l'un ni l'autre ne convient : une fonction
@@ -12,15 +13,29 @@ dans l'ordre des fonctions qu'elles servent, MWCC en émettant certaines suites
 déclarent donc groupées, dans l'ordre de leurs adresses, et chaque section se
 retrouve alors par le symbole qui l'a déclarée plutôt que par sa place.
 
-Mesuré sur Dark Chronicle (PS2 PAL) : sans cela, 25 des 90 unités que le
-découpage propose ne se lient pas à l'identique, et 13 fonctions restent hors
-de toute unité. À reverser en amont.
+Et la vitesse : chaque fonction greffée coûte une invocation de l'assembleur,
+soit une dizaine de millisecondes de démarrage de processus, et une unité en
+porte communément quatre-vingts. Ces assemblages ne dépendent pas les uns des
+autres ; les lancer ensemble rend le même objet, octet pour octet, et retire
+environ 0,7 s à chaque compilation — ce que le permuteur paie à chaque essai.
+
+Mesuré sur Dark Chronicle (PS2 PAL) : sans les deux premiers, 25 des 90 unités
+que le découpage propose ne se lient pas à l'identique, et 13 fonctions restent
+hors de toute unité. À reverser en amont.
 
 diff --git a/mwccgap/mwccgap.py b/mwccgap/mwccgap.py
-index 536d385..c845a33 100755
+index 536d385..3ceb6bb 100755
 --- a/mwccgap/mwccgap.py
 +++ b/mwccgap/mwccgap.py
-@@ -15,7 +15,7 @@ from .constants import (
+@@ -1,6 +1,7 @@
+ import copy
+ import tempfile
+ 
++from concurrent.futures import ThreadPoolExecutor
+ from pathlib import Path
+ from typing import List, Optional
+ 
+@@ -15,7 +16,7 @@ from .constants import (
      IGNORED_RELOCATIONS,
  )
  from .elf import Elf, TextSection, Relocation
@@ -29,7 +44,7 @@ index 536d385..c845a33 100755
  
  
  def process_c_file(
-@@ -76,6 +76,12 @@ def process_c_file(
+@@ -76,6 +77,12 @@ def process_c_file(
  
      symbol_to_section_idx = {}
      for symbol in compiled_elf.symtab.symbols:
@@ -42,18 +57,30 @@ index 536d385..c845a33 100755
          if symbol.name.startswith(FUNCTION_PREFIX):
              symbol.name = symbol.name[len(FUNCTION_PREFIX) :]
              symbol.st_name += len(FUNCTION_PREFIX)
-@@ -102,8 +108,9 @@ def process_c_file(
+@@ -102,10 +109,20 @@ def process_c_file(
          macro_inc_path=macro_inc_path,
      )
  
 -    for asm_file, num_rodata_symbols in asm_files:
-+    for asm_file, rodata_symbols in asm_files:
++    # Chaque fonction greffée coûte une invocation de l'assembleur, et c'est le
++    # démarrage du processus qui domine : environ 18 ms pièce, soit 1,3 s sur
++    # les 72 fonctions d'une unité moyenne — payées à chaque essai du
++    # permuteur. Les assemblages ne dépendent pas les uns des autres, donc ils
++    # se lancent ensemble ; la boucle qui suit garde son ordre, et l'objet
++    # produit est le même octet pour octet.
++    with ThreadPoolExecutor() as pool:
++        assembled = list(pool.map(
++            lambda entry: assembler.assemble_file(entry[0]), asm_files))
++
++    for (asm_file, rodata_symbols), asm_bytes in zip(asm_files, assembled):
          function = asm_file.stem
 +        num_rodata_symbols = len(rodata_symbols)
  
-         asm_bytes = assembler.assemble_file(asm_file)
+-        asm_bytes = assembler.assemble_file(asm_file)
          assembled_elf = Elf(asm_bytes)
-@@ -127,22 +134,16 @@ def process_c_file(
+ 
+         asm_functions = assembled_elf.get_functions()
+@@ -127,22 +144,16 @@ def process_c_file(
              else:
                  raise Exception(f"{function} not found in {c_file}")
  
@@ -85,7 +112,7 @@ index 536d385..c845a33 100755
          else:
              # this file only contains .rodata
              assert (
-@@ -164,6 +165,13 @@ def process_c_file(
+@@ -164,6 +175,13 @@ def process_c_file(
  
              text_section.data = asm_text[:compiled_function_length]
  
@@ -99,7 +126,7 @@ index 536d385..c845a33 100755
          if num_rodata_symbols > 0:
              assert (
                  len(assembled_elf.rodata_sections) == 1
-@@ -172,17 +180,28 @@ def process_c_file(
+@@ -172,17 +190,28 @@ def process_c_file(
  
              offset = 0
              rodata_section_offsets = []
@@ -132,7 +159,7 @@ index 536d385..c845a33 100755
  
              rel_rodata_sh_name = compiled_elf.add_sh_symbol(".rel.rodata")
  
-@@ -244,10 +263,13 @@ def process_c_file(
+@@ -244,10 +273,13 @@ def process_c_file(
                          [] for _ in rodata_section_indices
                      ]
                      for relocation in relocation_record.relocations:

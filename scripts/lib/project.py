@@ -119,31 +119,49 @@ def symbol_sources(build: bool = True) -> dict[str, Path]:
 
     La table est calculée une fois : l'établir par symbole relirait chaque objet
     autant de fois qu'il y a de fonctions.
+
+    Les deux commandes portent sur tous les objets d'un coup. Les appeler par
+    source coûtait 0,74 s de `make` chacune — le seul démarrage, l'objet étant
+    à jour —, soit près de quatre minutes sur les 319 unités, et c'est ce que
+    payait chaque `make diff`.
     """
     global _SYMBOL_SOURCES
     if _SYMBOL_SOURCES is not None:
         return _SYMBOL_SOURCES
 
+    objects = {
+        BUILD_DIR / path.relative_to(ROOT).with_suffix(".o"): path
+        for path in sources()
+    }
+
+    # `make` décide seul si un objet est périmé : se contenter de le construire
+    # quand il manque laisserait lire l'objet d'avant la dernière fonction
+    # écrite, qui ne la porte donc pas.
+    if build and objects:
+        run(["make", *(str(o.relative_to(ROOT)) for o in objects)],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+
+    present = [obj for obj in objects if obj.exists()]
     table: dict[str, Path] = {}
-    for path in sources():
-        obj = BUILD_DIR / path.relative_to(ROOT).with_suffix(".o")
-        # `make` décide seul si l'objet est périmé : se contenter de le
-        # construire quand il manque laisserait lire l'objet d'avant la
-        # dernière fonction écrite, qui ne la porte donc pas.
-        if build:
-            run(["make", str(obj.relative_to(ROOT))],
-                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        if not obj.exists():
+    if not present:
+        _SYMBOL_SOURCES = table
+        return table
+
+    listing = run(["mips-ps2-decompals-nm", "--defined-only",
+                   *(str(o) for o in present)], capture_output=True, text=True)
+
+    # Sur plusieurs fichiers, `nm` annonce chacun par une ligne « chemin: »
+    # avant ses symboles ; c'est elle qui dit à quelle source rattacher ce qui
+    # suit. Sur un seul, il n'annonce rien — d'où la valeur de départ.
+    current: Path | None = objects[present[0]] if len(present) == 1 else None
+    for line in listing.stdout.splitlines():
+        if line.endswith(":") and " " not in line:
+            current = objects.get(ROOT / line[:-1])
             continue
-        listing = run(["mips-ps2-decompals-nm", "--defined-only", str(obj)],
-                      capture_output=True, text=True)
-        if listing.returncode != 0:
-            continue
-        for line in listing.stdout.splitlines():
-            parts = line.split()
-            # « adresse type nom » ; `t`/`T` désigne le texte.
-            if len(parts) == 3 and parts[1] in "tT":
-                table.setdefault(parts[2], path)
+        parts = line.split()
+        # « adresse type nom » ; `t`/`T` désigne le texte.
+        if current is not None and len(parts) == 3 and parts[1] in "tT":
+            table.setdefault(parts[2], current)
 
     _SYMBOL_SOURCES = table
     return table

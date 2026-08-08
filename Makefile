@@ -98,7 +98,11 @@ LDFLAGS   := -EL --no-check-sections --accept-unknown-input-arch \
 # `asm/nonmatchings/` vivent les fonctions d'une unité reconstruite, que
 # mwccgap greffe dans l'objet compilé — les assembler à part les livrerait deux
 # fois à l'éditeur de liens.
-S_FILES   := $(shell find $(ASM_DIR) -name '*.s' -not -path '$(ASM_DIR)/nonmatchings/*' 2>/dev/null)
+# L'écarter par `-prune` et non par `-not -path` : ce dossier porte une
+# fonction par fichier, soit 7 759 entrées que `find` parcourait pour les
+# rejeter — 0,73 s payées au chargement de *chaque* `make`, donc à chaque essai
+# du permuteur.
+S_FILES   := $(shell find $(ASM_DIR) -path '$(ASM_DIR)/nonmatchings' -prune -o -name '*.s' -print 2>/dev/null)
 # Les microprogrammes des unités vectorielles restent des octets : leurs
 # instructions ne sont pas du MIPS, et aucun assembleur de la chaîne ne les
 # relit. Le désassembleur les dépose sous bin/, l'éditeur de liens les veut
