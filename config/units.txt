@@ -221,10 +221,10 @@
 # traduction d'origine, que `make carve` avait éclatée en huit.
 # Elle est du runtime Metrowerks, non du jeu : les plages de `config/sectors.txt`
 # l'englobent parce qu'elles sont grossières.
-0x0028C5F0 0x0028D160 runtime/fpmul
+0x0028C5F0 0x0028D1D0 runtime/fpmul
 
 # mgCVisualMotionMDT, CTreasureBoxManager, CStartupEpisodeTitle, CRandomCircle, MessageTaskManager, CGeoStone, CTreasureBox, CRedMarkModel, mgVertexWeight, CSound : 98 fonctions, 24196 octets.
-0x0028D160 0x002931B0 game/mgcvisualmotionmdt
+0x0028D1D0 0x002931B0 game/mgcvisualmotionmdt
 
 # CEditMap, CEditGrid, CMovie, CGridData : 111 fonctions, 24460 octets.
 0x00299620 0x0029F850 game/ceditmap_00299620

@@ -17,10 +17,10 @@
 # Les deux contributions s'ouvrent pourtant sur du runtime, et la borne basse
 # ne se prend donc pas à leur début : le premier bloc commence par `__swsetup`,
 # un reste de la bibliothèque C, avant de passer à `mgCTexture` ; le second par
-# les treize fonctions de l'émulation logicielle du flottant simple précision —
-# `__pack_f` à `__negsf2` —, jumelles de celles que la contribution d'avant
-# porte en double précision. Les compter au jeu lui attribuait 3 208 octets qui
+# les quinze fonctions de l'émulation logicielle du flottant simple précision —
+# `__pack_f` à `fptodp` —, jumelles de celles que la contribution d'avant
+# porte en double précision. Les compter au jeu lui attribuait 3 316 octets qui
 # ne sont pas de lui. Hors des plages, chaque contribution vote par ses propres
 # noms, et celle qu'aucun nom ne désigne hérite de sa voisine.
 0x0012C2C0 0x0028B8F8
-0x0028D160 0x00325C60
+0x0028D1D0 0x00325C60

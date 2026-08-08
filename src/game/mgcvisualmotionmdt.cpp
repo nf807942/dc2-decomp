@@ -8,8 +8,6 @@
 
 #include "common.h"
 
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", __make_fp);
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", fptodp);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", LoadFileSocket__FPcPUi);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", WriteFileSocket__FPcPUii);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Initialize__18mgCVisualMotionMDTFv);
