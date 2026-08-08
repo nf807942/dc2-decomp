@@ -35,6 +35,88 @@ BOOT_NAME = "SCES_511.90"
 SECTOR = 2048
 
 
+def grow_section(elf: bytearray, name: str, payload: bytes) -> bytearray:
+    """Remplace une section par un contenu plus long, et répare l'ELF autour.
+
+    Tant que la construction rend les octets du disque, l'injection est un
+    simple remplacement. Mais le jalon des tailles libres demande de porter un
+    exécutable plus long jusqu'à la console, et il faut alors décaler ce qui
+    suit la section dans le fichier : les autres sections, la table qui les
+    décrit, et les en-têtes de programme.
+
+    Ce qui se corrige tient en quatre champs — la taille de la section, les
+    `filesz` et `memsz` du segment chargé, et chaque offset de fichier au-delà
+    du point d'insertion. Le contenu de `.symtab` et `.relmain` désigne des
+    adresses virtuelles, non des offsets, et n'a donc pas à bouger ; la console
+    ne les lit pas davantage.
+
+    Une cinquième correction est en mémoire, et c'est celle qu'on ne voit pas
+    venir : le `heap` commence exactement où le bss finit — `0x01F64A00` —, si
+    bien qu'un texte plus long l'y ferait recouvrir. Ce qui vit au-delà de la
+    fin du segment chargé se décale donc d'autant.
+    """
+    offset, size = section_span(bytes(elf), name)
+    delta = len(payload) - size
+    if delta == 0:
+        elf[offset:offset + size] = payload
+        return elf
+
+    end = offset + size
+    grown = bytearray(elf[:offset]) + bytearray(payload) + bytearray(elf[end:])
+
+    shoff = struct.unpack_from("<I", grown, 0x20)[0]
+    shentsize = struct.unpack_from("<H", grown, 0x2E)[0]
+    shnum = struct.unpack_from("<H", grown, 0x30)[0]
+    phoff = struct.unpack_from("<I", grown, 0x1C)[0]
+    phentsize = struct.unpack_from("<H", grown, 0x2A)[0]
+    phnum = struct.unpack_from("<H", grown, 0x2C)[0]
+
+    # Les tables elles-mêmes se déplacent si elles vivent après l'insertion.
+    if shoff >= end:
+        struct.pack_into("<I", grown, 0x20, shoff + delta)
+        shoff += delta
+    if phoff >= end:
+        struct.pack_into("<I", grown, 0x1C, phoff + delta)
+        phoff += delta
+
+    # La fin mémoire du segment chargé, telle qu'elle était : c'est là que le
+    # `heap` commence, et c'est cette frontière que l'agrandissement pousse.
+    memory_end = 0
+    for i in range(phnum):
+        base = phoff + i * phentsize
+        p_offset, p_vaddr, _paddr, _filesz, p_memsz = struct.unpack_from(
+            "<5I", grown, base + 0x04)
+        if p_offset == offset:
+            memory_end = p_vaddr + p_memsz
+
+    for i in range(shnum):
+        base = shoff + i * shentsize
+        sh_addr = struct.unpack_from("<I", grown, base + 0x0C)[0]
+        sh_offset, sh_size = struct.unpack_from("<II", grown, base + 0x10)
+        if sh_offset == offset and sh_size == size:
+            struct.pack_into("<I", grown, base + 0x14, len(payload))
+        elif sh_offset >= end:
+            struct.pack_into("<I", grown, base + 0x10, sh_offset + delta)
+        if sh_addr and sh_addr >= memory_end:
+            struct.pack_into("<I", grown, base + 0x0C, sh_addr + delta)
+
+    for i in range(phnum):
+        base = phoff + i * phentsize
+        p_offset, p_vaddr, p_paddr, p_filesz, p_memsz = struct.unpack_from(
+            "<5I", grown, base + 0x04)
+        if p_offset == offset:
+            struct.pack_into("<II", grown, base + 0x10,
+                             p_filesz + delta, p_memsz + delta)
+            continue
+        if p_offset >= end:
+            struct.pack_into("<I", grown, base + 0x04, p_offset + delta)
+        if p_vaddr >= memory_end:
+            struct.pack_into("<II", grown, base + 0x08,
+                             p_vaddr + delta, p_paddr + delta)
+
+    return grown
+
+
 def section_span(elf: bytes, name: str) -> tuple[int, int]:
     """L'emplacement d'une section dans le fichier : offset et taille."""
     shoff = struct.unpack_from("<I", elf, 0x20)[0]
@@ -93,6 +175,37 @@ def locate_in_iso(iso: Path, name: str) -> tuple[int, int]:
     raise SystemExit(f"{name} introuvable dans {iso.name}")
 
 
+def directory_entry(iso: Path, name: str) -> int:
+    """L'offset, dans l'image, du champ de taille de l'entrée de répertoire.
+
+    Un exécutable plus long tient dans les secteurs que l'image lui a déjà
+    alloués — l'ISO arrondit —, mais la table des fichiers porte sa taille en
+    octets, et le noyau ne lira que ce qu'elle annonce.
+    """
+    with iso.open("rb") as f:
+        f.seek(16 * SECTOR)
+        pvd = f.read(SECTOR)
+        root = pvd[156:190]
+        lba = struct.unpack_from("<I", root, 2)[0]
+        size = struct.unpack_from("<I", root, 10)[0]
+        f.seek(lba * SECTOR)
+        directory = f.read(size)
+
+    offset, base = 0, lba * SECTOR
+    while offset < len(directory):
+        length = directory[offset]
+        if length == 0:
+            offset = (offset // SECTOR + 1) * SECTOR
+            continue
+        entry = directory[offset:offset + length]
+        name_len = entry[32]
+        if entry[33:33 + name_len].decode("latin1").split(";")[0] == name:
+            return base + offset + 10
+        offset += length
+
+    raise SystemExit(f"{name} introuvable dans {iso.name}")
+
+
 def build_elf() -> Path:
     image = BUILD_DIR / "main.bin"
     if not image.exists():
@@ -106,18 +219,14 @@ def build_elf() -> Path:
     offset, size = section_span(bytes(elf), "main")
 
     payload = image.read_bytes()
-    if len(payload) != size:
-        raise SystemExit(
-            f"la section construite fait {len(payload)} octets, "
-            f"le disque en attend {size} — `make build` doit passer d'abord"
-        )
-
-    elf[offset:offset + size] = payload
+    elf = grow_section(elf, "main", payload)
 
     output = BUILD_DIR / BOOT_NAME
     output.write_bytes(bytes(elf))
+    grown = len(payload) - size
+    note = f", {grown:+d} octets" if grown else ""
     print(f"{output.relative_to(ROOT)}  {len(elf)} octets"
-          f"  (section main injectée à 0x{offset:X})")
+          f"  (section main injectée à 0x{offset:X}{note})")
     return output
 
 
@@ -141,12 +250,17 @@ def build_iso(output: Path | None = None) -> Path:
     offset, size = locate_in_iso(disc, BOOT_NAME)
 
     payload = executable.read_bytes()
-    if len(payload) > size:
-        raise SystemExit("l'exécutable a grossi : l'image ne peut plus le loger")
+    # L'image alloue des secteurs entiers : ce que l'exécutable peut gagner sans
+    # que rien d'autre ait à bouger est ce que l'arrondi lui laisse.
+    allotted = -(-size // SECTOR) * SECTOR
+    if len(payload) > allotted:
+        raise SystemExit(
+            f"l'exécutable fait {len(payload)} octets et l'image ne lui en "
+            f"alloue que {allotted} : la table des fichiers serait à refaire")
 
     # L'image est copiée puis retouchée en place : le disque de l'utilisateur
-    # reste intact, et la table des fichiers n'a pas à être refaite puisque
-    # l'exécutable garde sa taille.
+    # reste intact, et la table des fichiers ne demande qu'une taille à corriger
+    # quand l'exécutable a grossi.
     print(f"copie de {disc.name} ({disc.stat().st_size // (1024 * 1024)} Mio)…")
     # Une image d'un tour précédent est encore là, et Windows refuse d'écrire
     # par-dessus tant qu'un lecteur la tient ouverte.
@@ -156,8 +270,16 @@ def build_iso(output: Path | None = None) -> Path:
     with output.open("r+b") as f:
         f.seek(offset)
         f.write(payload)
-        # Ce qui reste du dernier secteur appartient encore au fichier.
-        f.write(b"\x00" * (size - len(payload)))
+        # Ce qui reste des secteurs alloués appartient encore au fichier.
+        f.write(b"\x00" * (allotted - len(payload)))
+        if len(payload) != size:
+            # ISO 9660 écrit ses entiers deux fois, petit-boutiste puis
+            # gros-boutiste ; le noyau lit l'un ou l'autre selon la machine.
+            f.seek(directory_entry(disc, BOOT_NAME))
+            f.write(struct.pack("<I", len(payload))
+                    + struct.pack(">I", len(payload)))
+            print(f"taille de {BOOT_NAME} portée à {len(payload)} octets "
+                  f"dans la table des fichiers")
 
     shown = output.relative_to(ROOT) if output.is_absolute() else output
     print(f"{shown}  (exécutable remplacé à 0x{offset:X})")

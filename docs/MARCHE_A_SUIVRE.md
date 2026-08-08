@@ -262,6 +262,38 @@ compilateur a vue**, pas seulement une qui donne le bon résultat.
 
 ---
 
+## Éprouver un binaire plus long
+
+La construction se vérifie contre le disque, donc à l'octet près. Pour éprouver
+qu'une fonction peut *grossir* — c'est le critère de sortie du jalon 3 —, il faut
+sortir de cette vérification :
+
+```sh
+# après avoir ajouté du code à une fonction reconstruite
+make build/main.bin      # la construction seule, sans la comparaison
+make elf                 # l'exécutable, section agrandie et ELF réparé
+make iso ISO=build/grown.iso
+```
+
+`make build` échouera, et c'est normal : il compare au disque. Ce qui compte est
+que le lien passe sans « relocation truncated to fit », et que `make elf` accepte
+la nouvelle taille.
+
+Trois bornes à connaître :
+
+- **l'alignement à seize** de MWCC absorbe les petits ajouts — une instruction de
+  plus ne déplace souvent rien ;
+- **l'image alloue 524 octets de marge** à l'exécutable, l'ISO arrondissant au
+  secteur. Au-delà, sa table des fichiers serait à refaire ;
+- **la fenêtre de `$gp` n'a que seize octets** sous son symbole le plus bas.
+  Grossir le texte ne la sollicite pas — les petites données montent avec `_gp` —,
+  mais grossir `.sdata` la ferait déborder.
+
+L'image obtenue se lance dans un émulateur PS2, qui demande un BIOS que le dépôt
+ne fournit pas.
+
+---
+
 ## Conventions
 
 - Les symboles s'écrivent manglés, comme le binaire les porte :

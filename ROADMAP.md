@@ -201,19 +201,37 @@ lever demande de recentrer `_gp`, donc de renoncer à l'identité au disque.
 une fonction d'une instruction, reconstruire, et vérifier que le jeu tourne dans
 un émulateur. `make elf` et `make iso` produisent déjà de quoi le faire.
 
-**La moitié en est acquise.** Sur `CGamePad::WaitEnable` : une instruction de plus
-ne change rien — l'alignement à seize de MWCC l'absorbe —, mais treize déplacent
-tout, et proprement. Le texte finit en `0x00325CE0` au lieu de `0x00325C80`, le
-binaire fait 2 608 608 octets, **`_gp` suit de lui-même** à `0x00384750`, et le
-lien ne signale aucun débordement `%gp_rel`. Reste l'émulateur.
+**Tout est acquis sauf l'émulateur.** Sur `CGamePad::WaitEnable` : une instruction
+de plus ne change rien — l'alignement à seize de MWCC l'absorbe —, mais treize
+déplacent tout, et proprement. Le texte finit en `0x00325CE0` au lieu de
+`0x00325C80`, le binaire fait 2 608 608 octets, **`_gp` suit de lui-même** à
+`0x00384750`, et le lien ne signale aucun débordement `%gp_rel`.
+
+**`pack.py` sait désormais porter cet exécutable jusqu'à la console.** Il
+refusait toute taille différente ; `grow_section` répare maintenant l'ELF autour
+de la section agrandie — sa taille, les `filesz`/`memsz` du segment chargé, et
+chaque offset au-delà du point d'insertion. Deux faits s'y sont révélés :
+
+- **le `heap` commence exactement où le bss finit**, en `0x01F64A00`, si bien
+  qu'un texte plus long l'y recouvrait sans que `readelf` s'en plaigne. Ce qui
+  vit au-delà du segment chargé se décale donc d'autant — c'est la réponse au
+  « non mesuré » ci-dessous ;
+- **l'image a 524 octets de marge**, ISO 9660 allouant des secteurs entiers.
+  Au-delà, sa table des fichiers serait à refaire, et `pack.py` le dit. En deçà,
+  il corrige la taille déclarée, en petit- et gros-boutiste.
 
 Le test fait grossir le *texte*, qui pousse les petites données avec `_gp` : la
-fenêtre de ±32 Kio n'est donc pas éprouvée, et ne le sera qu'en grossissant
-`.sdata` elle-même.
+fenêtre de ±32 Kio n'est donc pas éprouvée par lui, et ne le sera qu'en
+grossissant `.sdata` elle-même.
 
-**Non mesuré** : ce qu'un texte plus long fait à la disposition mémoire de la
-console. Le bss va jusqu'à `0x01F64A00` et le tas commence après ; il y a de la
-marge, mais elle n'a pas été chiffrée.
+**Ce qui reste ne dépend plus du dépôt** : l'image se produit, l'éprouver demande
+un émulateur et un BIOS PS2.
+
+**Mesuré depuis** : le tas ne commence pas *après* le bss avec de la marge, il
+commence **exactement** où celui-ci finit, en `0x01F64A00`. Un texte plus long l'y
+recouvre, et rien dans l'ELF ne s'en plaint — c'est `pack.py` qui décale
+désormais ce qui vit au-delà du segment chargé. Ce que la console fait ensuite de
+ce tas déplacé reste, lui, à éprouver.
 
 ---
 
