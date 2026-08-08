@@ -181,6 +181,16 @@ Restent trois verrous, dans l'ordre où ils se lèveront :
 une fonction d'une instruction, reconstruire, et vérifier que le jeu tourne dans
 un émulateur. `make elf` et `make iso` produisent déjà de quoi le faire.
 
+**La moitié en est acquise.** Sur `CGamePad::WaitEnable` : une instruction de plus
+ne change rien — l'alignement à seize de MWCC l'absorbe —, mais treize déplacent
+tout, et proprement. Le texte finit en `0x00325CE0` au lieu de `0x00325C80`, le
+binaire fait 2 608 608 octets, **`_gp` suit de lui-même** à `0x00384750`, et le
+lien ne signale aucun débordement `%gp_rel`. Reste l'émulateur.
+
+Le test fait grossir le *texte*, qui pousse les petites données avec `_gp` : la
+fenêtre de ±32 Kio n'est donc pas éprouvée, et ne le sera qu'en grossissant
+`.sdata` elle-même.
+
 **Non mesuré** : ce qu'un texte plus long fait à la disposition mémoire de la
 console. Le bss va jusqu'à `0x01F64A00` et le tas commence après ; il y a de la
 marge, mais elle n'a pas été chiffrée.
