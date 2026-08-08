@@ -12,7 +12,14 @@ INCLUDE_ASM("nonmatchings/game/cfireafterhit", DrawMainUnitStatusBord__Ff);
 INCLUDE_ASM("nonmatchings/game/cfireafterhit", DrawRoboUnitStatusBord__Ff);
 INCLUDE_ASM("nonmatchings/game/cfireafterhit", DrawMonsterUnitStatusBord__Ff);
 INCLUDE_ASM("nonmatchings/game/cfireafterhit", DrawStatusBord__Fv);
-INCLUDE_ASM("nonmatchings/game/cfireafterhit", trans_effect_rate__Fi);
+
+float trans_effect_rate(int rate) {
+    float f = (float)rate / 255.0f;
+    if (1.0f < f) {
+        f = 1.0f;
+    }
+    return f;
+}
 INCLUDE_ASM("nonmatchings/game/cfireafterhit", trans_float_to_sceVector__FPfPfi);
 INCLUDE_ASM("nonmatchings/game/cfireafterhit", Initialize__14CChillAfterHitFv);
 INCLUDE_ASM("nonmatchings/game/cfireafterhit", SetPos__14CChillAfterHitFPffi);
