@@ -10,7 +10,7 @@ scripts/host/dc2 make …
 
 ---
 
-## Une fois, au départ
+## Au départ
 
 ```sh
 make tools     # le compilateur Metrowerks, depuis decompme/compilers
@@ -21,112 +21,43 @@ make build     # doit dire « identique au disque »
 Si `make build` ne dit pas *identique*, rien de ce qui suit n'a de sens : la
 référence est cassée, il faut la réparer d'abord.
 
----
+**Le découpage est fait.** 7 791 des 7 840 fonctions du binaire vivent déjà dans
+une des 326 unités, et chacune attend dans un `src/*.cpp` sous `INCLUDE_ASM`. Il
+n'y a donc rien à ouvrir : le travail commence directement à une fonction. Les
+sources sont rangées par provenance — `src/game/` pour Level-5, `src/sdk/` pour
+Sony, `src/runtime/` pour Metrowerks et la bibliothèque C, `src/mglib/` pour le
+middleware `mg*`.
 
-## 1. Choisir où travailler
-
-Presque tout le binaire vit déjà dans une unité — 325 d'entre elles, 7 788
-fonctions, 99,7 % de `.text` —, et chacune attend dans un `src/*.cpp` sous
-`INCLUDE_ASM`. Les sources sont rangées par provenance : `src/game/` pour le code
-de Level-5, `src/sdk/` pour celui de Sony, `src/runtime/` pour Metrowerks et la
-bibliothèque C, `src/mglib/` pour le middleware `mg*`. Les étapes 1 et 2 ne
-servent donc plus qu'à retoucher une frontière ou un classement que le découpage
-a décidés. **Pour reconstruire une fonction déjà dans une unité, sauter à
-l'étape 3.**
-
-```sh
-make report    # les fonctions par unité, la plus grosse d'abord
-make units
-```
-
-`make units` sort les classes dont la plage n'est traversée par aucune autre, la
-plus grosse d'abord, avec la ligne prête à coller :
-
-```
-0x001D6D80 0x001DAF60 cautomapgen   # 28 méthodes, 16672 octets
-```
-
-Pour regarder une classe de près — ses méthodes, leurs tailles, et ce qui
-s'intercale entre elles :
-
-```sh
-make units S=mgCFrame
-```
-
-Une classe *entrecoupée* n'est pas perdue : elle demande une plage plus large,
-qui portera plusieurs classes. C'est d'ailleurs ce que le binaire fait, une
-unité de traduction en contenant souvent plusieurs.
+Les 49 qui restent dehors sont les initialiseurs statiques `__sinit_*` : ce sont
+des fonctions, mais elles vivent après les données, et le script de lien range
+tous les `.text` ensemble. Les ouvrir ferait glisser ce qui les sépare des
+données ; c'est un chantier à part, décrit dans la feuille de route.
 
 ---
 
-## 2. Ouvrir l'unité
+## 1. Choisir une fonction
 
 ```sh
-make open S=CAutoMapGen
+make report     # puis ouvrir progress/index.html
 ```
 
-Ce qui se passe : la plage est ajoutée à `config/units.txt`, et
-`src/cautomapgen.cpp` est écrit — entièrement en `INCLUDE_ASM`, dans l'ordre des
-adresses.
+La page trie les fonctions par taille dans chaque unité, et c'est l'ordre le plus
+rentable. Deux conseils qui valent plus que la taille :
 
-```sh
-make setup     # le désassembleur écrit la plage une fonction par fichier
-make build     # doit rester « identique au disque »
-```
-
-**Ce `make build` est le vrai test de l'ouverture.** Pas une ligne de C++ n'est
-écrite, donc le binaire doit être inchangé.
-
-S'il ne l'est pas, c'est presque toujours la **borne haute**. Elle vaut ce que
-l'objet produit : la fin de la dernière fonction quand celle-ci est écrite en
-C++, le début de la fonction suivante quand elle est encore greffée — le
-remplissage entre les deux n'appartient alors pas au même objet. `make open`
-propose la première ; si le binaire diffère, essayer la seconde. Le symptôme est
-franc : des `jal` dont la cible perd quatre octets, et des centaines de plages.
-
-**Vérifier d'abord les sauts indirects :**
-
-```sh
-grep -c jlabel ref/asm/text/<unité>.s
-```
-
-Autre chose que zéro veut dire qu'une table de saut, rangée dans un
-sous-segment `rodata`, pointe à l'intérieur d'une fonction de l'unité. Passée en
-objet compilé, celle-ci n'expose plus ses étiquettes locales et le lien s'arrête :
-il faut donc que la table voyage avec elle, ce que la plage `rodata:` du
-quatrième champ déclare et que `make open` déduit seul.
-
-**Et vérifier les frontières de contribution d'objet :**
-
-```sh
-grep -c "^\.text" config/elf_sections.txt
-```
-
-Le désassembleur fait un sous-segment de chacune, et il tronque sans un mot
-l'unité qui l'enjambe. Le symptôme est une source réclamant un `INCLUDE_ASM`
-dont le fichier n'existe pas. Les deux gros blocs du jeu n'en portent aucune à
-l'intérieur ; le code de bibliothèque en porte une par fonction.
+- **rester dans une unité** une fois qu'on y est. La disposition d'une structure,
+  une fois établie, sert toutes les méthodes de la classe ; un champ mal typé se
+  paye sur chacune ;
+- **commencer par la plus petite de l'unité**. Elle apprend les conventions du
+  fichier pour un coût minime.
 
 ---
 
-## 3. Prendre une fonction
+## 2. Lire, puis demander un premier jet
 
-La plus petite d'abord : elle apprend les conventions de l'unité — comment la
-classe est disposée, ce que ses membres valent — pour un coût minime.
-
-```sh
-make units S=CAutoMapGen        # les tailles sont dans la liste
-```
-
-Lire le désassemblage :
+Le désassemblage de référence vit sous `ref/asm/text/<secteur>/<unité>.s` :
 
 ```sh
-sed -n '/glabel Draw__11CAutoMapGenFv/,/endlabel/p' ref/asm/text/cautomapgen.s
-```
-
-Puis demander un premier jet :
-
-```sh
+sed -n '/glabel Draw__11CAutoMapGenFv/,/endlabel/p' ref/asm/text/game/cautomapgen.s
 make decompile S=Draw__11CAutoMapGenFv
 ```
 
@@ -135,7 +66,7 @@ types sont à établir. Sur une fonction courte, c'est souvent presque exact.
 
 ---
 
-## 4. Écrire, comparer, recommencer
+## 3. Écrire, mesurer, recommencer
 
 Remplacer la ligne `INCLUDE_ASM` de la fonction par son corps, **à la même
 place** — l'ordre des adresses est celui que l'éditeur de liens attend.
@@ -147,7 +78,7 @@ make diff S=Draw__11CAutoMapGenFv
 Les deux suites d'instructions s'affichent côte à côte, avec le taux
 d'appariement. `100 %` veut dire que la fonction est reconstruite.
 
-Comment lire les écarts :
+Le premier écart est le seul qui compte : les suivants en découlent souvent.
 
 | Ce qu'on voit | Ce que ça dit |
 |---|---|
@@ -157,37 +88,80 @@ Comment lire les écarts :
 | `lw` là où le commerce fait `lh`/`lb` | la largeur du champ |
 | Tout est décalé après un point | une instruction manque avant ; regarder le premier écart seul |
 
-Le premier écart est le seul qui compte : les suivants en découlent souvent.
+---
+
+## 4. Quand ça plafonne
+
+Ce qui suit est le catalogue de ce qui a déjà résisté, avec la forme qui a fini
+par apparier. Chacun est mesuré sur une fonction réelle, pas déduit.
 
 **Un créneau de délai vide** — un `nop` là où le commerce a une instruction utile
-— veut dire que la valeur n'est pas disponible assez tôt. L'avancer par une
-déclaration en tête déplace l'allocation des registres et empire souvent le
-résultat ; ce qui marche est de l'évaluer dans la condition elle-même :
+— veut dire que la valeur n'est pas disponible assez tôt. La déclarer en tête
+déplace l'allocation des registres et empire souvent le résultat ; ce qui marche
+est de l'évaluer *dans* la condition :
 
 ```cpp
 if (this->table == NULL || (i = 0, this->count) <= 0) {
 ```
 
+**Un champ atteint plusieurs fois se prend par son adresse.** Le commerce hisse
+`&pad->phase` dans un registre sauvegardé et n'y touche plus qu'en `0x0(sN)` ;
+écrire `pad->phase` reforme l'offset après chaque appel. Le symptôme est un
+`addiu sN, base, offset` côté commerce là où nous portons l'offset dans chaque
+`lw`.
+
 **Un calcul que le commerce enchaîne dans le registre d'un paramètre** ne
-s'obtient qu'en écrivant dans ce paramètre. Une variable locale, même morte
-aussitôt, fait choisir un autre registre :
+s'obtient qu'en écrivant dans ce paramètre :
 
 ```cpp
 mpeg = (sceMpeg *)mpeg->work;          // lw a0, 0x40(a0) — apparie
 sceMpegWork *work = mpeg->work;        // lw v0, 0x40(a0) — n'apparie pas
 ```
 
-**Quand une fonction plafonne**, écrire un script qui compile vingt variantes et
-rapporte leur taux tranche plus vite que les essais un par un : chaque palier
-désigne le fait suivant à corriger.
+**Deux boucles successives veulent deux compteurs**, et **le nom du compteur
+décide de son registre** : MWCC attribue par ordre de déclaration, non par
+imbrication. Réutiliser `i` partout coûtait dix-huit instructions sur deux cent
+neuf.
 
-**Et si le plateau tient alors que la taille est déjà juste, changer de
-compilateur avant de réécrire.** Vingt et une versions s'installent par
+**Un aiguillage à un seul cas n'est pas un `if`.** Quand plusieurs retours rendent
+la même valeur et qu'un seul passe par un bloc partagé, le `switch` garde les
+sorties distinctes là où le `if` les fond — et le créneau de délai change avec.
+
+**Une boucle vide survit, mais pas sous toutes ses formes.** Écrite
+`for (i = 0; i < 7; i++) {}` elle disparaît ; ce qui la retient est le test `!=`,
+ou l'incrémentation portée dans la condition — `i = 0; while (++i < 7) {}`.
+
+**L'écart peut être hors de la fonction.** Un prototype, un type de paramètre,
+une taille de champ : `Init` a tenu 93,70 % contre seize formes de corps et 250
+essais du permuteur, et c'est `void *dma` au lieu de `u8 *dma` dans l'en-tête qui
+la retenait.
+
+### Les deux outils de recherche
+
+Ils ne servent pas la même chose :
+
+```sh
+make measure S=<symbole> V=<variantes.py>   # répond à une question posée
+make permute S=<symbole> [N=<essais>]       # cherche seul, à l'aveugle
+```
+
+`make measure` compile un lot de formes pour un même fragment — encadré dans la
+source par `/* @@nom */` et `/* @@fin */` — et rapporte leur taux. Il tranche en
+une passe ce que les essais un par un laissent en plateau : sur
+`GetDngMapFloorGlidInfo`, six lots ont mené de 74 % à 100 %, et chaque palier a
+désigné le fait suivant à corriger.
+
+`make permute` applique des transformations aveugles quand on ne sait plus quoi
+demander. Sur `AxisCalibration`, 31 essais ont trouvé une forme à laquelle
+personne n'avait pensé.
+
+### Si le plateau tient alors que la taille est déjà juste
+
+Changer de compilateur avant de réécrire. Vingt et une versions s'installent par
 `make tools TOOLS_ARGS=--all` ; les mesurer toutes sur la fonction qui résiste
-prend une minute et tranche souvent d'un coup. `MWCC_VERSION=… make …` en
-choisit une. Ce qui reste à ce stade — un créneau de délai vide, un registre
-sauvé qui diffère — vient de la chaîne, pas de la source : ni le permuteur ni
-les pragmas ne le corrigent.
+prend une minute, et `MWCC_VERSION=… make …` en choisit une. Ce qui reste à ce
+stade — un créneau vide, un registre sauvé qui diffère — vient de la chaîne, pas
+de la source : ni le permuteur ni les pragmas ne le corrigent.
 
 ---
 
@@ -198,99 +172,29 @@ make build      # identique au disque : la fonction est acquise
 make progress   # ce qui est reconstruit, en octets
 ```
 
-`make build` est le seul juge : `make diff` compare une fonction, `make build`
-compare le binaire entier. Une fonction à 100 % qui casse la construction
-signifie que quelque chose a bougé autour — une globale, un ordre, une taille.
-
-Puis la suivante, dans la même unité.
+`make build` est le seul juge. `make diff` compare une fonction, `make build`
+compare le binaire entier : une fonction à 100 % qui casse la construction
+signifie que quelque chose a bougé autour.
 
 ---
 
-## Voir où on en est
+## Voir une fonction à l'œuvre dans le jeu
+
+Pour savoir ce qu'une fonction fait vraiment, on peut la forcer à rendre une
+constante — **sans toucher aux sources**, donc sans perdre l'oracle :
 
 ```sh
-make report     # puis ouvrir progress/index.html
+make mod M="IsLevelUp__13CGameDataUsedFv=1"
+make iso ISO=build/essai.iso
 ```
 
-Carte du code proportionnelle aux octets, avancement par secteur, recherche par
-nom de fonction. Page autonome, rien n'en sort.
+`mod.py` retouche l'exécutable produit, pas le C++ : `make build` reste vert, et
+la fonction garde sa taille. Cela vaut pour **n'importe quelle** fonction du
+binaire, y compris celles qui ne sont pas encore reconstruites — c'est tout
+l'intérêt.
 
----
-
-## Un exemple complet
-
-`CGamePad::Connect`, 60 octets. Le désassemblage :
-
-```mips
-addiu  sp, sp, -0x10
-daddu  a0, zero, zero
-sd     ra, 0x0(sp)
-jal    scePadGetState
-daddu  a1, zero, zero
-addiu  v1, zero, 0x6
-bne    v0, v1, .L0014ADD8
-b      .L0014ADE0
-addiu  v0, zero, 0x1
-.L0014ADD8:
-xori   v0, v0, 0x2
-sltiu  v0, v0, 0x1
-```
-
-Ce qui se lit : un appel à `scePadGetState(0, 0)`, puis `== 6` qui rend 1, sinon
-`(v0 ^ 2) < 1` — c'est-à-dire `v0 == 2`. Deux états valent donc oui.
-
-Le C++, avec les noms du SDK :
-
-```cpp
-int CGamePad::Connect() {
-    int state = scePadGetState(0, 0);
-    if (state == scePadStateStable) {
-        return 1;
-    }
-    return state == scePadStateFindCTP1;
-}
-```
-
-`make diff` : **100 %**, quinze instructions identiques. `make build` :
-identique au disque.
-
-Noter la forme : `if (…) return 1; return …;` et non
-`return state == 6 || state == 2;`. Les deux disent la même chose, une seule
-rend ces octets — le `b` vers la fin et le `xori`/`sltiu` sont la trace du
-second `return`. **C'est le cœur du travail : trouver la formulation que le
-compilateur a vue**, pas seulement une qui donne le bon résultat.
-
----
-
-## Éprouver un binaire plus long
-
-La construction se vérifie contre le disque, donc à l'octet près. Pour éprouver
-qu'une fonction peut *grossir* — c'est le critère de sortie du jalon 3 —, il faut
-sortir de cette vérification :
-
-```sh
-# après avoir ajouté du code à une fonction reconstruite
-make build/main.bin      # la construction seule, sans la comparaison
-make elf                 # l'exécutable, section agrandie et ELF réparé
-make iso ISO=build/grown.iso
-```
-
-`make build` échouera, et c'est normal : il compare au disque. Ce qui compte est
-que le lien passe sans « relocation truncated to fit », et que `make elf` accepte
-la nouvelle taille.
-
-Trois bornes à connaître :
-
-- **l'alignement à seize** de MWCC absorbe les petits ajouts — une instruction de
-  plus ne déplace souvent rien ;
-- **l'image alloue 524 octets de marge** à l'exécutable, l'ISO arrondissant au
-  secteur. Au-delà, sa table des fichiers serait à refaire ;
-- **la fenêtre de `$gp` n'a que seize octets** sous son symbole le plus bas.
-  Grossir le texte ne la sollicite pas — les petites données montent avec `_gp` —,
-  mais grossir `.sdata` la ferait déborder.
-
-L'image obtenue se lance dans un émulateur PS2, qui demande un BIOS que le dépôt
-ne fournit pas.
+L'image se lance dans un émulateur PS2, qui demande un BIOS que le dépôt ne
+fournit pas.
 
 ---
 
@@ -301,9 +205,18 @@ ne fournit pas.
   `config/elf_symbol_addrs.txt` les liste tous.
 - Commentaires en français, identifiants en anglais.
 - Un commentaire dit *pourquoi*, jamais *quoi*. Un fait établi par sondage se
-  documente à l'endroit du code, avec le chiffre observé.
+  documente à l'endroit du code, avec le chiffre observé. **Une forme laide qui
+  apparie doit dire pourquoi elle l'est** — sans quoi le prochain lecteur la
+  « corrigera ».
+- Ne pas surinterpréter : ce qui n'est pas prouvé se dit tel quel, dans le code
+  comme dans la sortie d'un outil.
 - Rien de dérivé du jeu n'entre dans git — ni disque, ni désassemblage, ni
   tables. Ce qui se versionne est ce qu'on écrit.
+- **L'identité au disque ne se négocie pas.** C'est le seul oracle qui dise
+  qu'une source est juste ; tant que tout n'est pas recompilé, aucun gain de
+  confort ne la vaut.
+
+---
 
 ## Où trouver de l'aide sur une fonction
 
@@ -318,3 +231,39 @@ ne fournit pas.
   référence, jamais à copier dans le dépôt.
 - **[decomp.wiki](https://decomp.wiki/)** pour la méthode générale, et
   [decomp.me](https://decomp.me) pour partager une fonction qui résiste.
+
+---
+
+## Annexe — retoucher le découpage
+
+À ne lire que si une frontière d'unité est à corriger : le découpage couvre déjà
+tout le code, et ces cas sont rares.
+
+```sh
+make units S=CAutoMapGen    # ce qu'une classe couvre, et ce qui l'entrecoupe
+make carve                  # ce que le découpage automatique proposerait
+make open S=CAutoMapGen     # ouvrir une plage à la main
+```
+
+`config/units.txt` est la seule pièce du découpage qui s'écrit à la main. Une
+ligne y porte `<début> <fin> <secteur>/<nom> [rodata:<début>-<fin>]`.
+
+Après toute modification : `make setup && make build`. **Ce `make build` est le
+test.** Pas une ligne de C++ n'est écrite, donc le binaire doit être inchangé.
+
+Trois pièges, dans l'ordre où on les rencontre :
+
+- **la borne haute** vaut ce que l'objet produit — la fin de la dernière fonction
+  quand celle-ci est écrite en C++, le début de la suivante quand elle est encore
+  greffée. Le symptôme d'une erreur est franc : des `jal` dont la cible perd
+  quatre octets, sur des centaines de plages ;
+- **une table de saut doit voyager avec sa fonction**, ce que déclare le champ
+  `rodata:`. `grep -c jlabel ref/asm/text/<secteur>/<unité>.s` le dit d'avance.
+  La plage s'arrête exactement où la dernière table finit ;
+- **une frontière de contribution d'objet l'emporte** sur une unité déclarée : le
+  désassembleur tronque sans un mot celle qui l'enjambe, et le symptôme est un
+  `INCLUDE_ASM` dont le fichier n'existe pas. `config/elf_sections.txt` les liste.
+
+Et un réflexe : **devant une faute de segmentation au lien, sans message**,
+`objdump -h` sur l'objet en cause tranche en une seconde — il lui manque une
+section que le script réclame.
