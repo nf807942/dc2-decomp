@@ -156,8 +156,9 @@ réajuste les relocations. La relocation du texte est donc en place — c'est ce
 qui a rendu visible l'alignement à seize, puisqu'un décalage se propage.
 
 Des trois verrous, **deux sont levés** — `_gp` est calculé, et le parcours des
-initialiseurs statiques est établi. Reste la fenêtre de `$gp`, que le test de
-croissance ne sollicite pas.
+initialiseurs statiques est établi. Le troisième, la fenêtre de `$gp`, est
+**mesuré** : seize octets de marge d'un côté, cinquante-six mille de l'autre. Le
+lever demande de recentrer `_gp`, donc de renoncer à l'identité au disque.
 
 1. ~~**`_gp = 0x3846F0` est écrit en dur**~~ — **levé**. `normalize.py` le rend
    relatif à la fin du contenu du fichier, qui est aussi le début du bss :
@@ -165,11 +166,20 @@ croissance ne sollicite pas.
    valeur reste `0x003846F0` tant que rien ne bouge, ce que `make build`
    vérifie, et elle suivra sinon. `gp_value` reste en dur dans le découpage, et
    c'est autre chose : l'assembleur en a besoin pour réencoder les mêmes octets.
-2. **La fenêtre de `$gp` ne porte que ±32 Kio**, et 15 869 relocations `GPREL16`
-   s'y rapportent. Le symptôme est connu — « relocation truncated to fit » — et
-   s'est déjà produit pour 32 octets manquants. Grossir les petites données au-delà
-   de la fenêtre demandera de sortir des symboles du modèle `$gp`, donc de
-   toucher `-sdatathreshold`, qui reste entier.
+2. **La fenêtre de `$gp` ne porte que ±32 Kio**, et elle est **mesurée, non
+   levée**. Sur les 1 920 symboles qu'un `%gp_rel` atteint, le plus bas est
+   `sin_table_num` en `0x0037C700`, soit `_gp - 32752` : **seize octets de
+   marge**. Le plus haut est à `_gp - 23580`, si bien que **la moitié haute de la
+   fenêtre est entièrement inutilisée** — 56 347 octets. Toutes les petites
+   données tiennent en 9 172 octets sur les 65 535 adressables.
+
+   Éprouvé en déplaçant `_gp` : `+16` passe, `+32` rend dix « relocation
+   truncated to fit ». La mesure analytique et le lien s'accordent à l'octet.
+
+   Le remède se déduit du déséquilibre — **recentrer `_gp` rendrait environ
+   28 Kio de marge de chaque côté** —, mais il change les octets que le lien
+   encode. Il ne se prendra donc qu'en renonçant à l'identité au disque, ce qui
+   est justement ce que ce jalon permet. `-sdatathreshold` reste entier.
 3. ~~**Comment le runtime parcourt les 49 initialiseurs statiques**~~ —
    **établi**, et la réponse lève le verrou. `mwInit` (`0x00100190`) appelle
    `__initialize_cpp_rts(début, fin, …)`, qui lit un pointeur, l'appelle par
