@@ -165,6 +165,55 @@ def anchor_bin_symbols() -> int:
     return len(anchored)
 
 
+# `_gp` tel que splat l'écrit, depuis le `gp_value` du découpage.
+_GP = re.compile(r"^(\s*)_gp = 0x([0-9A-Fa-f]+);\s*$", re.MULTILINE)
+_BSS_START = "main_BSS_START = .;"
+
+
+def relocate_gp() -> int:
+    """Rend `_gp` relatif à la fin du contenu du fichier, au lieu de l'y figer.
+
+    `.reginfo` fixe `gp_value = 0x003846F0` et 15 869 relocations `GPREL16` s'y
+    rapportent ; l'assembleur doit recevoir cette valeur-là pour réencoder les
+    mêmes octets, et elle reste donc dans le découpage. Mais le *symbole* que le
+    lien définit n'a pas à être ce nombre : écrit en dur, il ne suivrait pas les
+    petites données si celles-ci bougeaient, et chaque `%gp_rel` raterait sa
+    cible d'autant.
+
+    L'écart est mesuré, non supposé : `0x003846F0 - 0x0037CD80 = 0x7970`, la fin
+    du contenu du fichier étant aussi le début du bss. Tant que rien ne bouge, la
+    valeur est la même — c'est ce que `make build` vérifie ; et si le texte
+    grossit, `_gp` suit.
+    """
+    script = ROOT / "linker_scripts" / "SCES_511.90.ld"
+    if not script.exists():
+        return 0
+
+    text = script.read_text(encoding="utf-8")
+    match = _GP.search(text)
+    if not match or _BSS_START not in text:
+        return 0
+
+    gp = int(match.group(2), 16)
+    # La valeur que le lien donnera au repère : la fin du contenu du fichier,
+    # que le découpage connaît par la taille de la section chargée.
+    image = ROOT / "rom" / "main.bin"
+    if not image.exists():
+        return 0
+    bss_start = 0x00100000 + image.stat().st_size
+    if not 0 <= gp - bss_start < 0x10000:
+        # Hors de la fenêtre de `$gp`, l'écart ne serait pas celui qu'on croit.
+        return 0
+
+    text = _GP.sub("", text, count=1)
+    text = text.replace(
+        _BSS_START,
+        f"{_BSS_START}\n        _gp = main_BSS_START + 0x{gp - bss_start:X};",
+        1)
+    script.write_text(text, encoding="utf-8")
+    return gp - bss_start
+
+
 def main() -> int:
     if not ASM_DIR.is_dir():
         return 0
@@ -187,6 +236,10 @@ def main() -> int:
     anchored = anchor_bin_symbols()
     if anchored:
         print(f"{anchored} symboles de bloc d'octets rattachés à leur objet")
+
+    offset = relocate_gp()
+    if offset:
+        print(f"_gp rendu relatif : main_BSS_START + 0x{offset:X}")
     return 0
 
 

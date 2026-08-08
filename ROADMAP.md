@@ -157,9 +157,12 @@ qui a rendu visible l'alignement à seize, puisqu'un décalage se propage.
 
 Restent trois verrous, dans l'ordre où ils se lèveront :
 
-1. **`_gp = 0x3846F0` est écrit en dur** dans le script de lien. Il désigne le
-   milieu des petites données ; si celles-ci bougent, il doit suivre. Une ligne
-   à rendre calculée.
+1. ~~**`_gp = 0x3846F0` est écrit en dur**~~ — **levé**. `normalize.py` le rend
+   relatif à la fin du contenu du fichier, qui est aussi le début du bss :
+   `_gp = main_BSS_START + 0x7970`, l'écart étant mesuré et non supposé. La
+   valeur reste `0x003846F0` tant que rien ne bouge, ce que `make build`
+   vérifie, et elle suivra sinon. `gp_value` reste en dur dans le découpage, et
+   c'est autre chose : l'assembleur en a besoin pour réencoder les mêmes octets.
 2. **La fenêtre de `$gp` ne porte que ±32 Kio**, et 15 869 relocations `GPREL16`
    s'y rapportent. Le symptôme est connu — « relocation truncated to fit » — et
    s'est déjà produit pour 32 octets manquants. Grossir les petites données au-delà
