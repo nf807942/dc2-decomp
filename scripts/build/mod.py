@@ -9,18 +9,17 @@ dans `build/SCES_511.90` puis dans l'image. Les sources restent celles qui
 rendent les octets du disque : le mod vit dans le fichier produit, jamais dans
 ce qu'on écrit.
 
-C'est la voie à prendre tant que le binaire vient surtout du désassemblage. Une
-fonction récrite en C++ ne peut pas y changer de taille : les 2 502 symboles
-que `undefined_syms_auto.ld` place à leur adresse absolue ne bougent pas avec
-elle, et `$gp` reste à la base que `.reginfo` fixe — la moindre instruction en
-plus décale les données sous les 15 869 relocations qui s'y rapportent, et le
-lien s'arrête sur « relocation truncated to fit ». Mesuré : `IsGeoStone`
-ramenée de 48 à 8 octets fait déborder `mgInitFont`.
+C'est la voie à prendre pour éprouver un comportement sans rien risquer : la
+fonction garde sa taille, donc rien ne bouge autour d'elle et l'image reste
+celle du commerce à cette fonction près.
 
-La contrainte tombera d'elle-même. Elle tient à ce qui reste en assembleur, non
-à la méthode : quand une unité aura ses données décompilées en même temps que
-son code, l'éditeur de liens les placera lui-même et la taille redeviendra
-libre.
+La contrainte qui la justifiait, elle, est tombée. Le texte peut désormais
+grossir : le bss est couvert par un segment déclaré, `_gp` se calcule depuis la
+fin du fichier, et `pack.py` sait porter un exécutable plus long jusqu'à
+l'image. Ce qui reste borné est le *petit* : les données atteintes par `$gp`
+n'ont que seize octets de marge sous leur symbole le plus bas, et recentrer
+`_gp` coûterait l'identité au disque — qu'on garde tant que tout n'est pas
+recompilé, puisqu'elle est le seul oracle.
 """
 
 from __future__ import annotations

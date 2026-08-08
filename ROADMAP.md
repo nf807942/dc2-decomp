@@ -178,8 +178,15 @@ lever demande de recentrer `_gp`, donc de renoncer à l'identité au disque.
 
    Le remède se déduit du déséquilibre — **recentrer `_gp` rendrait environ
    28 Kio de marge de chaque côté** —, mais il change les octets que le lien
-   encode. Il ne se prendra donc qu'en renonçant à l'identité au disque, ce qui
-   est justement ce que ce jalon permet. `-sdatathreshold` reste entier.
+   encode. **Il ne se prendra donc pas**, et c'est une décision du projet, non
+   une limite technique : l'identité au disque se garde tant que tout n'est pas
+   recompilé, parce qu'elle est le seul oracle qui dise qu'une source est juste.
+   La perdre pour gagner de la marge reviendrait à scier la branche.
+
+   La conséquence est nette et il faut la tenir : **les petites données ne
+   peuvent pas grossir de plus de seize octets** tant que cette règle vaut. Le
+   texte, lui, est libre — il pousse les petites données avec `_gp`.
+   `-sdatathreshold` reste entier.
 3. ~~**Comment le runtime parcourt les 49 initialiseurs statiques**~~ —
    **établi**, et la réponse lève le verrou. `mwInit` (`0x00100190`) appelle
    `__initialize_cpp_rts(début, fin, …)`, qui lit un pointeur, l'appelle par
