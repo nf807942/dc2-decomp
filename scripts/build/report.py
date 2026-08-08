@@ -19,7 +19,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from lib.project import CONFIG_DIR, ROOT, grafted_symbols  # noqa: E402
+from lib.project import (CONFIG_DIR, ROOT, grafted_symbols,  # noqa: E402
+                         padding_symbols)
 from build.gen_objdiff import SECTORS, sector_of, sectors_by_symbol  # noqa: E402
 
 PROGRESS_DIR = ROOT / "progress"
@@ -84,6 +85,7 @@ def compact(report: dict) -> dict:
     by_symbol = sectors_by_symbol()
 
     grafted = grafted_symbols()
+    padding = padding_symbols()
 
     units = []
     functions_all = []
@@ -107,11 +109,20 @@ def compact(report: dict) -> dict:
         # en donne compte les fonctions greffées, identiques par construction,
         # et une unité tout juste ouverte s'y afficherait déjà pleine.
         unit_done = 0
+        # Le code de l'unité se refait lui aussi depuis ses fonctions : celui
+        # qu'objdiff en donne compte le remplissage écarté ci-dessous, et le
+        # laisser au dénominateur retiendrait le rapport sous les 100 %.
+        unit_code = 0
 
         function_list = []
         for fn in unit.get("functions", []):
             name = fn.get("name", "?")
             size = int(fn.get("size") or 0)
+            # Le remplissage qu'une unité achevée laisse derrière elle n'est
+            # pas du code à reconstruire : l'y compter donnerait une part qui
+            # n'existe pas, et ferait passer un succès pour un reste.
+            if name in padding:
+                continue
             # Une fonction greffée porte les octets du disque : l'appariement
             # la rendrait à 100 % sans qu'une ligne de C++ soit écrite.
             share = 0.0 if name in grafted else measure(fn, "fuzzy_match_percent")
@@ -122,6 +133,7 @@ def compact(report: dict) -> dict:
                 sector, {"code": 0, "done": 0, "mapped": 0,
                          "functions": 0, "functions_done": 0})
             unit_done += done
+            unit_code += size
             entry["code"] += size
             entry["done"] += done
             entry["mapped"] += size if unit_mapped else 0
@@ -139,8 +151,8 @@ def compact(report: dict) -> dict:
             "name": unit.get("name", "?"),
             "sector": (unit.get("metadata", {}).get("progress_categories")
                        or ["game"])[0],
-            "code": code,
-            "share": round(100 * unit_done / code, 2) if code else 100.0,
+            "code": unit_code,
+            "share": round(100 * unit_done / unit_code, 2) if unit_code else 100.0,
             "functions": len(function_list),
             "source": unit.get("metadata", {}).get("source_path"),
             "mapped": unit_mapped,
@@ -155,7 +167,10 @@ def compact(report: dict) -> dict:
     mapped_code = sum(u["code"] for u in units if u["source"])
     mapped_units = sum(1 for u in units if u["source"])
 
-    total_code = as_int(report, "total_code")
+    # Le total suit les unités, non le rapport brut : celui-ci compte le
+    # remplissage que les unités achevées laissent, et le garder au dénominateur
+    # empêcherait le compte d'atteindre 100 %.
+    total_code = sum(u["code"] for u in units)
     total_done = sum(s["done"] for s in sectors.values())
 
     sha1 = ""

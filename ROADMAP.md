@@ -30,7 +30,8 @@ décompilation mais à ce qui reste adressé en dur.
 
 ```
 code reconstruit : 6 080 octets sur 2 215 100      0,274 %      32 fonctions
-unités ouvertes  : 325, 2 208 852 octets           99,7 %    7 788 fonctions
+unités ouvertes  : 326, 2 208 852 octets           99,7 %    7 791 fonctions
+code mappé       : 100,000 % — chaque octet de code appartient à une unité
 ```
 
 Ce qui reste dehors : les 49 initialiseurs statiques, les microprogrammes
@@ -40,9 +41,10 @@ vectoriels et les données.
 
 ## Jalon 1 — Finir le découpage du texte
 
-**Le compte passe de 72 unités à 325**, et `make build` rend les octets du disque.
-`.text` est couvert à 99,7 % : il ne reste dehors que les 49 initialiseurs
-statiques, et ceux-là ne sont pas du texte.
+**Le compte passe de 72 unités à 326**, et `make build` rend les octets du disque.
+Chaque octet de code appartient désormais à une unité — le rapport donne 100,000 %
+de code mappé. Il ne reste dehors que les 49 initialiseurs statiques, et ceux-là
+vivent après les données : ce n'est pas du texte.
 
 Le découpage ne s'arrête plus aux plages du jeu, et ce n'était pas un choix :
 **le remplacement fonction par fonction demande un sous-segment `cpp` et un
@@ -80,8 +82,11 @@ donc ouverts mais devront rester greffés. La mesure vaut plus largement : **92 
 182 contributions de bibliothèque seulement commencent sur un multiple de seize**,
 donc les 90 autres s'ouvrent sans pouvoir s'écrire tant que ce point tient.
 
-**Critère de sortie** : chaque octet de `.text` appartient à une unité. Atteint,
-aux initialiseurs statiques près — qui n'en sont pas.
+**Critère de sortie** : chaque octet de `.text` appartient à une unité.
+**Atteint** — le rapport donne 100,000 % de code mappé. Les 49 initialiseurs
+statiques restent dehors, mais ils vivent après les données et ne sont pas du
+texte ; le remplissage que laisse une unité achevée n'est pas du code, et le
+rapport ne le compte plus.
 
 ---
 
@@ -134,7 +139,7 @@ relocations d'une section greffée — c'est là qu'il faudra regarder.
   seule déjà migrées — sans quoi une donnée renommée ou supprimée n'a pas de
   propriétaire.
 
-**Critère de sortie** : `undefined_syms_auto.ld` ne porte plus que les six
+**Critère de sortie** : `undefined_syms_auto.ld` ne porte plus que les quinze
 fenêtres matérielles.
 
 **Non mesuré** : le coût de rattacher chaque donnée à son unité. Les 8 201

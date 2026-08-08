@@ -69,6 +69,43 @@ def grafted_symbols() -> set[str]:
     return names
 
 
+# Une ligne d'instruction : le commentaire d'adresse, puis le mnémonique. Les
+# espaces se bornent à la ligne — `\s` franchirait le saut qui sépare l'en-tête
+# du désassemblage, et rendrait le premier `nmlabel` pour une instruction.
+_INSTRUCTION = re.compile(r"^[ \t]*/\*[^*]*\*/[ \t]+(\S+)", re.MULTILINE)
+_PADDING: set[str] | None = None
+
+
+def padding_symbols() -> set[str]:
+    """Les « fonctions » que le désassembleur invente sur du remplissage.
+
+    Quand la dernière fonction d'une unité est écrite en C++, MWCC ne produit
+    plus l'alignement que l'assembleur posait derrière elle : il reste au
+    désassemblage, sans que rien le borne, et spimdisasm en fait un
+    `func_XXXXXXXX` de quatre octets qui ne porte qu'un `nop`.
+
+    Ce n'est pas du code du jeu, et le compter en donnerait une part à
+    reconstruire qui n'existe pas — c'est au contraire la trace d'une unité
+    achevée. Six unités sont dans ce cas, vingt-quatre octets en tout.
+    """
+    global _PADDING
+    if _PADDING is not None:
+        return _PADDING
+
+    found: set[str] = set()
+    for path in (REF_DIR / "text").rglob("*.s"):
+        text = path.read_text(encoding="utf-8", errors="replace")
+        names = _GLABEL.findall(text)
+        if len(names) != 1:
+            continue
+        opcodes = _INSTRUCTION.findall(text)
+        if opcodes and all(op == "nop" for op in opcodes):
+            found.update(names)
+
+    _PADDING = found
+    return found
+
+
 _SYMBOL_SOURCES: dict[str, Path] | None = None
 
 

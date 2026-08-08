@@ -128,12 +128,16 @@ def read_sectors() -> list[tuple[int, int]]:
 
 
 def text_span(functions: list[Function]) -> tuple[int, int]:
-    """De la première fonction de `.text` à la fin de la section.
+    """Du début de `.text` à sa fin.
 
     Le découpage couvre tout le texte, non les seules plages du jeu : une
     fonction hors unité ne peut pas s'écrire en C++, le remplacement fonction
     par fonction demandant un sous-segment `cpp` et un `INCLUDE_ASM`. Le code de
     bibliothèque n'y échappe donc pas, même livré compilé.
+
+    La borne basse est la première contribution de la section, non la première
+    fonction connue : les 192 octets d'amorçage la précèdent, et le binaire ne
+    les nomme qu'en `NOTYPE`.
 
     La borne haute est le début de `.vutext`, non la dernière fonction du
     binaire : les 49 initialiseurs statiques `__sinit_*` sont des `FUNC` mais
@@ -142,7 +146,7 @@ def text_span(functions: list[Function]) -> tuple[int, int]:
     et tout ce qui les sépare des données glisse — le symptôme est un
     débordement `%gp_rel`, les petites données s'étant éloignées de `_gp`.
     """
-    return functions[0].address, read_contributions(".vutext")[0]
+    return read_contributions()[0], read_contributions(".vutext")[0]
 
 
 def sector_dirs() -> dict[str, str]:

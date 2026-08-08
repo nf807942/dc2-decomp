@@ -261,6 +261,9 @@ def write_symbol_addrs(elf: Elf, path: Path) -> tuple[int, int]:
             continue
         chosen.setdefault(sym.value, sym)
 
+    for sym in boot_symbols(elf):
+        chosen.setdefault(sym.value, sym)
+
     # Le nom final se déduit en deux temps : assainissement, puis levée des
     # collisions par l'adresse. Compter les homonymes avant l'assainissement
     # manquerait ceux que celui-ci confond.
@@ -332,6 +335,43 @@ def write_symbol_addrs(elf: Elf, path: Path) -> tuple[int, int]:
 
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     return len(lines), renamed
+
+
+def boot_symbols(elf: Elf) -> list[Symbol]:
+    """Les fonctions d'amorçage, que le binaire ne déclare qu'en `NOTYPE`.
+
+    Les 192 premiers octets de `.text` portent le point d'entrée et ses voisins
+    — `_start` en `0x00100008`, `_exit`, `_root` —, et le binaire les nomme sans
+    leur donner de type ni de taille. Écartés de la table, ils laissaient le
+    désassembleur inventer `func_00100008` et le découpage ne pas voir cette
+    zone du tout : elle commençait avant la première fonction connue.
+
+    Le filtre est étroit à dessein, et le binaire le rend exact : un `NOTYPE`
+    nommé, dans `.text`, qu'aucun `FUNC` ni `OBJECT` ne nomme et qu'aucune
+    fonction dimensionnée ne couvre. Trois symboles y répondent, et ce sont
+    ceux-là ; les marqueurs du compilateur — `gcc2_compiled.`, `__gnu_compiled_c`
+    — tombent tous à des adresses déjà couvertes.
+    """
+    text_low = LOAD_VADDR
+    text_high = min(section_starts(elf).get(".vutext", [text_low]))
+
+    spans = sorted((s.value, s.value + s.size) for s in elf.symbols
+                   if s.kind in (SYM_FUNC, SYM_OBJECT) and s.size and s.value)
+    named = {s.value for s in elf.symbols
+             if s.kind in (SYM_FUNC, SYM_OBJECT) and s.name and s.value}
+
+    found: dict[int, Symbol] = {}
+    for sym in sorted(elf.symbols, key=lambda s: (s.value, s.name)):
+        if (sym.kind != SYM_NOTYPE or not sym.name or sym.name.startswith(".")
+                or not text_low <= sym.value < text_high
+                or sym.value in named
+                or any(low <= sym.value < high for low, high in spans)):
+            continue
+        # Le type manque au binaire, mais l'emplacement le dit : dans `.text`,
+        # ce qu'on nomme est du code.
+        found.setdefault(sym.value,
+                         Symbol(sym.name, sym.value, 0, SYM_FUNC, sym.shndx))
+    return list(found.values())
 
 
 def read_manual_addresses() -> set[int]:
