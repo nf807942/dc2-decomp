@@ -155,7 +155,9 @@ adresse**, `.main 0x100000`. Tout le reste est concaténé, et l'éditeur de lie
 réajuste les relocations. La relocation du texte est donc en place — c'est ce
 qui a rendu visible l'alignement à seize, puisqu'un décalage se propage.
 
-Restent trois verrous, dans l'ordre où ils se lèveront :
+Des trois verrous, **deux sont levés** — `_gp` est calculé, et le parcours des
+initialiseurs statiques est établi. Reste la fenêtre de `$gp`, que le test de
+croissance ne sollicite pas.
 
 1. ~~**`_gp = 0x3846F0` est écrit en dur**~~ — **levé**. `normalize.py` le rend
    relatif à la fin du contenu du fichier, qui est aussi le début du bss :
@@ -168,14 +170,22 @@ Restent trois verrous, dans l'ordre où ils se lèveront :
    s'est déjà produit pour 32 octets manquants. Grossir les petites données au-delà
    de la fenêtre demandera de sortir des symboles du modèle `$gp`, donc de
    toucher `-sdatathreshold`, qui reste entier.
-3. **Les 49 initialiseurs statiques `__sinit_*`** occupent une plage contiguë de
-   `0x00379680` à `0x0037AFDC`. Comment le runtime les parcourt — table de
-   pointeurs, bornes de section, suite d'appels — n'est pas établi. À trancher
-   avant de supprimer ou d'ajouter une unité de traduction. C'est aussi ce qui
-   les tient hors du jalon 1 : ce sont des `FUNC` situées après les données, et
-   le script de lien range tous les `.text` ensemble — les ouvrir en unité y
-   ferait glisser tout ce qui les sépare des données, jusqu'au débordement
-   `%gp_rel`. Mesuré, non supposé.
+3. ~~**Comment le runtime parcourt les 49 initialiseurs statiques**~~ —
+   **établi**, et la réponse lève le verrou. `mwInit` (`0x00100190`) appelle
+   `__initialize_cpp_rts(début, fin, …)`, qui lit un pointeur, l'appelle par
+   `jalr`, avance de quatre et boucle : c'est une **table de pointeurs**, les 49
+   `_p__sinit_*` de `0x0037AFE0` à `0x0037B0A4`, distincte des corps
+   `__sinit_*` qui vivent de `0x00379680` à `0x0037AFDC`.
+
+   Ce qui compte pour la liberté de taille : **`mwInit` charge ses bornes par
+   `%hi`/`%lo`**, donc ce sont des symboles que le lien reloge, non des
+   constantes. Ajouter ou retirer une unité de traduction demande d'ajouter ou
+   d'ôter son pointeur dans cette table ; la borne de fin suit d'elle-même.
+
+   Reste que ces corps sont des `FUNC` situées après les données, et que le
+   script de lien range tous les `.text` ensemble : les ouvrir en unité ferait
+   glisser tout ce qui les sépare des données, jusqu'au débordement `%gp_rel`.
+   C'est ce qui les tient hors du jalon 1, et c'est mesuré.
 
 **Critère de sortie**, et c'est une mesure, non un raisonnement : faire grossir
 une fonction d'une instruction, reconstruire, et vérifier que le jeu tourne dans
