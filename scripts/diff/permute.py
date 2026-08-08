@@ -369,26 +369,151 @@ def call_out_of_condition(text: str, _rng: random.Random) -> list[str]:
     return out
 
 
+def hoisted_declaration(expression: str, name: str) -> str | None:
+    """La déclaration qui tient `expression` dans une variable neuve.
+
+    Le type ne se devine pas d'une expression quelconque ; il se lit du
+    transtypage qu'elle porte déjà, faute de quoi on s'en tient aux entiers.
+    Rendre `void *` ne va pas : le C++ refuse d'en revenir à un pointeur typé
+    sans transtypage, et la variante ne compile pas — elle est alors mesurée
+    à -1 et le permuteur la rejette sans qu'on sache pourquoi.
+    """
+    cast = re.match(r"\(\s*([A-Za-z_]\w*(?:\s*\*)+)\s*\)\s*(.+)$", expression)
+    if cast:
+        return f"{cast.group(1).replace(' ', '')} {name} = {expression};"
+    if re.fullmatch(r"[&*]?[\w.>\[\]-]+", expression):
+        return f"int {name} = {expression};"
+    return None
+
+
 def temporary_for_argument(text: str, _rng: random.Random) -> list[str]:
     """Pose un argument d'appel dans une variable avant l'appel.
 
     Un argument déjà calculé n'occupe plus le même registre au moment de
     l'appel, et l'ordonnanceur range le reste autrement.
+
+    L'appel se cherche sur toute la ligne, non en tête d'instruction : une
+    condition de boucle en porte tout autant, et c'est là que l'ordre des
+    registres d'argument se décide le plus souvent.
     """
     out = []
-    for call in re.finditer(r"^([ \t]+)(\w+)\(([^()\n]+)\);$", text, re.M):
-        indent, name, arguments = call.groups()
-        if "held" in text:
+    for line in re.finditer(r"^([ \t]*)([^\n]*\w\([^\n]*\)[^\n]*)$", text, re.M):
+        indent, statement = line.groups()
+        if "held" in text or statement.lstrip().startswith(("for ", "/*", "*")):
             continue
-        pieces = [a.strip() for a in arguments.split(",")]
-        for index, piece in enumerate(pieces):
-            if re.fullmatch(r"-?\d+", piece) or not piece:
+        for call in re.finditer(r"(\w+)\(([^()]*(?:\([^()]*\)[^()]*)*)\)",
+                                statement):
+            pieces = [a.strip() for a in call.group(2).split(",")]
+            if len(pieces) < 2:
                 continue
-            replaced = list(pieces)
-            replaced[index] = "held"
-            hoisted = (f"{indent}void *held = (void *){piece};\n"
-                       f"{indent}{name}({', '.join(replaced)});")
-            out.append(text[:call.start()] + hoisted + text[call.end():])
+            for index, piece in enumerate(pieces):
+                if re.fullmatch(r"-?[\d.]+f?", piece) or not piece:
+                    continue
+                declaration = hoisted_declaration(piece, "held")
+                if declaration is None:
+                    continue
+                replaced = list(pieces)
+                replaced[index] = "held"
+                rebuilt = (statement[:call.start(2)] + ", ".join(replaced)
+                           + statement[call.end(2):])
+                # Une ligne qui ferme un bloc porte la déclaration à
+                # l'intérieur : hors du corps, la valeur ne serait plus celle
+                # du tour courant.
+                inner = indent + "    " if statement.startswith("}") else indent
+                out.append(text[:line.start()]
+                           + f"{inner}{declaration}\n{indent}{statement}"
+                           + text[line.end():])
+    return out
+
+
+def split_top_level(expression: str, operator: str) -> list[str]:
+    """Découpe une expression sur un opérateur logique, hors parenthèses."""
+    parts, depth, start, i = [], 0, 0, 0
+    while i < len(expression):
+        char = expression[i]
+        if char == "(":
+            depth += 1
+        elif char == ")":
+            depth -= 1
+        elif depth == 0 and expression.startswith(operator, i):
+            parts.append(expression[start:i].strip())
+            i += len(operator)
+            start = i
+            continue
+        i += 1
+    parts.append(expression[start:].strip())
+    return [p for p in parts if p]
+
+
+def condition_into_body(text: str, _rng: random.Random) -> list[str]:
+    """La condition d'un `do … while` passe dans le corps, un terme par `if`.
+
+    C'est ce qui manquait le plus au catalogue : aucune autre transformation
+    n'entre dans une condition de boucle. `while (A || B || C)` y était un bloc
+    opaque, et les appels qu'elle porte — leurs arguments, leur ordre —
+    échappaient à tout le reste. Éclatée en `for (;;) { if (A) continue; …
+    break; }`, elle redevient une suite d'instructions que le catalogue entier
+    peut reprendre.
+    """
+    out = []
+    # La condition d'une boucle tient souvent sur plusieurs lignes : s'arrêter
+    # au saut ne l'aurait jamais vue, et c'est justement quand elle porte assez
+    # de termes pour déborder qu'il vaut la peine de l'éclater.
+    pattern = re.compile(r"^([ \t]+)do \{\n"
+                         r"((?:[ \t]*[^{}\n]*\n)*?)"
+                         r"[ \t]*\} while \((.*?)\);$", re.M | re.S)
+    for match in pattern.finditer(text):
+        indent, body, condition = match.groups()
+        terms = split_top_level(" ".join(condition.split()), "||")
+        if len(terms) < 2:
+            continue
+        inner = indent + "    "
+        tests = "".join(f"{inner}if ({term}) {{\n{inner}    continue;\n"
+                        f"{inner}}}\n" for term in terms)
+        rebuilt = (f"{indent}for (;;) {{\n{body}{tests}"
+                   f"{inner}break;\n{indent}}}")
+        out.append(text[:match.start()] + rebuilt + text[match.end():])
+    return out
+
+
+def conditions(text: str) -> list[tuple[int, int]]:
+    """Les bornes de chaque condition de `if` ou de `while`.
+
+    Une expression régulière ne sait pas s'arrêter à la bonne parenthèse : la
+    première rencontrée ferme un appel, non la condition. Le comptage est le
+    seul moyen d'atteindre les conditions qui portent des appels, et ce sont
+    celles-là qui décident de l'ordre des registres d'argument.
+    """
+    found = []
+    for opening in re.finditer(r"\b(?:if|while)\s*\(", text):
+        depth, i = 1, opening.end()
+        while i < len(text) and depth:
+            depth += (text[i] == "(") - (text[i] == ")")
+            i += 1
+        if depth == 0:
+            found.append((opening.end(), i - 1))
+    return found
+
+
+def reorder_disjuncts(text: str, _rng: random.Random) -> list[str]:
+    """Échange deux termes voisins d'une chaîne de `||` ou de `&&`.
+
+    L'ordre des termes décide de celui des appels, donc des registres vivants
+    à chaque branchement. Le court-circuit en change le sens ; c'est la
+    construction qui tranche, comme toujours.
+    """
+    out = []
+    for start, stop in conditions(text):
+        condition = " ".join(text[start:stop].split())
+        for operator in ("||", "&&"):
+            terms = split_top_level(condition, operator)
+            if len(terms) < 2:
+                continue
+            for i in range(len(terms) - 1):
+                swapped = list(terms)
+                swapped[i], swapped[i + 1] = swapped[i + 1], swapped[i]
+                rebuilt = f" {operator} ".join(swapped)
+                out.append(text[:start] + rebuilt + text[stop:])
     return out
 
 
@@ -729,6 +854,8 @@ TRANSFORMS = [
     materialize_parameter,
     move_into_branch,
     compare_zero_rewrite,
+    condition_into_body,
+    reorder_disjuncts,
 ]
 
 

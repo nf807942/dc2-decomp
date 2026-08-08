@@ -9,20 +9,15 @@
  * vecteur les deux instructions `lq`/`sq` que le binaire porte. Déclaré en
  * simple structure, MWCC le recopie champ par champ, en huit instructions. */
 union VECTOR {
-    struct {
-        f32 x;
-        f32 y;
-        f32 z;
-        f32 w;
-    } f;
+    f32 f[4];
     u128 qw;
 };
 
 /* La boîte englobante que le middleware emploie pour interroger les collisions :
  * deux coins opposés, chacun sur seize octets. */
 struct mgVu0FBOX {
-    VECTOR max;
-    VECTOR min;
+    f32 max[4];
+    f32 min[4];
 };
 
 class CMapParts;
@@ -46,7 +41,7 @@ public:
     /* Rend la position du personnage. C'est la cinquième déclarée et le
      * binaire la prend en 0x18 de la table : MWCC en réserve les deux
      * premières entrées. */
-    virtual void vf18(VECTOR *pos) = 0;
+    virtual void vf18(f32 *pos) = 0;
 };
 
 /* Le gestionnaire des coffres : il dit si un point tombe trop près de l'un
@@ -112,8 +107,14 @@ public:
     s32 unknown_24;   /* 0x24 */
     s32 unknown_28;   /* 0x28 */
     u8 unknown_2C[0x90 - 0x2C];
-    VECTOR pos;       /* 0x90 — où il se tient */
-    VECTOR target;    /* 0xA0 — où il conduit */
+    /* Un point se déclare en tableau de flottants, non en
+     * structure : c'est ce que les prototypes du binaire disent —
+     * `Pf`, pointeur de flottant — et le passer sans transtypage est
+     * ce qui décide de l'ordre des registres d'argument. Une
+     * conversion, même sans instruction, est matérialisée avant les
+     * autres arguments et renverse l'ordre. */
+    f32 pos[4];       /* 0x90 — où il se tient */
+    f32 target[4];    /* 0xA0 — où il conduit */
     s32 unknown_B0;   /* 0xB0 */
     s32 unknown_B4;   /* 0xB4 */
     s32 unknown_B8;   /* 0xB8 — le nombre d'étapes, plafonné à 99 */
