@@ -14,9 +14,13 @@
 # médiane de 280 octets, une fonction chacune, et deux blocs de plusieurs
 # centaines de milliers d'octets portent tout ce que Level-5 a écrit.
 #
-# Le premier bloc s'ouvre sur `__swsetup`, un reste de la bibliothèque C, puis
-# passe aussitôt à `mgCTexture` ; le second sur `__pack_f`. Les deux bornes
-# basses sont donc prises au début de ces contributions, et la mesure suit ce
-# que le binaire montre plutôt que ce que les noms suggèrent.
-0x0012C1A8 0x0028B8F8
-0x0028C5F0 0x00325C60
+# Les deux contributions s'ouvrent pourtant sur du runtime, et la borne basse
+# ne se prend donc pas à leur début : le premier bloc commence par `__swsetup`,
+# un reste de la bibliothèque C, avant de passer à `mgCTexture` ; le second par
+# les treize fonctions de l'émulation logicielle du flottant simple précision —
+# `__pack_f` à `__negsf2` —, jumelles de celles que la contribution d'avant
+# porte en double précision. Les compter au jeu lui attribuait 3 208 octets qui
+# ne sont pas de lui. Hors des plages, chaque contribution vote par ses propres
+# noms, et celle qu'aucun nom ne désigne hérite de sa voisine.
+0x0012C2C0 0x0028B8F8
+0x0028D160 0x00325C60

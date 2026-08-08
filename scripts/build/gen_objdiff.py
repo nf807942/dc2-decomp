@@ -45,7 +45,14 @@ SECTORS: list[tuple[str, str, re.Pattern[str]]] = [
         r"|qsort$|bsearch$|s?rand$|setjmp$|longjmp$"
         r"|l?div$|l?abs$|fabsf?$|sqrtf?$|powf?$|expf?$|log[2f]?$|f?modf?$"
         r"|sin$|cos$|tan$|a(sin|cos|tan2?)$|floor$|ceil$|frexp$|ldexp$|modf$"
-        r"|to(upper|lower)$|is[a-z]+$)")),
+        r"|to(upper|lower)$|is[a-z]+$"
+        # L'émulation logicielle du flottant, qu'aucun préfixe ne désigne :
+        # deux unités jumelles, `dp*` en double et `fp*` en simple précision.
+        # Le vote de leur unité les rattraperait — les quatre noms en `__`
+        # qu'elles portent suffisent à la faire pencher —, mais il ne tient
+        # qu'au découpage : les nommer ici les en rend indépendantes.
+        r"|_?fpadd_parts\w*$|(dp|fp)(add|sub|mul|div|cmp)$"
+        r"|sitofp$|fpto(si|ui)$|litodp$|dpto(li|ul|fp)$)")),
     ("game", "Jeu", re.compile(r".")),
 ]
 
