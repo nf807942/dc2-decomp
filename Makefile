@@ -127,9 +127,11 @@ all: build
 
 setup: split
 
-# Le découpage se refait dès qu'une unité s'ouvre : `config/units.txt` en est
-# la seule pièce écrite à la main, et le désassembleur doit revoir la coupure.
-config/splat.yaml: config/units.txt scripts/setup/configure.py
+# Le découpage se refait dès qu'une unité s'ouvre, et dès qu'un symbole est
+# nommé à la main : `configure.py` écarte de sa table les adresses que
+# `symbol_addrs.txt` renomme, faute de quoi deux noms désignent le même endroit
+# et le lien reçoit le second par son adresse absolue.
+config/splat.yaml: config/units.txt config/symbol_addrs.txt scripts/setup/configure.py
 	$(PYTHON) scripts/setup/configure.py
 
 # Deux désassemblages : celui du travail, où une unité reconstruite laisse

@@ -5,3 +5,11 @@
 // ne porte pas un nom en « jtbl »/« jpt_ »/« lbl_ »/« jumptable_ » ; le nom que
 // Metrowerks lui a donné, `_1200_00377F10`, n'en est pas un.
 jtbl_00377F10 = 0x00377F10; // size:0x1C type:jtbl
+
+// `_xlaunch` reste hors de cette table, et c'est mesuré. C'est une étiquette au
+// milieu de `_kTLBException`, que le binaire déclare OBJECT de taille nulle ;
+// `type:label` la fait bien poser par le désassembleur, mais l'étiquette est
+// alors locale à la section greffée et son `%hi`/`%lo` ne se résout plus comme
+// le commerce l'encode — six octets divergent en 0x00118798, les deux
+// instructions qui la chargent. Elle reste donc donnée par son adresse absolue,
+// seul symbole du binaire dans ce cas.

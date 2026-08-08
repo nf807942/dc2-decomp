@@ -113,20 +113,21 @@ splat les y laissait, sa règle étant `not s.defined` là où spimdisasm les é
 `0x0032A380` et `.vudata` en `0x00363580`, cette dernière emmenant quatre tables
 de saut que la plage `rodata:0x00363660-0x003637B0` rend à `runtime/std`.
 
-Le compte tombe à **20, dont 15 fenêtres matérielles**.
+**Les noms en double sont écartés** — `configure.py` ne renomme plus une adresse
+que `symbol_addrs.txt` nomme —, et **les blocs d'octets suivent leur objet** :
+`normalize.py` pose `<nom> = .;` devant eux dans le script de lien, ce qui
+rattache `Vu_progmain`, `Vu_prog_wtr` et `My_dma_start0` à la position que le
+lien leur donne, au lieu de les figer.
 
-**Ce qui reste, sur les 20** :
+Le compte tombe à **16 : les 15 fenêtres matérielles, et `_xlaunch`.**
 
-| Ce que c'est | Combien | Ce qu'il faut |
-|---|---:|---|
-| fenêtres matérielles, sous l'adresse de chargement ou au-delà du bss | 15 | rien : le critère de sortie les excepte |
-| début d'un bloc d'octets `.vutext` ou `.vudata` | 3 | un `bin` n'a pas de symbole ; c'est le bloc qui est nommé |
-| `_xlaunch`, étiquette interne à `_kTLBException` | 1 | une étiquette au milieu d'une fonction |
-| `_1200_00377F10`, la table que m2c a fait renommer | 1 | reverser le nom une fois la fonction écrite |
-
-Le critère de sortie est donc **à cinq symboles**, et aucun des cinq ne tient au
-découpage : deux sont des noms qu'un autre porte déjà, trois désignent un bloc
-d'octets dont le contenu n'a pas de symbole.
+**Le critère de sortie est donc atteint à un symbole près**, et celui-là est
+mesuré. `_xlaunch` est une étiquette au milieu de `_kTLBException`, que le
+binaire déclare `OBJECT` de taille nulle. `type:label` la fait poser par le
+désassembleur, mais la construction diverge alors de six octets en `0x00118798` :
+l'étiquette est locale à la section greffée, et son `%hi`/`%lo` ne se résout plus
+comme le commerce l'encode. Le remède est du côté de mwccgap, qui répare les
+relocations d'une section greffée — c'est là qu'il faudra regarder.
 
 - **95 sous-segments `.rodata`, 147 `rodata` et 32 `data`** vivent hors de toute
   unité. Chacun devra rejoindre celle qui l'emploie, comme les plages de lecture

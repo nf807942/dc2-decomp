@@ -70,7 +70,11 @@ def normalize(text: str) -> str:
     return "\n".join(out) + "\n"
 
 
-_DLABEL = re.compile(r"^\s*(?:dlabel|glabel|jlabel)\s+(\S+)", re.MULTILINE)
+# Ce qui définit un symbole dans le désassemblage : la macro d'étiquette que le
+# découpage choisit, ou une étiquette nue — celle qu'un `type:label` fait poser
+# au milieu d'une fonction, comme `_xlaunch` dans `_kTLBException`.
+_DLABEL = re.compile(r"^\s*(?:(?:dlabel|glabel|jlabel)\s+(\S+)|(\w+):\s*$)",
+                     re.MULTILINE)
 _ASSIGNMENT = re.compile(r"^(\S+)\s*=\s*0x[0-9A-Fa-f]+;")
 
 
@@ -93,8 +97,9 @@ def drop_defined_undefined_syms() -> int:
 
     defined = set()
     for path in (ROOT / "asm").rglob("*.s"):
-        defined.update(_DLABEL.findall(path.read_text(encoding="utf-8",
-                                                      errors="replace")))
+        text = path.read_text(encoding="utf-8", errors="replace")
+        defined.update(name for pair in _DLABEL.findall(text)
+                       for name in pair if name)
 
     kept, dropped = [], 0
     for line in script.read_text(encoding="utf-8").splitlines():
@@ -107,6 +112,57 @@ def drop_defined_undefined_syms() -> int:
     if dropped:
         script.write_text("\n".join(kept) + "\n", encoding="utf-8")
     return dropped
+
+
+_BIN_OBJECT = re.compile(r"^\s*build/bin/\w+/([0-9A-F]{8})\.o\(\.data\);")
+
+
+def anchor_bin_symbols() -> int:
+    """Fait suivre au symbole d'un bloc d'octets la place que le lien lui donne.
+
+    Un microprogramme vectoriel est lié par `objcopy -I binary`, donc son objet
+    ne définit aucun des noms que le binaire lui donne — `Vu_progmain`,
+    `Vu_prog_wtr`, `My_dma_start0`. Le code qui les charge les recevait par leur
+    adresse absolue, ce qui les figerait : un texte plus long ferait glisser le
+    bloc sans eux.
+
+    L'affectation `<nom> = .;` posée devant l'objet dans le script de lien les
+    rattache à sa position. Le nom est celui que le désassembleur emploie, faute
+    de quoi la référence resterait pendante.
+    """
+    script = ROOT / "linker_scripts" / "SCES_511.90.ld"
+    undefined = ROOT / "linker_scripts" / "auto" / "undefined_syms_auto.ld"
+    if not script.exists() or not undefined.exists():
+        return 0
+
+    # Ce que le lien reçoit encore par adresse absolue, et à quelle adresse.
+    absolute = {}
+    for line in undefined.read_text(encoding="utf-8").splitlines():
+        match = _ASSIGNMENT.match(line.strip())
+        if match:
+            absolute[int(line.split("=", 1)[1].strip().rstrip(";"), 16)] = \
+                match.group(1)
+
+    anchored, lines = set(), []
+    for line in script.read_text(encoding="utf-8").splitlines():
+        block = _BIN_OBJECT.match(line)
+        if block:
+            address = int(block.group(1), 16)
+            name = absolute.get(address)
+            if name:
+                indent = line[:len(line) - len(line.lstrip())]
+                lines.append(f"{indent}{name} = .;")
+                anchored.add(name)
+        lines.append(line)
+
+    if not anchored:
+        return 0
+    script.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    kept = [line for line in undefined.read_text(encoding="utf-8").splitlines()
+            if not ((m := _ASSIGNMENT.match(line.strip())) and m.group(1) in anchored)]
+    undefined.write_text("\n".join(kept) + "\n", encoding="utf-8")
+    return len(anchored)
 
 
 def main() -> int:
@@ -127,6 +183,10 @@ def main() -> int:
     dropped = drop_defined_undefined_syms()
     if dropped:
         print(f"{dropped} symboles absolus retirés, leur section les définit")
+
+    anchored = anchor_bin_symbols()
+    if anchored:
+        print(f"{anchored} symboles de bloc d'octets rattachés à leur objet")
     return 0
 
 

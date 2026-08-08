@@ -278,9 +278,18 @@ def write_symbol_addrs(elf: Elf, path: Path) -> tuple[int, int]:
     words = {addr & ~3 for addr, size in small.items() if addr % 4}
     byte_sized = {addr for addr in small if (addr & ~3) in words}
 
+    # Ce que la table écrite à la main renomme, cette table-ci n'a pas à le
+    # nommer aussi : deux noms pour une adresse en laissent un référencé que
+    # rien ne définit, et le lien le reçoit alors par son adresse absolue.
+    # `jtbl_00377F10` est le seul cas — m2c exige ce nom-là, et `@1200`, que le
+    # binaire porte, n'en est pas un.
+    overridden = read_manual_addresses()
+
     lines: list[str] = []
     renamed = 0
     for addr in sorted(chosen):
+        if addr in overridden:
+            continue
         sym = chosen[addr]
         name, comment = candidate[addr], ""
         if counts[name] > 1:
@@ -323,6 +332,27 @@ def write_symbol_addrs(elf: Elf, path: Path) -> tuple[int, int]:
 
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
     return len(lines), renamed
+
+
+def read_manual_addresses() -> set[int]:
+    """Les adresses que `config/symbol_addrs.txt` nomme à la main.
+
+    C'est la table que le projet écrit et que le désassembleur lit après
+    celle-ci ; ce qu'elle nomme prime, et redonner ici un second nom à la même
+    adresse laisserait celui-ci référencé sans que rien le définisse.
+    """
+    path = CONFIG_DIR / "symbol_addrs.txt"
+    if not path.exists():
+        return set()
+    found = set()
+    for line in path.read_text(encoding="utf-8").splitlines():
+        line = line.split("//", 1)[0].strip()
+        if "=" in line and line.endswith(";"):
+            try:
+                found.add(int(line.split("=", 1)[1].rstrip(";").strip(), 16))
+            except ValueError:
+                continue
+    return found
 
 
 def read_units() -> list[tuple[int, int, str, tuple[int, int] | None]]:
