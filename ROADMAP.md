@@ -29,7 +29,7 @@ décompilation mais à ce qui reste adressé en dur.
 ## Où on en est
 
 ```
-code reconstruit : 6 488 octets sur 2 209 044      0,294 %      34 fonctions
+code reconstruit : 7 216 octets sur 2 209 044      0,327 %      36 fonctions
 unités ouvertes  : 319, 2 209 044 octets          100,0 %    7 791 fonctions
 code mappé       : 100,000 % — chaque octet de code appartient à une unité
 ```
