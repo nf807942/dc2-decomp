@@ -22,7 +22,7 @@ Si `make build` ne dit pas *identique*, rien de ce qui suit n'a de sens : la
 référence est cassée, il faut la réparer d'abord.
 
 **Le découpage est fait.** 7 791 des 7 840 fonctions du binaire vivent déjà dans
-une des 326 unités, et chacune attend dans un `src/*.cpp` sous `INCLUDE_ASM`. Il
+une des 319 unités, et chacune attend dans un `src/*.cpp` sous `INCLUDE_ASM`. Il
 n'y a donc rien à ouvrir : le travail commence directement à une fonction. Les
 sources sont rangées par provenance — `src/game/` pour Level-5, `src/sdk/` pour
 Sony, `src/runtime/` pour Metrowerks et la bibliothèque C, `src/mglib/` pour le

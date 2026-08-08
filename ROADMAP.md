@@ -29,8 +29,8 @@ décompilation mais à ce qui reste adressé en dur.
 ## Où on en est
 
 ```
-code reconstruit : 6 080 octets sur 2 215 100      0,274 %      32 fonctions
-unités ouvertes  : 326, 2 208 852 octets           99,7 %    7 791 fonctions
+code reconstruit : 6 144 octets sur 2 209 044      0,278 %      33 fonctions
+unités ouvertes  : 319, 2 209 044 octets          100,0 %    7 791 fonctions
 code mappé       : 100,000 % — chaque octet de code appartient à une unité
 ```
 
@@ -41,7 +41,7 @@ vectoriels et les données.
 
 ## Jalon 1 — Finir le découpage du texte
 
-**Le compte passe de 72 unités à 326**, et `make build` rend les octets du disque.
+**Le compte passe de 72 unités à 319**, et `make build` rend les octets du disque.
 Chaque octet de code appartient désormais à une unité — le rapport donne 100,000 %
 de code mappé. Il ne reste dehors que les 49 initialiseurs statiques, et ceux-là
 vivent après les données : ce n'est pas du texte.
