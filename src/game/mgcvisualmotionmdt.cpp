@@ -8,7 +8,16 @@
 
 #include "common.h"
 
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", LoadFileSocket__FPcPUi);
+/* Le corps ne rend qu'un code : ni la classe ni les arguments ne sont
+ * déréférencés, donc leur disposition reste à établir. */
+class mgCVisualMotionMDT {
+public:
+    s32 Iam();
+};
+
+s32 LoadFileSocket(char *path, u32 *size) {
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", WriteFileSocket__FPcPUii);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Initialize__18mgCVisualMotionMDTFv);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", CreateVertexWeight__18mgCVisualMotionMDTFPUiiP9mgCMemory);
@@ -29,7 +38,9 @@ INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", CreateExtRenderInfoPacket__1
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", SetBaseBox__18mgCVisualMotionMDTFPfPf);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", CreateBBox__18mgCVisualMotionMDTFPfPfPA4_f);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Copy__18mgCVisualMotionMDTFP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Iam__18mgCVisualMotionMDTFv);
+s32 mgCVisualMotionMDT::Iam(void) {
+    return 3;
+}
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", ezBgmInit__Fv);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", ezBgm__Fii);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", StreamOpenState__6CSoundFv);

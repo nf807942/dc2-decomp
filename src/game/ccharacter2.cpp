@@ -8,6 +8,18 @@
 
 #include "common.h"
 
+/* Le corps ne rend qu'un code : ni la classe ni les arguments ne sont
+ * déréférencés, donc leur disposition reste à établir. */
+class CDACollision {
+public:
+    s32 CheckHit(f32 *point);
+};
+
+/* La pile de l'interpréteur de script d'objet. Les commandes qui ne rendent
+ * qu'un code de retour ne la déréférencent pas : sa disposition reste à
+ * établir. */
+struct SPI_STACK;
+
 INCLUDE_ASM("nonmatchings/game/ccharacter2", GetKeyListPtr__11CCharacter2FPcPi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", GetSeqHeaderPtr__11CCharacter2FPcPi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", DeleteExtMotion__11CCharacter2Fv);
@@ -22,11 +34,17 @@ INCLUDE_ASM("nonmatchings/game/ccharacter2", LoadPackNoLine__11CCharacter2FPUiPc
 INCLUDE_ASM("nonmatchings/game/ccharacter2", LoadChrFile__11CCharacter2FPUiPcP9mgCMemoryP9mgCMemoryP9mgCMemoryiP11CCharacter2i);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", Initialize__11CCharacter2Fv);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", ScanInfoFile__FP11CCharacter2PUiPcP9mgCMemoryP9mgCMemoryP9mgCMemoryiP11CCharacter2i);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", _V2__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", _NAME__FP9SPI_STACKi);
+s32 _V2(SPI_STACK *stack, int argc) {
+    return 1;
+}
+s32 _NAME(SPI_STACK *stack, int argc) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _BODY_SIZE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _SCALE__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", _MATERIAL_ANIME__FP9SPI_STACKi);
+s32 _MATERIAL_ANIME(SPI_STACK *stack, int argc) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _POLY_NUM__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _IMG__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _IMG_END__FP9SPI_STACKi);
@@ -48,14 +66,20 @@ INCLUDE_ASM("nonmatchings/game/ccharacter2", _SEQ_END__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _CLOTH_START__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", __ct__13CDynamicAnimeFv);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _CLOTH__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", _CLOTH_END__FP9SPI_STACKi);
+s32 _CLOTH_END(SPI_STACK *stack, int argc) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _POSITION__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _ROTATION__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _SE_START__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _SE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _SELP__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", _SE_END__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", _MOTION_END__FP9SPI_STACKi);
+s32 _SE_END(SPI_STACK *stack, int argc) {
+    return 1;
+}
+s32 _MOTION_END(SPI_STACK *stack, int argc) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _EFFECT_START__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _EFFECT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _EFFECT_END__FP9SPI_STACKi);
@@ -66,7 +90,9 @@ INCLUDE_ASM("nonmatchings/game/ccharacter2", StepEffect__11CCharacter2Fv);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", DrawEffect__11CCharacter2Fv);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", ScanInfoSkinFile__FP11CCharacter2PUiPcPcP9mgCMemoryi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _SKIN_IMG__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", _SKIN_IMG_END__FP9SPI_STACKi);
+s32 _SKIN_IMG_END(SPI_STACK *stack, int argc) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _SKIN_MODEL__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", CreateChangeFrame__FP10mgLoadDataP8mgCFrame);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _SKIN_MOTION__FP9SPI_STACKi);
@@ -80,7 +106,9 @@ INCLUDE_ASM("nonmatchings/game/ccharacter2", __as__7CObjectFRC7CObject);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", BindPosition__FPfPfff_0017ABD0);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", ResetPosition__13CDynamicAnimeFv);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", Step__13CDynamicAnimeFv);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", CheckHit__12CDACollisionFPf);
+s32 CDACollision::CheckHit(f32 *point) {
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", SetWind__13CDynamicAnimeFfPf);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", ResetWind__13CDynamicAnimeFv);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", SetFloor__13CDynamicAnimeFf);
@@ -113,7 +141,9 @@ INCLUDE_ASM("nonmatchings/game/ccharacter2", DrawSub__13CDynamicAnimeFi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", Copy__13CDynamicAnimeFR13CDynamicAnimeP8mgCFrameP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynFRAME_START__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynFRAME__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", dynFRAME_END__FP9SPI_STACKi);
+s32 dynFRAME_END(SPI_STACK *stack, int argc) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynVERTEX_START__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynVERTEX__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynVERTEX_L__FP9SPI_STACKi);
@@ -123,22 +153,30 @@ INCLUDE_ASM("nonmatchings/game/ccharacter2", dynFixVertex__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynFIX_VERTEX__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynFIX_VERTEX_C__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynFIX_VERTEX_S__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", dynFIX_VERTEX_END__FP9SPI_STACKi);
+s32 dynFIX_VERTEX_END(SPI_STACK *stack, int argc) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", FRAME_POSE_Sub__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynFRAME_POSE_L__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynFRAME_POSE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynDRAW_FRAME__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynBIND_VERTEX_START__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynBIND_VERTEX__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", dynBIND_VERTEX_END__FP9SPI_STACKi);
+s32 dynBIND_VERTEX_END(SPI_STACK *stack, int argc) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynBOUNDING_BOX_START__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynBOUNDING_BOX__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", dynBOUNDING_BOX_END__FP9SPI_STACKi);
+s32 dynBOUNDING_BOX_END(SPI_STACK *stack, int argc) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynCOLLISION_START__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynCOLLISION__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", Initialize__10CDAColPipeFv);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", Initialize__12CDACollisionFv);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", dynCOLLISION_END__FP9SPI_STACKi);
+s32 dynCOLLISION_END(SPI_STACK *stack, int argc) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynGRAVITY__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynK__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynWind__FP9SPI_STACKi);

@@ -68,6 +68,45 @@ def as_int(node: dict, key: str) -> int:
     return int(value) if value else 0
 
 
+def histogram(rows: list[tuple[int, bool, bool]]) -> list[dict]:
+    """Répartit les fonctions par ordre de grandeur de taille.
+
+    Une classe par puissance de deux, la première réunissant tout ce qui tient
+    sous huit octets — en dessous, une fonction n'a pas de corps à reconstruire
+    et les classes se videraient une à une. La répartition dit ce qu'une part en
+    octets cache : reconstruire les petites fonctions avance le compte de
+    fonctions sans peser sur celui des octets, et l'inverse pour les grosses.
+    """
+    buckets: dict[int, dict[str, int]] = {}
+    for size, is_done, is_mapped in rows:
+        # `bit_length() - 1` donne l'exposant : 8 → 3, 15 → 3, 16 → 4.
+        rank = 0 if size < 8 else size.bit_length() - 1
+        bucket = buckets.setdefault(rank, {
+            "total": 0, "done": 0, "mapped": 0,
+            "code": 0, "code_done": 0, "code_mapped": 0})
+        bucket["total"] += 1
+        bucket["code"] += size
+        bucket["done"] += 1 if is_done else 0
+        bucket["code_done"] += size if is_done else 0
+        bucket["mapped"] += 1 if is_mapped else 0
+        bucket["code_mapped"] += size if is_mapped else 0
+
+    if not buckets:
+        return []
+    empty = {"total": 0, "done": 0, "mapped": 0,
+             "code": 0, "code_done": 0, "code_mapped": 0}
+    # Les rangs 1 et 2 n'existent pas : la première classe couvre déjà 0 à 7.
+    # Les rangs vides du milieu se rendent quand même, sans quoi l'axe sauterait
+    # une puissance de deux et les colonnes ne se compareraient plus.
+    ranks = [0] + list(range(3, max(buckets) + 1))
+    return [
+        {"lo": 0 if rank == 0 else 1 << rank,
+         "hi": 1 << ((rank + 1) if rank else 3),
+         **buckets.get(rank, empty)}
+        for rank in ranks
+    ]
+
+
 def compact(report: dict) -> dict:
     """Réduit le rapport à ce que la page affiche.
 
@@ -89,6 +128,10 @@ def compact(report: dict) -> dict:
 
     units = []
     functions_all = []
+    # Taille, identique au disque, mappée : ce que la répartition par ordre de
+    # grandeur demande, sur *toutes* les fonctions — la carte n'en garde que les
+    # plus grosses, et compter depuis elle tairait la moitié du binaire.
+    sizes: list[tuple[int, bool, bool]] = []
     sectors: dict[str, dict[str, float]] = {
         ident: {"code": 0, "done": 0, "mapped": 0, "functions": 0, "functions_done": 0}
         for ident, _n, _p in SECTORS
@@ -128,6 +171,10 @@ def compact(report: dict) -> dict:
             share = 0.0 if name in grafted else measure(fn, "fuzzy_match_percent")
             sector = by_symbol.get(name) or sector_of(name)
             done = round(size * share / 100)
+            # Le verdict se prend de la part exacte : celle que la page reçoit
+            # est arrondie, et un 99,6 % y passerait pour identique.
+            is_done = share >= 99.999
+            sizes.append((size, is_done, unit_mapped))
 
             entry = sectors.setdefault(
                 sector, {"code": 0, "done": 0, "mapped": 0,
@@ -138,7 +185,7 @@ def compact(report: dict) -> dict:
             entry["done"] += done
             entry["mapped"] += size if unit_mapped else 0
             entry["functions"] += 1
-            entry["functions_done"] += 1 if share >= 99.999 else 0
+            entry["functions_done"] += 1 if is_done else 0
 
             function_list.append([name, size, round(share), sector, unit_mapped])
             functions_all.append([name, size, round(share), sector, unit_mapped])
@@ -185,11 +232,16 @@ def compact(report: dict) -> dict:
             "code": total_code,
             "done": total_done,
             "data": as_int(report, "total_data"),
-            "functions": int(measure(report, "total_functions")),
+            # Le compte suit les unités comme celui des octets : le rapport brut
+            # compte le remplissage écarté plus haut, qui n'est pas une fonction.
+            "functions": len(sizes),
+            "functions_done": sum(1 for _s, done, _m in sizes if done),
+            "functions_mapped": sum(1 for _s, _d, mapped in sizes if mapped),
             "units": len(units),
             "mapped": mapped_code,
             "mapped_units": mapped_units,
         },
+        "histogram": histogram(sizes),
         "sectors": [
             {"id": ident, "name": sector_names.get(ident, ident), **sectors[ident]}
             for ident, _n, _p in SECTORS if sectors.get(ident, {}).get("code")

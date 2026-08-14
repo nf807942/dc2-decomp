@@ -8,6 +8,13 @@
 
 #include "common.h"
 
+/* Le corps ne rend qu'un code : ni la classe ni les arguments ne sont
+ * déréférencés, donc leur disposition reste à établir. */
+class CMemoryCardManager {
+public:
+    s32 Convert();
+};
+
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", __ct__18CMemoryCardManagerFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Initialize__18CMemoryCardManagerFP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", InitSaveFileInfoTable__18CMemoryCardManagerFv);
@@ -32,7 +39,9 @@ INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Step__18CMemoryCardManagerFv
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetVersion__18CMemoryCardManagerFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", SearchMcType__18CMemoryCardManagerFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Write__18CMemoryCardManagerFv);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Convert__18CMemoryCardManagerFv);
+s32 CMemoryCardManager::Convert(void) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", MakeDir__18CMemoryCardManagerFi);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetCostumeList__FUliPs);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", SaveToMc__18CMemoryCardManagerFi);

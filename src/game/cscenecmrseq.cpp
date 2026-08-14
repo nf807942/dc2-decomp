@@ -8,21 +8,34 @@
 
 #include "common.h"
 
+/* Le corps ne rend qu'un code : ni la classe ni les arguments ne sont
+ * déréférencés, donc leur disposition reste à établir. */
+struct _SEN_CMR_SEQ;
+struct _SEN_OBJ_SEQ;
+struct CSceneCmrSeq;
+struct CSceneObjSeq;
+
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsMoveAHD2__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsSetSyncObj__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsReleaseSyncObj__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsAHDSlowing__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsAHDKeep__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsAHDReturn__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
+s32 scsAHDReturn(_SEN_CMR_SEQ *sequence, CSceneCmrSeq *owner) {
+    return 2;
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsInitPas__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsSetPasFrm__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsAddPas__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsStartPas__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsPRSlowing__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsPRKeep__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsPRReturn__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
+s32 scsPRReturn(_SEN_CMR_SEQ *sequence, CSceneCmrSeq *owner) {
+    return 2;
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsFadeDelay__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsFadeInit__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
+s32 scsFadeInit(_SEN_CMR_SEQ *sequence, CSceneCmrSeq *owner) {
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsFadeIn__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsFadeOut__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsQuakeDelay__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
@@ -30,7 +43,9 @@ INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsQuake__FP12_SEN_CMR_SEQP12CScen
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsQuake2__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsCharaDelay__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsCharaAttach__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsDummy__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
+s32 scsDummy(_SEN_CMR_SEQ *sequence, CSceneCmrSeq *owner) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", InitSceneCmrSeq__FP12_SEN_CMR_SEQ);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", __ct__12CSceneCmrSeqFv);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", ZeroInitialize__12CSceneCmrSeqFv);
@@ -118,7 +133,9 @@ INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsScaleDelay__FP12_SEN_OBJ_SEQP12
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsSetScale__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsSeDelay__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsSePlay__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsDummy__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
+s32 scsDummy(_SEN_OBJ_SEQ *sequence, CSceneObjSeq *owner) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", InitSceneObjSeq__FP12_SEN_OBJ_SEQ);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", __ct__12CSceneObjSeqFv);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", ZeroInitialize__12CSceneObjSeqFv);

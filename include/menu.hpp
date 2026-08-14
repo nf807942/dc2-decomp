@@ -12,6 +12,11 @@
  * Les menus en tiennent plusieurs, chacun pour une sorte de contenu. */
 class mgCMemory {
 public:
+    /* Réserve un nombre de blocs de seize octets et rend l'index du premier ;
+     * `Align64` recale le sommet sur soixante-quatre. */
+    s32 Alloc(int blocks);
+    void Align64();
+
     u8 unknown_00[0x1C];
     u32 unknown_1C;  /* 0x1C */
     u8 *unknown_20;  /* 0x20 */
@@ -28,6 +33,8 @@ class CMenuPosDataForm {
 public:
     void SetAction(char *action);
     void SetActionCharaPtr(CActionChara *chara, int a, int b);
+    /* Compose un nombre dans le panneau, selon le format donné. */
+    void SetNumber(char *format, int value);
 };
 
 /* Le gestionnaire des panneaux : leur pas d'animation, leur liste d'affichage,
@@ -46,7 +53,20 @@ class CMenuKeyFunc {
 public:
     void SetWakuType(int type);
 
-    u8 unknown_00[0xC2];
+    /* Les touches de la trame : `CheckPushButton` rend les appuis neufs,
+     * `CheckSelectKey` les directions, et `CheckAnalogKey` remplit deux
+     * flottants depuis un manche. */
+    s32 CheckPushButton();
+    s32 CheckSelectKey();
+    void CheckAnalogKey(int stick, f32 *axis);
+
+    u8 unknown_00[0x50];
+    s16 unknown_50;  /* 0x50 */
+    u8 unknown_52[0x70 - 0x52];
+    /* La ligne retenue dans le panneau, dont les menus de mise au point tirent
+     * quel champ ils modifient. */
+    s32 unknown_70;  /* 0x70 */
+    u8 unknown_74[0xC2 - 0x74];
     s16 unknown_C2;  /* 0xC2 */
 };
 
@@ -87,7 +107,11 @@ public:
     /* Les données que chaque mode reçoit à son initialisation ; les commandes
      * en prennent l'adresse. */
     u32 unknown_18;  /* 0x18 */
-    u8 unknown_1C[0x110 - 0x1C];
+    u8 unknown_1C[0x28 - 0x1C];
+    /* Le bloc de textures que le menu occupe, rendu au gestionnaire avant d'en
+     * charger un autre. */
+    s32 unknown_28; /* 0x28 */
+    u8 unknown_2C[0x110 - 0x2C];
     s16 unknown_110; /* 0x110 */
     s16 unknown_112; /* 0x112 */
 };

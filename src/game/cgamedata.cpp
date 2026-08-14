@@ -8,25 +8,48 @@
 
 #include "common.h"
 
+/* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
+ * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
+extern s32 ActiveSaveData;
+extern s32 CaptureMode;
+extern s32 LoopNo;
+extern s32 PlayTimeCountFlag;
+extern s32 SubGameSaveData;
+extern s32 SystemSND_ID;
+
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetDebugFont__Fv);
-INCLUDE_ASM("nonmatchings/game/cgamedata", GetCaptureMode__Fv);
-INCLUDE_ASM("nonmatchings/game/cgamedata", GetSystemSndID__Fv);
+s32 GetCaptureMode(void) {
+    return CaptureMode;
+}
+s32 GetSystemSndID(void) {
+    return SystemSND_ID;
+}
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetMainScene__Fv);
-INCLUDE_ASM("nonmatchings/game/cgamedata", GetSaveData__Fv);
-INCLUDE_ASM("nonmatchings/game/cgamedata", GetSubGameSaveData__Fv);
+s32 GetSaveData(void) {
+    return ActiveSaveData;
+}
+s32 GetSubGameSaveData(void) {
+    return SubGameSaveData;
+}
 INCLUDE_ASM("nonmatchings/game/cgamedata", InitSaveData__Fv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetVramTopAddress__Fv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetMainStack__Fv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", NextLoop__Fi13INIT_LOOP_ARG);
-INCLUDE_ASM("nonmatchings/game/cgamedata", GetNowLoopNo__Fv);
+s32 GetNowLoopNo(void) {
+    return LoopNo;
+}
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetNowInitArg__Fv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", cat_start__Fv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", cat_end__Fv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", SetTextureTable__FiiP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cgamedata", InitPadTable__Fi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", VSyncCallBack__Fi_00192150);
-INCLUDE_ASM("nonmatchings/game/cgamedata", PlayTimeCount__Fi);
-INCLUDE_ASM("nonmatchings/game/cgamedata", GetPlayTimeCountFlag__Fv);
+void PlayTimeCount(s32 value) {
+    PlayTimeCountFlag = value;
+}
+s32 GetPlayTimeCountFlag(void) {
+    return PlayTimeCountFlag;
+}
 INCLUDE_ASM("nonmatchings/game/cgamedata", LanguageChange__FiP1);
 INCLUDE_ASM("nonmatchings/game/cgamedata", MainLoop__Fv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", MenuInit__F13INIT_LOOP_ARG);
@@ -42,7 +65,9 @@ INCLUDE_ASM("nonmatchings/game/cgamedata", demoQuitTimeOut__Fv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", demoAttractInterrupted__Fv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", demoAttractComplete__Fv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", FadeOutForE3__Fv);
-INCLUDE_ASM("nonmatchings/game/cgamedata", TimeLimitCheck__Fv);
+s32 TimeLimitCheck(void) {
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cgamedata", InitPauseMenu__Fi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", PauseMenu__Fv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", LoadGameConfig__FPc);

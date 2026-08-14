@@ -8,6 +8,17 @@
 
 #include "common.h"
 
+struct mgCMemory;
+
+/* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
+ * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
+extern s32 InteriorFlag;
+extern s32 NowMainMapNo;
+extern s32 NowSubMapNo;
+extern mgCMemory *ScriptBuffer_0037E568;
+
+#include "runscript.hpp"
+
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", PaintEditParts__FP8CEditMapiiPf);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", CheckPlaceAlt__FiP8CEditMapPfiPf);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", GetGeoMapLimitHeight__Fi);
@@ -29,14 +40,22 @@ INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", IntersectionPipePoly3__FPfPfPA4_
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", IntersectionSpherePoly3__FPfPA4_fPfPf);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", IntersectionBox__FPfPfP9mgVu0FBOXPA4_f);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", IntersectionBox__FPfPfP9mgVu0FBOXPA4_fPA4_f);
-INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", mt_test__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", GetMainMapNo__Fv);
-INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", GetSubMapNo__Fv);
+s32 mt_test(RS_STACKDATA *stack, int argc) {
+    return 1;
+}
+s32 GetMainMapNo(void) {
+    return NowMainMapNo;
+}
+s32 GetSubMapNo(void) {
+    return NowSubMapNo;
+}
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", ClearSubMapNo__Fv);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", __ct__14MapJumpMapInfoFv);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", SetMainMapInfo__FP14MapJumpMapInfo);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", SetSubMapInfo__FP14MapJumpMapInfo);
-INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", SetScriptBuffer__FP9mgCMemory);
+void SetScriptBuffer(mgCMemory *buffer) {
+    ScriptBuffer_0037E568 = buffer;
+}
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", PreLoadSync__Fv);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", MapJump__FP6CSceneP17SCN_LOADMAP_INFO2i);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", GetLoadMapInfo__FP17SCN_LOADMAP_INFO2i);
@@ -46,7 +65,9 @@ INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", ReloadMapScript__Fv);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", LoadScript__FPc);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", GetOldInteriorMapNo__Fv);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", InitInterior__Fv);
-INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", InInterior__Fv);
+s32 InInterior(void) {
+    return InteriorFlag;
+}
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", SaveBeforeInterior__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", SetInteriorDoorPos__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", GotoInterior__FP6CScenei);

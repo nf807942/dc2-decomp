@@ -8,6 +8,8 @@
 
 #include "common.h"
 
+#include "runscript.hpp"
+
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_SCALE__FP12RS_STACKDATAi_001E2410);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_PALLET_ANIM__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _RESET_PALLET_ANIM__FP12RS_STACKDATAi);
@@ -120,8 +122,12 @@ INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_USER_MONS_ID__FP12RS_STACKDA
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_PRIORITY__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _CREATE_MONSTER__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_CLIP_DIST__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_COLLISION__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_GRAVITY__FP12RS_STACKDATAi);
+s32 _SET_COLLISION(RS_STACKDATA *stack, int argc) {
+    return 0;
+}
+s32 _SET_GRAVITY(RS_STACKDATA *stack, int argc) {
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_ATTRIB__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_SCALE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_MONS_WIDTH__FP12RS_STACKDATAi);

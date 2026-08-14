@@ -143,6 +143,25 @@
   .fn s { text-decoration: none; color: var(--faint); font-variant-numeric: tabular-nums; }
   .fn u { text-decoration: none; width: 6px; height: 6px; border-radius: 50%;
           flex: none; background: var(--none); }
+  /* Histogramme des tailles */
+  .hist { display: flex; align-items: flex-end; gap: .4rem;
+          padding: 1rem .9rem .6rem; border: 1px solid var(--line);
+          border-radius: 10px; background: var(--panel); overflow-x: auto; }
+  /* Une colonne large de moins de quarante-six pixels ne porte plus son
+     compte : « 1 198 » y déborderait sur la voisine. */
+  .hist .col { flex: 1 1 0; min-width: 46px; display: flex; flex-direction: column;
+               align-items: center; justify-content: flex-end; }
+  .hist .val { font-size: .68rem; color: var(--dim); margin-bottom: .25rem;
+               white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .hist .stack { width: 100%; display: flex; flex-direction: column;
+                 justify-content: flex-end; }
+  .hist i { display: block; width: 100%; background: var(--none); }
+  .hist i.done { background: var(--done); }
+  .hist i.map { background: var(--accent); }
+  .hist i.top { border-radius: 3px 3px 0 0; }
+  .hist .lbl { font-size: .7rem; color: var(--faint); margin-top: .35rem;
+               font-family: ui-monospace, Menlo, Consolas, monospace; }
+
   .empty { padding: 2rem; text-align: center; color: var(--dim); }
   footer { margin-top: 3rem; color: var(--faint); font-size: .8rem; }
 </style>
@@ -185,6 +204,24 @@
     <svg id="map" viewBox="0 0 1000 420"
          role="img" aria-label="Carte du code par taille"></svg>
     <div class="legend" id="maplegend"></div>
+  </section>
+
+  <section>
+    <h2>Tailles de fonctions</h2>
+    <p class="hint" id="histhint"></p>
+    <div class="tools">
+      <select id="histset">
+        <option value="total">Toutes les fonctions</option>
+        <option value="done">Fonctions terminées</option>
+        <option value="mapped">Fonctions mappées</option>
+      </select>
+      <select id="histmetric">
+        <option value="count">Compte de fonctions</option>
+        <option value="code">Octets de code</option>
+      </select>
+    </div>
+    <div class="hist" id="hist"></div>
+    <div class="legend" id="histlegend"></div>
   </section>
 
   <section>
@@ -245,7 +282,8 @@ const T = DATA.total;
 const share = T.code ? 100 * T.done / T.code : 0;
 document.getElementById('pct').textContent = pct(share) + ' %';
 document.getElementById('of').textContent =
-  `${fmt(T.done)} sur ${fmt(T.code)} octets de code · ${fmt(T.functions)} fonctions · ${fmt(T.units)} unités`;
+  `${fmt(T.done)} sur ${fmt(T.code)} octets de code · `
+  + `${fmt(T.functions_done)} sur ${fmt(T.functions)} fonctions identiques · ${fmt(T.units)} unités`;
 document.getElementById('mainbar').style.width = Math.max(share, 0) + '%';
 document.getElementById('sub').innerHTML =
   `Dark Chronicle PAL <code>SCES_511.90</code> · section <code>main</code> `
@@ -257,7 +295,8 @@ const mappedShare = T.code ? 100 * T.mapped / T.code : 0;
 document.getElementById('mpct').textContent = pct(mappedShare) + ' %';
 document.getElementById('mof').innerHTML =
   `mappés dans ${fmt(T.mapped_units)} unités de <code>src/</code> · `
-  + `${fmt(T.mapped)} sur ${fmt(T.code)} octets de code`;
+  + `${fmt(T.mapped)} sur ${fmt(T.code)} octets de code · `
+  + `${fmt(T.functions_mapped)} sur ${fmt(T.functions)} fonctions`;
 document.getElementById('mappedbar').style.width = Math.max(mappedShare, 0) + '%';
 
 /* -- secteurs ------------------------------------------------------------ */
@@ -375,6 +414,65 @@ ${t.note} · ${sectorName[t.sector] || t.sector}</title>`
 ['scale', 'mapcolour'].forEach(id =>
   document.getElementById(id).addEventListener('change', drawMap));
 
+/* -- histogramme des tailles --------------------------------------------- */
+/* Chaque classe double la précédente : c'est le seul axe où les 7 837 fonctions
+   se lisent ensemble, la plus grosse valant mille fois la plus petite. */
+const PLOT = 160;  // hauteur de tracé, en pixels
+
+// Une borne se lit en Ki dès le millier : « 1 Ki » tient là où « 1 024 » déborde
+// d'une colonne large de trente-quatre pixels.
+const bound = n => n >= 1024 ? `${n / 1024} Ki` : String(n);
+
+function drawHist() {
+  const set = document.getElementById('histset').value;
+  const metric = document.getElementById('histmetric').value;
+  const byCode = metric === 'code';
+  const field = byCode
+    ? { total: 'code', done: 'code_done', mapped: 'code_mapped' }[set]
+    : { total: 'total', done: 'done', mapped: 'mapped' }[set];
+  const value = b => b[field];
+
+  const max = Math.max(1, ...DATA.histogram.map(value));
+  const totalShown = DATA.histogram.reduce((a, b) => a + value(b), 0);
+
+  document.getElementById('hist').innerHTML = DATA.histogram.map(b => {
+    const v = value(b);
+    const h = v ? Math.max(2, Math.round(PLOT * v / max)) : 0;
+    // Sur la vue d'ensemble, la part déjà identique se pose au pied de la
+    // colonne : le reste à faire se lit alors sans changer de filtre.
+    const done = set === 'total' && v
+      ? Math.min(h, Math.round(h * (byCode ? b.code_done : b.done) / v)) : 0;
+    const rest = h - done;
+    const tint = { total: '', done: ' done', mapped: ' map' }[set];
+    const s = n => n > 1 ? 's' : '';
+    return `<div class="col" title="${fmt(b.lo)} – ${fmt(b.hi - 1)} octets
+${fmt(b.total)} fonction${s(b.total)}, dont ${fmt(b.done)} identique${s(b.done)} et ${fmt(b.mapped)} mappée${s(b.mapped)}
+${fmt(b.code_done)} sur ${fmt(b.code)} octets identiques">
+        <span class="val">${v ? fmt(v) : ''}</span>
+        <span class="stack" style="height:${h}px">
+          ${rest ? `<i class="top${tint}" style="height:${rest}px"></i>` : ''}
+          ${done ? `<i class="done${rest ? '' : ' top'}" style="height:${done}px"></i>` : ''}
+        </span>
+        <span class="lbl">${bound(b.lo)}</span>
+      </div>`;
+  }).join('');
+
+  const what = { total: 'toutes les fonctions', done: 'les fonctions terminées',
+                 mapped: 'les fonctions mappées' }[set];
+  document.getElementById('histhint').textContent =
+    `Une colonne par ordre de grandeur, chacune deux fois plus large que la `
+    + `précédente ; l'étiquette donne la borne basse. Ici ${what} : `
+    + `${fmt(totalShown)} ${byCode ? 'octets' : 'fonctions'}.`;
+
+  document.getElementById('histlegend').innerHTML = set === 'total'
+    ? `<span><i class="swatch" style="background:var(--done)"></i> identique au disque</span>`
+      + `<span><i class="swatch" style="background:var(--none)"></i> reste à reconstruire</span>`
+    : `<span><i class="swatch" style="background:${set === 'done' ? 'var(--done)' : 'var(--accent)'}"></i> ${what}</span>`;
+}
+
+['histset', 'histmetric'].forEach(id =>
+  document.getElementById(id).addEventListener('change', drawHist));
+
 /* -- tableau ------------------------------------------------------------- */
 let sortKey = 'code', expanded = new Set();
 
@@ -443,5 +541,6 @@ document.querySelectorAll('th[data-key]').forEach(th => th.addEventListener('cli
   document.getElementById(id).addEventListener('input', render));
 
 drawMap();
+drawHist();
 render();
 </script>

@@ -8,7 +8,18 @@
 
 #include "common.h"
 
-INCLUDE_ASM("nonmatchings/game/cmap", Iam__4CMapFv);
+class CMap {
+public:
+    s32 Iam();
+};
+
+/* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
+ * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
+extern s32 CMapName;
+
+s32 CMap::Iam(void) {
+    return CMapName;
+}
 INCLUDE_ASM("nonmatchings/game/cmap", Initialize__11CPartsGroupFv);
 INCLUDE_ASM("nonmatchings/game/cmap", Add__11CPartsGroupFP23CList_14PartsGroupData_);
 INCLUDE_ASM("nonmatchings/game/cmap", Initialize__9CMapWaterFv);

@@ -31,7 +31,11 @@ ci-dessus distinguent. `make carve` a découpé le code du jeu de bout en bout ;
 ce qui reste hors des unités est du code de bibliothèque, livré compilé.
 
 La marche à suivre est dans [docs/MARCHE_A_SUIVRE.md](docs/MARCHE_A_SUIVRE.md),
-ce qui reste à faire dans [ROADMAP.md](ROADMAP.md).
+ce qui reste à faire dans [ROADMAP.md](ROADMAP.md). Ce que le sondage du binaire
+a établi se lit dans [docs/IDIOMES_MWCC.md](docs/IDIOMES_MWCC.md) — ce que le
+compilateur fait d'une forme de C — et dans
+[docs/BINAIRE_ET_CHAINE.md](docs/BINAIRE_ET_CHAINE.md) — l'ELF, le découpage et
+la chaîne qui le reconstruit.
 
 ## Prérequis
 

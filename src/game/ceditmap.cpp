@@ -8,7 +8,23 @@
 
 #include "common.h"
 
-INCLUDE_ASM("nonmatchings/game/ceditmap", Iam__8CEditMapFv);
+class CEditMap {
+public:
+    s32 Iam();
+};
+
+/* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
+ * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
+extern s32 CEditMapName;
+
+/* La pile de l'interpréteur de script d'objet. Les commandes qui ne rendent
+ * qu'un code de retour ne la déréférencent pas : sa disposition reste à
+ * établir. */
+struct SPI_STACK;
+
+s32 CEditMap::Iam(void) {
+    return CEditMapName;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap", Initialize__8CEditMapFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap", ClearGrid__8CEditMapFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap", ClearHouse__8CEditMapFv);
@@ -63,11 +79,15 @@ INCLUDE_ASM("nonmatchings/game/ceditmap", CheckWallEditParts__8CEditMapFP14CEdit
 INCLUDE_ASM("nonmatchings/game/ceditmap", Step__8CEditMapFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap", PreDraw__8CEditMapFPf);
 INCLUDE_ASM("nonmatchings/game/ceditmap", DrawSub__8CEditMapFi);
-INCLUDE_ASM("nonmatchings/game/ceditmap", emapEDIT_RIVER__FP9SPI_STACKi);
+s32 emapEDIT_RIVER(SPI_STACK *stack, int argc) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap", emapRIVER_PARTS_NAME__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceditmap", emapMASK_PARTS_NAME__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceditmap", emapWATER_PARTS_NAME__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ceditmap", emapEDIT_RIVER_END__FP9SPI_STACKi);
+s32 emapEDIT_RIVER_END(SPI_STACK *stack, int argc) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap", emapFIX_EPARTS_START__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceditmap", emapFIX_EPARTS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceditmap", emapFIX_EPARTS_END__FP9SPI_STACKi);

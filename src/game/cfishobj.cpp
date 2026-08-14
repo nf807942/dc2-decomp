@@ -8,18 +8,35 @@
 
 #include "common.h"
 
+/* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
+ * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
+extern s32 NowMode;
+extern s32 ShowHari;
+extern s32 ShowTakePhotoCnt;
+extern f32 WaterLevel;
+
 INCLUDE_ASM("nonmatchings/game/cfishobj", NowTakePhoto__Fv);
 INCLUDE_ASM("nonmatchings/game/cfishobj", IsEnablePhotoMenu__Fv);
-INCLUDE_ASM("nonmatchings/game/cfishobj", HidePhoto__Fv);
+void HidePhoto(void) {
+    ShowTakePhotoCnt = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cfishobj", GhostPhotoTiming__Fv);
 INCLUDE_ASM("nonmatchings/game/cfishobj", LoopTakePhoto__FP11CPadControlP15CInventUserData);
 INCLUDE_ASM("nonmatchings/game/cfishobj", DrawTakePhoto__FP17USER_PICTURE_INFOPf);
 INCLUDE_ASM("nonmatchings/game/cfishobj", SetTookPhotoData__FP17USER_PICTURE_INFO);
 INCLUDE_ASM("nonmatchings/game/cfishobj", DrawTakePhotoSystem__FiP15CInventUserData);
-INCLUDE_ASM("nonmatchings/game/cfishobj", SetFishingMode__Fi);
-INCLUDE_ASM("nonmatchings/game/cfishobj", GetFishingMode__Fv);
-INCLUDE_ASM("nonmatchings/game/cfishobj", SetWaterLevel__Ff);
-INCLUDE_ASM("nonmatchings/game/cfishobj", GetWaterLevel__Fv);
+void SetFishingMode(s32 value) {
+    NowMode = value;
+}
+s32 GetFishingMode(void) {
+    return NowMode;
+}
+void SetWaterLevel(f32 value) {
+    WaterLevel = value;
+}
+f32 GetWaterLevel(void) {
+    return WaterLevel;
+}
 INCLUDE_ASM("nonmatchings/game/cfishobj", GetActiveHariObj__Fv);
 INCLUDE_ASM("nonmatchings/game/cfishobj", GetActiveUkiObj__Fv);
 INCLUDE_ASM("nonmatchings/game/cfishobj", ExtendLine__Ff);
@@ -30,7 +47,9 @@ INCLUDE_ASM("nonmatchings/game/cfishobj", GetTriPose__FPA4_fPA4_fPi);
 INCLUDE_ASM("nonmatchings/game/cfishobj", GetHariPos__FPfPf);
 INCLUDE_ASM("nonmatchings/game/cfishobj", GetUkiPos__FPfPf);
 INCLUDE_ASM("nonmatchings/game/cfishobj", PullUki__Ff);
-INCLUDE_ASM("nonmatchings/game/cfishobj", SetShowHari__Fi);
+void SetShowHari(s32 value) {
+    ShowHari = value;
+}
 INCLUDE_ASM("nonmatchings/game/cfishobj", GetShowHari__Fv);
 INCLUDE_ASM("nonmatchings/game/cfishobj", SetLurePose__FP8mgCFrame);
 INCLUDE_ASM("nonmatchings/game/cfishobj", SetUkiPose__FP8mgCFrameP8mgCFrame);

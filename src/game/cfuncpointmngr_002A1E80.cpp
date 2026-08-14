@@ -8,6 +8,10 @@
 
 #include "common.h"
 
+/* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
+ * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
+extern s16 TitleOmakeFlag;
+
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr_002A1E80", UpdateStatus__14CFuncPointMngrFv);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr_002A1E80", Copy__14CFuncPointMngrFR14CFuncPointMngrP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr_002A1E80", Initialize__14CFuncPointMngrFv);
@@ -19,7 +23,9 @@ INCLUDE_ASM("nonmatchings/game/cfuncpointmngr_002A1E80", title_init_rand__Fv);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr_002A1E80", SetSoundMode__Fv);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr_002A1E80", InitTitleOmakeFlag__Fv);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr_002A1E80", TitleOmakeOn__Fv);
-INCLUDE_ASM("nonmatchings/game/cfuncpointmngr_002A1E80", CheckOmakeFlag__Fv);
+s32 CheckOmakeFlag(void) {
+    return TitleOmakeFlag;
+}
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr_002A1E80", InitOmakeEnv__FiP13INIT_LOOP_ARGPi);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr_002A1E80", TitleInit__F13INIT_LOOP_ARG);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr_002A1E80", TitleBootInit__Fv);

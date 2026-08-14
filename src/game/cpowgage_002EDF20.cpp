@@ -8,9 +8,17 @@
 
 #include "common.h"
 
+/* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
+ * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
+extern s32 Sphida;
+
 INCLUDE_ASM("nonmatchings/game/cpowgage_002EDF20", Step__8CPowGageFv);
 INCLUDE_ASM("nonmatchings/game/cpowgage_002EDF20", Draw__8CPowGageFv);
-INCLUDE_ASM("nonmatchings/game/cpowgage_002EDF20", InitSphida__Fv);
-INCLUDE_ASM("nonmatchings/game/cpowgage_002EDF20", GetSphidaPtr__Fv);
+void InitSphida(void) {
+    Sphida = 0;
+}
+s32 GetSphidaPtr(void) {
+    return Sphida;
+}
 INCLUDE_ASM("nonmatchings/game/cpowgage_002EDF20", __ct__7CSphidaFv);
 INCLUDE_ASM("nonmatchings/game/cpowgage_002EDF20", Initialize__7CSphidaFv);

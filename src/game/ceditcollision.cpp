@@ -8,6 +8,10 @@
 
 #include "common.h"
 
+/* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
+ * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
+extern s32 LadderMode;
+
 INCLUDE_ASM("nonmatchings/game/ceditcollision", GetBattleCharaInfo__Fv);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", ConvertItemAttrToCharaAttr__FiPiPi);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", CheckBadStatus__Fi);
@@ -33,13 +37,19 @@ INCLUDE_ASM("nonmatchings/game/ceditcollision", AquaFishFatigueClear__Fv);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", DebugGetItem__FP16CUserDataManageri);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", InitCharaViewerMain__F13INIT_LOOP_ARG);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", FinishCharaVieweMain__Fv);
-INCLUDE_ASM("nonmatchings/game/ceditcollision", LoopCharaViewerMain__Fv);
+s32 LoopCharaViewerMain(void) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceditcollision", InitTextuerViewerMain__F13INIT_LOOP_ARG);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", FinishTextuerVieweMain__Fv);
-INCLUDE_ASM("nonmatchings/game/ceditcollision", LoopTextuerViewerMain__Fv);
+s32 LoopTextuerViewerMain(void) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceditcollision", MapViewInit__F13INIT_LOOP_ARG);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", MapViewExit__Fv);
-INCLUDE_ASM("nonmatchings/game/ceditcollision", MapViewLoop__Fv);
+s32 MapViewLoop(void) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceditcollision", __ct__10CWaveTableFv);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", __dt__10CWaveTableFv);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", CreateTexture__10CWaveTableFP10mgCTexture);
@@ -71,4 +81,6 @@ INCLUDE_ASM("nonmatchings/game/ceditcollision", InitEyeCamera__FP11CCharacter2P1
 INCLUDE_ASM("nonmatchings/game/ceditcollision", ResetViewMode__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", EyeCamera__FP9mgCCameraP11CCharacter2i_001A77D0);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", InitLadder__FiP6CSceneP15CSceneEventData);
-INCLUDE_ASM("nonmatchings/game/ceditcollision", EndLadder__Fv);
+void EndLadder(void) {
+    LadderMode = 0;
+}

@@ -8,6 +8,22 @@
 
 #include "common.h"
 
+/* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
+ * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
+extern u8 isStarted;
+
+/* Les corps ne rendent qu'un code : ni la classe ni les arguments ne sont
+ * déréférencés, donc leur disposition reste à établir. */
+
+struct sceMpeg;
+struct sceMpegCbDataError;
+
+class CMovie {
+public:
+    s32 IsStarted();
+    s32 GetViBufTagSize();
+};
+
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", MenuNPCQuestViewInit__FP9mgCMemoryPii);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", MenuNPCQuestViewKey__Fv);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", MenuNPCQuestViewDraw__Fv);
@@ -45,10 +61,14 @@ INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", Play__6CMovieFPc);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", SwitchThread__6CMovieFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", Term__6CMovieFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", EndCheck__6CMovieFv);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", IsStarted__6CMovieFv);
+s32 CMovie::IsStarted(void) {
+    return isStarted;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", GetVoBufDataSize__6CMovieFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", GetViBufDataSize__6CMovieFv);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", GetViBufTagSize__6CMovieFv);
+s32 CMovie::GetViBufTagSize(void) {
+    return 0x1010;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", GetMpegWorkSize__6CMovieFii);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", GetReadBufSize__6CMovieFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", GetTagProgSize__6CMovieFii);
@@ -59,7 +79,9 @@ INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", videoDecFlush__6CMovieFP8Vide
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", defMain__FPv);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", videoDecMain__FPv);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", stepMain__FPv);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", mpegError__FP7sceMpegP18sceMpegCbDataErrorPv);
+s32 mpegError(sceMpeg *mpeg, sceMpegCbDataError *error, void *user) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", mpegNodata__FP7sceMpegP13sceMpegCbDataPv);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", mpegStopDMA__FP7sceMpegP13sceMpegCbDataPv);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", mpegRestartDMA__FP7sceMpegP13sceMpegCbDataPv);

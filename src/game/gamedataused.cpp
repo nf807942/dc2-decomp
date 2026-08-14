@@ -4,7 +4,12 @@
  */
 
 #include "common.h"
+
 #include "gamedataused.hpp"
+
+/* La globale que l'accesseur sert. Sa taille déclarée est celle que le découpage
+ * lui donne, et c'est elle qui décide du `%gp_rel`. */
+extern CGameDataUsed *FishGamePreEquip;
 
 INCLUDE_ASM("nonmatchings/game/gamedataused", CheckFill__11COMMON_GAGEFv);
 INCLUDE_ASM("nonmatchings/game/gamedataused", GetRate__11COMMON_GAGEFv);
@@ -13,7 +18,9 @@ INCLUDE_ASM("nonmatchings/game/gamedataused", AddPoint__11COMMON_GAGEFf);
 INCLUDE_ASM("nonmatchings/game/gamedataused", AddRate__11COMMON_GAGEFf);
 INCLUDE_ASM("nonmatchings/game/gamedataused", GetCommonGageRate__FP11COMMON_GAGE);
 INCLUDE_ASM("nonmatchings/game/gamedataused", CalcBreedFishParam__FP14BREEDFISH_USED);
-INCLUDE_ASM("nonmatchings/game/gamedataused", SetFishingGamePreEquip__FP13CGameDataUsed);
+void SetFishingGamePreEquip(CGameDataUsed *data) {
+    FishGamePreEquip = data;
+}
 INCLUDE_ASM("nonmatchings/game/gamedataused", ReEquipFishingGameWeapon__Fv);
 INCLUDE_ASM("nonmatchings/game/gamedataused", CheckFishingWeapon__FP13CGameDataUsed);
 INCLUDE_ASM("nonmatchings/game/gamedataused", GameDataSwap__FP13CGameDataUsedP13CGameDataUsedi);

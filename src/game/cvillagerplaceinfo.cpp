@@ -8,6 +8,11 @@
 
 #include "common.h"
 
+/* La pile de l'interpréteur de script d'objet. Les commandes qui ne rendent
+ * qu'un code de retour ne la déréférencent pas : sa disposition reste à
+ * établir. */
+struct SPI_STACK;
+
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", sgSystemDrawBuggy__FP11SubGameInfo);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", CharaControl__FP6CSceneP11CPadControl_00319DB0);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", InitBuggy__FP6CScene);
@@ -54,7 +59,9 @@ INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", niNPC__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", niNPC_END__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", niPROGRESS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", niPROGRESS_END__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", niPLACE__FP9SPI_STACKi);
+s32 niPLACE(SPI_STACK *stack, int argc) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", niNOON_PLACE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", niNIGHT_PLACE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", niNPC_INFO_NUM__FP9SPI_STACKi);

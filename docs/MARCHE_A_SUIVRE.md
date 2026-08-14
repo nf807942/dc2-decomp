@@ -50,6 +50,38 @@ rentable. Deux conseils qui valent plus que la taille :
 - **commencer par la plus petite de l'unité**. Elle apprend les conventions du
   fichier pour un coût minime.
 
+### Les petites, par lots
+
+Une autre entrée vaut mieux que la page de rapport quand on cherche du volume :
+
+```sh
+python3 scripts/diff/inventaire_petites.py       # jusqu'à 50 octets
+python3 scripts/diff/inventaire_petites.py 8     # les corps d'une instruction
+```
+
+L'outil compte les fonctions de `src/game/` encore greffées et **classe celles de
+huit octets par forme** — l'instruction unique de leur corps dit à elle seule ce
+que la source doit être. Le tas devient alors une poignée de lots uniformes qu'on
+écrit d'un trait, et c'est bien plus rentable qu'une fonction à la fois : cent
+cinquante-six fonctions sont entrées en trois passes, toutes à 100 % du premier
+coup, dont soixante-trois commandes de script `s32 _NOM(RS_STACKDATA *, int)` qui
+ne rendent qu'un code, trente-six autres retours constants et cinquante-sept
+accesseurs de globales.
+
+Trois choses à savoir avant de lancer un lot :
+
+- **la vérification se fait d'un coup.** `make build` couvre les centaines de
+  fonctions du lot en une passe et nomme les plages qui divergent ; `make diff`
+  ne sert qu'à celles-là ;
+- **les seuls achoppements sont des erreurs de compilation**, pas des écarts
+  d'octets : un pointeur de fonction déclaré `s32`, une classe dont la méthode
+  n'est pas déclarée, une globale de type pointeur, un `#include` placé après ce
+  qui l'emploie. Elles se lisent dans la sortie de MWCC et se corrigent une par
+  une ;
+- **un retour constant ne réclame aucune disposition.** `class X { public: s32
+  Foo(); };` suffit, et rien n'oblige à établir la classe entière — ce qui n'est
+  pas vrai des accesseurs de champs, qui demandent l'offset et la largeur.
+
 ---
 
 ## 2. Lire, puis demander un premier jet

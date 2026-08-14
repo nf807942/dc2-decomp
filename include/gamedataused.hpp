@@ -21,6 +21,11 @@ struct COMMON_GAGE {
 class CGameDataUsed {
 public:
     int IsLevelUp();
+    /* Le mangling les range dans la classe : `AddFusionPoint__13CGameDataUsedFi`
+     * est `CGameDataUsed::AddFusionPoint(int)`, non une fonction libre. */
+    void AddFusionPoint(int points);
+    void LevelUp();
+    int IsFishingRod();
 
     /* Le genre de l'objet. `GetLevel`, `IsLevelUp` et leurs pareilles s'y
      * réfèrent avant tout autre champ. */
@@ -41,6 +46,12 @@ public:
     COMMON_GAGE experience;
     /* Le niveau des objets de genre 3, borné à 99. */
     s16 level;
+    /* Les dix caractéristiques que l'écran de mise au point recopie depuis la
+     * table des armes, cinq par cinq. */
+    s16 status[10];   /* 0x22 */
+    u8 unknown_36[2];
+    /* Les attributs de l'arme, un bit chacun. */
+    u32 attribute;    /* 0x38 */
 };
 
 #endif /* GAMEDATAUSED_HPP */

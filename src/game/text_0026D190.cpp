@@ -8,11 +8,15 @@
 
 #include "common.h"
 
+#include "runscript.hpp"
+
 INCLUDE_ASM("nonmatchings/game/text_0026D190", _CHECK_INVENT_ITEM__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026D190", _SET_AI__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026D190", _CHECK_INVENT_PHOTO__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026D190", _GET_PHOTO_NUM__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_0026D190", _SET_CONTENTS_ETC__FP12RS_STACKDATAi);
+s32 _SET_CONTENTS_ETC(RS_STACKDATA *stack, int argc) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_0026D190", _SET_STATUS__FP12RS_STACKDATAi_0026D370);
 INCLUDE_ASM("nonmatchings/game/text_0026D190", _GOTO_SUBGAME__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026D190", _SET_GYORACE_ETC__FP12RS_STACKDATAi);

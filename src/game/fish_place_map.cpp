@@ -8,6 +8,12 @@
 
 #include "common.h"
 
+/* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
+ * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
+extern s32 ItemOver;
+extern s32 MenuOpenFlag;
+extern s32 SubGame;
+
 INCLUDE_ASM("nonmatchings/game/fish_place_map", CastingLoop__FP6CSceneP11CPadControl);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", InitUkiWait__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", ResetUkiCamera__FP14CCameraControl);
@@ -39,12 +45,20 @@ INCLUDE_ASM("nonmatchings/game/fish_place_map", fpFISH_MAP_END__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", LoadFishPlaceData__FPciP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", InitSubGame__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", SubGameRunning__Fv);
-INCLUDE_ASM("nonmatchings/game/fish_place_map", GetSubGameNo__Fv);
+s32 GetSubGameNo(void) {
+    return SubGame;
+}
 INCLUDE_ASM("nonmatchings/game/fish_place_map", GetNowSubGameInfo__Fv);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", sgMenuOpenEnable__Fv);
-INCLUDE_ASM("nonmatchings/game/fish_place_map", sgSetMenuOpenEnableFlag__Fi);
-INCLUDE_ASM("nonmatchings/game/fish_place_map", sgGetItemOver__Fv);
-INCLUDE_ASM("nonmatchings/game/fish_place_map", sgGetItemOverReset__Fv);
+void sgSetMenuOpenEnableFlag(s32 value) {
+    MenuOpenFlag = value;
+}
+s32 sgGetItemOver(void) {
+    return ItemOver;
+}
+void sgGetItemOverReset(void) {
+    ItemOver = 0;
+}
 INCLUDE_ASM("nonmatchings/game/fish_place_map", sgGetItemOverFlagOn__Fv);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", sgInitSubGame__FiP11SubGameInfo);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", sgLoopSubGame__Fv);

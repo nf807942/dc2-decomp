@@ -8,6 +8,8 @@
 
 #include "common.h"
 
+#include "runscript.hpp"
+
 INCLUDE_ASM("nonmatchings/game/cpowgage", _SPT_VAN_SET_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _SPT_VAN_SET_ROT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _SPT_VAN_SET_COL__FP12RS_STACKDATAi);
@@ -16,7 +18,9 @@ INCLUDE_ASM("nonmatchings/game/cpowgage", _SPT_ADD_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _SPT_ADD_ROTZ__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _SPT_ADD_COLOR__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _SPT_WORLD_ROT__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/cpowgage", _SPT_SET_LIFE__FP12RS_STACKDATAi);
+s32 _SPT_SET_LIFE(RS_STACKDATA *stack, int argc) {
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cpowgage", _SPT_SET_VELO_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _SPT_SET_ACC_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _SPT_SET_VELO_ROTZ__FP12RS_STACKDATAi);
@@ -46,9 +50,15 @@ INCLUDE_ASM("nonmatchings/game/cpowgage", _MON_SE_STOP2__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _SET_LIGHT_FLAG__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _SCN_GET_CHR_ENTOBJ_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _CREATE_DAMAGE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/cpowgage", _DELETE_DAMAGE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/cpowgage", _DMG_SET_POS__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/cpowgage", _DMG_SET_FRONT_VECT__FP12RS_STACKDATAi);
+s32 _DELETE_DAMAGE(RS_STACKDATA *stack, int argc) {
+    return 0;
+}
+s32 _DMG_SET_POS(RS_STACKDATA *stack, int argc) {
+    return 0;
+}
+s32 _DMG_SET_FRONT_VECT(RS_STACKDATA *stack, int argc) {
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cpowgage", _DMG_SET_DAMAGE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _COLPRIM_CREATE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _COLPRIM_SET_COORD__FP12RS_STACKDATAi);

@@ -8,21 +8,43 @@
 
 #include "common.h"
 
+/* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
+ * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
+extern s8 GyoRaceAquariumNo;
+extern s8 GyoRaceClass;
+extern s8 GyoRaceProgressNum;
+extern s8 GyoRaceRankingData;
+extern s32 GyoraceFish;
+
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", MenuAquaInit__FP9mgCMemoryPii);
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", MenuAquaKey__Fv);
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", MenuAquaDraw__Fv);
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", MenuGyoraceFishSelInit__FP9mgCMemoryPii);
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", MenuGyoraceFishSelKey__Fv);
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", MenuGyoraceFishSelDraw__Fv);
-INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", GetGyoRaceFish__Fv);
-INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", SetGyoRaceAquariumNo__Fi);
-INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", GetGyoRaceAquariumNo__Fv);
-INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", SetGyoRaceClass__Fi);
-INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", GetGyoRaceClass__Fv);
+s32 GetGyoRaceFish(void) {
+    return GyoraceFish;
+}
+void SetGyoRaceAquariumNo(s32 value) {
+    GyoRaceAquariumNo = value;
+}
+s32 GetGyoRaceAquariumNo(void) {
+    return GyoRaceAquariumNo;
+}
+void SetGyoRaceClass(s32 value) {
+    GyoRaceClass = value;
+}
+s32 GetGyoRaceClass(void) {
+    return GyoRaceClass;
+}
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", SetGyoRaceNo__Fi);
-INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", GetGyoRaceNo__Fv);
+s32 GetGyoRaceNo(void) {
+    return GyoRaceProgressNum;
+}
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", SetGyoRaceRanking__Fi);
-INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", GetGyoRaceRanking__Fv);
+s32 GetGyoRaceRanking(void) {
+    return GyoRaceRankingData;
+}
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", _GYORACE_LISTNUM__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", _GYORACE_DATA__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", LoadData__16CGyoraceFishDataFP9mgCMemoryP1);

@@ -8,11 +8,17 @@
 
 #include "common.h"
 
+/* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
+ * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
+extern s32 LockChara;
+
 INCLUDE_ASM("nonmatchings/game/cameractrlparam", LightingEdit__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/cameractrlparam", tagGyoFish__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cameractrlparam", LoadGyorace__Fv);
 INCLUDE_ASM("nonmatchings/game/cameractrlparam", GetUserData__Fv_001AAEF0);
-INCLUDE_ASM("nonmatchings/game/cameractrlparam", InitLockCharaCtrl__Fv);
+void InitLockCharaCtrl(void) {
+    LockChara = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cameractrlparam", LockCharaCtrl__Fv);
 INCLUDE_ASM("nonmatchings/game/cameractrlparam", UnLockCharaCtrl__Fv);
 INCLUDE_ASM("nonmatchings/game/cameractrlparam", IsEditMode__Fv);

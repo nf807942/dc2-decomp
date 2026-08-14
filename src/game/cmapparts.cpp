@@ -8,6 +8,23 @@
 
 #include "common.h"
 
+/* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
+ * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
+extern s32 mapAddMode;
+
+/* Le corps ne rend qu'un code : ni la classe ni les arguments ne sont
+ * déréférencés, donc leur disposition reste à établir. */
+class CObject {
+public:
+    s32 Draw();
+    s32 DrawDirect();
+};
+
+/* La pile de l'interpréteur de script d'objet. Les commandes qui ne rendent
+ * qu'un code de retour ne la déréférencent pas : sa disposition reste à
+ * établir. */
+struct SPI_STACK;
+
 INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__15CMapTreasureBoxFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetTrBox__4CMapFi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", DeleteTrBox__4CMapFiP12CMapFlagData);
@@ -16,8 +33,12 @@ INCLUDE_ASM("nonmatchings/game/cmapparts", LoadData__4CMapFPUiPUiPiP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cmapparts", CheckFuncEvent__FP10CFuncPointPfiP12MapEventInfoPf);
 INCLUDE_ASM("nonmatchings/game/cmapparts", Draw__4CMapFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", DrawDirect__4CMapFv);
-INCLUDE_ASM("nonmatchings/game/cmapparts", Draw__7CObjectFv);
-INCLUDE_ASM("nonmatchings/game/cmapparts", DrawDirect__7CObjectFv);
+s32 CObject::Draw(void) {
+    return 0;
+}
+s32 CObject::DrawDirect(void) {
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", Show__7CObjectFi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", SetFarDist__7CObjectFf);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetFarDist__7CObjectFv);
@@ -42,8 +63,12 @@ INCLUDE_ASM("nonmatchings/game/cmapparts", GetActiveLightNo__4CMapFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetActiveLightNo__8CMapInfoFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetLightInfo__4CMapFP16CMapLightingInfoPfi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mgAbs__Ff);
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapDummy__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", IsAddMode__Fv);
+s32 mapDummy(SPI_STACK *stack, int argc) {
+    return 1;
+}
+s32 IsAddMode(void) {
+    return mapAddMode;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPARTS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", pGetData__17CList_9CMapParts_Fv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__17CList_9CMapParts_Fv);
@@ -79,7 +104,9 @@ INCLUDE_ASM("nonmatchings/game/cmapparts", Initialize__13PieceMaterialFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE_MATERIAL__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetMaterial__8mgCFrameFi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetFrame__12CObjectFrameFv);
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE_MATERIAL_END__FP9SPI_STACKi);
+s32 mapPIECE_MATERIAL_END(SPI_STACK *stack, int argc) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE_COL_TYPE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE_TIME__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE_END__FP9SPI_STACKi);
@@ -92,7 +119,9 @@ INCLUDE_ASM("nonmatchings/game/cmapparts", mapPARTS_POS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPARTS_ROT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPARTS_SCALE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapMAP_PARTS_END__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", map_MAP_INFO_TOP__FP9SPI_STACKi);
+s32 map_MAP_INFO_TOP(SPI_STACK *stack, int argc) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapCAMERA_INFO__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__11CCameraInfoFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__15CCameraDrawInfoFv);
@@ -132,11 +161,15 @@ INCLUDE_ASM("nonmatchings/game/cmapparts", cfgFUNC_DATA__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", cfgFUNC_EVENT_DATA__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", cfgFUNC_DATA_END__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", cfgWATER_SURFACE_NUM__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", cfgWATER_SURFACE_START__FP9SPI_STACKi);
+s32 cfgWATER_SURFACE_START(SPI_STACK *stack, int argc) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", cfgWATER_VERTEX__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", cfgWATER_POS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", cfgWATER_PARAM__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", cfgWATER_SHAKE__FP9SPI_STACKi);
+s32 cfgWATER_SHAKE(SPI_STACK *stack, int argc) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", cfgWATER_SURFACE_END__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", cfgWATER_DRAW_NUM__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__9CMapWaterFv);

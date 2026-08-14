@@ -14,7 +14,9 @@ INCLUDE_ASM("nonmatchings/game/ceditinfomngr", CalcPushAlpha__FiPf);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", TitleMCCheckInit__Fi);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", TitleMCCheckKey__Fv);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", TitleMCCheckDraw__Fv);
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", DCTitleStep__Fi);
+s32 DCTitleStep(s32 phase) {
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", TitleCopyRightInit__Fv);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", TitleCopyRightStep__Fv);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", TitleCopyRightDraw__Fv);
@@ -30,7 +32,9 @@ INCLUDE_ASM("nonmatchings/game/ceditinfomngr", GetSelectLanguageNo__Fv);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", TitleLangSelDraw__Fv);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", InitSoundViewerMain__F13INIT_LOOP_ARG);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", FinishSoundVieweMain__Fv);
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", LoopSoundViewerMain__Fv);
+s32 LoopSoundViewerMain(void) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", Initialize__13CEditInfoMngrFv);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", SetePartsInfoTable__13CEditInfoMngrFP14CEditPartsInfoi);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", SeteFixPartsTable__13CEditInfoMngrFP10ePlaceDatai);

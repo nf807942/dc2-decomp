@@ -8,6 +8,12 @@
 
 #include "common.h"
 
+/* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
+ * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
+extern s32 CtrlLockFlag;
+extern s32 FontTex_2_Buff;
+extern s32 PartsInfoID;
+
 INCLUDE_ASM("nonmatchings/game/cfont", CheckKanjiFont__5CFontFi);
 INCLUDE_ASM("nonmatchings/game/cfont", CheckHalfFont__5CFontFi);
 INCLUDE_ASM("nonmatchings/game/cfont", SetDrawSize__5CFontFii);
@@ -58,8 +64,12 @@ INCLUDE_ASM("nonmatchings/game/cfont", DrawDQFukidashi__FP11mgCDrawPrim4RECTiiP1
 INCLUDE_ASM("nonmatchings/game/cfont", LoadGaijiImg__Fv);
 INCLUDE_ASM("nonmatchings/game/cfont", GetGaijiImgPtr__Fv);
 INCLUDE_ASM("nonmatchings/game/cfont", LoadFontTex2Img__Fv);
-INCLUDE_ASM("nonmatchings/game/cfont", GetFontTex2ImgPtr__Fv);
-INCLUDE_ASM("nonmatchings/game/cfont", CheckControl__Fv);
+s32 GetFontTex2ImgPtr(void) {
+    return FontTex_2_Buff;
+}
+s32 CheckControl(void) {
+    return CtrlLockFlag;
+}
 INCLUDE_ASM("nonmatchings/game/cfont", EditModeControlLock__Fv);
 INCLUDE_ASM("nonmatchings/game/cfont", EditModeControlUnLock__Fv);
 INCLUDE_ASM("nonmatchings/game/cfont", SetHelpMes__Fiii);
@@ -77,7 +87,9 @@ INCLUDE_ASM("nonmatchings/game/cfont", EditStartPlaceEffect__FP10CEditPartsPf);
 INCLUDE_ASM("nonmatchings/game/cfont", EditEndPlaceEffect__Fv);
 INCLUDE_ASM("nonmatchings/game/cfont", EditPreMenuAnime__Fi);
 INCLUDE_ASM("nonmatchings/game/cfont", LoadEditCursor__FP9mgCMemoryi);
-INCLUDE_ASM("nonmatchings/game/cfont", GetSelPartsInfoID__Fv);
+s32 GetSelPartsInfoID(void) {
+    return PartsInfoID;
+}
 INCLUDE_ASM("nonmatchings/game/cfont", ClearEditStepCnt__Fv);
 INCLUDE_ASM("nonmatchings/game/cfont", ClearUndoFlag__Fv);
 INCLUDE_ASM("nonmatchings/game/cfont", ClearEditFlag__Fv);

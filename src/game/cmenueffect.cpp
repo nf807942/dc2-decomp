@@ -8,6 +8,13 @@
 
 #include "common.h"
 
+/* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
+ * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
+extern s32 MenuEtcSpecialCode;
+extern s8 MenuLoopType;
+extern s32 MenuPrim;
+extern s32 mgFrameRate;
+
 INCLUDE_ASM("nonmatchings/game/cmenueffect", Initialize__11CMenuEffectFv);
 INCLUDE_ASM("nonmatchings/game/cmenueffect", PresetEffect__11CMenuEffectFP9mgCMemoryP10mgCTextureiPi);
 INCLUDE_ASM("nonmatchings/game/cmenueffect", SetMemory__11CMenuEffectFP9mgCMemory);
@@ -21,7 +28,9 @@ INCLUDE_ASM("nonmatchings/game/cmenueffect", Draw__11CMenuEffectFv);
 INCLUDE_ASM("nonmatchings/game/cmenueffect", PrimQuad_f___FP11mgCDrawPrim9mgRect_f_9mgRect_i_);
 INCLUDE_ASM("nonmatchings/game/cmenueffect", PrimQuad_i___FP11mgCDrawPrim9mgRect_i_9mgRect_i_);
 INCLUDE_ASM("nonmatchings/game/cmenueffect", MenuScreenBlackBeltSet__Fi);
-INCLUDE_ASM("nonmatchings/game/cmenueffect", GetMenuLoopType__Fv);
+s32 GetMenuLoopType(void) {
+    return MenuLoopType;
+}
 INCLUDE_ASM("nonmatchings/game/cmenueffect", CheckTrushMenu__Fv);
 INCLUDE_ASM("nonmatchings/game/cmenueffect", menu_GetSaveDataDungeon__Fv);
 INCLUDE_ASM("nonmatchings/game/cmenueffect", menu_GetBattleAreaScene__Fv);
@@ -29,12 +38,20 @@ INCLUDE_ASM("nonmatchings/game/cmenueffect", GetMenuSysData__Fv);
 INCLUDE_ASM("nonmatchings/game/cmenueffect", CheckBitFlagMenu__Fi);
 INCLUDE_ASM("nonmatchings/game/cmenueffect", CheckShortFlagMenu__Fi);
 INCLUDE_ASM("nonmatchings/game/cmenueffect", CheckStartChapter8__FP9CSaveData);
-INCLUDE_ASM("nonmatchings/game/cmenueffect", InitMenuEtcSpecialFlag__Fv);
+void InitMenuEtcSpecialFlag(void) {
+    MenuEtcSpecialCode = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cmenueffect", SetMenuEtcFlag__Fi);
-INCLUDE_ASM("nonmatchings/game/cmenueffect", GetMenuEtcFlag__Fv);
-INCLUDE_ASM("nonmatchings/game/cmenueffect", GetMenuPrim__Fv);
+s32 GetMenuEtcFlag(void) {
+    return MenuEtcSpecialCode;
+}
+s32 GetMenuPrim(void) {
+    return MenuPrim;
+}
 INCLUDE_ASM("nonmatchings/game/cmenueffect", MenuMainImageDataEnter__Fi);
-INCLUDE_ASM("nonmatchings/game/cmenueffect", SetMenuFrameRate__Fi);
+void SetMenuFrameRate(s32 value) {
+    mgFrameRate = value;
+}
 INCLUDE_ASM("nonmatchings/game/cmenueffect", SetMenuKeyCtrlEnv__Fi);
 INCLUDE_ASM("nonmatchings/game/cmenueffect", DisablePadReset__Fi);
 INCLUDE_ASM("nonmatchings/game/cmenueffect", MenuMainInit__FP13MENU_INIT_ARG);

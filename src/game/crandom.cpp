@@ -29,18 +29,34 @@ INCLUDE_ASM("nonmatchings/game/crandom", FutureMapSelect__Fv);
 INCLUDE_ASM("nonmatchings/game/crandom", InitHDDMenu__FP1);
 INCLUDE_ASM("nonmatchings/game/crandom", HDDMenuLoop__Fv);
 INCLUDE_ASM("nonmatchings/game/crandom", EmergencyMessage__Fi);
-INCLUDE_ASM("nonmatchings/game/crandom", HddConectCheck__FPi);
-INCLUDE_ASM("nonmatchings/game/crandom", CheckAppInstall__Fv);
-INCLUDE_ASM("nonmatchings/game/crandom", CheckInstallSpace__Fv);
-INCLUDE_ASM("nonmatchings/game/crandom", MountHDDFileSystem__Fv);
-INCLUDE_ASM("nonmatchings/game/crandom", UmountHDDFileSystem__Fv);
+s32 HddConectCheck(s32 *state) {
+    return 0;
+}
+s32 CheckAppInstall(void) {
+    return 0;
+}
+s32 CheckInstallSpace(void) {
+    return 0;
+}
+s32 MountHDDFileSystem(void) {
+    return 0;
+}
+s32 UmountHDDFileSystem(void) {
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/crandom", CreateInstallThread__FP1i);
 INCLUDE_ASM("nonmatchings/game/crandom", DeleteInstallThread__Fv);
-INCLUDE_ASM("nonmatchings/game/crandom", StepInstallThread__Fv);
-INCLUDE_ASM("nonmatchings/game/crandom", InstallPause__Fv);
+s32 StepInstallThread(void) {
+    return 0;
+}
+s32 InstallPause(void) {
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/crandom", InstallCancel__Fv);
 INCLUDE_ASM("nonmatchings/game/crandom", GetInstallProgress__Fv);
-INCLUDE_ASM("nonmatchings/game/crandom", UninstallApp__Fv);
+s32 UninstallApp(void) {
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/crandom", search_txt__Fc);
 INCLUDE_ASM("nonmatchings/game/crandom", ConvLongToTxt__FUlPc);
 INCLUDE_ASM("nonmatchings/game/crandom", ConvTxtToLong__FPcPUl);

@@ -8,6 +8,11 @@
 
 #include "common.h"
 
+/* La pile de l'interpréteur de script d'objet. Les commandes qui ne rendent
+ * qu'un code de retour ne la déréférencent pas : sa disposition reste à
+ * établir. */
+struct SPI_STACK;
+
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_TEXDATA_CLEAR__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_FORM_CLEAR__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_TEXDATA_MALLOC__FP9SPI_STACKi);
@@ -25,7 +30,9 @@ INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_FORM_DTYPE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_FORM_MTYPE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_FORM_DRAWFLG__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_FORM_VIBECNT__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_FORM_SETEND__FP9SPI_STACKi);
+s32 _MENU_FORM_SETEND(SPI_STACK *stack, int argc) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_FORM_MOVERATE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_FORM_PUTXY__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_FORM_RGBA__FP9SPI_STACKi);

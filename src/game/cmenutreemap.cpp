@@ -8,6 +8,18 @@
 
 #include "common.h"
 
+/* Le corps ne rend qu'un code : ni la classe ni les arguments ne sont
+ * déréférencés, donc leur disposition reste à établir. */
+struct ITEMCMD_RET_PARA;
+
+class CBaseMenuClass {
+public:
+    s32 IsAskExtend(s32 a, s32 b);
+    s32 IsCreateObject(s32 a, s32 b);
+    s32 IsMakeObject(s32 a, s32 b);
+    s32 ItemCmdAfter(s32 command, ITEMCMD_RET_PARA *para);
+};
+
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", CheckDngTreeMapFuncType__Fv);
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", MakeDngTreeMapJumpNo__FiiPiPi);
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", InitEnd__12CMenuTreeMapFv);
@@ -19,10 +31,18 @@ INCLUDE_ASM("nonmatchings/game/cmenutreemap", DngTreeMapInit__FP9mgCMemoryPiii);
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", Init__6ClsMesFv);
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", DngTreeMapKey__Fv);
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", DngTreeMapDraw__Fv);
-INCLUDE_ASM("nonmatchings/game/cmenutreemap", IsCreateObject__14CBaseMenuClassFii);
-INCLUDE_ASM("nonmatchings/game/cmenutreemap", IsMakeObject__14CBaseMenuClassFii);
-INCLUDE_ASM("nonmatchings/game/cmenutreemap", IsAskExtend__14CBaseMenuClassFii);
-INCLUDE_ASM("nonmatchings/game/cmenutreemap", ItemCmdAfter__14CBaseMenuClassFiP16ITEMCMD_RET_PARA);
+s32 CBaseMenuClass::IsCreateObject(s32 a, s32 b) {
+    return 1;
+}
+s32 CBaseMenuClass::IsMakeObject(s32 a, s32 b) {
+    return 0;
+}
+s32 CBaseMenuClass::IsAskExtend(s32 a, s32 b) {
+    return 0;
+}
+s32 CBaseMenuClass::ItemCmdAfter(s32 command, ITEMCMD_RET_PARA *para) {
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", ExitEnd__14CBaseMenuClassFv);
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", Set__9mgRect_f_Fffff);
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", GetPenkiColor__FiPf);

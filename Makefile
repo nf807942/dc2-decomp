@@ -58,12 +58,18 @@ MWCC_ENV  := MWCIncludes=$(INCLUDE_DIR)
 # dans ce compilateur, et les littéraux du binaire sont en lecture seule.
 # -Cpp_exceptions off parce que le binaire n'en porte aucune trace.
 #
+# -RTTI off parce que le code du jeu n'en porte aucune trace non plus : les cinq
+# seuls `__RTTI__` du binaire sont ceux des exceptions de la bibliothèque
+# Metrowerks, compilée à part. Sans ce drapeau, toute classe déclarée polymorphe
+# emporte dans son objet un `__RTTI__` et la chaîne de son nom, que le disque n'a
+# pas.
+#
 # -lang c++ parce que mwccgap donne son fichier intermédiaire l'extension `.c`,
 # dont MWCC déduirait le dialecte : le jeu est en C++, et son mangling le dit.
 #
 # `-c` n'y est pas : mwccgap l'ajoute lui-même devant ces drapeaux.
 CFLAGS    ?= -O4,p -lang c++ -char unsigned -str readonly -Cpp_exceptions off \
-             -sym on -i $(INCLUDE_DIR) -i $(SRC_DIR)
+             -RTTI off -sym on -i $(INCLUDE_DIR) -i $(SRC_DIR)
 
 # mwccgap greffe l'assembleur de référence dans l'objet compilé : MWCC émet le
 # texte d'une unité d'un seul bloc, donc une fonction non encore reconstruite ne

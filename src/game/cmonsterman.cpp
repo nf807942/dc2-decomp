@@ -8,6 +8,8 @@
 
 #include "common.h"
 
+#include "runscript.hpp"
+
 INCLUDE_ASM("nonmatchings/game/cmonsterman", Initialize__11CMonsterManFP6CScene);
 INCLUDE_ASM("nonmatchings/game/cmonsterman", DrawEffectScript__11CMonsterManFv);
 INCLUDE_ASM("nonmatchings/game/cmonsterman", StepEffectScript__11CMonsterManFv);
@@ -54,7 +56,9 @@ INCLUDE_ASM("nonmatchings/game/cmonsterman", GetStackVector__FPfPP12RS_STACKDATA
 INCLUDE_ASM("nonmatchings/game/cmonsterman", SetStackVector__FPfPP12RS_STACKDATA);
 INCLUDE_ASM("nonmatchings/game/cmonsterman", _SQRT__FP12RS_STACKDATAi_001E1CE0);
 INCLUDE_ASM("nonmatchings/game/cmonsterman", _ATAN2F__FP12RS_STACKDATAi_001E1D30);
-INCLUDE_ASM("nonmatchings/game/cmonsterman", _ND_TEST__FP12RS_STACKDATAi);
+s32 _ND_TEST(RS_STACKDATA *stack, int argc) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmonsterman", _GET_TARGET_ROT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cmonsterman", _GET_MONSTER_INDEX__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cmonsterman", _SET_MONSTER_LIFE__FP12RS_STACKDATAi);

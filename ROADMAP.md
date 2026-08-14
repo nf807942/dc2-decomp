@@ -310,6 +310,7 @@ Par ordre de ce que chacun débloque.
 
 | Chantier | Ce qu'il débloque |
 |---|---|
+| **Posséder les tables virtuelles** | tout constructeur de classe polymorphe |
 | **Relever qui emploie chaque donnée, par les relocations** | le jalon 2 en entier |
 | **mwccgap : abaisser l'alignement d'une fonction compilée** | les treize auxiliaires du runtime, qui ne peuvent qu'être greffés |
 | **Un test d'exécution en émulateur** | le critère de sortie du jalon 3 |
@@ -334,6 +335,26 @@ si splat rend l'accumulateur vectoriel avec son dollar dans les deux chemins.
 Les deux outils de recherche gardent leurs rôles distincts : `make measure`
 répond à une question posée, `make permute` cherche seul quand on ne sait plus
 quoi essayer.
+
+Posséder les tables virtuelles est le prochain verrou du jalon 2, et il ne se
+contourne pas : dès qu'une classe est déclarée polymorphe — ce que le commerce
+impose pour retrouver l'ordonnancement de son constructeur —, MWCC émet
+`__vt__<classe>` dans notre objet, et l'éditeur de liens la voit deux fois tant
+que le disque la porte. `__ct__14CCameraControlFv` est reconstruit à 100 % et
+attend cela sous un `#if 0`. Le chemin est repéré, et il ne se
+confond pas avec les plages `rodata:` existantes : MWCC émet la table dans une
+section `.vtables` à elle, distincte de `.rodata`, ce qui tombe bien — l'unité
+`ceditmap_002F0E80` possède déjà `rodata:0x00377810-0x00377848`, et une section
+ne se place qu'une fois. Il faut donc trois choses : une clé `vtables:` dans
+`config/units.txt` que `make carve` sache lire, un segment de découpage qui
+retire ces trente-six octets du bloc brut de 00379358, et la ligne
+`(.vtables)` posée à la bonne adresse dans le script de lien —
+`scripts/setup/normalize.py` retouche déjà ce script ligne à ligne, dans
+exactement cette forme. La table se retrouve en déclarant les virtuelles dans
+l'ordre des créneaux, les deux premières entrées étant réservées : pour
+`CCameraControl`, six dans `mgCCamera` (`Step`, `Suspend`, `Resume`, `Stay`,
+`GetCameraMatrix`, `Iam`), une dans `mgCCameraFollow` (`SetFollow`), et quatre
+redéfinitions.
 
 ---
 

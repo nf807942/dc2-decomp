@@ -8,6 +8,8 @@
 
 #include "common.h"
 
+#include "runscript.hpp"
+
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _CMRS_MOVE_REF__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _CMRS_INIT_PAS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _CMRS_SET_PAS_FRM__FP12RS_STACKDATAi);
@@ -74,7 +76,9 @@ INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_SE_DELAY__FP12RS_STACKDATAi
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_SE_PLAY__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_RESET_DA_POSITION__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_NORMAL_DRIVE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _ASQ_CHECK__FP12RS_STACKDATAi);
+s32 _ASQ_CHECK(RS_STACKDATA *stack, int argc) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _SND_INIT_PORT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _SND_LOAD_SOUND__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _GET_SND_ID__FP12RS_STACKDATAi);
@@ -106,16 +110,24 @@ INCLUDE_ASM("nonmatchings/game/text_002734D0", _INIT_SE_SRC__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _INIT_SE_ENV__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _INIT_SE_BAS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _LOAD_SE_SRC__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _LOAD_SE_FOOT__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _LOAD_SE_DOOR__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _LOAD_SE_BOX__FP12RS_STACKDATAi);
+s32 _LOAD_SE_FOOT(RS_STACKDATA *stack, int argc) {
+    return 0;
+}
+s32 _LOAD_SE_DOOR(RS_STACKDATA *stack, int argc) {
+    return 0;
+}
+s32 _LOAD_SE_BOX(RS_STACKDATA *stack, int argc) {
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _LOAD_SE_BATTLE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _SND_DELETE_PORT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _FADE_IN_BGM__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _FADE_OUT_BGM__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _STOP_ENV_BGM__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _SET_BGM_VOL__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _SND_SET_REVERB__FP12RS_STACKDATAi);
+s32 _SND_SET_REVERB(RS_STACKDATA *stack, int argc) {
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _SND_SET_ENV_VOL__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _STREAM_SILENT_CHECK__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _AUTO_CHANGE_ENV__FP12RS_STACKDATAi);

@@ -8,6 +8,11 @@
 
 #include "common.h"
 
+/* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
+ * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
+extern s8 MenuDrawNumberKeta;
+extern u8 MenuMainFrame_ActionEndFlag;
+
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", CheckRoboShieldKit__FP16CUserDataManagerP13CGameDataUsediPiPi);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", MenuUseItemCheckFunc__FP13CGameDataUsedP14CItemUseTargeti);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", CheckItemUseEnable__12CMenuItemUseFP13CGameDataUsediPv);
@@ -39,7 +44,9 @@ INCLUDE_ASM("nonmatchings/game/cmenuitemuse", InitSpectolRasterTable__FP9mgCMemo
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", DrawOneItem__FP11mgCDrawPrim9mgRect_f_iiP25MENU_PARTS_EFFECT_STRUCT1PUci);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", MenuWindowHelp__FP11mgCDrawPrimP10mgCTextureffffPs);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", MenuPresentBoxView__FiiRiP10mgCTextureP10mgCTexture);
-INCLUDE_ASM("nonmatchings/game/cmenuitemuse", SetMenuDrawNumberKeta__Fc);
+void SetMenuDrawNumberKeta(char value) {
+    MenuDrawNumberKeta = value;
+}
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", DrawMenuNumber__FP11mgCDrawPrimii9mgRect_i_9mgRect_i_ii);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", PrimDrawNumber__FP11mgCDrawPrimiiii9mgRect_i_ii);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", PrimDrawNumber2__FP11mgCDrawPrimiiii9mgRect_i_ii);
@@ -63,7 +70,9 @@ INCLUDE_ASM("nonmatchings/game/cmenuitemuse", MenuCursorDraw__FP10mgCTexturePffi
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", MenuCursorDraw__FP10mgCTexturePffi);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", DrawMenuTilePattern__FP11mgCDrawPrimP10mgCTextureff9mgRect_i_iPUc);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", DrawMenuMainFrmImg__FRi9mgRect_i_9mgRect_i_iiiii);
-INCLUDE_ASM("nonmatchings/game/cmenuitemuse", GetMenuMainFrameEndFlag__Fv);
+s32 GetMenuMainFrameEndFlag(void) {
+    return MenuMainFrame_ActionEndFlag;
+}
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", GetMenuMainFrameLeftTopPos__Fi);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", GetMenuMainFrameCount__Fv);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", MenuMainFrameModeSet__Fii);

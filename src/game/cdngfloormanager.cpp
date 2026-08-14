@@ -8,6 +8,10 @@
 
 #include "common.h"
 
+/* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
+ * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
+extern s32 NextCharaMode;
+
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", GetActiveFloorInfo__16CDngFloorManagerFv);
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", RelationGlid__16CDngFloorManagerFv);
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", CheckDrawGlidInfo__16CDngFloorManagerFv);
@@ -51,7 +55,9 @@ INCLUDE_ASM("nonmatchings/game/cdngfloormanager", EsaInit__Fv);
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", ReplayPrevBGM__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", LoadExMotionBG__FP11SubGameInfoP1);
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", LoadExMotionStep__FP11SubGameInfoP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/cdngfloormanager", SetNextMode__Fi);
+void SetNextMode(s32 value) {
+    NextCharaMode = value;
+}
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", ExitFishing__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", sgInitFishing__FP11SubGameInfo);
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", sgRestartFishing__FP11SubGameInfo);

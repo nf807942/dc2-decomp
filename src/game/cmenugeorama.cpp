@@ -8,7 +8,13 @@
 
 #include "common.h"
 
-INCLUDE_ASM("nonmatchings/game/cmenugeorama", DrawDownLoadAnaunceSwitch__Fi);
+/* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
+ * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
+extern s8 DownLoadInfoDrawFlag;
+
+void DrawDownLoadAnaunceSwitch(s32 value) {
+    DownLoadInfoDrawFlag = value;
+}
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", StepDownLoadAnaunce__Fi);
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", DrawDownLoadAnaunce__Fv);
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", MakeDownLoadAnaunce__FiP9mgCMemoryPiPiPi);

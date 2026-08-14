@@ -107,6 +107,20 @@ public:
     int GetLY();
     int GetRX2();
 
+    /* L'état des boutons tel que les menus l'interrogent : `On` dit un bouton
+     * tenu, `Down` un appui neuf. Le masque est celui des `PAD_*` ci-dessus. */
+    int On(int mask);
+    int Down(int mask);
+
+    /* Le mode menu retient les touches que le masque désigne. */
+    void MenuModeOn(int mask);
+    void MenuModeOff();
+
+    /* Les manches en flottant, de -1 à 1. */
+    f32 GetLXf();
+    f32 GetLYf();
+    f32 GetRYf();
+
 private:
     /* 0x000 : usage inconnu — aucune fonction de l'unité n'y touche encore. */
     int m_root;
@@ -131,5 +145,11 @@ private:
     int m_unk470;                     /* 0x470 */
     int m_unk474;                     /* 0x474 */
 };
+
+/* Le manette que tout le jeu interroge. Le binaire porte plusieurs `GamePad` à
+ * liaison locale ; le désassembleur les départage par l'adresse, et c'est sous
+ * ce nom-là qu'on l'appelle. Sa taille — 0x478 octets — la met hors du seuil
+ * des petites données, donc elle s'adresse par `%hi`/`%lo`. */
+extern CGamePad GamePad_003FA5A0;
 
 #endif /* GAMEPAD_HPP */
