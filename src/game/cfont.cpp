@@ -7,22 +7,37 @@
  */
 
 #include "common.h"
+#include "gen/CFont.hpp"
 
 /* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
  * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
 extern s32 CtrlLockFlag;
 extern s32 FontTex_2_Buff;
 extern s32 PartsInfoID;
+extern s32 PreMenuCount;
+extern s32 PreMenuMaxCount;
+
 
 INCLUDE_ASM("nonmatchings/game/cfont", CheckKanjiFont__5CFontFi);
 INCLUDE_ASM("nonmatchings/game/cfont", CheckHalfFont__5CFontFi);
-INCLUDE_ASM("nonmatchings/game/cfont", SetDrawSize__5CFontFii);
-INCLUDE_ASM("nonmatchings/game/cfont", SetClearance__5CFontFii);
-INCLUDE_ASM("nonmatchings/game/cfont", SetPos__5CFontFii);
+void CFont::SetDrawSize(s32 arg0, s32 arg1) {
+    this->field_0xA4 = arg0;
+    this->field_0xA8 = arg1;
+}
+void CFont::SetClearance(s32 arg0, s32 arg1) {
+    this->field_0x9C = arg0;
+    this->field_0xA0 = arg1;
+}
+void CFont::SetPos(s32 arg0, s32 arg1) {
+    this->field_0x94 = arg0;
+    this->field_0x98 = arg1;
+}
 INCLUDE_ASM("nonmatchings/game/cfont", SetColor__5CFontFiiii);
 INCLUDE_ASM("nonmatchings/game/cfont", SetColor__5CFontF10RGBAQ_TYPE);
 INCLUDE_ASM("nonmatchings/game/cfont", SetColor__5CFontFUi);
-INCLUDE_ASM("nonmatchings/game/cfont", SetFuchi__5CFontFi);
+void CFont::SetFuchi(s32 arg0) {
+    this->field_0x80 = arg0;
+}
 INCLUDE_ASM("nonmatchings/game/cfont", SetStr__5CFontFPc);
 INCLUDE_ASM("nonmatchings/game/cfont", GetGaijiFontNo__FPc);
 INCLUDE_ASM("nonmatchings/game/cfont", GetGaijiLen__FUs);
@@ -85,7 +100,10 @@ INCLUDE_ASM("nonmatchings/game/cfont", SystemMesClose__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/cfont", SystemMesStep__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/cfont", EditStartPlaceEffect__FP10CEditPartsPf);
 INCLUDE_ASM("nonmatchings/game/cfont", EditEndPlaceEffect__Fv);
-INCLUDE_ASM("nonmatchings/game/cfont", EditPreMenuAnime__Fi);
+void EditPreMenuAnime(s32 arg0) {
+    PreMenuMaxCount = arg0;
+    PreMenuCount = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cfont", LoadEditCursor__FP9mgCMemoryi);
 s32 GetSelPartsInfoID(void) {
     return PartsInfoID;

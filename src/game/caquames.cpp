@@ -7,6 +7,7 @@
  */
 
 #include "common.h"
+#include "gen/CBubble.hpp"
 
 INCLUDE_ASM("nonmatchings/game/caquames", MenuInventDraw__Fv);
 INCLUDE_ASM("nonmatchings/game/caquames", Get_aquarium_paul_table__Fi);
@@ -20,7 +21,10 @@ INCLUDE_ASM("nonmatchings/game/caquames", SetTexture__7CBubbleFP10mgCTextureii);
 INCLUDE_ASM("nonmatchings/game/caquames", Step__7CBubbleFv);
 INCLUDE_ASM("nonmatchings/game/caquames", Draw__7CBubbleFv);
 INCLUDE_ASM("nonmatchings/game/caquames", Initialize__7CBubbleFP9mgCMemoryPfif);
-INCLUDE_ASM("nonmatchings/game/caquames", RunOff__7CBubbleFv);
+void CBubble::RunOff(void) {
+    this->field_0x1 = 0;
+    this->field_0x4 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/caquames", GetChildFishNo__Fii);
 INCLUDE_ASM("nonmatchings/game/caquames", SetFishAdjustScale__Fiiff);
 INCLUDE_ASM("nonmatchings/game/caquames", Initialize__20CAquaFishActionParamFv);

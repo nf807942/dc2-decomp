@@ -38,8 +38,14 @@ données ; c'est un chantier à part, décrit dans la feuille de route.
 ## 1. Choisir une fonction
 
 ```sh
-make report     # puis ouvrir progress/index.html
+make etat ARGS=--cibles    # une demi-seconde : ce qui reste, du plus lourd
+make etat ARGS=--classes   # le même reste, rangé par classe
+make report                # la mesure fine — puis ouvrir progress/index.html
 ```
+
+`make etat` se lit des sources et ne construit rien ; `make report` compare les
+objets un à un et dit les parts intermédiaires. Les deux tombent sur le même
+compte de fonctions faites, par deux chemins indépendants.
 
 La page trie les fonctions par taille dans chaque unité, et c'est l'ordre le plus
 rentable. Deux conseils qui valent plus que la taille :
@@ -200,9 +206,14 @@ de la source : ni le permuteur ni les pragmas ne le corrigent.
 ## 5. Confirmer
 
 ```sh
-make build      # identique au disque : la fonction est acquise
-make progress   # ce qui est reconstruit, en octets
+make ci         # les contrôles, puis le binaire entier
+make etat       # ce qui est reconstruit, et la cadence
 ```
+
+`make ci` enchaîne `make controle` — six fautes qui se lisent dans le texte, en
+une demi-seconde, dont l'en-tête engendré absent — et `make build`, qui prend
+une minute dix. Le hook `.githooks/pre-push` lance le même avant toute poussée ;
+`DC2_SANS_BUILD=1 git push` le saute quand la poussée ne touche pas la source.
 
 `make build` est le seul juge. `make diff` compare une fonction, `make build`
 compare le binaire entier : une fonction à 100 % qui casse la construction

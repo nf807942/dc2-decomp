@@ -7,6 +7,7 @@
  */
 
 #include "common.h"
+#include "gen/CPiyori.hpp"
 
 INCLUDE_ASM("nonmatchings/game/cweaponelement", Initialize__14CWeaponElementFv);
 INCLUDE_ASM("nonmatchings/game/cweaponelement", Set__14CWeaponElementFPA4_fPffif);
@@ -31,8 +32,13 @@ INCLUDE_ASM("nonmatchings/game/cweaponelement", fRand__Ff);
 INCLUDE_ASM("nonmatchings/game/cweaponelement", SetLevelUpInfo__12CLevelupInfoFiiii);
 INCLUDE_ASM("nonmatchings/game/cweaponelement", Draw__12CLevelupInfoFv);
 INCLUDE_ASM("nonmatchings/game/cweaponelement", Step__12CLevelupInfoFv);
-INCLUDE_ASM("nonmatchings/game/cweaponelement", Initialize__7CPiyoriFv);
-INCLUDE_ASM("nonmatchings/game/cweaponelement", Reset__7CPiyoriFv);
+void CPiyori::Initialize(void) {
+    this->field_0x0 = 0;
+}
+void CPiyori::Reset(void) {
+    this->field_0x0 = 0;
+    this->field_0x1C = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cweaponelement", Set__7CPiyoriFP9mgCObjectffs);
 INCLUDE_ASM("nonmatchings/game/cweaponelement", Set__7CPiyoriFP9mgCObjects);
 INCLUDE_ASM("nonmatchings/game/cweaponelement", Draw__7CPiyoriFv);

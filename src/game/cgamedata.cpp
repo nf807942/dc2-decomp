@@ -7,6 +7,7 @@
  */
 
 #include "common.h"
+#include "gen/CDataRoboPart.hpp"
 
 /* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
  * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
@@ -39,8 +40,10 @@ s32 GetNowLoopNo(void) {
     return LoopNo;
 }
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetNowInitArg__Fv);
-INCLUDE_ASM("nonmatchings/game/cgamedata", cat_start__Fv);
-INCLUDE_ASM("nonmatchings/game/cgamedata", cat_end__Fv);
+void cat_start(void) {
+}
+void cat_end(void) {
+}
 INCLUDE_ASM("nonmatchings/game/cgamedata", SetTextureTable__FiiP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cgamedata", InitPadTable__Fi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", VSyncCallBack__Fi_00192150);
@@ -60,11 +63,16 @@ INCLUDE_ASM("nonmatchings/game/cgamedata", EventSelect__Fv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetFontTexture__Fi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", LoadFontTexture__Fv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", ReLoadFontTexture__Fi);
-INCLUDE_ASM("nonmatchings/game/cgamedata", demQuit__Fv);
-INCLUDE_ASM("nonmatchings/game/cgamedata", demoQuitTimeOut__Fv);
-INCLUDE_ASM("nonmatchings/game/cgamedata", demoAttractInterrupted__Fv);
-INCLUDE_ASM("nonmatchings/game/cgamedata", demoAttractComplete__Fv);
-INCLUDE_ASM("nonmatchings/game/cgamedata", FadeOutForE3__Fv);
+void demQuit(void) {
+}
+void demoQuitTimeOut(void) {
+}
+void demoAttractInterrupted(void) {
+}
+void demoAttractComplete(void) {
+}
+void FadeOutForE3(void) {
+}
 s32 TimeLimitCheck(void) {
     return 0;
 }
@@ -98,7 +106,9 @@ INCLUDE_ASM("nonmatchings/game/cgamedata", GetGameDataPt__Fv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", __ct__9CDataItemFv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", __ct__11CDataAttachFv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", __ct__11CDataWeaponFv);
-INCLUDE_ASM("nonmatchings/game/cgamedata", GetOffsetNo__13CDataRoboPartFv);
+u8 CDataRoboPart::GetOffsetNo(void) {
+    return this->field_0x22;
+}
 INCLUDE_ASM("nonmatchings/game/cgamedata", __ct__14CDataBreedFishFv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", Initialize__9CGameDataFv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", _DATACOMINIT__FP9SPI_STACKi);

@@ -17,6 +17,7 @@ ASM_DIR = ROOT / "asm"
 # l'original contre lequel on la mesure.
 REF_DIR = ROOT / "ref" / "asm"
 SRC_DIR = ROOT / "src"
+INCLUDE_DIR = ROOT / "include"
 BUILD_DIR = ROOT / "build"
 CONFIG_DIR = ROOT / "config"
 
@@ -62,11 +63,56 @@ def grafted_symbols() -> set[str]:
     pour appariées. Ouvrir une unité afficherait alors ses fonctions comme
     reconstruites sans qu'une ligne de C++ soit écrite.
     """
-    names: set[str] = set()
+    return {name for names in grafted_by_source().values() for name in names}
+
+
+def grafted_by_source() -> dict[Path, set[str]]:
+    """Les fonctions greffées, rangées sous la source qui les laisse.
+
+    La provenance d'une fonction est celle de son unité, non celle que son nom
+    suggère : `src/sdk/` porte des symboles que rien dans leur nom ne distingue
+    de ceux du jeu.
+    """
+    table: dict[Path, set[str]] = {}
     for path in sources():
-        names |= set(_INCLUDE_ASM.findall(
+        table[path] = set(_INCLUDE_ASM.findall(
             path.read_text(encoding="utf-8", errors="replace")))
-    return names
+    return table
+
+
+@dataclass
+class Function:
+    """Une fonction du binaire : le nom qu'il porte, son adresse, sa taille."""
+    name: str
+    address: int
+    size: int
+
+
+# `<nom> = 0x<adresse>; // type:func size:0x<taille>` — la taille manque pour
+# les quelques symboles que l'ELF ne dimensionne pas.
+_FUNC = re.compile(
+    r"^(\S+)\s*=\s*0x([0-9A-Fa-f]+);.*?type:func(?:.*?size:0x([0-9A-Fa-f]+))?",
+    re.MULTILINE)
+
+_FUNCTIONS: dict[str, Function] | None = None
+
+
+def functions() -> dict[str, Function]:
+    """Toutes les fonctions du binaire, par leur nom manglé.
+
+    La table vient de l'ELF non strippé, que `make setup` écrit : c'est elle
+    qui dit ce qui reste à faire, et elle ne dépend d'aucune construction.
+    """
+    global _FUNCTIONS
+    if _FUNCTIONS is not None:
+        return _FUNCTIONS
+
+    table = require(CONFIG_DIR / "elf_symbol_addrs.txt", "lancez `make setup`")
+    _FUNCTIONS = {
+        name: Function(name, int(addr, 16), int(size, 16) if size else 0)
+        for name, addr, size in _FUNC.findall(table.read_text(encoding="utf-8"))
+    }
+    return _FUNCTIONS
 
 
 # Une ligne d'instruction : le commentaire d'adresse, puis le mnémonique. Les
@@ -172,16 +218,68 @@ def source_defining(symbol: str, build: bool = True) -> Path | None:
     return symbol_sources(build).get(symbol)
 
 
+def declared_units() -> list[tuple[int, int, str]]:
+    """Les unités que `config/units.txt` déclare : début, fin, nom.
+
+    Une ligne porte trois champs, ou quatre quand une plage `rodata:`
+    accompagne l'unité.
+    """
+    path = CONFIG_DIR / "units.txt"
+    if not path.exists():
+        return []
+    declared = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        fields = line.split("#", 1)[0].split()
+        if len(fields) >= 3:
+            declared.append((int(fields[0], 16), int(fields[1], 16), fields[2]))
+    return declared
+
+
+def unit_of(symbol: str) -> str | None:
+    """L'unité qui couvre ce symbole, par son adresse.
+
+    Le découpage dit tout : `config/units.txt` confie une plage à
+    `src/<nom>.cpp`, et le désassemblage de référence de cette même unité vit
+    en `ref/asm/text/<nom>.s`. Chercher plutôt que déduire coûtait sept
+    secondes par essai — 1,8 s à relire les 414 fichiers de `ref/asm`, et cinq
+    à passer `make` puis `nm` sur les 319 objets pour retrouver qui définit
+    quoi. Rien de tout cela n'est nécessaire : l'adresse le dit.
+    """
+    fonction = functions().get(symbol)
+    if fonction is None:
+        return None
+    for low, high, name in declared_units():
+        if low <= fonction.address < high:
+            return name
+    return None
+
+
 def find_symbol(symbol: str) -> Location:
     """Trouve le désassemblage de référence qui définit un symbole.
 
-    La recherche passe par le contenu plutôt que par la table : un fichier
-    porte le nom de son adresse de départ, et c'est l'étiquette qui dit ce
-    qu'il contient. Elle porte sur `ref/asm`, le désassemblage complet : c'est
-    le seul qui garde une fonction déjà reconstruite.
+    La référence est `ref/asm`, le désassemblage complet : c'est le seul qui
+    garde une fonction déjà reconstruite.
+
+    Une fonction hors de toute unité déclarée n'a pas de source ; le balayage
+    du contenu reste alors le seul recours, et il ne coûte que là.
     """
     if not REF_DIR.is_dir():
         raise SystemExit("ref/asm absent — lancez `make setup`")
+
+    name = unit_of(symbol)
+    if name is not None:
+        asm_file = REF_DIR / "text" / f"{name}.s"
+        if asm_file.exists():
+            # Une source qui greffe encore le symbole ne le reconstruit pas :
+            # la comparer au commerce rendrait 100 % sans qu'une ligne de C++
+            # soit écrite.
+            source = SRC_DIR / f"{name}.cpp"
+            if not source.exists():
+                source = SRC_DIR / f"{name}.c"
+            grafted = grafted_by_source().get(source, set())
+            return Location(symbol, asm_file,
+                            source if source.exists() and symbol not in grafted
+                            else None)
 
     matches = [
         path for path in sorted(REF_DIR.rglob("*.s"))

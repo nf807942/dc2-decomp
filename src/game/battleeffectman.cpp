@@ -7,6 +7,10 @@
  */
 
 #include "common.h"
+#include "gen/CHealingEffectMan.hpp"
+#include "gen/CMiniEffPrim.hpp"
+#include "gen/CPalletAnime.hpp"
+#include "gen/CSparcEffect.hpp"
 
 INCLUDE_ASM("nonmatchings/game/battleeffectman", SetPos__8CThunderFPfff);
 INCLUDE_ASM("nonmatchings/game/battleeffectman", Draw__8CThunderFv);
@@ -14,11 +18,15 @@ INCLUDE_ASM("nonmatchings/game/battleeffectman", Step__8CThunderFv);
 INCLUDE_ASM("nonmatchings/game/battleeffectman", Initialize__8CThunderFv);
 INCLUDE_ASM("nonmatchings/game/battleeffectman", Draw__12CSparcEffectFv);
 INCLUDE_ASM("nonmatchings/game/battleeffectman", Step__12CSparcEffectFv);
-INCLUDE_ASM("nonmatchings/game/battleeffectman", Initialize__12CSparcEffectFv);
+void CSparcEffect::Initialize(void) {
+    this->field_0xA9 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/battleeffectman", SetPrim__12CMiniEffPrimFPfi);
 INCLUDE_ASM("nonmatchings/game/battleeffectman", Draw__12CMiniEffPrimFP10CPreSprite);
 INCLUDE_ASM("nonmatchings/game/battleeffectman", Step__12CMiniEffPrimFv);
-INCLUDE_ASM("nonmatchings/game/battleeffectman", Initialize__12CMiniEffPrimFv);
+void CMiniEffPrim::Initialize(void) {
+    this->field_0x10 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/battleeffectman", CreatPrim__15CMiniEffPrimManFPfi);
 INCLUDE_ASM("nonmatchings/game/battleeffectman", Draw__15CMiniEffPrimManFv);
 INCLUDE_ASM("nonmatchings/game/battleeffectman", Step__15CMiniEffPrimManFv);
@@ -26,10 +34,15 @@ INCLUDE_ASM("nonmatchings/game/battleeffectman", Initialize__15CMiniEffPrimManFv
 INCLUDE_ASM("nonmatchings/game/battleeffectman", SetAnim__12CPalletAnimeFssssss);
 INCLUDE_ASM("nonmatchings/game/battleeffectman", CreatPallet__12CPalletAnimeFPfPf);
 INCLUDE_ASM("nonmatchings/game/battleeffectman", Step__12CPalletAnimeFv);
-INCLUDE_ASM("nonmatchings/game/battleeffectman", Initialize__12CPalletAnimeFv);
+void CPalletAnime::Initialize(void) {
+    this->field_0xA = 0;
+    this->field_0x8 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/battleeffectman", Draw__17CHealingEffectManFP9mgCCamera);
 INCLUDE_ASM("nonmatchings/game/battleeffectman", Step__17CHealingEffectManFv);
-INCLUDE_ASM("nonmatchings/game/battleeffectman", SetMode__17CHealingEffectManFi);
+void CHealingEffectMan::SetMode(s32 arg0) {
+    this->field_0x314 = arg0;
+}
 INCLUDE_ASM("nonmatchings/game/battleeffectman", Set__17CHealingEffectManFPf);
 INCLUDE_ASM("nonmatchings/game/battleeffectman", Initialize__17CHealingEffectManFv);
 INCLUDE_ASM("nonmatchings/game/battleeffectman", Draw__14CSwordLuminousFv);

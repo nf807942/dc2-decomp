@@ -7,6 +7,10 @@
  */
 
 #include "common.h"
+extern s32 eaAnaData;
+extern s32 eaAnaSrc;
+struct SPI_STACK;
+
 
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", Init__Q26CScene8BGM_INFOFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", InitSnd__6CSceneFv);
@@ -112,8 +116,14 @@ INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", eaCON_NO__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", eaON_PARTS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", eaOFF_PARTS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", eaPERCENT__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", eaEND_ANALYZE__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", eaEND_GEO_ANALYZE__FP9SPI_STACKi);
+s32 eaEND_ANALYZE(SPI_STACK * arg0, s32 arg1) {
+    eaAnaData = 0;
+    return 1;
+}
+s32 eaEND_GEO_ANALYZE(SPI_STACK * arg0, s32 arg1) {
+    eaAnaSrc = 0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetMaxPolyn__Fi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetMaxDrawMem__Fi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", __ct__14EditAnalyzeSrcFv);

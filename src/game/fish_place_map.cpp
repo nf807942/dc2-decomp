@@ -7,12 +7,15 @@
  */
 
 #include "common.h"
+#include "gen/sgCPlayVoice.hpp"
 
 /* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
  * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
 extern s32 ItemOver;
 extern s32 MenuOpenFlag;
 extern s32 SubGame;
+struct FISH_DATA;
+
 
 INCLUDE_ASM("nonmatchings/game/fish_place_map", CastingLoop__FP6CSceneP11CPadControl);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", InitUkiWait__FP6CScene);
@@ -31,7 +34,9 @@ INCLUDE_ASM("nonmatchings/game/fish_place_map", CheckCasting__FP6CScenePfPf);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", GetRandamNumber__Ffff);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", GetUkiWaitTime__FP9FISH_DATAP6CScenePfii);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", GetUkiPokeTime__FP9FISH_DATA);
-INCLUDE_ASM("nonmatchings/game/fish_place_map", GetUkiPullTime__FP9FISH_DATA);
+s32 GetUkiPullTime(FISH_DATA * arg0) {
+    return 30;
+}
 INCLUDE_ASM("nonmatchings/game/fish_place_map", FishLoadBG__FP9FISH_DATAP1);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", LineTensionStep__FP9FISH_DATAi);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", GetAppearFish__FiPfP10FISH_PLACEi);
@@ -59,7 +64,9 @@ s32 sgGetItemOver(void) {
 void sgGetItemOverReset(void) {
     ItemOver = 0;
 }
-INCLUDE_ASM("nonmatchings/game/fish_place_map", sgGetItemOverFlagOn__Fv);
+void sgGetItemOverFlagOn(void) {
+    ItemOver = 1;
+}
 INCLUDE_ASM("nonmatchings/game/fish_place_map", sgInitSubGame__FiP11SubGameInfo);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", sgLoopSubGame__Fv);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", sgLoopSubGame2__Fv);
@@ -73,7 +80,9 @@ INCLUDE_ASM("nonmatchings/game/fish_place_map", sgDrawSubGameEffect__Fv);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", sgDrawSubGameSystem__Fv);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", Open__12sgCPlayVoiceFi);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", SetVol__12sgCPlayVoiceFff);
-INCLUDE_ASM("nonmatchings/game/fish_place_map", Play__12sgCPlayVoiceFv);
+void sgCPlayVoice::Play(void) {
+    this->field_0x8 = 1;
+}
 INCLUDE_ASM("nonmatchings/game/fish_place_map", Step__12sgCPlayVoiceFv);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", Close__12sgCPlayVoiceFv);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", sgInitGyoRace__FP11SubGameInfo);

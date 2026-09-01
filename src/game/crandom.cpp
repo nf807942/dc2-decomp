@@ -7,10 +7,16 @@
  */
 
 #include "common.h"
+#include "gen/CQuestManager.hpp"
+struct i;
+
 
 INCLUDE_ASM("nonmatchings/game/crandom", __ct__14CVillagerPlaceFv);
 INCLUDE_ASM("nonmatchings/game/crandom", GetQuestData__Fv);
-INCLUDE_ASM("nonmatchings/game/crandom", Initialize__13CQuestManagerFv);
+void CQuestManager::Initialize(void) {
+    this->field_0x0 = 0;
+    this->field_0x4 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/crandom", GetQuestInfo__13CQuestManagerFi);
 INCLUDE_ASM("nonmatchings/game/crandom", quest_NUM__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/crandom", quest_NEW__FP9SPI_STACKi);
@@ -44,16 +50,22 @@ s32 MountHDDFileSystem(void) {
 s32 UmountHDDFileSystem(void) {
     return 0;
 }
-INCLUDE_ASM("nonmatchings/game/crandom", CreateInstallThread__FP1i);
-INCLUDE_ASM("nonmatchings/game/crandom", DeleteInstallThread__Fv);
+s32 CreateInstallThread(i * arg0) {
+    return 0;
+}
+void DeleteInstallThread(void) {
+}
 s32 StepInstallThread(void) {
     return 0;
 }
 s32 InstallPause(void) {
     return 0;
 }
-INCLUDE_ASM("nonmatchings/game/crandom", InstallCancel__Fv);
-INCLUDE_ASM("nonmatchings/game/crandom", GetInstallProgress__Fv);
+void InstallCancel(void) {
+}
+f32 GetInstallProgress(void) {
+    return 0.0f;
+}
 s32 UninstallApp(void) {
     return 0;
 }

@@ -27,7 +27,8 @@ INCLUDE_ASM("nonmatchings/game/cmenueffect", Step__11CMenuEffectFv);
 INCLUDE_ASM("nonmatchings/game/cmenueffect", Draw__11CMenuEffectFv);
 INCLUDE_ASM("nonmatchings/game/cmenueffect", PrimQuad_f___FP11mgCDrawPrim9mgRect_f_9mgRect_i_);
 INCLUDE_ASM("nonmatchings/game/cmenueffect", PrimQuad_i___FP11mgCDrawPrim9mgRect_i_9mgRect_i_);
-INCLUDE_ASM("nonmatchings/game/cmenueffect", MenuScreenBlackBeltSet__Fi);
+void MenuScreenBlackBeltSet(s32 arg0) {
+}
 s32 GetMenuLoopType(void) {
     return MenuLoopType;
 }

@@ -7,6 +7,8 @@
  */
 
 #include "common.h"
+#include "gen/CFuncPointMngr.hpp"
+#include "gen/CList_10CFuncPoint_.hpp"
 
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", setImageTag__FPUiPviii);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", videoDecBeginPut__FP8VideoDecPPUcPiPPUcPi);
@@ -31,7 +33,10 @@ INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", SetParam__9CObjAnimeFPf);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", GetParam__9CObjAnimeFPf);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", AssignFuncAnime__9CObjAnimeFP10CFuncPointP9CMapParts);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", Add__14CFuncPointMngrFiP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", Initialize__19CList_10CFuncPoint_Fv);
+void CList_10CFuncPoint_::Initialize(void) {
+    this->field_0x4 = 0;
+    this->field_0x0 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", Add__14CFuncPointMngrFiP19CList_10CFuncPoint_);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", Reserve__14CFuncPointMngrFiP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", __ct__19CList_10CFuncPoint_Fv);
@@ -42,7 +47,9 @@ INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", GetEventNum__14CFuncPointMngrFi)
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", EnableFuncNum__14CFuncPointMngrFi);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", GetStart__14CFuncPointMngrFi);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", Get__14CFuncPointMngrFv);
-INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", GetEnd__14CFuncPointMngrFv);
+void CFuncPointMngr::GetEnd(void) {
+    this->field_0x2C = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", Search__14CFuncPointMngrFPc);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", GetLight__14CFuncPointMngrFPfP10CFuncPointiP15CFuncPointChecki);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", Step__14CFuncPointMngrFiP15CFuncPointCheck);

@@ -7,6 +7,7 @@
  */
 
 #include "common.h"
+#include "gen/CDynamicAnime.hpp"
 
 /* Le corps ne rend qu'un code : ni la classe ni les arguments ne sont
  * déréférencés, donc leur disposition reste à établir. */
@@ -110,9 +111,13 @@ s32 CDACollision::CheckHit(f32 *point) {
     return 0;
 }
 INCLUDE_ASM("nonmatchings/game/ccharacter2", SetWind__13CDynamicAnimeFfPf);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", ResetWind__13CDynamicAnimeFv);
+void CDynamicAnime::ResetWind(void) {
+    this->field_0x68 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", SetFloor__13CDynamicAnimeFf);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", ResetFloor__13CDynamicAnimeFv);
+void CDynamicAnime::ResetFloor(void) {
+    this->field_0x88 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", FramePose__13CDynamicAnimeFP8mgCFrameP13DA_FRAME_POSE);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", PreCollision__13CDynamicAnimeFv);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", Initialize__13CDynamicAnimeFv);

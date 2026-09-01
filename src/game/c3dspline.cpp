@@ -7,6 +7,8 @@
  */
 
 #include "common.h"
+#include "gen/CCameraPas.hpp"
+#include "gen/CCharaPas.hpp"
 
 /* La pile de l'interpréteur de script d'objet. Les commandes qui ne rendent
  * qu'un code de retour ne la déréférencent pas : sa disposition reste à
@@ -125,11 +127,18 @@ INCLUDE_ASM("nonmatchings/game/c3dspline", InsCameraPas__10CCameraPasFiPfPf);
 INCLUDE_ASM("nonmatchings/game/c3dspline", SetCameraPas__10CCameraPasFiPfPf);
 INCLUDE_ASM("nonmatchings/game/c3dspline", GetCameraPas__10CCameraPasFiPfPf);
 INCLUDE_ASM("nonmatchings/game/c3dspline", DelCameraPas__10CCameraPasFi);
-INCLUDE_ASM("nonmatchings/game/c3dspline", SetFrame__10CCameraPasFi);
-INCLUDE_ASM("nonmatchings/game/c3dspline", GetFrame__10CCameraPasFv);
+s32 CCameraPas::SetFrame(s32 arg0) {
+    this->field_0x204 = arg0;
+    return 0;
+}
+s32 CCameraPas::GetFrame(void) {
+    return this->field_0x204;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", Initialize__10CCameraPasFv);
 INCLUDE_ASM("nonmatchings/game/c3dspline", Setup__10CCameraPasFv);
-INCLUDE_ASM("nonmatchings/game/c3dspline", Run__10CCameraPasFv);
+void CCameraPas::Run(void) {
+    this->field_0x940 = 1;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", Step__10CCameraPasFPfPf);
 INCLUDE_ASM("nonmatchings/game/c3dspline", CheckEnd__10CCameraPasFv);
 INCLUDE_ASM("nonmatchings/game/c3dspline", __ct__9CCharaPasFv);
@@ -143,8 +152,12 @@ INCLUDE_ASM("nonmatchings/game/c3dspline", InsCharaPas__9CCharaPasFiPf);
 INCLUDE_ASM("nonmatchings/game/c3dspline", SetCharaPas__9CCharaPasFiPf);
 INCLUDE_ASM("nonmatchings/game/c3dspline", GetCharaPas__9CCharaPasFiPf);
 INCLUDE_ASM("nonmatchings/game/c3dspline", DelCharaPas__9CCharaPasFi);
-INCLUDE_ASM("nonmatchings/game/c3dspline", SetFrame__9CCharaPasFi);
-INCLUDE_ASM("nonmatchings/game/c3dspline", GetFrame__9CCharaPasFv);
+void CCharaPas::SetFrame(s32 arg0) {
+    this->field_0x100 = arg0;
+}
+s32 CCharaPas::GetFrame(void) {
+    return this->field_0x100;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", scsPRDelay__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/c3dspline", scsSetPos__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/c3dspline", scsSetRef__FP12_SEN_CMR_SEQP12CSceneCmrSeq);

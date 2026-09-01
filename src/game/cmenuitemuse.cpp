@@ -12,6 +12,9 @@
  * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
 extern s8 MenuDrawNumberKeta;
 extern u8 MenuMainFrame_ActionEndFlag;
+extern "C" void *memset(void *destination, s32 value, u32 size);
+struct MENUFORM_MAKEBRD_INFO;
+
 
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", CheckRoboShieldKit__FP16CUserDataManagerP13CGameDataUsediPiPi);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", MenuUseItemCheckFunc__FP13CGameDataUsedP14CItemUseTargeti);
@@ -21,7 +24,9 @@ INCLUDE_ASM("nonmatchings/game/cmenuitemuse", UseItem__12CMenuItemUseFP13CGameDa
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", Initialize__12CMenuItemUseFv);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", CheckNowStateUseThisItem__FP13CGameDataUsedP14CItemUseTarget);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", AttachMessageForm__Fv);
-INCLUDE_ASM("nonmatchings/game/cmenuitemuse", Init_MENUFORM_MAKEBRD_INFO__FP21MENUFORM_MAKEBRD_INFO);
+void Init_MENUFORM_MAKEBRD_INFO(MENUFORM_MAKEBRD_INFO * arg0) {
+    memset(arg0, 0, 44);
+}
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", GetMenuItemIconTexGetXY__FiR9mgRect_i_);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", GetMenuItemIconTexInfo__Fii);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", ConvMGIRECTtoINTtbl__F9mgRect_i_Pi);

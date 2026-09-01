@@ -28,5 +28,6 @@ INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", EditDataSave__Fv);
 INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", EditDataLoad__Fv);
 INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", KeepEditAnalyze__Fv);
 INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", EditAnalyzeChanged__Fv);
-INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", LoadComVillaager__Fv);
+void LoadComVillaager(void) {
+}
 INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", LoadMap__Fv);

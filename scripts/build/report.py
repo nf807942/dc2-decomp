@@ -24,7 +24,11 @@ from lib.project import (CONFIG_DIR, ROOT, grafted_symbols,  # noqa: E402
 from build.gen_objdiff import SECTORS, sector_of, sectors_by_symbol  # noqa: E402
 
 PROGRESS_DIR = ROOT / "progress"
-REPORT_JSON = PROGRESS_DIR / "report.json"
+# Le rapport brut d'objdiff, sous son propre nom : `make progress` écrit au
+# format de decomp.dev, et les deux se sont longtemps écrasés dans le même
+# fichier — le dernier lancé décidait de ce qu'on lisait, l'un comptant les
+# fonctions greffées et l'autre non.
+REPORT_JSON = PROGRESS_DIR / "objdiff.json"
 PAGE = PROGRESS_DIR / "index.html"
 TEMPLATE = Path(__file__).resolve().parent / "report_template.html"
 

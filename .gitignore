@@ -71,8 +71,14 @@ SLPS_*
 
 # Rapports de progression et configuration objdiff, engendrés depuis le
 # découpage à chaque construction.
-/progress/
+# Le dossier s'exclut par son contenu, non en bloc : git ne rouvre pas un
+# fichier dont le dossier est ignoré, et l'exception ci-dessous serait morte.
+/progress/*
 /objdiff.json
+# Le journal de cadence fait exception : il ne vient pas du jeu mais de nos
+# propres sources, et une mesure d'avancement qu'un `make distclean` efface ne
+# dit plus rien du rythme. `make etat --reconstituer` le refait depuis git.
+!/progress/journal.jsonl
 
 # Python
 **/__pycache__/

@@ -7,10 +7,13 @@
  */
 
 #include "common.h"
+#include "gen/CStarDust.hpp"
 
 INCLUDE_ASM("nonmatchings/game/cmenuinvent_00207770", IsAskExtend__11CMenuInventFii);
 INCLUDE_ASM("nonmatchings/game/cmenuinvent_00207770", PhotoNetaEnter__11CMenuInventFii);
-INCLUDE_ASM("nonmatchings/game/cmenuinvent_00207770", __ct__9CStarDustFv);
+CStarDust::CStarDust(void) {
+    this->field_0xA = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cmenuinvent_00207770", IsAccessAlbum__11CMenuInventFv);
 INCLUDE_ASM("nonmatchings/game/cmenuinvent_00207770", GetNetaBoardCursorPosition__11CMenuInventFiPi);
 INCLUDE_ASM("nonmatchings/game/cmenuinvent_00207770", GetNetaMemoCursorPosition__11CMenuInventFiPi);

@@ -12,6 +12,10 @@
  * qu'un code de retour ne la déréférencent pas : sa disposition reste à
  * établir. */
 struct SPI_STACK;
+extern s32 ShowOffOnce;
+extern s32 niVlgr;
+extern s32 vpiInfo;
+
 
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", sgSystemDrawBuggy__FP11SubGameInfo);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", CharaControl__FP6CSceneP11CPadControl_00319DB0);
@@ -47,7 +51,9 @@ INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", LoadHelpMes__FP1);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", GetHepMesInfo__Fv);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", CreateHelpMes__Fi);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", StepHelpMes__Fv);
-INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", ShowOffOnceHelpMes__Fv);
+void ShowOffOnceHelpMes(void) {
+    ShowOffOnce = 1;
+}
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", DrawHelpMes__Fv);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", ShowHelpMes__Fii);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", ShowErrorHelpMes__Fii);
@@ -56,7 +62,10 @@ INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", GetVlgrPlaceTable__FPi);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", GetVillagerInfo__Fi);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", GetVillagerModelName__FiPc);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", niNPC__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", niNPC_END__FP9SPI_STACKi);
+s32 niNPC_END(SPI_STACK * arg0, s32 arg1) {
+    niVlgr = 0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", niPROGRESS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", niPROGRESS_END__FP9SPI_STACKi);
 s32 niPLACE(SPI_STACK *stack, int argc) {
@@ -72,7 +81,10 @@ INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", LoadPlaceInfo__FPciP9mgCMemo
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", vpiNPC_PLACE_NUM__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", __ct__18CVillagerPlaceInfoFv);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", vpiNPC_PLACE__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", vpiNPC_PLACE_END__FP9SPI_STACKi);
+s32 vpiNPC_PLACE_END(SPI_STACK * arg0, s32 arg1) {
+    vpiInfo = 0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", vpiPLACE_POS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", vpiMOVE_TO__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", vpiWAIT__FP9SPI_STACKi);

@@ -9,6 +9,9 @@
 #include "common.h"
 
 #include "runscript.hpp"
+extern s32 SwordEffect;
+struct RS_STACKDATA;
+
 
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_SET_MINIMAP_FLAG__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_SET_MM_LINE_FLAG__FP12RS_STACKDATAi);
@@ -66,7 +69,10 @@ INCLUDE_ASM("nonmatchings/game/text_002798A0", _ANGLE_LIMIT__FP12RS_STACKDATAi_0
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _GET_RAND__FP12RS_STACKDATAi_0027AA50);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _LINE_POINT_DIST__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _CREATE_SWORD_EFFECT__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002798A0", _DELETE_SWORD_EFFECT__FP12RS_STACKDATAi);
+s32 _DELETE_SWORD_EFFECT(RS_STACKDATA * arg0, s32 arg1) {
+    SwordEffect = 0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SWORD_EFFECT_COLOR__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SWORD_EFFECT_ADD_POINT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _ADD_CHARA_POS__FP12RS_STACKDATAi);

@@ -49,7 +49,9 @@ s32 GetMainMapNo(void) {
 s32 GetSubMapNo(void) {
     return NowSubMapNo;
 }
-INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", ClearSubMapNo__Fv);
+void ClearSubMapNo(void) {
+    NowSubMapNo = -1;
+}
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", __ct__14MapJumpMapInfoFv);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", SetMainMapInfo__FP14MapJumpMapInfo);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", SetSubMapInfo__FP14MapJumpMapInfo);

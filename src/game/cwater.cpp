@@ -7,6 +7,8 @@
  */
 
 #include "common.h"
+#include "gen/CWaterFrame.hpp"
+#include "gen/dbgCJISFont.hpp"
 
 INCLUDE_ASM("nonmatchings/game/cwater", Initialize__7CMapSkyFv);
 INCLUDE_ASM("nonmatchings/game/cwater", DrawSkyBack__7CMapSkyFPfPfPf);
@@ -30,7 +32,9 @@ INCLUDE_ASM("nonmatchings/game/cwater", Hamon__6CWaterFv);
 INCLUDE_ASM("nonmatchings/game/cwater", SetVertex__6CWaterFPfPf);
 INCLUDE_ASM("nonmatchings/game/cwater", Shake__6CWaterFiif);
 INCLUDE_ASM("nonmatchings/game/cwater", Shake__11CWaterFrameFfff);
-INCLUDE_ASM("nonmatchings/game/cwater", GetWater__11CWaterFrameFv);
+s32 CWaterFrame::GetWater(void) {
+    return this->field_0xF8;
+}
 INCLUDE_ASM("nonmatchings/game/cwater", SetSize__6CWaterFiiP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cwater", SetParam__6CWaterFffff);
 INCLUDE_ASM("nonmatchings/game/cwater", SetColor__6CWaterFUcUcUcUc);
@@ -52,7 +56,9 @@ INCLUDE_ASM("nonmatchings/game/cwater", ascii2serno__FUc);
 INCLUDE_ASM("nonmatchings/game/cwater", __ct__11dbgCJISFontFv);
 INCLUDE_ASM("nonmatchings/game/cwater", Initialize__11dbgCJISFontFv);
 INCLUDE_ASM("nonmatchings/game/cwater", InitTexture__11dbgCJISFontFiPciPciPc);
-INCLUDE_ASM("nonmatchings/game/cwater", Clear__11dbgCJISFontFv);
+void dbgCJISFont::Clear(void) {
+    this->field_0x88 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cwater", __putc__11dbgCJISFontFUl);
 INCLUDE_ASM("nonmatchings/game/cwater", PrintDirect__11dbgCJISFontFiiPce);
 INCLUDE_ASM("nonmatchings/game/cwater", runerror__FPCc);

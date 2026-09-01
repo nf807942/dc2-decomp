@@ -7,6 +7,7 @@
  */
 
 #include "common.h"
+#include "gen/CBattleCharaInfo.hpp"
 
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", Initialize__13CFishAquariumFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetAquariumFishTop__13CFishAquariumFi);
@@ -148,7 +149,9 @@ INCLUDE_ASM("nonmatchings/game/cuserdatamanager", Initialize__16CBattleCharaInfo
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetEquipTablePtr__16CBattleCharaInfoFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SetChrNo__16CBattleCharaInfoFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetMonsterID__16CBattleCharaInfoFv);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetNowNPC__16CBattleCharaInfoFv);
+s16 CBattleCharaInfo::GetNowNPC(void) {
+    return this->field_0x4;
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", UseNPCPoint__16CBattleCharaInfoFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetActiveItemInfo__16CBattleCharaInfoFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", UseActiveItem__16CBattleCharaInfoFP13CGameDataUsed);
@@ -170,7 +173,9 @@ INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AddAbs__16CBattleCharaInfoFifP
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AddAbsRate__16CBattleCharaInfoFifPi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetNowAbs__16CBattleCharaInfoFiPi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", LevelUpWeapon__16CBattleCharaInfoFP13CGameDataUsed);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetDefenceVol__16CBattleCharaInfoFv);
+s16 CBattleCharaInfo::GetDefenceVol(void) {
+    return this->field_0x6C;
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AddHp_Point__16CBattleCharaInfoFff);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AddHp_Rate__16CBattleCharaInfoFfif);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SetHpRate__16CBattleCharaInfoFf);

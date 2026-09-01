@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+# La non-régression, avant que le dépôt ne parte ailleurs.
+#
+# `make build` compare au disque, et c'est le seul verdict qui compte. Il tient
+# en une minute et dix secondes depuis que la construction se parallélise, ce
+# qui le rend tenable à chaque poussée — il en coûtait huit.
+#
+# Aucune intégration continue distante ne peut le faire à notre place : elle
+# aurait besoin du binaire du commerce, et rien de dérivé du jeu ne sort d'ici.
+# Cette barrière est donc locale par nature, non par facilité.
+#
+# Installation : git config core.hooksPath .githooks
+# Contournement, quand la poussée ne touche pas la construction :
+#   DC2_SANS_BUILD=1 git push
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+echo "pre-push : contrôles…" >&2
+"$ROOT/scripts/host/dc2" make controle >&2 || {
+    echo "pre-push : les contrôles échouent. Corrigez, ou poussez avec" >&2
+    echo "           DC2_SANS_BUILD=1 si la poussée ne touche pas la source." >&2
+    exit 1
+}
+
+if [ "${DC2_SANS_BUILD:-0}" = "1" ]; then
+    echo "pre-push : construction sautée (DC2_SANS_BUILD=1)." >&2
+    exit 0
+fi
+
+echo "pre-push : construction…" >&2
+if ! "$ROOT/scripts/host/dc2" make build >&2; then
+    echo "pre-push : la construction ne rend plus les octets du disque." >&2
+    echo "           Une source qui compile mais change un octet est une" >&2
+    echo "           régression, pas une avancée." >&2
+    exit 1
+fi
+
+exit 0

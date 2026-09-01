@@ -7,6 +7,9 @@
  */
 
 #include "common.h"
+#include "gen/CGeyserEffectPoint.hpp"
+#include "gen/CSphidaData.hpp"
+#include "gen/CSubGameData.hpp"
 
 /* Le corps ne rend qu'un code : ni la classe ni les arguments ne sont
  * déréférencés, donc leur disposition reste à établir. */
@@ -14,6 +17,8 @@ class CMemoryCardManager {
 public:
     s32 Convert();
 };
+extern "C" void *memset(void *destination, s32 value, u32 size);
+
 
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", __ct__18CMemoryCardManagerFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Initialize__18CMemoryCardManagerFP9mgCMemory);
@@ -98,10 +103,16 @@ INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", CheckNowTourType__9CSaveData
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", AddTourCountEtc__9CSaveDataFi);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetTourCountEtc__9CSaveDataFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", FinishTour__9CSaveDataFv);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Initialize__11CSphidaDataFv);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", SetHorl__11CSphidaDataFi);
+void CSphidaData::Initialize(void) {
+    memset(this, 0, 6216);
+}
+void CSphidaData::SetHorl(s32 arg0) {
+    this->field_0x1478 = arg0;
+}
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", SetHorlScore__11CSphidaDataFii);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetNowHorl__11CSphidaDataFv);
+s16 CSphidaData::GetNowHorl(void) {
+    return this->field_0x1478;
+}
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetHorlScore__11CSphidaDataFi);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", ClearPlayerScore__11CSphidaDataFi);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", EnterScore__11CSphidaDataFv);
@@ -114,10 +125,16 @@ INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", SearchSpace__12CGyoRaceDataF
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", SearchSpaceData__12CGyoRaceDataFPi);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetData__12CGyoRaceDataFi);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", __ct__12CSubGameDataFv);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Initialize__12CSubGameDataFv);
+void CSubGameData::Initialize(void) {
+    memset(this, 0, 21616);
+}
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", PlayEnable__12CSubGameDataFii);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetSphidaData__12CSubGameDataFv);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetGyoRaceData__12CSubGameDataFv);
+void * CSubGameData::GetSphidaData(void) {
+    return &this->field_0x100;
+}
+void * CSubGameData::GetGyoRaceData(void) {
+    return &this->field_0x1948;
+}
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetFloorInfoPtr__16CSaveDataDungeonFii);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Initialize__16CSaveDataDungeonFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", SetFloorID__16CSaveDataDungeonFi);
@@ -134,7 +151,9 @@ INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetEmpty__13CGeyserEffectFv)
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", CreatePoint__13CGeyserEffectFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", CreatePacket__13CGeyserEffectFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", InitGeyserEffect__FiP6CSceneiP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", __ct__18CGeyserEffectPointFv);
+CGeyserEffectPoint::CGeyserEffectPoint(void) {
+    this->field_0x28 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", __ct__13CGeyserEffectFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", StepGeyserEffect__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", DrawGeyserEffect__FP6CScene);

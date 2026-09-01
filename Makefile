@@ -33,6 +33,14 @@ LD        := $(CROSS)ld
 OBJCOPY   := $(CROSS)objcopy
 OBJDUMP   := $(CROSS)objdump
 
+# La construction se parallélise sans risque : chaque objet est indépendant, et
+# le lien attend qu'ils soient tous là. Mesuré sur une reconstruction entière —
+# 7 min 49 s en séquentiel, 1 min 09 s sur vingt fils, le binaire restant
+# identique au disque. `-Otarget` garde la sortie d'une unité d'un seul bloc,
+# sans quoi vingt compilations écriraient dans le même flux.
+JOBS      ?= $(shell nproc 2>/dev/null || echo 4)
+MAKEFLAGS += -j$(JOBS) -Otarget
+
 PYTHON    := python3
 SPLAT     := $(PYTHON) -m splat split
 
@@ -126,8 +134,8 @@ REF_O_FILES := $(addprefix $(BUILD_DIR)/, $(REF_S_FILES:.s=.o))
 O_FILES   := $(addprefix $(BUILD_DIR)/, $(S_FILES:.s=.o) $(BIN_FILES:.bin=.o) \
              $(addsuffix .o, $(basename $(SRC_FILES))))
 
-.PHONY: all setup tools patch split build check diff decompile measure carve \
-        clean distclean progress report
+.PHONY: all setup tools patch split build objects check diff decompile measure \
+        carve clean distclean controle ci etat progress report
 
 all: build
 
@@ -162,6 +170,11 @@ split: config/splat.yaml
 # --------------------------------------------------------------------------
 
 build: check
+
+# Tous les objets, sans lier. C'est ce qu'objdiff mesure, et la mesure garde son
+# sens là où le lien échouerait : une passe automatique construit ainsi avant de
+# savoir si ce qu'elle propose tient.
+objects: $(O_FILES) $(REF_O_FILES)
 
 $(BUILD_DIR)/%.o: %.s
 	@mkdir -p $(dir $@)
@@ -275,6 +288,24 @@ carve:
 # `make units S=mgCFrame` détaille une classe.
 units:
 	@$(PYTHON) scripts/build/units.py $(S) $(UNITS_ARGS)
+
+# Ce qu'une construction paierait cher, décelé sans compiler : un en-tête
+# engendré absent, une greffe sans désassemblage, deux unités qui se
+# chevauchent. Une demi-seconde, sur l'hôte comme dans le conteneur.
+controle:
+	@$(PYTHON) scripts/build/controle.py
+
+# La non-régression : les contrôles, puis les octets du disque. C'est ce que le
+# hook `pre-push` lance, et ce qu'une intégration continue lancerait si le
+# binaire du commerce pouvait sortir de cette machine — il ne le peut pas.
+ci: controle
+	@$(MAKE) build
+
+# L'état du jour et la cadence, lus des sources : aucune construction, donc le
+# chiffre sort en une demi-seconde et se consulte à chaque pas. `make report`
+# reste la mesure fine, qui compare fonction par fonction.
+etat:
+	@$(PYTHON) scripts/build/etat.py $(ARGS)
 
 # Part des octets qui viennent de source compilée plutôt que du désassemblage.
 progress:

@@ -18,7 +18,8 @@ public:
 s32 LoadFileSocket(char *path, u32 *size) {
     return 0;
 }
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", WriteFileSocket__FPcPUii);
+void WriteFileSocket(char * arg0, u32 * arg1, s32 arg2) {
+}
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Initialize__18mgCVisualMotionMDTFv);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", CreateVertexWeight__18mgCVisualMotionMDTFPUiiP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", __ct__14mgVertexWeightFv);
@@ -85,7 +86,8 @@ INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", CheckEvent__19CTreasureBoxMa
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", GetGateKeyIndex__Fii);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", GetKeyDoorIndex__Fii);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Lamb2WolfManager__Fv);
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", LoopSoundManager__Fi);
+void LoopSoundManager(s32 arg0) {
+}
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", BattleSoundManager__Fv);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", StatusWarningSnd__Fv);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", BattleAreaBGMCtrl__Fv);
@@ -113,5 +115,7 @@ INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", _FLE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", CreatMonsterFloorInfo__FPci);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", AutoSetMonster__Fv);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", AutoSetMonster__FiPfPfi);
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", DungeonFloorInit__Fv);
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", DungeonFloorFinish__Fv);
+void DungeonFloorInit(void) {
+}
+void DungeonFloorFinish(void) {
+}

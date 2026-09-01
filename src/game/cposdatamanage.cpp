@@ -7,6 +7,7 @@
  */
 
 #include "common.h"
+#include "gen/CLevelUpEffect.hpp"
 
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Initialize__14CPosDataManageFv);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", GetTexGetInfo__14CPosDataManageFi);
@@ -74,7 +75,9 @@ INCLUDE_ASM("nonmatchings/game/cposdatamanage", Draw__14CRepairManagerFv);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Initialize__14CLevelUpEffectFv);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Generate__14CLevelUpEffectFP10mgCTextureiii);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Generate__14CLevelUpEffectFP10mgCTextureiP11CCharacter2);
-INCLUDE_ASM("nonmatchings/game/cposdatamanage", IsRun__14CLevelUpEffectFv);
+u8 CLevelUpEffect::IsRun(void) {
+    return this->field_0x0;
+}
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Step__14CLevelUpEffectFv);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Draw__14CLevelUpEffectFv);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Initialize__21CLevelUpEffectManagerFv);

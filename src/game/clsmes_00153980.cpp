@@ -7,10 +7,15 @@
  */
 
 #include "common.h"
+#include "gen/ClsMes.hpp"
 
 INCLUDE_ASM("nonmatchings/game/clsmes_00153980", SetWindowMode__6ClsMesFi);
-INCLUDE_ASM("nonmatchings/game/clsmes_00153980", GetWindowMode__6ClsMesFv);
-INCLUDE_ASM("nonmatchings/game/clsmes_00153980", SetWindowBgOpaqueFlg__6ClsMesFi);
+s32 ClsMes::GetWindowMode(void) {
+    return this->field_0x138;
+}
+void ClsMes::SetWindowBgOpaqueFlg(s32 arg0) {
+    this->field_0x13C = arg0;
+}
 INCLUDE_ASM("nonmatchings/game/clsmes_00153980", StepNpcName__6ClsMesFv);
 INCLUDE_ASM("nonmatchings/game/clsmes_00153980", StepNormal__6ClsMesFv);
 INCLUDE_ASM("nonmatchings/game/clsmes_00153980", Step__6ClsMesFv);

@@ -321,7 +321,9 @@ Le compilateur est `mwcps2-3.0-011126`, au niveau `-O4,p`, en `-lang c++`.
   mesure sur le désassemblage entier l'a montré en une seconde. La règle est donc
   celle du point précédent — compter d'abord.
 
-- **Un fragment isolé se compile en une seconde, une unité en quatre-vingt-dix.**
+- **Un fragment isolé se compile en une seconde, une unité en deux à quatre.**
+  (Quatre-vingt-dix à la première mesure ; la construction se parallélise depuis,
+  et le coût d'une unité est surtout fixe — voir « Ce que coûte un pas ».)
   `scripts/diff/probe.sh` passe un `.cpp` autonome au compilateur avec les
   drapeaux du projet et le désassemble : quand l'écart tient à quelques
   instructions, c'est ce qui rend une centaine de formes abordable. La

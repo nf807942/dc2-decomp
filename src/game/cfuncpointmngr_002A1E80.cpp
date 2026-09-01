@@ -11,6 +11,8 @@
 /* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
  * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
 extern s16 TitleOmakeFlag;
+extern s32 OmakeFlag;
+
 
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr_002A1E80", UpdateStatus__14CFuncPointMngrFv);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr_002A1E80", Copy__14CFuncPointMngrFR14CFuncPointMngrP9mgCMemory);
@@ -21,8 +23,13 @@ INCLUDE_ASM("nonmatchings/game/cfuncpointmngr_002A1E80", GetSeSrcVolPan__FPA4_fP
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr_002A1E80", GetLightAnimeWeight__FP10CFuncPointi);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr_002A1E80", title_init_rand__Fv);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr_002A1E80", SetSoundMode__Fv);
-INCLUDE_ASM("nonmatchings/game/cfuncpointmngr_002A1E80", InitTitleOmakeFlag__Fv);
-INCLUDE_ASM("nonmatchings/game/cfuncpointmngr_002A1E80", TitleOmakeOn__Fv);
+void InitTitleOmakeFlag(void) {
+    TitleOmakeFlag = 0;
+    OmakeFlag = 0;
+}
+void TitleOmakeOn(void) {
+    TitleOmakeFlag = 1;
+}
 s32 CheckOmakeFlag(void) {
     return TitleOmakeFlag;
 }

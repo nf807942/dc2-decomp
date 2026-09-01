@@ -29,10 +29,25 @@ décompilation mais à ce qui reste adressé en dur.
 ## Où on en est
 
 ```
-code reconstruit : 10 004 octets sur 2 209 044     0,453 %      39 fonctions
-unités ouvertes  : 319, 2 209 044 octets          100,0 %    7 791 fonctions
+code reconstruit : 13 240 octets sur 2 215 100     0,598 %     298 fonctions
+unités ouvertes  : 319, 2 208 852 octets           99,7 %    7 791 fonctions
 code mappé       : 100,000 % — chaque octet de code appartient à une unité
 ```
+
+Au 2 septembre 2026, et `make etat` le refait en une demi-seconde. Le journal
+`progress/journal.jsonl` en garde la trace jour par jour ; il a été reconstitué
+depuis l'historique git, et il dit la cadence :
+
+```
+pour finir en 2 ans :  10,3 fn/jour    3 008 o/jour
+rythme observé      :  11,9 fn/jour      668 o/jour   (sur 29 jours)
+fin projetée        :  2035-09-01
+```
+
+**Le compte de fonctions tient la cadence ; les octets sont 4,5 fois trop
+lents.** Les deux mesures ne disent pas la même chose et il faut les lire
+ensemble : reconstruire les petites fonctions avance le nombre sans peser sur
+le poids.
 
 Ce qui reste dehors : les 49 initialiseurs statiques, les microprogrammes
 vectoriels et les données.
@@ -314,7 +329,7 @@ Par ordre de ce que chacun débloque.
 | **Relever qui emploie chaque donnée, par les relocations** | le jalon 2 en entier |
 | **mwccgap : abaisser l'alignement d'une fonction compilée** | les treize auxiliaires du runtime, qui ne peuvent qu'être greffés |
 | **Un test d'exécution en émulateur** | le critère de sortie du jalon 3 |
-| **Intégration continue** | la non-régression de `make build`, aujourd'hui vérifiée à la main |
+| ~~**Intégration continue**~~ | **fait** — `make ci` enchaîne `make controle` et `make build`, et `.githooks/pre-push` le lance avant toute poussée. Aucun service distant ne peut le faire : il lui faudrait le binaire du commerce. |
 | **`make carve` : réunir une unité d'une fonction à sa voisine** | la lisibilité de `config/units.txt` |
 
 `tools/patches/` porte ce que le projet corrige dans les outils tiers, `make patch`

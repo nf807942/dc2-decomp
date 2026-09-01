@@ -7,10 +7,14 @@
  */
 
 #include "common.h"
+#include "gen/CRain.hpp"
+#include "gen/mgCObjectStack_21CList_12EMAP_MESSAGE__.hpp"
 
 INCLUDE_ASM("nonmatchings/game/cscene", SetCharNo__5CRainFi);
 INCLUDE_ASM("nonmatchings/game/cscene", ParticleBirth__5CRainFPfi);
-INCLUDE_ASM("nonmatchings/game/cscene", Stop__5CRainFv);
+void CRain::Stop(void) {
+    this->field_0x0 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cscene", Start__5CRainFv);
 INCLUDE_ASM("nonmatchings/game/cscene", Step__5CRainFv);
 INCLUDE_ASM("nonmatchings/game/cscene", Init__5CRainFv);
@@ -96,7 +100,9 @@ INCLUDE_ASM("nonmatchings/game/cscene", DeleteChara__6CSceneFi);
 INCLUDE_ASM("nonmatchings/game/cscene", CopyChara__6CSceneFiiP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cscene", LoadMapFromMemory__6CSceneFiP17SCN_LOADMAP_INFO2);
 INCLUDE_ASM("nonmatchings/game/cscene", LoadMapFromMemory__6CSceneFiiP17SCN_LOADMAP_INFO2);
-INCLUDE_ASM("nonmatchings/game/cscene", Initialize__39mgCObjectStack_21CList_12EMAP_MESSAGE__Fv);
+void mgCObjectStack_21CList_12EMAP_MESSAGE__::Initialize(void) {
+    this->field_0x8 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cscene", __ct__4CMapFv);
 INCLUDE_ASM("nonmatchings/game/cscene", LoadMapBGStep__6CSceneFP17SCN_LOADMAP_INFO2);
 INCLUDE_ASM("nonmatchings/game/cscene", LoadMap__6CSceneFiP17SCN_LOADMAP_INFO2i);

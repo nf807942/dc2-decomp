@@ -7,6 +7,8 @@
  */
 
 #include "common.h"
+#include "gen/CList_14PartsGroupData_.hpp"
+#include "gen/CList_P9CMapParts_.hpp"
 
 class CMap {
 public:
@@ -26,7 +28,10 @@ INCLUDE_ASM("nonmatchings/game/cmap", Initialize__9CMapWaterFv);
 INCLUDE_ASM("nonmatchings/game/cmap", Clear__9CMapWaterFv);
 INCLUDE_ASM("nonmatchings/game/cmap", GetPartsGroup__4CMapFi);
 INCLUDE_ASM("nonmatchings/game/cmap", AddPartsGroup__4CMapFPcP9CMapPartsP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/cmap", Initialize__23CList_14PartsGroupData_Fv);
+void CList_14PartsGroupData_::Initialize(void) {
+    this->field_0x4 = 0;
+    this->field_0x0 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cmap", SearchPartsGroup__4CMapFPc);
 INCLUDE_ASM("nonmatchings/game/cmap", SearchPartsGroupNo__4CMapFPc);
 INCLUDE_ASM("nonmatchings/game/cmap", SerachEmptyPartsGroupNo__4CMapFv);
@@ -43,7 +48,10 @@ INCLUDE_ASM("nonmatchings/game/cmap", SaerchEffectIndex__4CMapFPc);
 INCLUDE_ASM("nonmatchings/game/cmap", AddParts__4CMapFP17CList_9CMapParts_);
 INCLUDE_ASM("nonmatchings/game/cmap", GetParts__4CMapFPc);
 INCLUDE_ASM("nonmatchings/game/cmap", CreateDrawRect__4CMapFP9mgCMemoryP9mgVu0FBOXP9mgVu0FBOXi);
-INCLUDE_ASM("nonmatchings/game/cmap", Initialize__18CList_P9CMapParts_Fv);
+void CList_P9CMapParts_::Initialize(void) {
+    this->field_0x4 = 0;
+    this->field_0x0 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cmap", CreateOcclusion__4CMapFPA4_f);
 INCLUDE_ASM("nonmatchings/game/cmap", PlaceParts__4CMapFPcPfPfPfP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cmap", PlacePartsEnd__4CMapFv);

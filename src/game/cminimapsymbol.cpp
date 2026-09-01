@@ -7,6 +7,7 @@
  */
 
 #include "common.h"
+#include "gen/CAfterWire.hpp"
 
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", DngStep__Fv);
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", RunMainEvent__Fv);
@@ -25,7 +26,9 @@ INCLUDE_ASM("nonmatchings/game/cminimapsymbol", DBGCMD_RunScript__Fi);
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", __ct__13CFireAfterHitFv);
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", __ct__14CChillAfterHitFv);
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", __ct__8CThunderFv);
-INCLUDE_ASM("nonmatchings/game/cminimapsymbol", __ct__10CAfterWireFv);
+CAfterWire::CAfterWire(void) {
+    this->field_0x0 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", __ct__12CDamageScoreFv);
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", SetMapInfo__14CMiniMapSymbolFP4CMapP13CAutoMapPartsiiff);
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", DrawSymbolOpen__14CMiniMapSymbolFv);

@@ -11,10 +11,15 @@
 /* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
  * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
 extern s32 PauseFlag_0037E850;
+extern s32 cancel_now_loading;
+struct SubGameInfo;
+
 
 INCLUDE_ASM("nonmatchings/game/nowloadinginfo", sgLoopGyoRace__FP11SubGameInfo);
 INCLUDE_ASM("nonmatchings/game/nowloadinginfo", AutoCam__FP11SubGameInfo);
-INCLUDE_ASM("nonmatchings/game/nowloadinginfo", sgMapDrawGyoRace__FP11SubGameInfo);
+s32 sgMapDrawGyoRace(SubGameInfo * arg0) {
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/nowloadinginfo", sgCharaDrawGyoRace__FP11SubGameInfo);
 INCLUDE_ASM("nonmatchings/game/nowloadinginfo", DivSpriteScreen__FR11mgCDrawPrim_0030C940);
 INCLUDE_ASM("nonmatchings/game/nowloadinginfo", sgEffectDrawGyoRace__FP11SubGameInfo);
@@ -22,7 +27,9 @@ INCLUDE_ASM("nonmatchings/game/nowloadinginfo", sgSysDrawGyoRace__FP11SubGameInf
 INCLUDE_ASM("nonmatchings/game/nowloadinginfo", Jikkyou__FP11SubGameInfo);
 INCLUDE_ASM("nonmatchings/game/nowloadinginfo", SwitchNowLoadingThread__Fv);
 INCLUDE_ASM("nonmatchings/game/nowloadinginfo", NowLoadingLoop__FPv);
-INCLUDE_ASM("nonmatchings/game/nowloadinginfo", CancelNowLoading__Fv);
+void CancelNowLoading(void) {
+    cancel_now_loading = 1;
+}
 INCLUDE_ASM("nonmatchings/game/nowloadinginfo", CreateNowLoading__FP14NowLoadingInfo);
 INCLUDE_ASM("nonmatchings/game/nowloadinginfo", NowLoadingBarStep__Fv);
 INCLUDE_ASM("nonmatchings/game/nowloadinginfo", NowLoadingBarSteEnd__Fv);

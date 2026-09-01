@@ -7,6 +7,8 @@
  */
 
 #include "common.h"
+struct mgCMemory;
+
 
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _RUN_MAIN_MOVE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _RUN_SHROW_MOVE__FP12RS_STACKDATAi);
@@ -90,7 +92,8 @@ INCLUDE_ASM("nonmatchings/game/text_002D3110", InitMapSelect__FP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", MapTypeSelect__Fv);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", MapSelect__Fv);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", MapSelectLoop__Fv);
-INCLUDE_ASM("nonmatchings/game/text_002D3110", InitSaveDataEdit__FP9mgCMemory);
+void InitSaveDataEdit(mgCMemory * arg0) {
+}
 INCLUDE_ASM("nonmatchings/game/text_002D3110", SaveDataEditLoop__Fv);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", EventViewLoop__Fv);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", LoadEventViewData__FP1P9mgCMemory);

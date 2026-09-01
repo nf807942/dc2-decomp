@@ -101,7 +101,6 @@ def main() -> int:
               f"{sum(opened)} octets ({100 * sum(opened) / total_bytes:.1f} %), "
               f"{len(opened)} fonctions")
 
-    # Le format que decomp.dev consomme.
     report = {
         "measures": {
             "code": done_bytes, "code/total": total_bytes,
@@ -109,7 +108,10 @@ def main() -> int:
             "functions": done_count, "functions/total": total_count,
         }
     }
-    out = ROOT / "progress" / "report.json"
+    # Le format que decomp.dev consomme, sous son propre nom : le rapport brut
+    # d'objdiff que `make report` engendre porte le même nom de mesure et un
+    # tout autre sens.
+    out = ROOT / "progress" / "decomp_dev.json"
     out.parent.mkdir(exist_ok=True)
     out.write_text(json.dumps(report, indent=2), encoding="utf-8")
     return 0
