@@ -254,7 +254,11 @@ extern "C" f32 GetNowTime__4CMapFv(CMap *objet) {
     }
     return 12.0f;
 }
-INCLUDE_ASM("nonmatchings/game/cmapparts", GetNowTimeBand__4CMapFv);
+extern "C" f32 GetNowTime__4CMapFv(CMap *objet);
+extern "C" s32 GetTimeBand__Ff(f32 arg0);
+extern "C" void GetNowTimeBand__4CMapFv(CMap *objet) {
+    GetTimeBand__Ff(GetNowTime__4CMapFv(objet));
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetNowTimeLightBand__4CMapFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetLightingRatio__4CMapFPf);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetLightingFlareRatio__4CMapFPf);
@@ -330,7 +334,12 @@ void CMapPiece::SetMaterial(PieceMaterial * arg0, s32 arg1) {
     this->field_0x90 = arg0;
     this->field_0x8C = arg1;
 }
-INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__13PieceMaterialFv);
+struct PieceMaterial;
+extern "C" s32 Initialize__13PieceMaterialFv(PieceMaterial *objet);
+extern "C" PieceMaterial *__ct__13PieceMaterialFv(PieceMaterial *objet) {
+    Initialize__13PieceMaterialFv(objet);
+    return objet;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", Initialize__13PieceMaterialFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE_MATERIAL__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetMaterial__8mgCFrameFi);
@@ -385,7 +394,11 @@ s32 map_MAP_INFO_TOP(SPI_STACK *stack, int argc) {
 }
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapCAMERA_INFO__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__11CCameraInfoFv);
-INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__15CCameraDrawInfoFv);
+extern "C" s32 Initialize__15CCameraDrawInfoFv(CCameraDrawInfo *objet);
+extern "C" CCameraDrawInfo *__ct__15CCameraDrawInfoFv(CCameraDrawInfo *objet) {
+    Initialize__15CCameraDrawInfoFv(objet);
+    return objet;
+}
 void CCameraDrawInfo::Initialize(void) {
     this->field_0x4 = 0;
     this->field_0x0 = -1;
@@ -525,7 +538,25 @@ INCLUDE_ASM("nonmatchings/game/cmapparts", Draw__9CMapPieceFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", DrawStep__9CMapPartsFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", CreateBoundBox__9CMapPartsFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", CheckColBox__9CMapPartsFP9mgVu0FBOX);
-INCLUDE_ASM("nonmatchings/game/cmapparts", GetBBox__9CMapPartsFP9mgVu0FBOX);
+#include "sphida.hpp"
+typedef struct CMapParts_infere {
+    /* 0x000 */ char pad0[0x230];
+    /* 0x230 */ s32 unk230;                         /* inferred */
+    /* 0x234 */ char pad234[0xC];                   /* maybe part of unk230[4]? */
+    /* 0x240 */ mgVu0FBOX unk240;                   /* inferred */
+    /* 0x240 */ char pad240[1];
+} CMapParts_infere;                                        /* size >= 0x241 */
+extern "C" s32 __as__9mgVu0FBOXFR9mgVu0FBOX(mgVu0FBOX *objet, mgVu0FBOX *arg0);
+extern "C" s32 GetBBox__9CMapPartsFP9mgVu0FBOX(CMapParts_infere *objet, mgVu0FBOX *arg0) {
+    s32 temp_v0;
+
+    temp_v0 = objet->unk230;
+    if (temp_v0 == 0) {
+        return temp_v0;
+    }
+    __as__9mgVu0FBOXFR9mgVu0FBOX(arg0, &objet->unk240);
+    return objet->unk230;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetBoundBox__9CMapPartsFP9mgVu0FBOX);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetBoundSphere__9CMapPartsFPf);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetLWMatrix__9CMapPartsFPA4_f);
@@ -543,7 +574,27 @@ void CList_9CObjAnime_::Initialize(void) {
     this->field_0x4 = 0;
     this->field_0x0 = 0;
 }
-INCLUDE_ASM("nonmatchings/game/cmapparts", Initialize__15CMapTreasureBoxFv);
+typedef struct CMapTreasureBox_infere {
+    /* 0x000 */ char pad0[0x660];
+    /* 0x660 */ s32 unk660;                         /* inferred */
+    /* 0x664 */ s32 unk664;                         /* inferred */
+    /* 0x668 */ s32 unk668;                         /* inferred */
+    /* 0x66C */ s32 unk66C;                         /* inferred */
+    /* 0x670 */ s32 unk670;                         /* inferred */
+    /* 0x674 */ s32 unk674;                         /* inferred */
+    /* 0x678 */ s32 unk678;                         /* inferred */
+} CMapTreasureBox_infere;                                  /* size >= 0x67C */
+extern "C" s32 Initialize__11CCharacter2Fv(CCharacter2 *objet);
+extern "C" void Initialize__15CMapTreasureBoxFv(CMapTreasureBox_infere *objet) {
+    Initialize__11CCharacter2Fv((CCharacter2 *) objet);
+    objet->unk660 = 0;
+    objet->unk664 = 0;
+    objet->unk668 = -1;
+    objet->unk66C = 0;
+    objet->unk670 = -1;
+    objet->unk674 = 0;
+    objet->unk678 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", AssignFuncPoint__15CMapTreasureBoxFP10CFuncPointP9CMapParts);
 #include "gen/mgCFrame.hpp"
 typedef struct CMapTreasureBox {

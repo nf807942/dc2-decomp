@@ -74,7 +74,11 @@ INCLUDE_ASM("nonmatchings/game/ccharacter2", _SEQ_START__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _SEQ__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _SEQ_END__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _CLOTH_START__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", __ct__13CDynamicAnimeFv);
+extern "C" s32 Initialize__13CDynamicAnimeFv(CDynamicAnime *objet);
+extern "C" CDynamicAnime *__ct__13CDynamicAnimeFv(CDynamicAnime *objet) {
+    Initialize__13CDynamicAnimeFv(objet);
+    return objet;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _CLOTH__FP9SPI_STACKi);
 s32 _CLOTH_END(SPI_STACK *stack, int argc) {
     return 1;

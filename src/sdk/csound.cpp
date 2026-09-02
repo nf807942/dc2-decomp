@@ -190,7 +190,11 @@ INCLUDE_ASM("nonmatchings/sdk/csound", sndGetSeDefVol__FUii);
 INCLUDE_ASM("nonmatchings/sdk/csound", IsBgmPort__Fi);
 INCLUDE_ASM("nonmatchings/sdk/csound", GetCSndPortNo__FiPiPiPi);
 INCLUDE_ASM("nonmatchings/sdk/csound", sndLoadSound__FiPUiP9mgCMemory);
-INCLUDE_ASM("nonmatchings/sdk/csound", __ct__13sndCSeSeqDataFv);
+extern "C" s32 Initialize__13sndCSeSeqDataFv(sndCSeSeqData *objet);
+extern "C" sndCSeSeqData *__ct__13sndCSeSeqDataFv(sndCSeSeqData *objet) {
+    Initialize__13sndCSeSeqDataFv(objet);
+    return objet;
+}
 INCLUDE_ASM("nonmatchings/sdk/csound", sndDeletePort__Fi);
 INCLUDE_ASM("nonmatchings/sdk/csound", GetPortBankNo__FUiPiPi);
 INCLUDE_ASM("nonmatchings/sdk/csound", sndSePlay__FUiii);

@@ -107,7 +107,12 @@ extern s32 start_thunder;
 extern s32 thunder_count;
 
 
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", __ct__18CMemoryCardManagerFv);
+#include "menu.hpp"
+extern "C" s32 Initialize__18CMemoryCardManagerFP9mgCMemory(CMemoryCardManager *objet, mgCMemory *arg0);
+extern "C" CMemoryCardManager *__ct__18CMemoryCardManagerFv(CMemoryCardManager *objet) {
+    Initialize__18CMemoryCardManagerFP9mgCMemory(objet, NULL);
+    return objet;
+}
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Initialize__18CMemoryCardManagerFP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", InitSaveFileInfoTable__18CMemoryCardManagerFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetOpenAttribute__18CMemoryCardManagerFPc);
@@ -154,7 +159,21 @@ extern "C" s32 GetSaveDataSize__18CMemoryCardManagerFi(CMemoryCardManager *objet
     }
     return var_v0;
 }
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", SetFuncNo__18CMemoryCardManagerFi);
+typedef struct CMemoryCardManager_infere {
+    /* 0x000 */ char pad0[0x50];
+    /* 0x050 */ s32 unk50;                          /* inferred */
+    /* 0x054 */ char pad54[4];
+    /* 0x058 */ s32 unk58;                          /* inferred */
+    /* 0x05C */ char pad5C[0x8B0];                  /* maybe part of unk58[0x22D]? */
+    /* 0x90C */ s32 unk90C;                         /* inferred */
+} CMemoryCardManager_infere;                               /* size >= 0x910 */
+extern "C" void SetFuncNo__18CMemoryCardManagerFi(CMemoryCardManager_infere *objet, s32 arg0) {
+    objet->unk50 = arg0;
+    objet->unk58 = 0;
+    if (arg0 == 1) {
+        objet->unk90C = 0xB;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetFuncNo__18CMemoryCardManagerFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", CheckMaxUniqueCounter__18CMemoryCardManagerFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetUpdateFile__18CMemoryCardManagerFv);
@@ -245,7 +264,21 @@ INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", CheckNowTourEvent__9CSaveDat
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", CheckNowTourType__9CSaveDataFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", AddTourCountEtc__9CSaveDataFi);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetTourCountEtc__9CSaveDataFv);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", FinishTour__9CSaveDataFv);
+typedef struct CSaveData_infere {
+    /* 0x00000 */ char pad0[0x1A14];
+    /* 0x01A14 */ s32 unk1A14;                      /* inferred */
+    /* 0x01A18 */ char pad1A18[0x629BC];            /* maybe part of unk1A14[0x18A70]? */
+    /* 0x643D4 */ s32 unk643D4;                     /* inferred */
+    /* 0x643D8 */ s16 unk643D8;                     /* inferred */
+    /* 0x643DA */ char pad643DA[1];
+    /* 0x643DB */ s8 unk643DB;                      /* inferred */
+    /* 0x643DC */ s32 unk643DC;                     /* inferred */
+} CSaveData_infere;                                        /* size >= 0x643E0 */
+extern "C" void FinishTour__9CSaveDataFv(CSaveData_infere *objet) {
+    objet->unk643D4 = objet->unk1A14 - objet->unk643DC;
+    objet->unk643D8 = 0;
+    objet->unk643DB = 0;
+}
 void CSphidaData::Initialize(void) {
     memset(this, 0, 6216);
 }

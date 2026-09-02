@@ -56,7 +56,19 @@ INCLUDE_ASM("nonmatchings/game/cuserdatamanager", EntryRemain__18CFishingTournam
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetRecord__18CFishingTournamentFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SetRank__18CFishingTournamentFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SortRecord__18CFishingTournamentFv);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", CalcTopWeight__18CFishingTournamentFv);
+typedef struct CFishingTournament_infere {
+    /* 0x00 */ char pad0[0x24];
+    /* 0x24 */ s16 unk24;                           /* inferred */
+    /* 0x26 */ char pad26[6];                       /* maybe part of unk24[4]? */
+    /* 0x2C */ s16 unk2C;                           /* inferred */
+    /* 0x2E */ char pad2E[6];                       /* maybe part of unk2C[4]? */
+    /* 0x34 */ s16 unk34;                           /* inferred */
+} CFishingTournament_infere;                               /* size >= 0x36 */
+extern "C" s32 SortRecord__18CFishingTournamentFv(CFishingTournament_infere *objet);
+extern "C" s32 CalcTopWeight__18CFishingTournamentFv(CFishingTournament_infere *objet) {
+    SortRecord__18CFishingTournamentFv(objet);
+    return objet->unk34 + (objet->unk24 + objet->unk2C);
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", Initialize__16CUserDataManagerFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", RefreshParam__16CUserDataManagerFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetUsedDataPtr__16CUserDataManagerFi);
@@ -79,7 +91,13 @@ INCLUDE_ASM("nonmatchings/game/cuserdatamanager", DisableCharaChange__16CUserDat
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", CheckEnableCharaChange__16CUserDataManagerFiPi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", CheckQuickChange__16CUserDataManagerFiPi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", EnableCharaChangeMask__16CUserDataManagerFi);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", DisableCharaChangeMask__16CUserDataManagerFi);
+typedef struct CUserDataManager_infere {
+    /* 0x00000 */ char pad0[0x44D94];
+    /* 0x44D94 */ u8 unk44D94;                      /* inferred */
+} CUserDataManager_infere;                                 /* size >= 0x44D95 */
+extern "C" void DisableCharaChangeMask__16CUserDataManagerFi(CUserDataManager_infere *objet, s32 arg0) {
+    objet->unk44D94 &= ~(1 << arg0) & 0xFF;
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", InitCharaChangeMask__16CUserDataManagerFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetEnableCharaChangeFlag__16CUserDataManagerFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetCharaStatusAttirbutePtr__16CUserDataManagerFi);
@@ -220,7 +238,20 @@ s16 CBattleCharaInfo::GetDefenceVol(void) {
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AddHp_Point__16CBattleCharaInfoFff);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AddHp_Rate__16CBattleCharaInfoFfif);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SetHpRate__16CBattleCharaInfoFf);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetMaxHp_i__16CBattleCharaInfoFv);
+typedef struct CBattleCharaInfo_infere {
+    /* 0x00 */ char pad0[0x74];
+    /* 0x74 */ f32 *unk74;                          /* inferred */
+} CBattleCharaInfo_infere;                                 /* size >= 0x78 */
+extern "C" s32 fptosi(f32);
+extern "C" s32 GetMaxHp_i__16CBattleCharaInfoFv(CBattleCharaInfo_infere *objet) {
+    f32 *temp_v0;
+
+    temp_v0 = objet->unk74;
+    if (temp_v0 != NULL) {
+        return fptosi(*temp_v0);
+    }
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetNowHp_i__16CBattleCharaInfoFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SetAttr__16CBattleCharaInfoFii);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SetAttrVol__16CBattleCharaInfoFii);

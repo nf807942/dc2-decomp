@@ -51,7 +51,18 @@ INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetNextRef__9mgCCameraFfff);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetNextRef__9mgCCameraFPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetDir__9mgCCameraFPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetCameraMatrix__9mgCCameraFPA4_f);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetSpeed__9mgCCameraFff);
+typedef struct mgCCamera_infere {
+    /* 0x00 */ char pad0[0x48];
+    /* 0x48 */ f32 unk48;                           /* inferred */
+    /* 0x4C */ f32 unk4C;                           /* inferred */
+} mgCCamera_infere;                                        /* size >= 0x50 */
+extern "C" void SetSpeed__9mgCCameraFff(mgCCamera_infere *objet, f32 arg0, f32 arg1) {
+    objet->unk48 = arg0;
+    objet->unk4C = arg1;
+    if (arg1 < 0.0f) {
+        objet->unk4C = objet->unk48;
+    }
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetRoll__9mgCCameraFf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetPos__9mgCCameraFPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetRef__9mgCCameraFPf);
@@ -212,7 +223,54 @@ INCLUDE_ASM("nonmatchings/mglib/mgcframe", Draw__14mgCDrawManagerFiP13sceVif1Pac
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", EndDraw__14mgCDrawManagerFP13sceVif1Packet);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", AddPacket__14mgCDrawManagerFiP1P1i);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Initialize__12mgCFrameAttrFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", __ct__12mgCFrameAttrFv);
+extern "C" void __ct__13mgCVisualAttrFv(void *);
+struct mgCFrameAttr {
+    char pad_0[0x4];
+    s32 field_4;
+    s32 field_8;
+    s32 field_C;
+    s32 field_10;
+    char pad_14[0xC];
+    s32 field_20;
+    s32 field_24;
+    s32 field_28;
+    char pad_2C[0xC];
+    s32 field_38;
+    s32 field_3C;
+    char pad_40[0x4];
+    s32 field_44;
+    char pad_48[0x4];
+    s32 field_4C;
+    char pad_50[0x10];
+    s32 field_60;
+    char pad_64[0x1C];
+    s32 field_80;
+    s32 field_84;
+    s32 field_88;
+    char pad_8C[0x4];
+    f32 field_90;
+    f32 field_94;
+    f32 field_98;
+    f32 field_9C;
+    f32 field_A0;
+    f32 field_A4;
+    f32 field_A8;
+    f32 field_AC;
+};
+struct mgCVisualAttr {
+    s32 field_0;
+    s32 field_4;
+    s32 field_8;
+    s32 field_C;
+    s32 field_10;
+    s32 field_14;
+};
+extern "C" s32 Initialize__12mgCFrameAttrFv(mgCFrameAttr *objet);
+extern "C" mgCFrameAttr *__ct__12mgCFrameAttrFv(mgCFrameAttr *objet) {
+    __ct__13mgCVisualAttrFv((mgCVisualAttr *) objet);
+    Initialize__12mgCFrameAttrFv(objet);
+    return objet;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", QuatToMat__FPfPA4_f);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", test1__FPA4_fPA4_fPA4_fPfPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", test2__FPfPf);
@@ -247,7 +305,25 @@ INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetWorldBBox__8mgCFrameFP9mgVu0FBOX);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetFrameNum__8mgCFrameFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetParent__8mgCFrameFP8mgCFrame);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetBrother__8mgCFrameFP8mgCFrame);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetChild__8mgCFrameFP8mgCFrame);
+typedef struct mgCFrame_infere {
+    /* 0x00 */ char pad0[0x54];
+    /* 0x54 */ mgCFrame_infere *unk54;                     /* inferred */
+    /* 0x58 */ mgCFrame_infere *unk58;                     /* inferred */
+} mgCFrame_infere;                                         /* size >= 0x5C */
+extern "C" s32 SetBrother__8mgCFrameFP8mgCFrame(mgCFrame_infere *objet, mgCFrame_infere *arg0);
+extern "C" void SetChild__8mgCFrameFP8mgCFrame(mgCFrame_infere *objet, mgCFrame_infere *arg0) {
+    mgCFrame_infere *temp_a0;
+
+    if (arg0 != NULL) {
+        temp_a0 = objet->unk58;
+        if (temp_a0 != NULL) {
+            SetBrother__8mgCFrameFP8mgCFrame(temp_a0, arg0);
+        } else {
+            objet->unk58 = arg0;
+        }
+        arg0->unk54 = objet;
+    }
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", DeleteParent__8mgCFrameFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetReference__8mgCFrameFP8mgCFrame);
 void mgCFrame::DeleteReference(void) {

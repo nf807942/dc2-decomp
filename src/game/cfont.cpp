@@ -135,7 +135,11 @@ extern "C" s32 emGetPenkiItemNo__Fi(s32 arg0) {
     }
     return GetPenkiItemNo__Fi(arg0);
 }
-INCLUDE_ASM("nonmatchings/game/cfont", emGetPenkiItemNo__FPf);
+extern "C" s32 emGetPenkiItemNo__Fi(s32 arg0);
+extern "C" s32 emSearchColorCode__FPf(f32 *arg0);
+extern "C" void emGetPenkiItemNo__FPf(f32 *arg0) {
+    emGetPenkiItemNo__Fi(emSearchColorCode__FPf(arg0));
+}
 void IntiSystemMes(void) {
     SysMesCnt = 0;
     SysMesNo = -1;
