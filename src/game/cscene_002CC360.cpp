@@ -30,7 +30,31 @@ INCLUDE_ASM("nonmatchings/game/cscene_002CC360", GetCharaLighting__6CSceneFPA4_f
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", DrawChara__6CSceneFii);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", DrawCharaShadow__6CSceneFi);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", DrawExclamationMark__6CSceneFP8mgCFrame);
-INCLUDE_ASM("nonmatchings/game/cscene_002CC360", SearchCharaTexb__6CSceneFi);
+#include "sphida.hpp"
+extern "C" s32 GetCharaTexb__6CSceneFi(CScene *objet, s32 arg0);
+extern "C" s32 SearchCharaTexb__6CSceneFi(CScene *objet, s32 arg0) {
+    s32 texb;
+    s32 autre;
+    s32 i;
+    s32 j;
+
+    texb = GetCharaTexb__6CSceneFi(objet, arg0);
+    i = 0;
+    if (texb < 0) {
+        return -1;
+    }
+    do {
+        j = i + 8;
+        if (j != arg0) {
+            autre = GetCharaTexb__6CSceneFi(objet, j);
+            if ((autre >= 0) && (autre == texb)) {
+                return j;
+            }
+        }
+        i += 1;
+    } while (i < 0x18);
+    return -1;
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", PreLoadVillager__6CSceneFiP1);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", PreLoadVillagerEnd__6CSceneFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", DeleteVillager__6CSceneFi);
