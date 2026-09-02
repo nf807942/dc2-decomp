@@ -135,7 +135,7 @@ O_FILES   := $(addprefix $(BUILD_DIR)/, $(S_FILES:.s=.o) $(BIN_FILES:.bin=.o) \
              $(addsuffix .o, $(basename $(SRC_FILES))))
 
 .PHONY: all setup tools patch split build objects check diff decompile measure \
-        atlas carve clean distclean contexte injecte controle ci etat progress report
+        atlas carve clean distclean contexte injecte provenance controle ci etat progress report
 
 all: build
 
@@ -294,6 +294,11 @@ units:
 # lui que le contexte se construit ensuite.
 atlas:
 	@$(PYTHON) scripts/build/atlas.py $(ARGS)
+
+# Ce que `.mwcats` dit de l'origine de chaque fonction : compilée depuis une
+# source, ou recopiée d'une bibliothèque livrée compilée.
+provenance:
+	@$(PYTHON) scripts/build/provenance.py $(ARGS)
 
 # Verse les champs de l'atlas dans les classes que le dépôt déclare vides. Une
 # disposition ne change les octets que si le code l'emploie — sauf pour une

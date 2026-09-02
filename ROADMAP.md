@@ -250,7 +250,12 @@ ces octets du bloc brut de `00379358`, et la ligne `(.vtables)` posée par
 `normalize.py`. `__ct__14CCameraControlFv` est reconstruit à 100 % et attend
 cela sous un `#if 0`.
 
-**4.2 Les bibliothèques externes**, 332 Ko et un oracle extérieur : le runtime
+**4.2 Les bibliothèques externes.** `make provenance` en donne le compte exact,
+et il n'est pas celui que le classement par dossier suggérait : **928 fonctions,
+182 648 octets**, soit tout ce que `.mwcats` ne porte pas. Deux cent onze
+fonctions rangées en `sdk`/`runtime` ont en fait été compilées avec le jeu et
+relèvent donc de la reconstruction ordinaire ; aucune fonction de bibliothèque
+n'a en revanche été rangée à tort dans le jeu. Le détail : le runtime
 Metrowerks (81 176 o, dont 2 264 ont leur source dans l'installateur
 CodeWarrior), la MSL C (`memcpy`, `sprintf`, `_dtoa`), le SDK Sony (142 304 o —
 `ps2sdk` donne les prototypes exacts, mais son code n'apparie pas), le
@@ -346,8 +351,10 @@ une reconstruction.
   désormais là.
 - **Le rapprochement avec DCDecomp** sur le middleware `mg*`.
 - **Questions ouvertes** : la liaison 13 que portent 193 `FUNC` et 27 `OBJECT` ;
-  `.mwcats`, 56 392 octets propres à Metrowerks ; `-sdatathreshold` ; la
-  compression du mangling que `P1P1i` révèle et que le démangleur lit mal.
+  `-sdatathreshold` ; la compression du mangling que `P1P1i` révèle et que le
+  démangleur lit mal. **`.mwcats` n'en est plus une** : c'est la table des
+  fonctions que MWCC a compilées lui-même, décodée et vérifiée sur ses 6 912
+  entrées — voir `make provenance`.
 - **Retrouver les 49 unités de traduction d'origine.** Le découpage actuel ne le
   prétend pas. Pistes non éprouvées : l'appariement avec `.rodata`, l'ordre des
   `__sinit_`, le couplage des appels.
