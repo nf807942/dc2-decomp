@@ -34,7 +34,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from lib.project import (ROOT, functions, grafted_by_source,  # noqa: E402
                          run, unit_of)
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from conversions import cast_les_affectations  # noqa: E402
+from conversions import (cast_les_affectations,  # noqa: E402
+                         nettoie_declarations)
 
 # `typedef struct X {` … `} X;` — la structure que m2c infère d'un pointeur.
 # m2c fait suivre l'accolade fermante d'un commentaire de taille — `} X;
@@ -394,7 +395,7 @@ def normalise(texte: str, symbole: str, vues: set[str],
     # identifiant inconnu, les suivants devenant des « declaration syntax
     # error » anonymes, et cinq tours n'en déclaraient donc que cinq.
     definis = {_NOM_STRUCT.search(bloc).group(1) for bloc in structs}
-    employes = set(re.findall(r"\b([A-Za-z_]\w*)\s*\*", "\n".join(externes) + corps))
+    employes = set(re.findall(r"\b([A-Za-z_]\w*)\s*\*", "\n".join(externes + structs) + corps))
     # `arg0 * 5` est une multiplication, non une déclaration : le motif ci-dessus
     # ne les distingue pas, et faisait émettre un `struct arg0;` que rien
     # n'emploie. Ce que le corps déclare comme variable n'est jamais un type.
@@ -429,7 +430,7 @@ def normalise(texte: str, symbole: str, vues: set[str],
     corps = cast_les_affectations(corps)
 
     declarations = "\n".join(en_tete + structs + externes)
-    return declarations, corps
+    return nettoie_declarations(declarations), corps
 
 
 def score(symbole: str, unite: str) -> float | None:

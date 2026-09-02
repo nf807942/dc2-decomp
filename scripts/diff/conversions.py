@@ -61,6 +61,29 @@ def types_locaux(corps: str) -> dict[str, str]:
     return trouve
 
 
+# `? *unk4E4;` dans un champ, `f(s32, ?, void *)` dans un prototype : ce que m2c
+# écrit quand il n'a pas tranché le type. MWCC répond « declaration syntax
+# error » et perd la structure ou le prototype entier — deuxième cause d'échec
+# de compilation de la chaîne, et la première en octets : 103 fonctions, 45 048.
+_INTERRO_POINTEUR = re.compile(r"\?\s*\*")
+_INTERRO_SEULE = re.compile(r"(?<![\w?])\?(?![\w?*])")
+
+
+def nettoie_declarations(declarations: str) -> str:
+    """Ôte des déclarations les `?` que m2c y laisse.
+
+    Le remplacement ne vaut que pour les *déclarations*. Dans un corps, un `?`
+    isolé est un opérateur ternaire, et le confondre avec un type inconnu
+    changerait le sens du code ; ici, aucune expression ne peut apparaître.
+
+    `? *` devient `void *` : la seule chose sûre est que c'est un pointeur. Un
+    `?` seul devient `s32`, la largeur d'un registre — c'est une supposition,
+    elle est dite comme telle, et `make diff` la tranche.
+    """
+    rendu = _INTERRO_POINTEUR.sub("void *", declarations)
+    return _INTERRO_SEULE.sub("s32", rendu)
+
+
 def cast_les_affectations(corps: str) -> str:
     """Pose un cast vers le type déclaré, quand un pointeur est en jeu."""
     types = types_locaux(corps)
