@@ -92,8 +92,81 @@ s32 _MOTION_END(SPI_STACK *stack, int argc) {
 }
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _EFFECT_START__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _EFFECT__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", _EFFECT_END__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", InitEffect__11CCharacter2Fv);
+extern "C" u32 eff_pack_ptr;
+extern "C" u32 eff_pack_size;
+struct SPI_STACK {
+    s32 field_0;
+    s32 field_4;
+};
+extern "C" s32 _EFFECT_END__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    if (eff_pack_ptr == 0) {
+        return 0;
+    }
+    eff_pack_ptr = 0;
+    eff_pack_size = 0;
+    return 1;
+}
+typedef struct CCharacter2 {
+    /* 0x000 */ char pad0[0x5E4];
+    /* 0x5E4 */ s32 unk5E4;                         /* inferred */
+    /* 0x5E8 */ s32 unk5E8;                         /* inferred */
+    /* 0x5EC */ s32 unk5EC;                         /* inferred */
+    /* 0x5F0 */ s32 unk5F0;                         /* inferred */
+    /* 0x5F4 */ s32 unk5F4;                         /* inferred */
+    /* 0x5F8 */ s32 unk5F8;                         /* inferred */
+    /* 0x5FC */ s32 unk5FC;                         /* inferred */
+    /* 0x600 */ s32 unk600;                         /* inferred */
+    /* 0x604 */ s32 unk604;                         /* inferred */
+    /* 0x608 */ s32 unk608;                         /* inferred */
+    /* 0x60C */ s32 unk60C;                         /* inferred */
+    /* 0x610 */ s32 unk610;                         /* inferred */
+    /* 0x614 */ s32 unk614;                         /* inferred */
+    /* 0x618 */ s32 unk618;                         /* inferred */
+    /* 0x61C */ s32 unk61C;                         /* inferred */
+    /* 0x620 */ s32 unk620;                         /* inferred */
+    /* 0x624 */ s32 unk624;                         /* inferred */
+    /* 0x628 */ s32 unk628;                         /* inferred */
+    /* 0x62C */ s32 unk62C;                         /* inferred */
+    /* 0x630 */ s32 unk630;                         /* inferred */
+    /* 0x634 */ s32 unk634;                         /* inferred */
+    /* 0x638 */ s32 unk638;                         /* inferred */
+    /* 0x63C */ s32 unk63C;                         /* inferred */
+    /* 0x640 */ s32 unk640;                         /* inferred */
+    /* 0x644 */ s32 unk644;                         /* inferred */
+    /* 0x648 */ s32 unk648;                         /* inferred */
+    /* 0x64C */ s32 unk64C;                         /* inferred */
+    /* 0x650 */ s32 unk650;                         /* inferred */
+} CCharacter2;                                      /* size >= 0x654 */
+extern "C" void InitEffect__11CCharacter2Fv(CCharacter2 *objet) {
+    objet->unk5EC = 0;
+    objet->unk5F0 = 0;
+    objet->unk5F4 = 0;
+    objet->unk5F8 = 0;
+    objet->unk5FC = 0;
+    objet->unk600 = 0;
+    objet->unk604 = 0;
+    objet->unk608 = 0;
+    objet->unk60C = 0;
+    objet->unk610 = 0;
+    objet->unk614 = 0;
+    objet->unk618 = 0;
+    objet->unk61C = 0;
+    objet->unk620 = 0;
+    objet->unk624 = 0;
+    objet->unk628 = 0;
+    objet->unk62C = 0;
+    objet->unk630 = 0;
+    objet->unk634 = 0;
+    objet->unk638 = 0;
+    objet->unk63C = 0;
+    objet->unk640 = 0;
+    objet->unk644 = 0;
+    objet->unk648 = 0;
+    objet->unk5E8 = 0;
+    objet->unk650 = 1;
+    objet->unk64C = 0;
+    objet->unk5E4 = 1;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", ExecEntryEffect__11CCharacter2FP15CHRINFO_KEY_SET);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", CtrlEffect__11CCharacter2Fv);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", StepEffect__11CCharacter2Fv);
@@ -196,7 +269,23 @@ s32 dynBOUNDING_BOX_END(SPI_STACK *stack, int argc) {
 }
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynCOLLISION_START__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynCOLLISION__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", Initialize__10CDAColPipeFv);
+typedef struct CDAColPipe {
+    /* 0x00 */ char pad0[4];
+    /* 0x04 */ s32 unk4;                            /* inferred */
+    /* 0x08 */ char pad8[8];                        /* maybe part of unk4[3]? */
+    /* 0x10 */ f32 unk10;                           /* inferred */
+    /* 0x14 */ char pad14[0xC];                     /* maybe part of unk10[4]? */
+    /* 0x20 */ f32 unk20;                           /* inferred */
+    /* 0x24 */ char pad24[0xAC];                    /* maybe part of unk20[0x2C]? */
+    /* 0xD0 */ s32 unkD0;                           /* inferred */
+} CDAColPipe;                                       /* size >= 0xD4 */
+extern "C" void mgZeroVector__FPf(f32 *arg0);
+extern "C" void Initialize__10CDAColPipeFv(CDAColPipe *objet) {
+    objet->unkD0 = 0;
+    mgZeroVector__FPf(&objet->unk10);
+    mgZeroVector__FPf(&objet->unk20);
+    objet->unk4 = 0x3F4CCCCD;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", Initialize__12CDACollisionFv);
 s32 dynCOLLISION_END(SPI_STACK *stack, int argc) {
     return 1;

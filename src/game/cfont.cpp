@@ -67,7 +67,14 @@ INCLUDE_ASM("nonmatchings/game/cfont", MySetTex__FPcP11mgCDrawPrim);
 INCLUDE_ASM("nonmatchings/game/cfont", MySetTex__FiP11mgCDrawPrim);
 INCLUDE_ASM("nonmatchings/game/cfont", DrawGaiji_sub__FP11mgCDrawPrimiii10RGBAQ_TYPEi);
 INCLUDE_ASM("nonmatchings/game/cfont", DrawGaiji__5CFontFP11mgCDrawPrimiii);
-INCLUDE_ASM("nonmatchings/game/cfont", UpDateWH__FPiPiii);
+extern "C" void UpDateWH__FPiPiii(s32 *arg0, s32 *arg1, s32 arg2, s32 arg3) {
+    if (*arg0 < arg2) {
+        *arg0 = arg2;
+    }
+    if (*arg1 < arg3) {
+        *arg1 = arg3;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cfont", CalcDrawWH__5CFontFPcPiPi);
 INCLUDE_ASM("nonmatchings/game/cfont", DrawDirect__5CFontFPcii);
 INCLUDE_ASM("nonmatchings/game/cfont", Preset__5CFontFi);
@@ -75,7 +82,16 @@ INCLUDE_ASM("nonmatchings/game/cfont", Init__5CFontFv);
 INCLUDE_ASM("nonmatchings/game/cfont", Setup__10COcclusionFPA4_f);
 INCLUDE_ASM("nonmatchings/game/cfont", CheckSphere__10COcclusionFPf);
 INCLUDE_ASM("nonmatchings/game/cfont", CalcSelectCursorPos__F4RECTPi);
-INCLUDE_ASM("nonmatchings/game/cfont", OffsetYesNoWin__FP4RECTP4RECT);
+typedef struct RECT {
+    /* 0x0 */ char pad0[8];
+    /* 0x8 */ s32 unk8;                             /* inferred */
+} RECT;                                             /* size >= 0xC */
+extern "C" void OffsetYesNoWin__FP4RECTP4RECT(RECT *arg0, RECT *arg1) {
+    if (arg0->unk8 < 0xA6) {
+        arg0->unk8 = 0xA6;
+        arg1->unk8 = 0xA6;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cfont", DrawVersatileWin_yesno__FP11mgCDrawPrim4RECTP10RGBAQ_TYPEii);
 INCLUDE_ASM("nonmatchings/game/cfont", MyMenuHelpWinDraw__FP11mgCDrawPrim4RECTi);
 INCLUDE_ASM("nonmatchings/game/cfont", MyMenuFloatingWinDraw__FP11mgCDrawPrim4RECTiiP10RGBAQ_TYPEP10RGBAQ_TYPE);
@@ -95,17 +111,30 @@ s32 CheckControl(void) {
     return CtrlLockFlag;
 }
 INCLUDE_ASM("nonmatchings/game/cfont", EditModeControlLock__Fv);
-INCLUDE_ASM("nonmatchings/game/cfont", EditModeControlUnLock__Fv);
+extern "C" void EditModeControlUnLock__Fv(void) {
+    CtrlLockFlag -= 1;
+    if (CtrlLockFlag < 0) {
+        CtrlLockFlag = 0;
+    }
+}
 void SetHelpMes(s32 arg0, s32 arg1, s32 arg2) {
     EditHelpMesNo = arg0;
     EditHelpMesParam = arg1;
     EditHelpMesParam2 = arg2;
 }
 INCLUDE_ASM("nonmatchings/game/cfont", GetUserData__Fv_002DD7A0);
-INCLUDE_ASM("nonmatchings/game/cfont", ConvColor__Ff);
+extern "C" f32 ConvColor__Ff(f32 arg0) {
+    return arg0 / 128.0f;
+}
 INCLUDE_ASM("nonmatchings/game/cfont", ConvColorV__FPf);
 INCLUDE_ASM("nonmatchings/game/cfont", emSearchColorCode__FPf);
-INCLUDE_ASM("nonmatchings/game/cfont", emGetPenkiItemNo__Fi);
+extern "C" s32 GetPenkiItemNo__Fi(s32 arg0);
+extern "C" s32 emGetPenkiItemNo__Fi(s32 arg0) {
+    if ((arg0 < 0) || (arg0 >= 8)) {
+        return -1;
+    }
+    return GetPenkiItemNo__Fi(arg0);
+}
 INCLUDE_ASM("nonmatchings/game/cfont", emGetPenkiItemNo__FPf);
 void IntiSystemMes(void) {
     SysMesCnt = 0;
@@ -113,7 +142,17 @@ void IntiSystemMes(void) {
 }
 INCLUDE_ASM("nonmatchings/game/cfont", OpenSystemMes__FP6CSceneii);
 INCLUDE_ASM("nonmatchings/game/cfont", SystemMesClose__FP6CScene);
-INCLUDE_ASM("nonmatchings/game/cfont", SystemMesStep__FP6CScene);
+#include "sphida.hpp"
+extern "C" void SystemMesClose__FP6CScene(CScene *arg0);
+extern "C" void SystemMesStep__FP6CScene(CScene *arg0) {
+    if (SysMesNo >= 0) {
+        if (SysMesCnt < 0) {
+            SystemMesClose__FP6CScene(arg0);
+            SysMesCnt = 0;
+        }
+        SysMesCnt -= 1;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cfont", EditStartPlaceEffect__FP10CEditPartsPf);
 INCLUDE_ASM("nonmatchings/game/cfont", EditEndPlaceEffect__Fv);
 void EditPreMenuAnime(s32 arg0) {
@@ -131,7 +170,23 @@ void ClearEditStepCnt(void) {
 }
 INCLUDE_ASM("nonmatchings/game/cfont", ClearUndoFlag__Fv);
 INCLUDE_ASM("nonmatchings/game/cfont", ClearEditFlag__Fv);
-INCLUDE_ASM("nonmatchings/game/cfont", InitEditFlag__Fv);
+extern "C" u32 EditModeNo;
+extern "C" u32 HighSpeedMoveCnt;
+extern "C" u32 MagnetEnable;
+extern "C" u32 eCameraDist;
+extern "C" void EditInitPlaceAnime__Fv();
+extern "C" void EditInitPlaceEffect__Fv();
+extern "C" void ClearEditFlag__Fv();
+extern "C" void InitEditFlag__Fv(void) {
+    eCameraDist = 0x44160000;
+    EditModeNo = 0;
+    ClearEditFlag__Fv();
+    EditInitPlaceAnime__Fv();
+    EditInitPlaceEffect__Fv();
+    CtrlLockFlag = 0;
+    MagnetEnable = 1;
+    HighSpeedMoveCnt = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cfont", StartEditMode__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/cfont", EndEditMode__FP6CScenePf);
 INCLUDE_ASM("nonmatchings/game/cfont", StartEditModeFromMenu__FP6CSceneiPi);

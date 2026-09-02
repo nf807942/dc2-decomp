@@ -154,7 +154,21 @@ void CSceneObjSeq::SetEohNo(s32 arg0) {
     this->field_0x64 = arg0;
 }
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SearchSeq__12CSceneObjSeqFv);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", GetNextSeq__12CSceneObjSeqFP12_SEN_OBJ_SEQ);
+typedef struct _SEN_OBJ_SEQ {
+    /* 0x00 */ char pad0[0x4C];
+    /* 0x4C */ s32 unk4C;                           /* inferred */
+} _SEN_OBJ_SEQ;                                     /* size >= 0x50 */
+extern "C" void InitSceneObjSeq__FP12_SEN_OBJ_SEQ(_SEN_OBJ_SEQ *arg0);
+extern "C" s32 GetNextSeq__12CSceneObjSeqFP12_SEN_OBJ_SEQ(CSceneObjSeq *objet, _SEN_OBJ_SEQ *arg0) {
+    s32 temp_s0;
+
+    if (arg0 == NULL) {
+        return 0;
+    }
+    temp_s0 = arg0->unk4C;
+    InitSceneObjSeq__FP12_SEN_OBJ_SEQ(arg0);
+    return temp_s0;
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SearchNextPosSeq__12CSceneObjSeqFv);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SearchNextRotSeq__12CSceneObjSeqFv);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SearchNextMotSeq__12CSceneObjSeqFv);

@@ -63,8 +63,18 @@ INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_LOCKON_MODE__FP12RS_STACKDAT
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_MONSTER_NUM__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_DIST__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_OBJ__FP12RS_STACKDATAi_001E4730);
-INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_BODY__FP12RS_STACKDATAi_001E4780);
-INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_DMG__FP12RS_STACKDATAi);
+extern "C" u8 _1728_0036D340[23];
+extern "C" void printf(void *);
+extern "C" s32 _SET_BODY__FP12RS_STACKDATAi_001E4780(void) {
+    printf(&_1728_0036D340);
+    return 1;
+}
+extern "C" u8 _1733_0036D360[22];
+extern "C" void printf(void *);
+extern "C" s32 _SET_DMG__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    printf(&_1733_0036D360);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_DMG2__FP12RS_STACKDATAi_001E47E0);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_OBJ_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_MAPOBJ_POS__FP12RS_STACKDATAi);

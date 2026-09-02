@@ -28,7 +28,11 @@ INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", InitLighting__13mgRENDER_INFOFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetLight__13mgRENDER_INFOFPA4_fPA4_f);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", GetLight__13mgRENDER_INFOFPA4_fPA4_f);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetLight__13mgRENDER_INFOFiPfPf);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetAmbient__13mgRENDER_INFOFPf);
+extern "C" void sceVu0CopyVector(s32, f32 *);
+extern "C" s32 GetpLightInfo__13mgRENDER_INFOFv(mgRENDER_INFO *objet);
+extern "C" void SetAmbient__13mgRENDER_INFOFPf(mgRENDER_INFO *objet, f32 *arg0) {
+    sceVu0CopyVector(GetpLightInfo__13mgRENDER_INFOFv(objet) + 0x80, arg0);
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", GetAmbient__13mgRENDER_INFOFPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetPlight__13mgRENDER_INFOFiPfPfff);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetPlight__13mgRENDER_INFOFiP13mgPOINT_LIGHT);
@@ -57,7 +61,33 @@ INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Free__9mgCMemoryFP1);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", StartStackMode__9mgCMemoryFii);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", EndStackMode__9mgCMemoryFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", stAlloc64__9mgCMemoryFi);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", stAllocTest__9mgCMemoryFi);
+extern "C" u8 _288_00366DC0[24];
+struct temp_v1;
+typedef struct mgCMemory {
+    /* 0x00 */ char pad0[0x1C];
+    /* 0x1C */ s32 unk1C;                           /* inferred */
+    /* 0x20 */ s32 unk20;                           /* inferred */
+    /* 0x24 */ s32 unk24;                           /* inferred */
+    /* 0x28 */ s32 unk28;                           /* inferred */
+} mgCMemory;                                        /* size >= 0x2C */
+extern "C" void printf(void *, s32, s32, mgCMemory *);
+extern "C" s32 stAllocTest__9mgCMemoryFi(mgCMemory *objet, s32 arg0) {
+    s32 temp_a1;
+    s32 temp_a2;
+    s32 temp_v1;
+
+    if (objet->unk1C != 0) {
+        return 0;
+    }
+    temp_v1 = objet->unk24;
+    temp_a2 = objet->unk28;
+    temp_a1 = temp_v1 + arg0;
+    if (temp_a1 >= temp_a2) {
+        printf(&_288_00366DC0, temp_a1, temp_a2, objet);
+        return 0;
+    }
+    return objet->unk20 + (temp_v1 * 0x10);
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", stAlloc__9mgCMemoryFi);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Alloc__9mgCMemoryFi);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", stAlign64__9mgCMemoryFv);

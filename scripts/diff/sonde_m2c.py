@@ -185,6 +185,101 @@ def decompile(symbole: str) -> str | None:
     return resultat.stdout
 
 
+_FLECHE = re.compile(r"\b([A-Za-z_]\w*)\s*->\s*(unk[0-9A-Fa-f]+)\b")
+_CHAMP_M2C = re.compile(
+    r"/\*\s*0x([0-9A-Fa-f]+)\s*\*/\s*(.+?)\s*(\w+)\s*(\[[^\]]*\])?\s*;")
+
+
+def _type_pointe(variable: str, corps: str) -> str | None:
+    """Le type que le corps donne à `variable`, quand c'est un pointeur."""
+    trouve = re.search(r"\b([A-Za-z_]\w*)\s*\*\s*%s\b" % re.escape(variable),
+                       corps)
+    return trouve.group(1) if trouve else None
+
+
+def _struct_par_offsets(nom: str, offsets: dict[int, str]) -> str:
+    """Une structure bâtie sur les seuls décalages que le corps réclame.
+
+    m2c écrit `arg1->unk74` sans avoir inféré de structure pour `arg1` : le
+    mangling disait `Pi`, il l'a cru, et MWCC répond « expression syntax error »
+    parce qu'un `s32 *` n'a pas de champ. Le décalage, lui, est sûr — il est
+    dans le nom. La largeur ne l'est pas : quatre octets est le cas courant, et
+    c'est `make diff` qui dira si la lecture était plus étroite.
+
+    Une structure fausse vaut mieux qu'une absente : elle fait entrer la
+    fonction dans la mesure, où l'affinage peut la reprendre, là où l'absence
+    la laissait au rebut sans le moindre chiffre.
+    """
+    lignes, curseur = [], 0
+    for decalage in sorted(offsets):
+        if decalage < curseur:
+            continue
+        if decalage > curseur:
+            lignes.append("    char pad%X[0x%X];" % (curseur, decalage - curseur))
+        lignes.append("    /* 0x%X */ s32 %s;" % (decalage, offsets[decalage]))
+        curseur = decalage + 4
+    return "struct %s {\n%s\n};" % (nom, "\n".join(lignes))
+
+
+def _elargit(bloc: str, manquants: dict[int, str]) -> str:
+    """Ajoute à une structure inférée par m2c les champs qu'elle ne porte pas.
+
+    Ses propres champs se gardent tels quels : m2c a inféré leurs types en
+    lisant les instructions, et les remplacer par des `s32` perdrait ce qu'il
+    savait. Seuls les trous se comblent.
+    """
+    connus = {int(d, 16) for d, _, _, _ in _CHAMP_M2C.findall(bloc)}
+    ajouts = {d: n for d, n in manquants.items() if d not in connus}
+    if not ajouts:
+        return bloc
+    # Le remplissage se pose en queue : insérer au bon décalage demanderait de
+    # recalculer toute la disposition, et m2c a déjà rempli ses trous.
+    fin = bloc.rindex("}")
+    queue = "\n".join("    /* 0x%X */ s32 %s;" % (d, n)
+                      for d, n in sorted(ajouts.items()))
+    return bloc[:fin] + queue + "\n" + bloc[fin:]
+
+
+def complete_structures(structs: list[str], corps: str) -> tuple[list[str], str]:
+    """Donne un type aux pointeurs que le corps déréférence sans déclaration.
+
+    C'est la moitié des échecs de compilation de la chaîne, mesurée par
+    `scripts/diff/causes.py` : 27 % de « undefined identifier `unkNN` » quand la
+    structure existe sans le champ, 24 % d'« expression syntax error » quand
+    elle n'existe pas du tout. Le même défaut, vu des deux côtés.
+    """
+    demandes: dict[str, dict[int, str]] = {}
+    for variable, champ in _FLECHE.findall(corps):
+        demandes.setdefault(variable, {})[int(champ[3:], 16)] = champ
+    if not demandes:
+        return structs, corps
+
+    par_nom = {}
+    for rang, bloc in enumerate(structs):
+        trouve = _NOM_STRUCT.search(bloc)
+        if trouve:
+            par_nom[trouve.group(1)] = rang
+
+    neuves = []
+    for variable, offsets in demandes.items():
+        type_ = _type_pointe(variable, corps)
+        if type_ is None:
+            continue
+        if type_ in par_nom:
+            rang = par_nom[type_]
+            structs[rang] = _elargit(structs[rang], offsets)
+            continue
+        # Ni structure de m2c, ni type qui porte ces champs : on en bâtit une,
+        # nommée d'après la variable pour que deux paramètres du même type de
+        # base ne se disputent pas le nom.
+        forge = "%s_champs" % variable
+        neuves.append(_struct_par_offsets(forge, offsets))
+        corps = re.sub(r"\b%s\s*\*\s*%s\b" % (re.escape(type_),
+                                              re.escape(variable)),
+                       "struct %s *%s" % (forge, variable), corps)
+    return structs + neuves, corps
+
+
 def normalise(texte: str, symbole: str,
               vues: set[str]) -> tuple[str, str] | None:
     """Rend (déclarations, définition) prêtes à compiler, ou rien.
@@ -256,7 +351,15 @@ def normalise(texte: str, symbole: str,
     # error » anonymes, et cinq tours n'en déclaraient donc que cinq.
     definis = {_NOM_STRUCT.search(bloc).group(1) for bloc in structs}
     employes = set(re.findall(r"\b([A-Za-z_]\w*)\s*\*", "\n".join(externes) + corps))
-    avant = sorted(nom for nom in employes - definis - vues
+    # `arg0 * 5` est une multiplication, non une déclaration : le motif ci-dessus
+    # ne les distingue pas, et faisait émettre un `struct arg0;` que rien
+    # n'emploie. Ce que le corps déclare comme variable n'est jamais un type.
+    locales = set(re.findall(r"^\s*(?:struct\s+)?[A-Za-z_]\w*\s*\**\s*"
+                             r"([A-Za-z_]\w*)\s*(?:\[[^\]]*\])?;\s*$",
+                             corps, re.MULTILINE))
+    locales |= set(re.findall(r"[A-Za-z_]\w*\s*\**\s*([A-Za-z_]\w*)\s*[,)]",
+                              corps.split("\n", 1)[0]))
+    avant = sorted(nom for nom in employes - definis - vues - locales
                    if nom not in _BASE and not nom.startswith("un"))
 
     # Le contexte a donné les types à m2c ; l'unité, elle, ne les voit pas, et
@@ -275,6 +378,8 @@ def normalise(texte: str, symbole: str,
             continue
         bloc = definition_atlas(nom)
         en_tete.append(bloc if bloc else "struct %s;" % nom)
+
+    structs, corps = complete_structures(structs, corps)
 
     declarations = "\n".join(en_tete + structs + externes)
     return declarations, corps

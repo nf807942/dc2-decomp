@@ -90,7 +90,30 @@ INCLUDE_ASM("nonmatchings/game/cscene_002CC360", CalcReflectionVector__FPfPfPf);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", Draw__9CFragmentFPff);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", Step__9CFragmentFP6CCPolyi);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", Set__9CFragmentFPfPf);
-INCLUDE_ASM("nonmatchings/game/cscene_002CC360", Init__9CFragmentFv);
+typedef struct CFragment {
+    /* 0x00 */ s32 unk0;                            /* inferred */
+    /* 0x04 */ s32 unk4;                            /* inferred */
+    /* 0x08 */ char pad8[8];                        /* maybe part of unk4[3]? */
+    /* 0x10 */ f32 unk10;                           /* inferred */
+    /* 0x14 */ char pad14[0xC];                     /* maybe part of unk10[4]? */
+    /* 0x20 */ f32 unk20;                           /* inferred */
+    /* 0x24 */ char pad24[0xC];                     /* maybe part of unk20[4]? */
+    /* 0x30 */ f32 unk30;                           /* inferred */
+    /* 0x34 */ char pad34[0xC];                     /* maybe part of unk30[4]? */
+    /* 0x40 */ f32 unk40;                           /* inferred */
+    /* 0x44 */ char pad44[0xC];                     /* maybe part of unk40[4]? */
+    /* 0x50 */ s32 unk50;                           /* inferred */
+} CFragment;                                        /* size >= 0x54 */
+extern "C" void InitVector__FPf(f32 *arg0);
+extern "C" void Init__9CFragmentFv(CFragment *objet) {
+    objet->unk0 = -1;
+    objet->unk4 = 0;
+    InitVector__FPf(&objet->unk10);
+    InitVector__FPf(&objet->unk20);
+    InitVector__FPf(&objet->unk30);
+    InitVector__FPf(&objet->unk40);
+    objet->unk50 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", Clash__5CBPotFPfPfPf);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", Step__5CBPotFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", SetObject2__5CBPotFiP9CMapParts);
@@ -102,9 +125,86 @@ INCLUDE_ASM("nonmatchings/game/cscene_002CC360", Bakuhatsu__4CPotFPfPf);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", Step__4CPotFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", Throw__4CPotFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", Hold__4CPotFP9CMapParts);
-INCLUDE_ASM("nonmatchings/game/cscene_002CC360", Init__4CPotFi);
+typedef struct CPot {
+    /* 0x00 */ s32 unk0;                            /* inferred */
+    /* 0x04 */ s32 unk4;                            /* inferred */
+    /* 0x08 */ char pad8[8];                        /* maybe part of unk4[3]? */
+    /* 0x10 */ f32 unk10;                           /* inferred */
+    /* 0x14 */ char pad14[0xC];                     /* maybe part of unk10[4]? */
+    /* 0x20 */ f32 unk20;                           /* inferred */
+    /* 0x24 */ char pad24[0xC];                     /* maybe part of unk20[4]? */
+    /* 0x30 */ f32 unk30;                           /* inferred */
+    /* 0x34 */ char pad34[0xC];                     /* maybe part of unk30[4]? */
+    /* 0x40 */ f32 unk40;                           /* inferred */
+    /* 0x44 */ char pad44[0xC];                     /* maybe part of unk40[4]? */
+    /* 0x50 */ f32 unk50;                           /* inferred */
+    /* 0x54 */ char pad54[0xC];                     /* maybe part of unk50[4]? */
+    /* 0x60 */ f32 unk60;                           /* inferred */
+    /* 0x64 */ char pad64[0xC];                     /* maybe part of unk60[4]? */
+    /* 0x70 */ s32 unk70;                           /* inferred */
+} CPot;                                             /* size >= 0x74 */
+extern "C" void InitVector__FPf(f32 *arg0);
+extern "C" void Init__4CPotFi(CPot *objet, s32 arg0) {
+    objet->unk0 = 0;
+    objet->unk4 = 0;
+    InitVector__FPf(&objet->unk10);
+    if (arg0 != 1) {
+        InitVector__FPf(&objet->unk20);
+    }
+    InitVector__FPf(&objet->unk30);
+    InitVector__FPf(&objet->unk40);
+    InitVector__FPf(&objet->unk50);
+    if (arg0 != 1) {
+        InitVector__FPf(&objet->unk60);
+    }
+    objet->unk70 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", Init__Q214CVillagerPlace12ProgressInfoFv);
-INCLUDE_ASM("nonmatchings/game/cscene_002CC360", Initialize__13CVillagerDataFv);
+typedef struct CVillagerData {
+    /* 0x00 */ s32 unk0;                            /* inferred */
+    /* 0x04 */ s32 unk4;                            /* inferred */
+    /* 0x08 */ s32 unk8;                            /* inferred */
+    /* 0x0C */ s32 unkC;                            /* inferred */
+    /* 0x10 */ s32 unk10;                           /* inferred */
+    /* 0x14 */ s32 unk14;                           /* inferred */
+    /* 0x18 */ s32 unk18;                           /* inferred */
+    /* 0x1C */ s32 unk1C;                           /* inferred */
+    /* 0x20 */ s32 unk20;                           /* inferred */
+    /* 0x24 */ s32 unk24;                           /* inferred */
+    /* 0x28 */ s32 unk28;                           /* inferred */
+    /* 0x2C */ s32 unk2C;                           /* inferred */
+    /* 0x30 */ s32 unk30;                           /* inferred */
+    /* 0x34 */ char pad34[4];
+    /* 0x38 */ s32 unk38;                           /* inferred */
+    /* 0x3C */ s32 unk3C;                           /* inferred */
+    /* 0x40 */ s32 unk40;                           /* inferred */
+    /* 0x44 */ char pad44[0xC];                     /* maybe part of unk40[4]? */
+    /* 0x50 */ f32 unk50;                           /* inferred */
+    /* 0x54 */ char pad54[0xC];                     /* maybe part of unk50[4]? */
+    /* 0x60 */ f32 unk60;                           /* inferred */
+} CVillagerData;                                    /* size >= 0x64 */
+extern "C" void mgZeroVectorW__FPf(f32 *arg0);
+extern "C" void mgZeroVector__FPf(f32 *arg0);
+extern "C" void Initialize__13CVillagerDataFv(CVillagerData *objet) {
+    objet->unk0 = -1;
+    objet->unk4 = -1;
+    objet->unkC = 0;
+    objet->unk8 = -1;
+    objet->unk2C = 0;
+    objet->unk10 = 0;
+    objet->unk14 = 0;
+    objet->unk18 = 0;
+    objet->unk1C = 0;
+    objet->unk30 = 0;
+    objet->unk20 = 0;
+    objet->unk24 = 0;
+    objet->unk28 = 0;
+    objet->unk38 = 0;
+    objet->unk3C = 0;
+    objet->unk40 = 0;
+    mgZeroVectorW__FPf(&objet->unk50);
+    mgZeroVector__FPf(&objet->unk60);
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", Add__18CVillagerPlaceInfoFP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", Initialize__13CVillagerMngrFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", GetData__13CVillagerMngrFi);

@@ -71,7 +71,30 @@ INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", LoadSeSrcPack__6CSceneFiPUi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", LoadSeEnvPack__6CSceneFiPUi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", LoadSeBattlePack__6CSceneFiPUi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", LoadSeBasePack__6CSceneFiPUi);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", PrePlaySeSrc__6CSceneFv);
+typedef struct CScene {
+    /* 0x0000 */ char pad0[0x9E00];
+    /* 0x9E00 */ s32 unk9E00;                       /* inferred */
+    /* 0x9E04 */ s32 unk9E04;                       /* inferred */
+    /* 0x9E08 */ char pad9E08[0x80];                /* maybe part of unk9E04[0x21]? */
+    /* 0x9E88 */ s32 unk9E88;                       /* inferred */
+    /* 0x9E8C */ s32 unk9E8C;                       /* inferred */
+    /* 0x9E90 */ char pad9E90[0x80];                /* maybe part of unk9E8C[0x21]? */
+    /* 0x9F10 */ s32 unk9F10;                       /* inferred */
+    /* 0x9F14 */ s32 unk9F14;                       /* inferred */
+    /* 0x9F18 */ char pad9F18[0x80];                /* maybe part of unk9F14[0x21]? */
+    /* 0x9F98 */ s32 unk9F98;                       /* inferred */
+    /* 0x9F9C */ s32 unk9F9C;                       /* inferred */
+} CScene;                                           /* size >= 0x9FA0 */
+extern "C" void PrePlaySeSrc__6CSceneFv(CScene *objet) {
+    objet->unk9E00 = -1;
+    objet->unk9E04 = 0;
+    objet->unk9E88 = -1;
+    objet->unk9E8C = 0;
+    objet->unk9F10 = -1;
+    objet->unk9F14 = 0;
+    objet->unk9F98 = -1;
+    objet->unk9F9C = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", PlaySeSrc__6CSceneFiff);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", check_se_play__6CSceneFi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetTimeBgmVolf__6CSceneFv);
@@ -140,18 +163,93 @@ s32 eaEND_GEO_ANALYZE(SPI_STACK * arg0, s32 arg1) {
     eaAnaSrc = 0;
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetMaxPolyn__Fi);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetMaxDrawMem__Fi);
+struct irregular;
+struct match;
+extern "C" s32 GetMaxPolyn__Fi(s32 arg0) {
+    s32 var_v0;
+
+    var_v0 = 0xFA0;
+    if (arg0 != 4) {
+        var_v0 = 0x1770;
+        switch (arg0) {                             /* irregular */
+        case 0:
+            return 0xFA0;
+        case 1:
+            return 0x1770;
+        case 2:
+            return 0x1770;
+        case 3:
+            /* Duplicate return node #10. Try simplifying control flow for better match */
+            return var_v0;
+        default:
+            return 0;
+        }
+    } else {
+        return var_v0;
+    }
+}
+struct irregular;
+struct match;
+extern "C" s32 GetMaxDrawMem__Fi(s32 arg0) {
+    s32 var_v0;
+
+    var_v0 = 0xBB80;
+    if (arg0 != 4) {
+        var_v0 = 0xD2F0;
+        switch (arg0) {                             /* irregular */
+        case 0:
+            return 0xBB80;
+        case 1:
+            return 0xC350;
+        case 2:
+            return 0xD2F0;
+        case 3:
+            /* Duplicate return node #10. Try simplifying control flow for better match */
+            return var_v0;
+        default:
+            return 0;
+        }
+    } else {
+        return var_v0;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", __ct__14EditAnalyzeSrcFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", MenuChapterInit__FP9mgCMemoryPiii);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", MenuChapterKey__Fv);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", MenuChapterDraw__Fv);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", _NPC_NUM__FP9SPI_STACKi);
+extern "C" u32 NpcBaseDataTotalNum;
+struct SPI_STACK {
+    s32 field_0;
+    s32 field_4;
+};
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(SPI_STACK *arg0);
+extern "C" s32 _NPC_NUM__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    NpcBaseDataTotalNum = spiGetStackInt__FP9SPI_STACK(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", _NPC_INFO__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", LoadNPCCfg__Fv);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetPartyCharaMessage__Fiii);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetNPCModelName__Fi);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetNPCName__Fi);
+extern "C" s32 GetPartyNPCData__Fi(s32 arg0);
+extern "C" s32 GetNPCModelName__Fi(s32 arg0) {
+    s32 temp_v0;
+
+    temp_v0 = GetPartyNPCData__Fi(arg0);
+    if (temp_v0 != 0) {
+        return temp_v0 + 0x1F;
+    }
+    return 0;
+}
+extern "C" s32 GetPartyNPCData__Fi(s32 arg0);
+extern "C" s32 GetNPCName__Fi(s32 arg0) {
+    s32 temp_v0;
+
+    temp_v0 = GetPartyNPCData__Fi(arg0);
+    if (temp_v0 != 0) {
+        return temp_v0 + 3;
+    }
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetPartyCharaModelName__Fii);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetPartyNPCData__Fi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", _WMAP_POSNUM__FP9SPI_STACKi);

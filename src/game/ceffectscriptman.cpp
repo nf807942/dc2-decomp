@@ -10,12 +10,55 @@
 
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", Initialize__16CEffectScriptManFP9mgCMemoryii);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", SetWorkBuffer__16CEffectScriptManFP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/ceffectscriptman", SearchBaseNo__16CEffectScriptManFPc);
+struct CEffectScriptMan {
+    char pad_0[0xC];
+    s32 field_C;
+    s32 field_10;
+    s32 field_14;
+    s32 field_18;
+    s32 field_1C;
+    s32 field_20;
+    s32 field_24;
+    s32 field_28;
+    char pad_2C[0x154];
+    s32 field_180;
+    char pad_184[0x1D8];
+    s32 field_35C;
+    s32 field_360;
+    s32 field_364;
+};
+extern "C" s32 strcmp(s32, s8 *);
+extern "C" s32 GetEffSptBaseDefPtr__Fi(s32 arg0);
+extern "C" s32 SearchBaseNo__16CEffectScriptManFPc(CEffectScriptMan *objet, s8 *arg0) {
+    s32 temp_v0;
+    s32 var_s0;
+
+    var_s0 = 0;
+loop_1:
+    temp_v0 = GetEffSptBaseDefPtr__Fi(var_s0);
+    if (temp_v0 == 0) {
+        return -1;
+    }
+    if (strcmp(temp_v0, arg0) == 0) {
+        return var_s0;
+    }
+    var_s0 += 1;
+    goto loop_1;
+}
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", LoadBaseEffSpt__16CEffectScriptManFiP9mgCMemoryi);
-INCLUDE_ASM("nonmatchings/game/ceffectscriptman", LoadBaseEffSpt__16CEffectScriptManFPcP9mgCMemoryi);
+#include "menu.hpp"
+extern "C" void LoadBaseEffSpt__16CEffectScriptManFiP9mgCMemoryi(CEffectScriptMan *objet, s32 arg0, mgCMemory *arg1, s32 arg2);
+extern "C" s32 SearchBaseNo__16CEffectScriptManFPc(CEffectScriptMan *objet, s8 *arg0);
+extern "C" void LoadBaseEffSpt__16CEffectScriptManFPcP9mgCMemoryi(CEffectScriptMan *objet, s8 *arg0, mgCMemory *arg1, s32 arg2) {
+    LoadBaseEffSpt__16CEffectScriptManFiP9mgCMemoryi(objet, SearchBaseNo__16CEffectScriptManFPc(objet, arg0), arg1, arg2);
+}
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", ClearBaseFromLevel__16CEffectScriptManFiPii);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", GetBaseChara__16CEffectScriptManFi);
-INCLUDE_ASM("nonmatchings/game/ceffectscriptman", GetBaseChara__16CEffectScriptManFPc);
+extern "C" void GetBaseChara__16CEffectScriptManFi(CEffectScriptMan *objet, s32 arg0);
+extern "C" s32 SearchBaseNo__16CEffectScriptManFPc(CEffectScriptMan *objet, s8 *arg0);
+extern "C" void GetBaseChara__16CEffectScriptManFPc(CEffectScriptMan *objet, s8 *arg0) {
+    GetBaseChara__16CEffectScriptManFi(objet, SearchBaseNo__16CEffectScriptManFPc(objet, arg0));
+}
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", GetNotUsedTexb__16CEffectScriptManFv);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", AddTexb__16CEffectScriptManFv);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", BuildBase__16CEffectScriptManFiP1iP1iP9mgCMemoryi);
@@ -23,7 +66,11 @@ INCLUDE_ASM("nonmatchings/game/ceffectscriptman", BuildBase__16CEffectScriptManF
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", BuildPack__16CEffectScriptManFiPUiP9mgCMemoryi);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", BuildPack__16CEffectScriptManFPcPUiP9mgCMemoryi);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", GetNeedFilePath__16CEffectScriptManFiPcPc);
-INCLUDE_ASM("nonmatchings/game/ceffectscriptman", GetNeedFilePath__16CEffectScriptManFPcPcPc);
+extern "C" void GetNeedFilePath__16CEffectScriptManFiPcPc(CEffectScriptMan *objet, s32 arg0, s8 *arg1, s8 *arg2);
+extern "C" s32 SearchBaseNo__16CEffectScriptManFPc(CEffectScriptMan *objet, s8 *arg0);
+extern "C" void GetNeedFilePath__16CEffectScriptManFPcPcPc(CEffectScriptMan *objet, s8 *arg0, s8 *arg1, s8 *arg2) {
+    GetNeedFilePath__16CEffectScriptManFiPcPc(objet, SearchBaseNo__16CEffectScriptManFPc(objet, arg0), arg1, arg2);
+}
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", CreateEffSpt__16CEffectScriptManFiii);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", CreateEffSpt__16CEffectScriptManFPcii);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", ClearEffectFromChrid__16CEffectScriptManFi);
@@ -119,7 +166,14 @@ INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _CHR_CHK_MOT_END__FP12RS_STACK
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _CHR_SET_LIGHT_COLOR__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _SPT_ASSIGN_SPRITE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _SPT_DELETE_SPRITE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _SPT_SET_TEXNAME__FP12RS_STACKDATAi);
+extern "C" u32 now_script;
+#include "runscript.hpp"
+extern "C" void strcpy(s32, s32);
+extern "C" s32 GetStackString__FP12RS_STACKDATA_002E8340();
+extern "C" s32 _SPT_SET_TEXNAME__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    strcpy(now_script + 0x30, GetStackString__FP12RS_STACKDATA_002E8340());
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _SPT_SET_ALPHAB__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _SPT_INIT_SPRITE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _SPT_SET_DRAW_FLAG__FP12RS_STACKDATAi);

@@ -11,14 +11,37 @@
 #include "gen/mgCFrame.hpp"
 #include "gen/mgCObject.hpp"
 
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgRnd__Fv);
+extern "C" s32 rand();
+extern "C" f32 mgRnd__Fv(void) {
+    return (f32) rand() / 2.1474836e9f;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgNRnd__Fv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgCreateSinTable__Fv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgSinf__Ff);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgCosf__Ff);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Step__9mgCCameraFi);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Stay__9mgCCameraFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetPos__9mgCCameraFfff);
+typedef struct mgCCamera {
+    /* 0x00 */ f32 unk0;                            /* inferred */
+    /* 0x04 */ f32 unk4;                            /* inferred */
+    /* 0x08 */ f32 unk8;                            /* inferred */
+    /* 0x0C */ s32 unkC;                            /* inferred */
+    /* 0x10 */ char pad10[0x10];                    /* maybe part of unkC[5]? */
+    /* 0x20 */ f32 unk20;                           /* inferred */
+    /* 0x24 */ f32 unk24;                           /* inferred */
+    /* 0x28 */ f32 unk28;                           /* inferred */
+    /* 0x2C */ s32 unk2C;                           /* inferred */
+} mgCCamera;                                        /* size >= 0x30 */
+extern "C" void SetPos__9mgCCameraFfff(mgCCamera *objet, f32 arg0, f32 arg1, f32 arg2) {
+    objet->unk20 = arg0;
+    objet->unk0 = arg0;
+    objet->unk24 = arg1;
+    objet->unk4 = arg1;
+    objet->unk28 = arg2;
+    objet->unk8 = arg2;
+    objet->unk2C = 0x3F800000;
+    objet->unkC = 0x3F800000;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetPos__9mgCCameraFPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetNextPos__9mgCCameraFfff);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetNextPos__9mgCCameraFPf);
@@ -38,7 +61,16 @@ INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetAngleH__9mgCCameraFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetAngleV__9mgCCameraFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", __ct__9mgCCameraFf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetFollowNextPos__15mgCCameraFollowFPf);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetFollowNext__15mgCCameraFollowFPf);
+typedef struct mgCCameraFollow {
+    /* 0x00 */ char pad0[0x80];
+    /* 0x80 */ f32 unk80;                           /* inferred */
+} mgCCameraFollow;                                  /* size >= 0x84 */
+extern "C" void mgAddVector__FPfPf(f32 *arg0, f32 *arg1);
+extern "C" void GetFollow__15mgCCameraFollowFPf(mgCCameraFollow *objet, f32 *arg0);
+extern "C" void GetFollowNext__15mgCCameraFollowFPf(mgCCameraFollow *objet, f32 *arg0) {
+    GetFollow__15mgCCameraFollowFPf(objet, arg0);
+    mgAddVector__FPfPf(arg0, &objet->unk80);
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Step__15mgCCameraFollowFi);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Stay__15mgCCameraFollowFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetFollow__15mgCCameraFollowFfff);
@@ -81,7 +113,21 @@ INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgCopyFrame__FP8mgCFrameP9mgCMemoryi)
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Begin__13mgCMDTBuilderFP9mgCMemory);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", End__13mgCMDTBuilderFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", End__13mgCMDTBuilderFP8mgCFrameP12mgCVisualMDTP10mgLoadData);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", BeginData__13mgCMDTBuilderFi);
+typedef struct mgCMDTBuilder {
+    /* 0x00 */ char pad0[8];
+    /* 0x08 */ s32 unk8;                            /* inferred */
+    /* 0x0C */ s32 unkC;                            /* inferred */
+    /* 0x10 */ s32 unk10;                           /* inferred */
+    /* 0x14 */ char pad14[0x14];                    /* maybe part of unk10[6]? */
+    /* 0x28 */ s32 unk28;                           /* inferred */
+} mgCMDTBuilder;                                    /* size >= 0x2C */
+extern "C" void BeginData__13mgCMDTBuilderFi(mgCMDTBuilder *objet, s32 arg0) {
+    if (objet->unk28 == 0) {
+        objet->unkC = objet->unk8;
+        objet->unk10 = 0;
+        objet->unk28 = arg0;
+    }
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetData__13mgCMDTBuilderFPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetData__13mgCMDTBuilderFffff);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetMaterial__13mgCMDTBuilderFPfPc);
@@ -108,7 +154,12 @@ INCLUDE_ASM("nonmatchings/mglib/mgcframe", Initialize__11mgCDrawPrimFP9mgCMemory
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Begin__11mgCDrawPrimFi);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", BeginDma__11mgCDrawPrimFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", EndDma__11mgCDrawPrimFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", Flush__11mgCDrawPrimFv);
+extern "C" void BeginDma__11mgCDrawPrimFv(mgCDrawPrim *objet);
+extern "C" void EndDma__11mgCDrawPrimFv(mgCDrawPrim *objet);
+extern "C" void Flush__11mgCDrawPrimFv(mgCDrawPrim *objet) {
+    EndDma__11mgCDrawPrimFv(objet);
+    BeginDma__11mgCDrawPrimFv(objet);
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", End__11mgCDrawPrimFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Begin2__11mgCDrawPrimFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", BeginPrim2__11mgCDrawPrimFi);

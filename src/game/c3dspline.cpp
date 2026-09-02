@@ -73,7 +73,20 @@ INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_WAKU_CIRCLE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_PARTS_EFF_NUM__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_PARTS_EFFECT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", MenuDataAnalyze__FPciP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_EXE_COMMAND_NAME__FP9SPI_STACKi);
+extern "C" u8 MenuCommandAnalyzeInfo[104];
+extern "C" u8 SpiMenuExeCommandFlag;
+extern "C" s32 spiGetStackString__FP9SPI_STACK(SPI_STACK *arg0);
+extern "C" s32 strcmp(void *, s32);
+extern "C" s32 _MENU_EXE_COMMAND_NAME__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    s32 temp_a1;
+
+    temp_a1 = spiGetStackString__FP9SPI_STACK(arg0);
+    SpiMenuExeCommandFlag = 0;
+    if (strcmp(&MenuCommandAnalyzeInfo, temp_a1) == 0) {
+        SpiMenuExeCommandFlag = 1;
+    }
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_EXE_FORM_DRAWFLAG__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_EXE_FORM_RGBA__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_EXE_FORM_CALCRGBAPARAM__FP9SPI_STACKi);
@@ -113,8 +126,22 @@ extern "C" s32 _MENU_WAKUTYPE__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
 }
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_SCENE_FADE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_SE_PLAY__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_EXE_INIT_DRAWLIST__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_EXE_RESET_TEXINFO__FP9SPI_STACKi);
+extern "C" void InitDrawList__14CPosDataManageFv(CPosDataManage *objet);
+extern "C" s32 _MENU_EXE_INIT_DRAWLIST__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    if (SpiMenuExeCommandFlag == 0) {
+        return 1;
+    }
+    InitDrawList__14CPosDataManageFv(MenuPosData);
+    return 1;
+}
+extern "C" void ResetTextureInfoAll__14CPosDataManageFv(CPosDataManage *objet);
+extern "C" s32 _MENU_EXE_RESET_TEXINFO__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    if (SpiMenuExeCommandFlag == 0) {
+        return 1;
+    }
+    ResetTextureInfoAll__14CPosDataManageFv(MenuPosData);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_DEBUG_PRINTF__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", MenuCommandAnalyze__FPciPc);
 INCLUDE_ASM("nonmatchings/game/c3dspline", LoadNpcTalkMes__FP9mgCMemory);
@@ -201,7 +228,48 @@ INCLUDE_ASM("nonmatchings/game/c3dspline", scsAHDDelay__FP12_SEN_CMR_SEQP12CScen
 INCLUDE_ASM("nonmatchings/game/c3dspline", scsSetAngle__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/c3dspline", scsSetHeight__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/c3dspline", scsSetDist__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
-INCLUDE_ASM("nonmatchings/game/c3dspline", scsSetAHD__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
+typedef struct CSceneCmrSeq {
+    /* 0x00 */ char pad0[0x50];
+    /* 0x50 */ f32 unk50;                           /* inferred */
+    /* 0x54 */ f32 unk54;                           /* inferred */
+    /* 0x58 */ f32 unk58;                           /* inferred */
+    /* 0x5C */ char pad5C[4];
+    /* 0x60 */ f32 unk60;                           /* inferred */
+    /* 0x64 */ f32 unk64;                           /* inferred */
+    /* 0x68 */ f32 unk68;                           /* inferred */
+    /* 0x6C */ char pad6C[4];
+    /* 0x70 */ f32 unk70;                           /* inferred */
+    /* 0x74 */ f32 unk74;                           /* inferred */
+    /* 0x78 */ f32 unk78;                           /* inferred */
+    /* 0x7C */ s32 unk7C;                           /* inferred */
+    /* 0x80 */ char pad80[0x20];                    /* maybe part of unk7C[9]? */
+    /* 0xA0 */ f32 unkA0;                           /* inferred */
+    /* 0xA4 */ f32 unkA4;                           /* inferred */
+    /* 0xA8 */ f32 unkA8;                           /* inferred */
+} CSceneCmrSeq;                                     /* size >= 0xAC */
+typedef struct _SEN_CMR_SEQ {
+    /* 0x00 */ char pad0[0x10];
+    /* 0x10 */ f32 unk10;                           /* inferred */
+    /* 0x14 */ f32 unk14;                           /* inferred */
+    /* 0x18 */ f32 unk18;                           /* inferred */
+} _SEN_CMR_SEQ;                                     /* size >= 0x1C */
+extern "C" f32 cosf(f32);
+extern "C" f32 sinf(f32);
+extern "C" s32 scsSetAHD__FP12_SEN_CMR_SEQP12CSceneCmrSeq(_SEN_CMR_SEQ *arg0, CSceneCmrSeq *arg1) {
+    if (arg1->unk7C != 0) {
+        arg1->unkA0 = arg0->unk10;
+        arg1->unkA4 = arg0->unk14;
+        arg1->unkA8 = arg0->unk18;
+    } else {
+        arg1->unk50 = arg1->unk60 + (arg0->unk18 * sinf(arg0->unk10));
+        arg1->unk54 = arg0->unk14 + arg1->unk64;
+        arg1->unk58 = arg1->unk68 + (arg0->unk18 * cosf(arg0->unk10));
+        arg1->unk70 = arg0->unk10;
+        arg1->unk74 = arg0->unk14;
+        arg1->unk78 = arg0->unk18;
+    }
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", scsMove__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/c3dspline", scsMove2__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/c3dspline", scsMoveRef__FP12_SEN_CMR_SEQP12CSceneCmrSeq);

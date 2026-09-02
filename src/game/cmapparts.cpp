@@ -217,8 +217,43 @@ INCLUDE_ASM("nonmatchings/game/cmapparts", GetFarDist__7CObjectFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", SetNearDist__7CObjectFf);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetNearDist__7CObjectFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", Copy__7CObjectFR7CObjectP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/cmapparts", GetTimeBand__Ff);
-INCLUDE_ASM("nonmatchings/game/cmapparts", GetNowTime__4CMapFv);
+extern "C" s32 GetTimeBand__Ff(f32 arg0) {
+    s32 var_v0;
+
+    var_v0 = 2;
+    if (!(arg0 < 6.0f)) {
+        if (arg0 < 9.0f) {
+            var_v0 = 3;
+        }
+    }
+    if (!(arg0 < 9.0f)) {
+        if (arg0 < 17.0f) {
+            var_v0 = 0;
+        }
+    }
+    if (!(arg0 < 17.0f) && (arg0 < 21.0f)) {
+        var_v0 = 1;
+    }
+    return var_v0;
+}
+typedef struct CMap {
+    /* 0x000 */ char pad0[0xC0];
+    /* 0x0C0 */ s32 unkC0;                          /* inferred */
+    /* 0x0C4 */ char padC4[4];
+    /* 0x0C8 */ f32 unkC8;                          /* inferred */
+    /* 0x0CC */ s32 unkCC;                          /* inferred */
+    /* 0x0D0 */ char padD0[0xBB8];                  /* maybe part of unkCC[0x2EF]? */
+    /* 0xC88 */ f32 unkC88;                         /* inferred */
+} CMap;                                             /* size >= 0xC8C */
+extern "C" f32 GetNowTime__4CMapFv(CMap *objet) {
+    if (objet->unkC0 != 0) {
+        return objet->unkC88;
+    }
+    if (objet->unkCC != 0) {
+        return objet->unkC8;
+    }
+    return 12.0f;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetNowTimeBand__4CMapFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetNowTimeLightBand__4CMapFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetLightingRatio__4CMapFPf);
@@ -311,8 +346,36 @@ INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE_END__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPARTS_END__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapMAP_PARTS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapMAP_FAR_CLIP__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapPARTS_NAME__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapPARTS_GROUP__FP9SPI_STACKi);
+extern "C" u8 mapMapPartsName[256];
+struct SPI_STACK {
+    s32 field_0;
+    s32 field_4;
+};
+extern "C" s32 spiGetStackString__FP9SPI_STACK(SPI_STACK *arg0);
+extern "C" void strcpy(void *, s32);
+extern "C" s32 mapPARTS_NAME__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    s32 temp_v0;
+
+    temp_v0 = spiGetStackString__FP9SPI_STACK(arg0);
+    if (temp_v0 == 0) {
+        return 0;
+    }
+    strcpy(&mapMapPartsName, temp_v0);
+    return 1;
+}
+extern "C" u8 mapMapPartsGroupName[256];
+extern "C" s32 spiGetStackString__FP9SPI_STACK(SPI_STACK *arg0);
+extern "C" void strcpy(void *, s32);
+extern "C" s32 mapPARTS_GROUP__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    s32 temp_v0;
+
+    temp_v0 = spiGetStackString__FP9SPI_STACK(arg0);
+    if (temp_v0 == 0) {
+        return 0;
+    }
+    strcpy(&mapMapPartsGroupName, temp_v0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPARTS_POS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPARTS_ROT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPARTS_SCALE__FP9SPI_STACKi);
@@ -327,16 +390,38 @@ void CCameraDrawInfo::Initialize(void) {
     this->field_0x4 = 0;
     this->field_0x0 = -1;
 }
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapFIX_CAMERA__FP9SPI_STACKi);
+extern "C" u32 mapCameraRectIdx;
+extern "C" s32 IsAddMode__Fv();
+extern "C" s32 mapFIX_CAMERA__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    if (IsAddMode__Fv() != 0) {
+        return 1;
+    }
+    mapCameraRectIdx = 0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFIX_CAMERA_POS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFIX_CAMERA_POS2__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFIX_CAMERA_OFF_GROUP__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFIX_CAMERA_RECT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", SetCollision__9CColFrameFP10CCollision);
 INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__10CCollisionFv);
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapFIX_CAMERA_END__FP9SPI_STACKi);
+extern "C" u32 mapCameraInfoIdx;
+extern "C" s32 IsAddMode__Fv();
+extern "C" s32 mapFIX_CAMERA_END__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    if (IsAddMode__Fv() != 0) {
+        return 1;
+    }
+    mapCameraInfoIdx += 1;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapCAMERA_INFO_END__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapFUNC_POINT__FP9SPI_STACKi);
+extern "C" u32 mapFuncPointIdx;
+extern "C" void spiGetStackInt__FP9SPI_STACK(SPI_STACK *arg0);
+extern "C" s32 mapFUNC_POINT__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    spiGetStackInt__FP9SPI_STACK(arg0);
+    mapFuncPointIdx = 0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFUNC_DATA__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFUNC_NAME__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFUNC_FLAG__FP9SPI_STACKi);
@@ -460,4 +545,19 @@ void CList_9CObjAnime_::Initialize(void) {
 }
 INCLUDE_ASM("nonmatchings/game/cmapparts", Initialize__15CMapTreasureBoxFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", AssignFuncPoint__15CMapTreasureBoxFP10CFuncPointP9CMapParts);
-INCLUDE_ASM("nonmatchings/game/cmapparts", GetWorldPosition__15CMapTreasureBoxFPf);
+#include "gen/mgCFrame.hpp"
+typedef struct CMapTreasureBox {
+    /* 0x00 */ char pad0[0x70];
+    /* 0x70 */ mgCFrame *unk70;                     /* inferred */
+} CMapTreasureBox;                                  /* size >= 0x74 */
+extern "C" void GetWorldPosition0__8mgCFrameFPf(mgCFrame *objet, f32 *arg0);
+extern "C" void mgZeroVectorW__FPf(f32 *arg0);
+extern "C" void GetWorldPosition__15CMapTreasureBoxFPf(CMapTreasureBox *objet, f32 *arg0) {
+    mgCFrame *temp_a0;
+
+    mgZeroVectorW__FPf(arg0);
+    temp_a0 = objet->unk70;
+    if (temp_a0 != NULL) {
+        GetWorldPosition0__8mgCFrameFPf(temp_a0, arg0);
+    }
+}

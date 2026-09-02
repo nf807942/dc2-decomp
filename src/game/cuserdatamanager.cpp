@@ -32,7 +32,12 @@ INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetDegreeLevel__16MOS_CHANGE_P
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", LevelUp__16MOS_CHANGE_PARAMFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", Initialize__11CMonsterBoxFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetMonsterBajjiData__11CMonsterBoxFi);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetMonsterBajjiDataByMonsterID__11CMonsterBoxFi);
+struct CMonsterBox;
+extern "C" s32 get_gajji_id_from_monster_progress_table__FiPi(s32 arg0, s32 *arg1);
+extern "C" void GetMonsterBajjiData__11CMonsterBoxFi(CMonsterBox *objet, s32 arg0);
+extern "C" void GetMonsterBajjiDataByMonsterID__11CMonsterBoxFi(CMonsterBox *objet, s32 arg0) {
+    GetMonsterBajjiData__11CMonsterBoxFi(objet, get_gajji_id_from_monster_progress_table__FiPi(arg0, NULL) + 1);
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", EnableChange__11CMonsterBoxFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", IsChange__11CMonsterBoxFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AllCure__11CMonsterBoxFv);
@@ -109,7 +114,12 @@ INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AllWeaponRepair__16CUserDataMa
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", RefreshNPCStatus__16CUserDataManagerFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetFishingRodNo__16CUserDataManagerFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", NowFishingStyle__16CUserDataManagerFv);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetActiveEsa__16CUserDataManagerFv);
+struct CUserDataManager;
+extern "C" void GetActiveEsa__16CUserDataManagerFi(CUserDataManager *objet, s32 arg0);
+extern "C" s32 GetFishingRodNo__16CUserDataManagerFv(CUserDataManager *objet);
+extern "C" void GetActiveEsa__16CUserDataManagerFv(CUserDataManager *objet) {
+    GetActiveEsa__16CUserDataManagerFi(objet, GetFishingRodNo__16CUserDataManagerFv(objet));
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetActiveEsa__16CUserDataManagerFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetFishBait__16CUserDataManagerFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", DeleteBait__16CUserDataManagerFv);
@@ -117,7 +127,20 @@ INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetFishInAquarium__16CUserData
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", CheckFishRecordUpdate__16CUserDataManagerFiff);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetFishRecord__16CUserDataManagerFiPfPf);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetRodStatus__16CUserDataManagerFPi);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AddFp__16CUserDataManagerFi);
+#include "gamedataused.hpp"
+typedef struct CUserDataManager {
+    /* 0x0000 */ char pad0[0x40B8];
+    /* 0x40B8 */ CGameDataUsed unk40B8;             /* inferred */
+    /* 0x40B8 */ char pad40B8[1];
+} CUserDataManager;                                 /* size >= 0x40B9 */
+extern "C" s32 AddFusionPoint__13CGameDataUsedFi(CGameDataUsed *objet, s32 arg0);
+extern "C" s32 GetFishingRodNo__16CUserDataManagerFv(CUserDataManager *objet);
+extern "C" s32 AddFp__16CUserDataManagerFi(CUserDataManager *objet, s32 arg0) {
+    if (GetFishingRodNo__16CUserDataManagerFv(objet) <= 0) {
+        return 0;
+    }
+    return AddFusionPoint__13CGameDataUsedFi(&objet->unk40B8, arg0);
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SetChrEquip__16CUserDataManagerFiP13CGameDataUsed);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SetChrEquip__16CUserDataManagerFii);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SetChrEquipDirect__16CUserDataManagerFii);
