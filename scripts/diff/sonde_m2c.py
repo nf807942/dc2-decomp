@@ -81,18 +81,31 @@ def deja_vues(unite: str) -> set[str]:
 # Un type déclaré sans le moindre champ n'apprend rien : le tenir pour « vu »
 # empêche de poser la structure que m2c infère, et le corps parle alors d'un
 # `unk904` que rien ne définit. C'est la même règle que pour le contexte.
-_CORPS = re.compile(r"(?:class|struct)\s+(\w+)\s*(?::[^{;]*)?\{(.*?)^\}",
-                    re.DOTALL | re.MULTILINE)
-_UN_CHAMP = re.compile(r"^\s+[A-Za-z_][\w ():*&\[\]]*;", re.MULTILINE)
+_OUVRE_TYPE = re.compile(r"^\s*(?:typedef\s+)?(?:struct|class|union)\s+(\w+)")
 
 
 def _avec_champs(texte: str) -> set[str]:
-    """Les types que ce texte déclare *avec* au moins un champ de donnée."""
-    trouve = set()
-    for nom, corps in _CORPS.findall(texte):
-        lignes = [l for l in _UN_CHAMP.findall(corps) if "(" not in l]
-        if lignes:
-            trouve.add(nom)
+    """Les types que ce texte déclare *avec* au moins un champ de donnée.
+
+    Le parcours se fait ligne à ligne plutôt que par une expression sur
+    plusieurs lignes : celle-ci rendait le bon résultat à l'essai et rien du
+    tout depuis le module, sans que la différence se laisse voir.
+    """
+    trouve, nom, champs, profondeur = set(), None, 0, 0
+    for ligne in texte.splitlines():
+        if nom is None:
+            entete = _OUVRE_TYPE.match(ligne)
+            if entete and "{" in ligne:
+                nom, champs, profondeur = entete.group(1), 0, 1
+            continue
+        profondeur += ligne.count("{") - ligne.count("}")
+        depouillee = ligne.split("/*")[0].split("//")[0].rstrip()
+        if depouillee.endswith(";") and "(" not in depouillee                 and depouillee.strip():
+            champs += 1
+        if profondeur <= 0:
+            if champs:
+                trouve.add(nom)
+            nom = None
     return trouve
 
 
@@ -179,9 +192,23 @@ def normalise(texte: str, symbole: str,
     # Une structure que le projet déclare déjà ne se redéclare pas : MWCC
     # répond « struct/union/enum/class tag 'CColPrim' redefined », et celle du
     # projet porte de vrais noms de champs qu'il vaut mieux employer.
-    structs = [bloc for bloc in _STRUCT.findall(texte)
-               if _NOM_STRUCT.search(bloc).group(1) not in vues]
+    # Une structure que l'unité déclare déjà ne peut pas être redéclarée — MWCC
+    # répond « tag 'X' redefined ». Mais l'écarter ne marche pas davantage : sans
+    # contexte, m2c a inventé ses propres noms de champs, et le corps parle d'un
+    # `unk30` que la déclaration de l'unité ignore. On renomme donc la structure
+    # inférée, dans sa définition comme dans le corps : les deux coexistent, et
+    # ce sont les octets qui trancheront.
+    structs, renommes = [], {}
+    for bloc in _STRUCT.findall(texte):
+        nom = _NOM_STRUCT.search(bloc).group(1)
+        if nom in vues:
+            neuf = nom + "_infere"
+            renommes[nom] = neuf
+            bloc = re.sub(r"%s" % re.escape(nom), neuf, bloc)
+        structs.append(bloc)
     reste = _STRUCT.sub("", texte)
+    for ancien, neuf in renommes.items():
+        reste = re.sub(r"%s" % re.escape(ancien), neuf, reste)
 
     externes = []
     for retour, nom, params in _EXTERN.findall(reste):
