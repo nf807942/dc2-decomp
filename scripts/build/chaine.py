@@ -39,9 +39,10 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "diff"))
+import affine  # noqa: E402
 import sonde_m2c  # noqa: E402
 from lib.project import (ROOT, functions, grafted_by_source,  # noqa: E402
-                         unit_of)
+                         run, unit_of)
 
 ETAT = ROOT / "progress" / "chaine.json"
 
@@ -79,6 +80,24 @@ def par_unite(mini: int, maxi: int) -> dict[str, list[tuple[int, str]]]:
                        key=lambda kv: -sum(t for t, _ in kv[1])))
 
 
+def recompile_et_mesure(symbole: str, unite: str) -> float | None:
+    """Reconstruit l'unité, puis rend l'appariement de la fonction.
+
+    `score()` seul interrogerait objdiff sur l'objet d'avant : la variante que
+    l'affinage vient d'écrire ne serait pas mesurée, et son score serait celui
+    de la forme précédente. C'est la même erreur que le faux 100 % d'une
+    fonction restée greffée, une couche plus loin.
+    """
+    objet = ROOT / "build" / "src" / (unite + ".o")
+    if objet.exists():
+        objet.unlink()
+    bati = run(["make", str(objet.relative_to(ROOT))],
+               capture_output=True, text=True)
+    if bati.returncode != 0:
+        return None
+    return sonde_m2c.score(symbole, unite)
+
+
 def main(argv: list[str]) -> int:
     parseur = argparse.ArgumentParser(description=__doc__)
     parseur.add_argument("--mini", type=int, default=128)
@@ -111,6 +130,16 @@ def main(argv: list[str]) -> int:
             verdict = sonde_m2c.eprouve(symbole, unite, taille, garde=True)
             faits += 1
             part = verdict.get("part")
+
+            # Une fonction qui compile sans apparier n'est pas perdue : les
+            # idiomes mesurés valent d'être essayes avant de la rendre. La
+            # sonde, elle, l'abandonnait a 93 %.
+            if part is not None and 85.0 <= part < 99.999:
+                part, gagnee_par_idiome = affine.affine(
+                    symbole, unite, part, recompile_et_mesure)
+                if gagnee_par_idiome:
+                    verdict["part"] = part
+                    verdict["idiome"] = True
             etat["eprouvees"][symbole] = {
                 "issue": verdict["issue"], "part": part, "taille": taille,
                 # La cause, et non la seule issue : c'est elle qui dit quelle
