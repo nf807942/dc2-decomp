@@ -584,6 +584,15 @@ def eprouve(symbole: str, unite: str, taille: int,
                 and (verdict.get("part") or 0) >= 99.999):
             source.write_text(avant, encoding="utf-8")
 
+        # L objet part avec la source. Un SIGTERM tombe le plus souvent
+        # pendant `make`, qui laisse alors un `.o` tronque : `make` le
+        # croit a jour puisqu il est plus recent que sa source, et la
+        # construction suivante s ecarte du disque sur 73 % des octets
+        # sans qu aucune source ait change. Deux diagnostics ont ete
+        # perdus a chercher la faute dans `src/`.
+        if objet.exists():
+            objet.unlink()
+
 
 _INCONNU = re.compile(r"undefined identifier '(\w+)'")
 _OBJET = re.compile(r"^(\w+) = 0x[0-9A-Fa-f]+; // size:0x([0-9A-Fa-f]+)",
