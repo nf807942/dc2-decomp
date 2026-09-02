@@ -46,6 +46,10 @@ _ENTETE = re.compile(r"^(\S+) (%s)\((.*?)\) \{$", re.MULTILINE)
 
 INCLUDE_ASM = 'INCLUDE_ASM("nonmatchings/%s", %s);'
 
+# Ce que m2c dit d'un champ qu'il ne type pas : rien, ou sa largeur.
+_LARGEUR_INCONNUE = {"": "char", "8": "s8", "16": "s16",
+                     "32": "s32", "64": "s64"}
+
 # `typedef struct CColPrim {` — le nom que la structure inférée porte.
 _NOM_STRUCT = re.compile(r"^typedef struct (\w+)")
 # Ce qui n'est pas un type nommé du jeu, et ne se déclare donc pas en avant.
@@ -200,6 +204,16 @@ def normalise(texte: str, symbole: str,
     # ce sont les octets qui trancheront.
     structs, renommes = [], {}
     for bloc in _STRUCT.findall(texte):
+        # m2c écrit `?` le champ dont il ignore le type, et `?32` celui dont il
+        # ne connaît que la largeur. Ni l'un ni l'autre n'est du C : MWCC répond
+        # « declaration syntax error » et perd la structure entière. La largeur,
+        # elle, est sûre — c'est la seule chose qu'on garde.
+        bloc = re.sub(r"(/\*[^*]*\*/\s*)\?(\d*)(\s+\w+;)",
+                      lambda m: "%s%s%s" % (m.group(1),
+                                            _LARGEUR_INCONNUE.get(m.group(2),
+                                                                  "char"),
+                                            m.group(3)),
+                      bloc)
         nom = _NOM_STRUCT.search(bloc).group(1)
         if nom in vues:
             neuf = nom + "_infere"
@@ -216,6 +230,11 @@ def normalise(texte: str, symbole: str,
         # ne le dit pas davantage, et `void` n'engage que la déclaration.
         # Le prototype d'une méthode nomme `this` son premier paramètre, ce
         # qu'un prototype `extern "C"` ne peut pas davantage qu'une définition.
+        # `? *` en paramètre est le même aveu que dans une structure : m2c
+        # ne sait pas le type. `void *` en garde la seule chose sûre — que
+        # c'est un pointeur. On vise `? *`, jamais un `?` isolé, qui serait
+        # un opérateur ternaire.
+        params = re.sub(r"\?\s*\*", "void *", params)
         externes.append('extern "C" %s %s(%s);'
                         % ("void" if retour == "?" else retour, nom,
                            re.sub(r"\bthis\b", "objet", params)))
