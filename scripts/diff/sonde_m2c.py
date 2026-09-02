@@ -35,7 +35,7 @@ from lib.project import (ROOT, functions, grafted_by_source,  # noqa: E402
                          run, unit_of)
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from conversions import (cast_les_affectations,  # noqa: E402
-                         declare_les_piles, nettoie_declarations,
+                         assemble, declare_les_piles, nettoie_declarations,
                          nettoie_locales)
 
 # `typedef struct X {` … `} X;` — la structure que m2c infère d'un pointeur.
