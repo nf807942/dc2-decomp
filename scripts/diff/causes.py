@@ -120,13 +120,25 @@ def main(argv: list[str]) -> int:
     parseur = argparse.ArgumentParser(description=__doc__)
     parseur.add_argument("--combien", type=int, default=60)
     parseur.add_argument("--graine", type=int, default=1)
+    parseur.add_argument("--liste", default="",
+                         help="un fichier de symboles, un par ligne")
     options = parseur.parse_args(argv)
 
-    etat = json.loads(ETAT.read_text(encoding="utf-8"))["eprouvees"]
-    lot = [nom for nom, v in etat.items()
-           if v["issue"] == "ne compile pas" and unit_of(nom)]
-    total = len(lot)
-    random.Random(options.graine).shuffle(lot)
+    # Une population figee, sinon la comparaison ne veut rien dire : la moisson
+    # ecrit dans `chaine.json` pendant la mesure, et a graine egale deux tours
+    # ne tirent alors pas les memes fonctions. Deux comparaisons « avant/apres »
+    # ont ete faussees ainsi avant que `--liste` n'existe.
+    if options.liste:
+        lot = [l.strip() for l in
+               Path(options.liste).read_text(encoding="utf-8").splitlines()
+               if l.strip()]
+        total = len(lot)
+    else:
+        etat = json.loads(ETAT.read_text(encoding="utf-8"))["eprouvees"]
+        lot = [nom for nom, v in etat.items()
+               if v["issue"] == "ne compile pas" and unit_of(nom)]
+        total = len(lot)
+        random.Random(options.graine).shuffle(lot)
     lot = lot[:options.combien]
     print("causes : %d fonctions tirees sur %d qui ne compilent pas\n"
           % (len(lot), total), flush=True)
