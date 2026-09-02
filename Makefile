@@ -135,7 +135,7 @@ O_FILES   := $(addprefix $(BUILD_DIR)/, $(S_FILES:.s=.o) $(BIN_FILES:.bin=.o) \
              $(addsuffix .o, $(basename $(SRC_FILES))))
 
 .PHONY: all setup tools patch split build objects check diff decompile measure \
-        carve clean distclean contexte controle ci etat progress report
+        atlas carve clean distclean contexte controle ci etat progress report
 
 all: build
 
@@ -289,8 +289,14 @@ carve:
 units:
 	@$(PYTHON) scripts/build/units.py $(S) $(UNITS_ARGS)
 
+# L'atlas des types : ce que m2c infère du binaire entier, fusionné. Il tourne
+# *sans* contexte — un type déjà déclaré fait cesser l'inférence — et c'est de
+# lui que le contexte se construit ensuite.
+atlas:
+	@$(PYTHON) scripts/build/atlas.py $(ARGS)
+
 # Le contexte que m2c lit pour typer ce qu'il décompile, engendré depuis
-# `include/`. Sans lui, m2c invente un nom de champ par décalage.
+# `include/` et l'atlas. Sans lui, m2c invente un nom de champ par décalage.
 contexte:
 	@$(PYTHON) scripts/build/contexte.py
 

@@ -19,6 +19,7 @@ Le fichier est engendré, jamais tenu à la main : la vérité reste dans
 
 from __future__ import annotations
 
+import json
 import re
 import sys
 from pathlib import Path
@@ -150,6 +151,67 @@ def blocs_de_type(texte: str) -> list[str]:
     return blocs
 
 
+ATLAS = ROOT / "progress" / "atlas.json"
+
+# La largeur de ce que l'atlas propose, pour poser le remplissage entre champs.
+_LARGEUR = {"s8": 1, "u8": 1, "char": 1, "bool": 1, "s16": 2, "u16": 2,
+            "s32": 4, "u32": 4, "f32": 4, "s64": 8, "u64": 8, "f64": 8,
+            "s128": 16, "u128": 16}
+
+
+def depuis_atlas(deja: set[str]) -> tuple[set[str], list[str]]:
+    """Les structures que l'atlas décrit, rendues en C.
+
+    L'arbitrage tient en une règle, et elle se voit dans le fichier : au
+    décalage contredit, **la proposition la plus attestée l'emporte**. Un type
+    proposé par douze unités et un autre par une seule ne se valent pas. Ce que
+    m2c n'a pas su typer — le `?` — est écarté plutôt que deviné : le champ
+    disparaît dans le remplissage, ce qui n'affirme rien.
+
+    Une structure que le dépôt tient déjà à la main n'est pas remplacée : elle
+    porte de vrais noms de champs, et c'est un acquis.
+    """
+    if not ATLAS.exists():
+        return set(), []
+    atlas = json.loads(ATLAS.read_text(encoding="utf-8"))["types"]
+
+    noms, blocs = set(), []
+    for nom, decrit in sorted(atlas.items()):
+        if nom in deja or nom in _BASES_NOMMEES:
+            continue
+        lignes, position = [], 0
+        for decalage, propositions in decrit["champs"].items():
+            kind = next(iter(propositions))
+            # m2c rend « ? » ce qu'il ne type pas, et « ?32 » quand il n'en
+            # connaît que la largeur : ni l'un ni l'autre n'est un type C.
+            # m2c rend « ? » ce qu'il ne type pas, « ?32 » quand il n'en connaît
+            # que la largeur, et parfois un nom de type imbriqué à la C++ —
+            # `CScene::BGM_STATUS` — que le C ne sait pas lire. Aucun des trois
+            # n'est un type C, et deviner à leur place n'apprendrait rien.
+            if "?" in kind or "::" in kind or kind.endswith("]"):
+                continue
+            # Un type nommé employé *par valeur* demande sa définition, que
+            # l'atlas n'a pas toujours : m2c répond « Tried to use struct
+            # CMapLightingInfo before it is defined ». Un pointeur, lui, se
+            # contente du nom. Le champ écarté devient du remplissage, ce qui
+            # n'affirme rien.
+            if not kind.endswith("*") and kind.rstrip(" *") not in _BASES_NOMMEES:
+                continue
+            offset = int(decalage, 16)
+            if offset < position:
+                continue
+            largeur = _LARGEUR.get(kind.rstrip(" *"), 4) if not kind.endswith("*") else 4
+            if offset > position:
+                lignes.append("    char pad_%X[0x%X];" % (position, offset - position))
+            lignes.append("    %s field_%X;" % (kind, offset))
+            position = offset + largeur
+        if not lignes:
+            continue
+        noms.add(nom)
+        blocs.append("struct %s {\n%s\n};" % (nom, "\n".join(lignes)))
+    return noms, blocs
+
+
 def prototypes(definis: set[str]) -> tuple[set[str], list[str]]:
     """Les signatures que le mangling donne, sous le nom que le binaire porte.
 
@@ -255,6 +317,21 @@ def main() -> int:
     # qu'un identifiant *est* un nom de type pour lire `DngMapFloorInfo info;`.
     # Les en-têtes étant en C++, ils emploient ce nom sans `struct` et souvent
     # avant sa définition ; sans ces typedefs, m2c s'arrête sur le premier.
+    # L'atlas vient après les en-têtes tenus à la main, jamais devant : ceux-ci
+    # portent de vrais noms de champs, et c'est un acquis qu'on ne remplace pas.
+    depuis, blocs = depuis_atlas(connus)
+    if blocs:
+        corps.append("/* progress/atlas.json — ce que m2c infère du binaire. */")
+        corps.extend(blocs)
+        connus |= depuis
+        nommes |= depuis
+        # Un champ peut porter un type que l'atlas ne décrit pas — `VoTag *` —,
+        # et il lui faut son typedef comme à n'importe quel autre.
+        for bloc in blocs:
+            for kind in re.findall(r"^    ([A-Za-z_]\w*)[\s*]", bloc, re.MULTILINE):
+                if kind not in _BASES_NOMMEES:
+                    nommes.add(kind)
+
     cites, signatures = prototypes(connus)
     morceaux.append("/* Les noms de type, avant tout emploi. */")
     morceaux += ["typedef struct %s %s;" % (nom, nom)

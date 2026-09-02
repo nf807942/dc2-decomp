@@ -78,6 +78,69 @@ def deja_vues(unite: str) -> set[str]:
     return vues
 
 
+_PORTEURS: dict[str, str] | None = None
+
+
+def entete_du_type(nom: str) -> str | None:
+    """L'en-tête d'`include/` qui déclare ce type, s'il y en a un.
+
+    C'est celui que m2c a lu dans le contexte : ses champs portent les noms du
+    projet, et l'unité doit voir la même déclaration, sans quoi le corps parle
+    d'un `unknown_20` que rien ne définit chez elle.
+    """
+    global _PORTEURS
+    if _PORTEURS is None:
+        _PORTEURS = {}
+        include = ROOT / "include"
+        for chemin in sorted(include.rglob("*.h")) + sorted(include.rglob("*.hpp")):
+            relatif = chemin.relative_to(include).as_posix()
+            for trouve in _DECLARE.findall(
+                    chemin.read_text(encoding="utf-8", errors="replace")):
+                _PORTEURS.setdefault(trouve, relatif)
+    return _PORTEURS.get(nom)
+
+
+_ATLAS: dict | None = None
+
+
+def definition_atlas(nom: str) -> str | None:
+    """La disposition que l'atlas donne de ce type, rendue en C++.
+
+    Même arbitrage que le contexte, et pour la même raison : la proposition la
+    plus attestée l'emporte, et ce que m2c n'a pas su typer devient du
+    remplissage plutôt qu'une invention.
+    """
+    global _ATLAS
+    if _ATLAS is None:
+        chemin = ROOT / "progress" / "atlas.json"
+        _ATLAS = (json.loads(chemin.read_text(encoding="utf-8"))["types"]
+                  if chemin.exists() else {})
+    decrit = _ATLAS.get(nom)
+    if decrit is None:
+        return None
+
+    largeurs = {"s8": 1, "u8": 1, "char": 1, "bool": 1, "s16": 2, "u16": 2,
+                "s32": 4, "u32": 4, "f32": 4, "s64": 8, "u64": 8, "f64": 8}
+    lignes, position = [], 0
+    for decalage, propositions in decrit["champs"].items():
+        kind = next(iter(propositions))
+        if "?" in kind or "::" in kind or kind.endswith("]"):
+            continue
+        if not kind.endswith("*") and kind.rstrip(" *") not in largeurs:
+            continue
+        offset = int(decalage, 16)
+        if offset < position:
+            continue
+        if offset > position:
+            lignes.append("    char pad_%X[0x%X];" % (position, offset - position))
+        lignes.append("    %s field_%X;" % (kind, offset))
+        position = offset + (4 if kind.endswith("*")
+                             else largeurs.get(kind.rstrip(" *"), 4))
+    if not lignes:
+        return None
+    return "struct %s {\n%s\n};" % (nom, "\n".join(lignes))
+
+
 def decompile(symbole: str) -> str | None:
     """La sortie de m2c pour cette fonction, ou rien s'il refuse."""
     resultat = run([sys.executable, "scripts/diff/decompile.py", symbole],
@@ -132,8 +195,24 @@ def normalise(texte: str, symbole: str,
     avant = sorted(nom for nom in employes - definis - vues
                    if nom not in _BASE and not nom.startswith("un"))
 
-    declarations = "\n".join(["struct %s;" % nom for nom in avant]
-                             + structs + externes)
+    # Le contexte a donné les types à m2c ; l'unité, elle, ne les voit pas, et
+    # MWCC répond « illegal use of incomplete struct 'mgCMemory' ». L'atlas
+    # porte la disposition : autant la poser, plutôt qu'une déclaration en avant
+    # qui ne suffit qu'à passer un pointeur.
+    en_tete = []
+    for nom in avant:
+        # L'en-tête du projet passe avant l'atlas : c'est lui que m2c a lu dans
+        # le contexte, et ses champs portent d'autres noms — `unknown_20` là où
+        # l'atlas dit `field_20`. Poser l'atlas ici ferait diverger le corps de
+        # sa propre déclaration.
+        porteur = entete_du_type(nom)
+        if porteur:
+            en_tete.append('#include "%s"' % porteur)
+            continue
+        bloc = definition_atlas(nom)
+        en_tete.append(bloc if bloc else "struct %s;" % nom)
+
+    declarations = "\n".join(en_tete + structs + externes)
     return declarations, corps
 
 
