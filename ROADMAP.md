@@ -4,107 +4,107 @@ Ce qui reste entre l'état d'aujourd'hui et un code entièrement maîtrisé. Les
 chiffres sont ceux du 2 septembre 2026 ; ils se refont par `make etat` (une
 demi-seconde), `make report`, `make carve`.
 
-Ce document dit aussi ce qui n'est pas mesuré. Une étape dont le coût n'a pas
-été éprouvé le déclare — c'est ce qui la distingue d'une étape planifiée.
+Ce document dit aussi ce qui n'est pas mesuré, et ce qui a été mesuré puis
+démenti. Une étape dont le coût n'a pas été éprouvé le déclare — c'est ce qui la
+distingue d'une étape planifiée.
+
+**L'horizon est de dix ans, et c'est assumé.** Ce plan ne cherche donc pas un
+levier qui multiplierait la cadence par cinq : aucun n'a résisté à la mesure. Il
+cherche une méthode sans impasse, applicable fonction après fonction, dont le
+rendement s'améliore à mesure que le corpus d'idiomes s'enrichit.
 
 ---
 
-## Où on en est réellement
+## Où on en est
 
 ```
 fonctions connues     7 840        2 215 100 octets
-écrites en C++          456 (5,82 %)   16 748 o   0,756 %
-greffées              7 335        2 192 104 o
+écrites en C++          457 (5,83 %)   16 904 o   0,763 %
+greffées              7 334        2 191 948 o
 hors unité               49            6 248 o   (les __sinit_*)
 ```
 
-Ce qui reste, par provenance :
-
 | Provenance | fn | octets | part |
 |---|---|---|---|
-| `game` | 5 648 | 1 860 276 | 84,9 % |
+| `game` | 5 647 | 1 860 120 | 84,9 % |
 | `sdk` | 905 | 142 304 | 6,5 % |
 | `mglib` | 555 | 108 348 | 4,9 % |
 | `runtime` | 227 | 81 176 | 3,7 % |
 
-Deux distributions décident de la stratégie :
+Deux distributions décident de l'ordre du travail :
 
-- **Par taille** — 3 769 fonctions ≤ 128 o ne pèsent que **11 %** des octets
-  restants ; les **410 fonctions > 1 Ko en pèsent 41 %**.
-- **Par nature** — 2 858 méthodes réparties sur **288 classes** (926 816 o), et
-  **4 477 fonctions libres ou statiques** (1 265 288 o). Les fonctions libres
-  pèsent plus lourd que toutes les classes réunies, et 67 classes seulement
-  portent plus de dix méthodes.
-
-Les dix classes les plus lourdes font 31 % des octets de classe : `ClsMes`
-(41 436 o), `CEditMap` (35 272), `CMenuItemInfo` (34 412), `CActionChara`
-(33 768), `CScene` (33 552), `CMenuInvent` (30 952), `CAquarium` (24 172),
-`CMap` (20 048), `CMonsterMan` (19 332), `CMenuChrCngMenu` (16 800).
+- **Par taille** — 3 769 fonctions ≤ 128 o ne pèsent que **11 %** des octets ;
+  les **410 fonctions > 1 Ko en pèsent 41 %**.
+- **Par nature** — 2 858 méthodes sur **288 classes** (926 816 o), et **4 477
+  fonctions libres ou statiques** (1 265 288 o). Les fonctions libres pèsent
+  plus que toutes les classes réunies ; 67 classes seulement portent plus de dix
+  méthodes.
 
 ---
 
-## Le chiffre qui commande le plan
+## La méthode, et c'est le cœur du plan
 
-```
-pour finir en 2 ans :  10,0 fn/jour    3 003 o/jour
-rythme observé      :  15,7 fn/jour      574 o/jour
-fin projetée        :  2037
-```
+**Une fonction se reconstruit en quatre gestes, et le troisième est le seul qui
+demande un humain.**
 
-**Le compte de fonctions est en avance de 57 % ; le poids est 5,2 fois trop
-lent.** Un mois de travail a produit 456 fonctions et 0,756 % des octets.
+1. **`make decompile S=…`** donne un premier jet. m2c lit le désassemblage,
+   infère les structures, nomme les variables. Son résultat n'est pas juste,
+   mais il est lisible et proche.
+2. **La normalisation** rend ce jet compilable : `this` renommé, structures
+   inférées posées, déclarations complétées depuis la table des symboles,
+   champs non typés traduits par leur largeur. `scripts/diff/sonde_m2c.py` fait
+   ce travail et dit où il bute.
+3. **La correction des idiomes** — c'est ici que tout se joue. Le jet est
+   typiquement à 90 %, et l'écart tient à deux ou trois formes que MWCC rend
+   autrement. `docs/IDIOMES_MWCC.md` en porte une trentaine, chacune avec sa
+   fonction témoin et son chiffre.
+4. **`make diff S=…`** tranche, en 4,8 s. Puis `make ci` sur l'ensemble.
 
-La conséquence est dure et il faut la tenir : **une étape qui n'avance que le
-compte de fonctions ne rapproche plus l'échéance.** Elle ne se justifie que par
-ce qu'elle apprend ou débloque. Le plan qui suit n'est donc pas ordonné par
-chantiers thématiques — bibliothèques, classes, fonctions libres —, mais par
-**ce qui fait baisser le coût d'une fonction moyenne**.
+**Ce que cela vaut, mesuré de bout en bout** : `CScene::SearchCharaTexb`, 156
+octets, jet m2c à **93,21 %**, deux corrections d'idiome, **100 %**, `make ci`
+identique au disque. Les deux corrections étaient : *deux sorties identiques
+s'écrivent deux fois*, et *une valeur employée dans une boucle s'y calcule*.
+Toutes deux sont maintenant dans `CLAUDE.md`, et serviront à toutes les
+suivantes.
 
----
-
-## Ce que l'été a mesuré, et qui refait le plan
-
-Quatre faits, tous éprouvés, dont deux invalident la structure précédente.
-
-**1. m2c n'est pas le problème ; les déclarations le sont.** Sur vingt fonctions
-de 150 à 400 octets, **une seule compile — mais elle apparie à 97,43 %**, sans
-permuteur. Tous les échecs sont des identifiants, des types ou des signatures
-que rien ne déclare. Le travail restant sur une fonction moyenne n'est donc pas
-de la décompilation : c'est de la plomberie de déclarations, plus quelques
-instructions de finition.
-
-**2. La disposition d'une classe s'infère en masse, et c'est du temps machine.**
-m2c infère une structure depuis *chaque* fonction. Fusionner ces inférences sur
-les méthodes d'une même classe donne une disposition sans commune mesure avec
-celle d'une fonction seule :
-
-| classe | méthodes lues | champs fusionnés | contradictions | étendue |
-|---|---|---|---|---|
-| `CMap` | 35 | **47** | 3 (6 %) | 0xCFC |
-| `ClsMes` | 30 | **136** | 7 (5 %) | 0x2950 |
-| `CActionChara` | 30 | **229** | 30 (13 %) | 0xF5C |
-
-Une seule fonction de `CMap` donnait quatre champs. **Le typage n'est donc pas
-un chantier artisanal de plusieurs mois : c'est une nuit de calcul et
-l'arbitrage de 5 à 13 % de contradictions.** C'est le changement le plus
-important de ce plan.
-
-**3. Le contexte et l'inférence sont antagonistes.** Un type déclaré au contexte
-— même pauvre, même vide — fait cesser l'inférence de m2c. `ClsMes` rendait zéro
-champ avec contexte et 136 sans. Toute passe d'inférence doit donc tourner
-**sans contexte** ; le contexte se construit *à partir* d'elle, jamais l'inverse.
-
-**4. Une passe en bloc paie l'échec d'une fonction au prix de son unité.** La
-première passe a perdu 122 fonctions pour une vingtaine de fautives. Deux gestes
-suffisent : refuser en amont ce qu'on ne sait pas justifier, et laisser le
-compilateur désigner la ligne fautive pour retirer cette fonction-là et
-recommencer. Le compte d'unités en échec est tombé de 24 à 0.
+**C'est le seul progrès qui compose.** Un idiome trouvé une fois épargne du
+temps sur toutes les fonctions qui le portent. C'est ce qui rend un horizon de
+dix ans praticable là où la force brute ne l'est pas.
 
 ---
 
-## Acquis — le débit
+## Ce que la mesure a démenti, et qu'il ne faut pas refaire
 
-Fait cet été, et c'est le socle de tout le reste.
+Quatre voies ont été outillées puis mesurées. Deux ne produisent pas, et les
+inscrire ici évite de les rouvrir.
+
+**La chaîne entièrement automatique ne produit pas.** Sur quarante fonctions de
+150 à 400 octets, la normalisation automatique en amène **deux** à compiler et
+**une** à 100 %. Les trente-huit autres butent sur des causes hétérogènes —
+aucune ne domine, chacune demande son diagnostic. m2c lui-même renonce sur huit.
+
+**Le permuteur ne rattrape pas un jet m2c.** Sur la meilleure candidate, **121
+essais n'ont pas bougé de 93,21 %** : l'écart était un décalage de branchement
+dans une boucle, hors de portée de ses vingt-neuf transformations. Le permuteur
+garde sa valeur là où il l'a prouvée — une allocation de registres sur du code
+déjà juste —, pas comme finisseur.
+
+**Un contexte partiel rend m2c moins bon que pas de contexte du tout.** Sans
+contexte, il infère un type entier et en émet la déclaration ; avec une version
+incomplète — structure vide, structure partielle, ou même un simple `typedef`
+opaque —, il s'en sert *et* invente un `unkXX` que rien ne définit. Mesuré sur
+trente fonctions : **3 compilent sans contexte, 1 avec**. `build/ctx.c` n'est
+donc plus engendré par défaut.
+
+**Une mesure par fonction peut mentir.** objdiff compare l'objet compilé au
+commerce ; si la pose échoue, l'unité compile son propre assembleur et le score
+rend 100 %. Une collision de nom de variable a suffi à produire quarante-quatre
+faux gains d'affilée. `eprouve` refuse désormais de scorer une fonction dont
+l'`INCLUDE_ASM` est encore là.
+
+---
+
+## Acquis — les outils
 
 | | avant | après |
 |---|---|---|
@@ -113,136 +113,118 @@ Fait cet été, et c'est le socle de tout le reste.
 | une unité recompilée | — | 2,1 s + 8,5 ms par greffe |
 | `make etat` / `make controle` | n'existait pas | **0,5 s, sur l'hôte** |
 
-La mesure sépare l'écrit du greffé et tombe sur le même chiffre par deux chemins
-indépendants ; `progress/journal.jsonl` garde la cadence jour par jour ;
-`make ci` et `.githooks/pre-push` tiennent la non-régression. Le parallélisme est
-le défaut. Le cache d'objets greffés a été mesuré puis **écarté** : il ne
-rendrait que 1,7 s sur la pire unité.
-
-Le traducteur déterministe de `petites.py` est épuisé pour ce qu'il sait faire —
-298 → 456 fonctions — et il a produit un idiome neuf : *une globale hors de la
-fenêtre de `$gp` s'atteint comme un champ de structure, jamais comme un tableau
-indexé*, 54 % contre 100 %.
-
----
-
-## Phase 1 — L'atlas des types (semaines, pas mois)
-
-**C'est le seul chantier sur le chemin critique, et il est bien plus court qu'on
-ne croyait.**
-
-**1.1 La récolte.** Lancer m2c **sans contexte** sur les 7 335 fonctions
-restantes, garder les structures inférées, les fusionner par type. Coût :
-~3 s par fonction, soit **une nuit de machine**, refaisable. Sortie :
-`config/atlas.json` — pour chaque type, chaque décalage vu, le ou les types
-proposés, et par combien de fonctions.
-
-**1.2 L'arbitrage.** 5 à 13 % des décalages portent deux propositions
-contradictoires. Trois règles suffisent probablement, et chacune se mesure : le
-nombre de témoins l'emporte ; un accès large l'emporte sur un accès étroit au
-même décalage ; un pointeur l'emporte sur un entier de même largeur — cette
-dernière est déjà éprouvée dans `petites.py`. Ce qui reste douteux se marque
-comme tel dans l'en-tête plutôt que d'être tranché.
-
-**1.3 Les en-têtes.** Engendrer un en-tête par type depuis l'atlas, et faire
-converger avec ce que le dépôt tient déjà à la main. **C'est le point non
-mesuré du plan** : `include/gen/` porte les champs qu'un accesseur a exigés,
-`src/game/cmap.cpp` déclare une `class CMap` sans aucun champ, et les deux
-doivent se rejoindre sans casser `make build`.
-
-**1.4 Le contexte se refait depuis l'atlas**, et non plus depuis `include/`
-seul. La règle mesurée s'applique : n'y mettre que ce qu'on sait.
-
-**Critère de sortie, mesurable** : la sonde `sonde_m2c.py` passe de 1 sur 20 à
-au moins 12 sur 20 qui compilent. C'est ce chiffre, et lui seul, qui autorise la
-phase 2.
-
-**Ce que l'atlas ne donnera pas**, et qu'il faut savoir d'avance : les noms de
-champs restent `unkXX` — le renommage est une autre affaire ; une union ou un
-héritage fausse les décalages ; et il ne dit rien des tables virtuelles.
+- **La mesure est honnête et gratuite.** `make etat` sépare l'écrit du greffé et
+  tombe sur le même compte que `make report` par un chemin indépendant ;
+  `progress/journal.jsonl` garde la cadence jour par jour.
+- **La non-régression tient.** `make ci` enchaîne six contrôles textuels et la
+  construction ; `.githooks/pre-push` la lance avant toute poussée. Aucun
+  service distant ne peut le faire — il lui faudrait le binaire du commerce.
+- **`make atlas`** relève ce que m2c infère des 325 unités et le fusionne :
+  **369 types, 6 901 champs, 7,9 % de contradictions**, 65 des 67 classes de
+  plus de dix méthodes couvertes. Sa place est dans les en-têtes du projet, pas
+  dans le contexte de m2c.
+- **`make injecte`** verse ces champs dans les classes déclarées vides. Mesuré :
+  quarante-cinq champs posés dans `CMap` laissent `Iam__4CMapFv` à 100 %. Une
+  disposition ne change les octets que si le code l'emploie — sauf pour une
+  classe de base, dont l'élargissement décale ses dérivées.
+- **`scripts/diff/petites.py`**, le traducteur déterministe, a produit **158
+  fonctions** vérifiées. C'est la seule voie entièrement automatique qui ait
+  jamais rien donné.
 
 ---
 
-## Phase 2 — La chaîne (1–2 mois)
+## Étape 1 — Épuiser le traducteur déterministe
 
-Elle devient simple une fois la phase 1 acquise, parce qu'il ne reste que de la
-plomberie.
+La seule voie qui produit sans intervention. Elle n'atteint que les fonctions
+sans pile ni branchement, mais elle les prend toutes.
 
-**2.1 Le pilote** : m2c → normalisation → compilation → score → gardé si 100 %,
-rendu à l'assembleur sinon. **Le parallélisme se prend par unité, pas par
-fonction** — une unité est un fichier, mais vingt unités se compilent de front.
+`petites.py resume --secteur tout --mini 8 --maxi 255` classe les refus par
+motif : on lève le plus lourd, on relance, on mesure. Restent, chiffrés :
 
-**2.2 Tourner sans surveillance** demande trois choses, et pas une de plus : un
-état repris après coupure, `make controle` après chaque unité avec retour à
-l'état d'avant en cas d'échec, et un rapport au réveil classant les motifs de
-refus.
+- les **appels terminaux dont la cible est manglée** (~124 fn) — la signature se
+  lit du mangling, il suffit d'y recourir au lieu de la table figée de trois
+  entrées ;
+- les **instructions arithmétiques simples** — `slt`, `andi`, `sll`, somme de
+  deux registres (~150 fn) ;
+- les **arguments au-delà du quatrième** (99 fn).
 
-**2.3 Les paliers de taille**, du plus mécanique au plus lourd : ≤ 128 o
-(3 769 fn, 11 % des octets), puis ≤ 512 o (6 375 fn cumulées, 41 %), puis
-au-delà.
+**On s'arrête aux branchements et à la pile** : 3 131 refus « registre `sp` sans
+provenance » et ~430 refus de branchement sont le domaine de m2c. Les traiter
+ici serait réécrire un décompilateur, et c'est la frontière de l'étape.
 
-Les briques existent : `essai_petites.py` sait appliquer, compiler, écarter la
-fonction que le compilateur désigne et rendre l'état, en deux minutes.
-
-**Sortie visée** : **25 % des octets**, obtenus surtout par temps machine. Le
-compte de fonctions n'est plus un objectif.
+**Sortie attendue** : quelques centaines de fonctions, quelques milliers
+d'octets. Certain, mais ne déplace pas la courbe des octets — c'est admis.
 
 ---
 
-## Phase 3 — Le corpus d'idiomes (continu, à partir de la phase 2)
+## Étape 2 — Le corpus d'idiomes
 
-C'est ici que le permuteur trouve sa vraie place, qui n'est pas la première.
+C'est l'étape qui rend les huit suivantes praticables, et la seule dont le
+rendement croît avec le temps.
 
-À 97,43 % au premier jet, il ne manque souvent que deux ou trois instructions —
-et ces écarts se répètent. Le dépôt en a déjà nommé une trentaine dans
-`docs/IDIOMES_MWCC.md` : l'ordre croissant des registres qu'une conversion
-casse, `x += c` contre `x = x + c`, la constante à gauche d'une comparaison
-flottante, le bloc conditionnel *dans* la condition.
-
-**La règle de travail, mesurée sur `CSphida::SetUp` :** compter d'abord sur le
+**La règle de travail, mesurée sur `CSphida::SetUp`** : compter d'abord sur le
 désassemblage entier. Une propriété supposée du compilateur se vérifie en une
 seconde sur des milliers de sites ; c'est ce qui a débloqué cette fonction là où
 450 essais du permuteur avaient échoué.
 
-**Donc** : la chaîne classe ce qu'elle refuse ; les motifs qui reviennent
-deviennent des règles appliquées automatiquement ; le permuteur ne sert que pour
-le résidu. `permute.py` devra alors travailler sur une copie confiée par le
-pilote, en file triée par octets à gagner.
+**Le cycle** : reconstruire une fonction à la main depuis son jet m2c ; quand
+l'écart résiste, en faire une question ; la trancher sur le désassemblage
+entier ou par `make measure` ; consigner la réponse dans `docs/IDIOMES_MWCC.md`
+avec sa fonction témoin et son chiffre.
+
+**Ce qui vaut la peine d'être outillé** : appliquer automatiquement les idiomes
+déjà connus au jet de m2c, avant de le donner à l'humain. Sortir un calcul de
+boucle, dédoubler une sortie, retourner une comparaison flottante — chacun est
+une transformation mécanique. C'est le seul endroit où l'automatisation a encore
+une chance, et elle se mesure au taux de la sonde.
 
 ---
 
-## Phase 4 — Ce que la machine ne fera pas
+## Étape 3 — Le travail de fond, par classe puis par poids
 
-Trois chantiers indépendants, à mener en parallèle des phases 2 et 3. **Aucun
-n'est sur le chemin critique** — ce sont les portes d'entrée naturelles pour un
-contributeur.
+C'est ici que passent les années, et c'est la seule étape qui se mesure sans se
+planifier.
+
+**Par classe d'abord**, tant qu'il en reste de lourdes : la disposition
+s'établit une fois et sert toutes les méthodes. Dix classes font 31 % des octets
+de classe, vingt-cinq 52 %, cinquante 71 %, cent 86 %. L'atlas donne le point de
+départ, `make injecte` le pose, les vrais noms se substituent à mesure qu'on
+comprend.
+
+**Puis par poids** : les 410 fonctions de plus de 1 Ko, 41 % des octets
+restants. Pas de disposition à établir, mais du graphe de contrôle — le terrain
+de `make measure` et des idiomes.
+
+L'ordre entre les deux n'est pas rigide : une classe lourde contient souvent de
+grosses fonctions, et les traiter ensemble évite de rouvrir sa disposition.
+
+---
+
+## Étape 4 — Les chantiers indépendants
+
+Aucun ne dépend des trois premiers. Ce sont les portes d'entrée naturelles pour
+un contributeur, si le dépôt s'ouvre.
 
 **4.1 Les tables virtuelles.** Dès qu'une classe est déclarée polymorphe — ce
-que le commerce impose pour retrouver l'ordonnancement d'un constructeur —,
-MWCC émet `__vt__<classe>` dans notre objet et le lien la voit deux fois. Le
-chemin est repéré : une clé `vtables:` dans `config/units.txt` que `make carve`
-sache lire, un segment retirant ces octets du bloc brut de `00379358`, et la
-ligne `(.vtables)` posée par `normalize.py` — MWCC émet la table dans une
-section à elle, distincte de `.rodata`. `__ct__14CCameraControlFv` est
-reconstruit à 100 % et attend cela sous un `#if 0`.
+que le commerce impose pour retrouver l'ordonnancement d'un constructeur —, MWCC
+émet `__vt__<classe>` dans notre objet et le lien la voit deux fois. Le chemin
+est repéré : une clé `vtables:` dans `config/units.txt`, un segment qui retire
+ces octets du bloc brut de `00379358`, et la ligne `(.vtables)` posée par
+`normalize.py`. `__ct__14CCameraControlFv` est reconstruit à 100 % et attend
+cela sous un `#if 0`.
 
 **4.2 Les bibliothèques externes**, 332 Ko et un oracle extérieur : le runtime
 Metrowerks (81 176 o, dont 2 264 ont leur source dans l'installateur
 CodeWarrior), la MSL C (`memcpy`, `sprintf`, `_dtoa`), le SDK Sony (142 304 o —
-`ps2sdk` en donne les prototypes exacts, mais son code ne peut pas apparier), le
-middleware `mg*` (108 348 o, dont les signatures se transposent depuis
-DCDecomp). **Un chiffre les désigne** : sur les 831 fonctions que le traducteur
-refuse pour cause de mangling, **381 sont des noms C purs** — `abort`, `atof`,
-`fabsf` — qui n'ont pas de signature manglée et n'en auront jamais.
-
-**4.3 Les grosses fonctions.** Les 410 fonctions de plus de 1 Ko font 41 % des
-octets restants. Pas de disposition à établir, mais du graphe de contrôle : le
-terrain de `make measure` et du permuteur. **À traiter en dernier, et à la
-main** : c'est le seul endroit où l'humain reste plus rapide que la machine.
+`ps2sdk` donne les prototypes exacts, mais son code n'apparie pas), le
+middleware `mg*` (108 348 o, signatures transposables depuis DCDecomp). **Un
+chiffre les désigne** : sur les 831 fonctions que le traducteur refuse pour
+cause de mangling, **381 sont des noms C purs** — `abort`, `atof`, `fabsf` — qui
+n'ont pas de signature manglée et n'en auront jamais.
 
 ---
 
-## Phase 5 — La cohérence finale
+## Étape 5 — La cohérence finale
 
 Ces tâches ne peuvent pas précéder la recompilation.
 
@@ -251,12 +233,12 @@ absolue sont passés de 2 503 à **16 : les quinze fenêtres matérielles et
 `_xlaunch`**. Ce dernier est une étiquette au milieu de `_kTLBException` que le
 binaire déclare `OBJECT` de taille nulle ; le remède est du côté de mwccgap, qui
 répare les relocations d'une section greffée. **Restent 95 sous-segments
-`.rodata`, 147 `rodata` et 32 `data` hors de toute unité** ; les rattacher
+`.rodata`, 147 `rodata` et 32 `data`** hors de toute unité ; les rattacher
 demande de relever qui emploie chaque donnée par les relocations, ce qui n'est
 pas outillé.
 
 **Les tailles.** Deux verrous sur trois sont levés : `_gp` est calculé
-(`main_BSS_START + 0x7970`) et le parcours des 49 initialiseurs statiques est
+(`main_BSS_START + 0x7970`), et le parcours des 49 initialiseurs statiques est
 établi — `mwInit` charge ses bornes par `%hi`/`%lo`, ce sont des symboles que le
 lien reloge. Le troisième est **mesuré et ne sera pas levé** : la fenêtre de
 `$gp` n'a que seize octets de marge en bas et 56 347 inutilisés en haut ;
@@ -285,17 +267,15 @@ lien ne signale aucun débordement.
 ## Ordre et dépendances
 
 ```
-Phase 1 (atlas des types) ──→ Phase 2 (chaîne) ──→ Phase 3 (idiomes) ──┐
-                                                                        ├──→ Phase 5
-Phase 4.1 (vtables) ───────────────────────────────────────────────────┤
-Phase 4.2 (bibliothèques) ─────────────────────────────────────────────┤
-Phase 4.3 (grosses fonctions) ─────────────────────────────────────────┘
+Étape 1 (traducteur déterministe) ──┐
+Étape 2 (idiomes) ──────────────────┼──→ Étape 3 (le fond) ──→ Étape 5
+Étape 4.1 (vtables) ────────────────┘                          ↑
+Étape 4.2 (bibliothèques) ─────────────────────────────────────┘
 ```
 
-**Une seule chose est sur le chemin critique : l'atlas.** Tout le reste peut
-attendre ou se mener en parallèle. C'est le renversement par rapport au plan
-précédent, qui étalait le typage sur deux à trois mois en parallèle de la
-chaîne — alors qu'il la conditionne et qu'il est court.
+Les étapes 1 et 2 se mènent de front : la première produit sans surveillance, la
+seconde s'enrichit de chaque fonction reconstruite à la main. L'étape 4 ne
+dépend de rien.
 
 ---
 
@@ -303,21 +283,21 @@ chaîne — alors qu'il la conditionne et qu'il est court.
 
 | Chantier | Ce qu'il débloque |
 |---|---|
-| **La passe d'inférence en masse** | la phase 1, donc tout |
-| **Faire converger atlas et déclarations tenues à la main** | le seul point non mesuré |
+| **Appliquer les idiomes connus au jet de m2c** | l'étape 2, et le seul reste d'automatisation crédible |
 | **Posséder les tables virtuelles** | tout constructeur de classe polymorphe |
-| **Relever qui emploie chaque donnée, par les relocations** | la phase 5 |
+| **Relever qui emploie chaque donnée, par les relocations** | l'étape 5 |
 | **mwccgap : abaisser l'alignement d'une fonction compilée** | les treize auxiliaires du runtime |
 | **mwccgap : réparer les relocations d'une section greffée** | `_xlaunch`, dernier symbole absolu |
 | **Un test d'exécution en émulateur** | le critère de sortie du projet |
 | ~~Intégration continue~~ | **fait** — `make ci`, `.githooks/pre-push` |
 | ~~Boucle de mesure courte~~ | **fait** — 4,8 s |
+| ~~Atlas des types~~ | **fait** — `make atlas`, `make injecte` |
 
 `make measure` répond à une question posée ; `make permute` cherche seul quand
-on ne sait plus quoi demander ; `make etat` dit où en est le compte ;
-`essai_petites.py` dit si un plan compile, en deux minutes. Un prédicat sur le
-désassembleur s'éprouve contre `asm/nonmatchings/`, non contre une
-reconstruction.
+on ne sait plus quoi demander, sur du code déjà juste ; `make etat` dit où en est
+le compte ; `essai_petites.py` dit si un plan compile, en deux minutes. Un
+prédicat sur le désassembleur s'éprouve contre `asm/nonmatchings/`, non contre
+une reconstruction.
 
 ---
 
@@ -325,8 +305,8 @@ reconstruction.
 
 - **Passer le dépôt en public et l'inscrire sur decomp.dev.** Le rapport est au
   format attendu. Notre règle interdisant de publier le désassemblage, il faudra
-  publier le rapport seul. **C'est le préalable à tout contributeur**, et la CI
-  est désormais là.
+  publier le rapport seul. C'est le préalable à tout contributeur, et la CI est
+  désormais là.
 - **Le rapprochement avec DCDecomp** sur le middleware `mg*`.
 - **Questions ouvertes** : la liaison 13 que portent 193 `FUNC` et 27 `OBJECT` ;
   `.mwcats`, 56 392 octets propres à Metrowerks ; `-sdatathreshold` ; la
@@ -339,39 +319,32 @@ reconstruction.
 
 ## Ce qu'il faut se dire franchement
 
-**La projection actuelle donne 2037.** Elle suppose que le rythme de l'été
-continue, et c'est justement ce que ce plan refuse : le rythme de l'été venait
-d'un traducteur qui n'atteint que les petites fonctions.
+**Le rythme est de 574 octets par jour, et aucune des voies mesurées ne le
+change d'un ordre de grandeur.** À ce compte, le binaire est reconstruit vers
+2037. C'est l'horizon retenu.
 
-Ce qui peut faire basculer la courbe est chiffré, pas espéré. À 97,43 % au
-premier jet, **le coût d'une fonction moyenne est celui de ses déclarations, pas
-de sa logique.** Si la phase 1 fait passer la sonde de 1 sur 20 à 12 sur 20, la
-chaîne traite les 6 375 fonctions de moins de 512 octets — 41 % des octets — par
-temps machine. C'est le seul chemin connu vers l'échéance.
+Ce qui peut l'améliorer n'est pas un outil mais une accumulation : chaque idiome
+consigné rend les fonctions suivantes plus rapides, et il en reste beaucoup à
+trouver — les trente d'aujourd'hui ont été payés une par une. C'est un rendement
+qui croît lentement mais qui ne redescend jamais.
 
-Ce qui reste ensuite est irréductible et se compte en mois d'humain : les 410
-grosses fonctions, les tables virtuelles, les bibliothèques externes.
+**Deux choses seraient décisives et ne dépendent pas de la technique :**
+l'ouverture à des contributeurs, dont l'étape 4 offre deux portes d'entrée sans
+lien avec le chemin principal ; et le maintien de la discipline de mesure —
+cette session a produit quarante-quatre faux gains avant qu'une garde ne les
+arrête, et trois voies outillées avant d'être mesurées.
 
-**Deux ans à une personne reste le haut de la fourchette** ; les projets
-comparables tiennent trois à cinq ans, à plusieurs. Deux leviers, et le second
-n'a pas changé :
-
-1. **L'atlas d'abord.** Il est court, il est mesuré, et rien d'automatique n'est
-   possible avant lui.
-2. **L'ouverture à des contributeurs**, dont la phase 4 offre trois portes
-   d'entrée qui ne touchent pas au chemin critique.
-
-Sans l'un des deux, vise plutôt trois ans.
+**La règle qui résume tout** : ne jamais construire plus de deux itérations sur
+une hypothèse qu'aucun chiffre n'a confirmée.
 
 ---
 
 ## Prochaine action concrète
 
-Écrire la passe d'inférence en masse — `scripts/build/atlas.py` — et la lancer
-une nuit sur les 7 335 fonctions restantes, **sans contexte**. Le prototype qui
-a produit le tableau ci-dessus tient en quarante lignes ; ce qu'il lui manque
-est la persistance, la reprise, et le compte des témoins par décalage.
+Reconstruire cinq à dix fonctions à la main depuis leur jet m2c, en notant
+chaque idiome rencontré. C'est ce qui dira si les 93 % de `SearchCharaTexb` sont
+représentatifs, et cela produit des fonctions en même temps que du corpus.
 
-Le lendemain, deux chiffres diront si le plan tient : combien de champs l'atlas
-porte pour les 67 classes de plus de dix méthodes, et combien de contradictions
-il faut arbitrer.
+En parallèle, lever le premier blocage du traducteur déterministe — les appels
+terminaux dont la cible est manglée, 124 fonctions dont la signature est déjà
+dans le binaire.
