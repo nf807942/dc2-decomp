@@ -598,7 +598,12 @@ def declaration(nom: str, corps: str = "") -> str | None:
         # `this` d'abord quand c'en est une méthode : sous `extern "C"`, il
         # n'est qu'un paramètre de plus, et son type importe peu à l'appel.
         params = (["void *"] if symbole.cls else []) + list(symbole.params)
-        return 'extern "C" void %s(%s);' % (nom, ", ".join(params) or "void")
+        # Le retour se rend `s32`, non `void` : le mangling C++ n'encode pas le
+        # type de retour, et `void` fait echouer tout appel dont la valeur sert
+        # — « illegal explicit conversion from 'void' to ». `s32` est la largeur
+        # de $v0, et se laisse ignorer quand la valeur ne sert pas. Le type
+        # declare d'un retour entier ne change pas les octets de l'appel.
+        return 'extern "C" s32 %s(%s);' % (nom, ", ".join(params) or "void")
 
     taille = objets().get(nom)
     if taille is None:
