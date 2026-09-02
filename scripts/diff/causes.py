@@ -82,7 +82,9 @@ def cause(symbole: str, unite: str, jeton: str) -> tuple[str, str]:
     texte = sonde_m2c.decompile(symbole)
     if texte is None:
         return "m2c refuse", ""
-    rendu = sonde_m2c.normalise(texte, symbole, set())
+    rendu = sonde_m2c.normalise(texte, symbole,
+                                sonde_m2c.deja_vues(unite),
+                                sonde_m2c.deja_declarees(unite))
     if rendu is None:
         return "sortie illisible", ""
     declarations, corps = rendu

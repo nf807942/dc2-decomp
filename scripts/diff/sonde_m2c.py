@@ -69,17 +69,49 @@ def deja_vues(unite: str) -> set[str]:
     écarter la structure que m2c en donne la laisserait sans rien — c'est ce
     qui avait fait retomber à zéro la seule fonction qui appariait.
     """
+    return _parcourt(unite, _avec_champs)
+
+
+def deja_declarees(unite: str) -> set[str]:
+    """Tout tag que cette unité voit, qu'il porte des champs ou non.
+
+    `deja_vues` répond à « faut-il poser ce type ? » et écarte pour cela les
+    coquilles vides, qui n'apprennent rien. Mais MWCC, lui, refuse la
+    redéfinition d'une coquille vide comme celle d'une classe pleine :
+    « struct/union/enum/class tag 'CMap' redefined ». Ce sont deux questions
+    différentes, et les confondre laissait m2c poser un `typedef struct CMap`
+    par-dessus la classe que l'unité déclare déjà.
+
+    Mesuré sur les premières causes que la chaîne a enregistrées : 23 des 24
+    échecs de compilation diagnostiqués portaient ce message.
+    """
+    return _parcourt(unite, lambda texte: set(_DECLARE.findall(texte)))
+
+
+def _parcourt(unite: str, extrait) -> set[str]:
+    """Applique `extrait` à l'unité et aux en-têtes qu'elle atteint.
+
+    Le parcours est transitif : `cmap.cpp` n'inclut pas `gen/CMap.hpp`
+    directement mais par un en-tête intermédiaire, et s'arrêter au premier rang
+    laissait la collision passer.
+    """
     source = ROOT / "src" / (unite + ".cpp")
     if not source.exists():
         return set()
     texte = source.read_text(encoding="utf-8", errors="replace")
-    vues = _avec_champs(texte)
-    for inclus in _INCLUDE.findall(texte):
+    trouve, a_voir, vus = extrait(texte), list(_INCLUDE.findall(texte)), set()
+    while a_voir:
+        inclus = a_voir.pop()
+        if inclus in vus:
+            continue
+        vus.add(inclus)
         chemin = ROOT / "include" / inclus
-        if chemin.exists():
-            vues |= _avec_champs(
-                chemin.read_text(encoding="utf-8", errors="replace"))
-    return vues
+        if not chemin.exists():
+            continue
+        contenu = chemin.read_text(encoding="utf-8", errors="replace")
+        trouve |= extrait(contenu)
+        a_voir.extend(_INCLUDE.findall(contenu))
+    return trouve
 
 
 # Un type déclaré sans le moindre champ n'apprend rien : le tenir pour « vu »
@@ -280,8 +312,8 @@ def complete_structures(structs: list[str], corps: str) -> tuple[list[str], str]
     return structs + neuves, corps
 
 
-def normalise(texte: str, symbole: str,
-              vues: set[str]) -> tuple[str, str] | None:
+def normalise(texte: str, symbole: str, vues: set[str],
+              declarees: set[str] | None = None) -> tuple[str, str] | None:
     """Rend (déclarations, définition) prêtes à compiler, ou rien.
 
     Trois retouches, et pas une de plus : les structures inférées se gardent
@@ -310,7 +342,7 @@ def normalise(texte: str, symbole: str,
                                             m.group(3)),
                       bloc)
         nom = _NOM_STRUCT.search(bloc).group(1)
-        if nom in vues:
+        if nom in (vues if declarees is None else declarees):
             neuf = nom + "_infere"
             renommes[nom] = neuf
             bloc = re.sub(r"%s" % re.escape(nom), neuf, bloc)
@@ -423,7 +455,8 @@ def eprouve(symbole: str, unite: str, taille: int,
             return {**verdict, "issue": "m2c ne sait pas traduire",
                     "cause": aveu}
 
-    rendu = normalise(texte, symbole, deja_vues(unite))
+    rendu = normalise(texte, symbole, deja_vues(unite),
+                      deja_declarees(unite))
     if rendu is None:
         return {**verdict, "issue": "sortie illisible"}
     declarations, corps = rendu
