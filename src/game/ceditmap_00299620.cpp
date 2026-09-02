@@ -130,7 +130,20 @@ INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", viBufEndPut__FP5ViBufi);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", viBufAddDMA__FP5ViBuf);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", viBufStopDMA__FP5ViBuf);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", viBufRestartDMA__FP5ViBuf);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", viBufDelete__FP5ViBuf);
+typedef struct ViBuf {
+    /* 0x00 */ char pad0[0x40];
+    /* 0x40 */ s32 unk40;                           /* inferred */
+} ViBuf;                                            /* size >= 0x44 */
+extern "C" void DeleteSema(s32);
+extern "C" void setD4_CHCR__FUi(u32 arg0);
+extern "C" s32 viBufDelete__FP5ViBuf(ViBuf *arg0) {
+    setD4_CHCR__FUi(5U);
+    *(s32 *)0x1000B420 = 0;
+    *(s32 *)0x1000B410 = 0;
+    *(s32 *)0x1000B430 = 0;
+    DeleteSema(arg0->unk40);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", viBufFlush__FP5ViBuf);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", viBufModifyPts__FP5ViBufP9TimeStamp);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", viBufPutTs__FP5ViBufP9TimeStamp);

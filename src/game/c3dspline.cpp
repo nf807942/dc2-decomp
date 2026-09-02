@@ -96,7 +96,21 @@ INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_SET_OPENSPEED__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_INPUT_KEY__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_CURSOR_ONOFF__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_CURSOR_FADE__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_WAKUTYPE__FP9SPI_STACKi);
+extern "C" u8 SpiMenuExeCommandFlag;
+#include "menu.hpp"
+struct SPI_STACK {
+    s32 field_0;
+    s32 field_4;
+};
+extern "C" void SetWakuType__12CMenuKeyFuncFi(CMenuKeyFunc *objet, s32 arg0);
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(SPI_STACK *arg0);
+extern "C" s32 _MENU_WAKUTYPE__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    if (SpiMenuExeCommandFlag == 0) {
+        return 1;
+    }
+    SetWakuType__12CMenuKeyFuncFi(MenuCommonInfo, spiGetStackInt__FP9SPI_STACK(arg0));
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_SCENE_FADE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_SE_PLAY__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_EXE_INIT_DRAWLIST__FP9SPI_STACKi);

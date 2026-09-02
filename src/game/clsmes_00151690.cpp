@@ -9,7 +9,42 @@
 #include "common.h"
 #include "gen/ClsMes.hpp"
 
-INCLUDE_ASM("nonmatchings/game/clsmes_00151690", CheckPosInOutFor2P__Fffffff);
+extern "C" s32 CheckPosInOutFor2P__Fffffff(f32 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5) {
+    f32 var_f0;
+    f32 var_f14;
+    f32 var_f15;
+    f32 var_f1;
+    s32 var_v0;
+
+    var_f14 = arg2;
+    var_f15 = arg3;
+    var_f0 = var_f14;
+    if (arg0 < var_f14) {
+        var_f0 = arg0;
+    } else {
+        var_f14 = arg0;
+    }
+    var_f1 = var_f15;
+    if (arg1 < var_f15) {
+        var_f1 = arg1;
+    } else {
+        var_f15 = arg1;
+    }
+    if (arg4 < var_f0) {
+        return 0;
+    }
+    if (var_f14 < arg4) {
+        return 0;
+    }
+    if (arg5 < var_f1) {
+        return 0;
+    }
+    var_v0 = 1;
+    if (!(var_f15 < arg5)) {
+        var_v0 = 0;
+    }
+    return var_v0 ^ 1;
+}
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", CalcIntersectionPointLineAndLine__FffffffffPfPf);
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", CalcIntersectionPoint2PAnd2P__FffffffffPfPf);
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", MySetPrim__FP11mgCDrawPrimii);
