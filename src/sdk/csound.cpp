@@ -27,8 +27,26 @@ INCLUDE_ASM("nonmatchings/sdk/csound", SE_SetVol__6CSoundFiiiiii);
 INCLUDE_ASM("nonmatchings/sdk/csound", SE_SetPan__6CSoundFiiiiii);
 INCLUDE_ASM("nonmatchings/sdk/csound", SE_Stop__6CSoundFiiiii);
 INCLUDE_ASM("nonmatchings/sdk/csound", Step__6CSoundFv);
-INCLUDE_ASM("nonmatchings/sdk/csound", Stop__6CSoundFi);
-INCLUDE_ASM("nonmatchings/sdk/csound", SetVol__6CSoundFii);
+extern "C" u8 _733_00369110[15];
+struct CSound;
+extern "C" void printf(void *, s32);
+extern "C" void ezMidi__Fii(s32 arg0, s32 arg1);
+extern "C" void Stop__6CSoundFi(CSound *objet, s32 arg0) {
+    ezMidi__Fii(arg0 + 0x20, 0);
+    printf(&_733_00369110, arg0);
+}
+struct CSound;
+extern "C" s32 fptosi(f32);
+extern "C" void ezMidi__Fii(s32 arg0, s32 arg1);
+extern "C" void SetVol__6CSoundFii(CSound *objet, s32 arg0, s32 arg1) {
+    s32 var_a2;
+
+    var_a2 = arg1;
+    if (var_a2 != 0x100) {
+        var_a2 = fptosi(2.015748f * (f32) var_a2);
+    }
+    ezMidi__Fii(arg0 + 0xB0, var_a2);
+}
 INCLUDE_ASM("nonmatchings/sdk/csound", SetStereoMode__6CSoundFi);
 INCLUDE_ASM("nonmatchings/sdk/csound", SetMasterVol__6CSoundFii);
 INCLUDE_ASM("nonmatchings/sdk/csound", LoadHdBd__6CSoundFiiiii);
@@ -40,8 +58,20 @@ INCLUDE_ASM("nonmatchings/sdk/csound", StreamOpenFast__6CSoundFiPc);
 INCLUDE_ASM("nonmatchings/sdk/csound", StreamOpenFromFPLFast__6CSoundFiPcPc);
 INCLUDE_ASM("nonmatchings/sdk/csound", StreamPlay__6CSoundFi);
 INCLUDE_ASM("nonmatchings/sdk/csound", StreamStop__6CSoundFi);
-INCLUDE_ASM("nonmatchings/sdk/csound", StreamClose__6CSoundFi);
-INCLUDE_ASM("nonmatchings/sdk/csound", StreamEND__6CSoundFi);
+struct CSound;
+extern "C" void ezBgm__Fii(s32 arg0, s32 arg1);
+extern "C" void StreamClose__6CSoundFi(CSound *objet, s32 arg0) {
+    ezBgm__Fii(arg0 | 0x60, 0);
+    ezBgm__Fii(arg0 | 0x30, 0);
+    ezBgm__Fii(arg0 | 0x10, 0);
+}
+struct CSound;
+extern "C" void ezBgm__Fii(s32 arg0, s32 arg1);
+extern "C" void StreamEND__6CSoundFi(CSound *objet, s32 arg0) {
+    ezBgm__Fii(arg0 | 0x60, 0);
+    ezBgm__Fii(arg0 | 0x70, 0);
+    ezBgm__Fii(arg0 | 0x10, 0);
+}
 INCLUDE_ASM("nonmatchings/sdk/csound", StreamPause__6CSoundFi);
 INCLUDE_ASM("nonmatchings/sdk/csound", StreamRePlay__6CSoundFi);
 INCLUDE_ASM("nonmatchings/sdk/csound", StreamSetVol__6CSoundFiii);
@@ -64,7 +94,21 @@ INCLUDE_ASM("nonmatchings/sdk/csound", LoadSMF__13sndCSeSeqDataFPciP9mgCMemory);
 INCLUDE_ASM("nonmatchings/sdk/csound", Initialize__9sndCSeSeqFv);
 INCLUDE_ASM("nonmatchings/sdk/csound", SetSeID__9sndCSeSeqFi);
 INCLUDE_ASM("nonmatchings/sdk/csound", Count__9sndCSeSeqFf);
-INCLUDE_ASM("nonmatchings/sdk/csound", Stop__9sndCSeSeqFv);
+typedef struct sndCSeSeq {
+    /* 0x00 */ char pad0[8];
+    /* 0x08 */ s32 unk8;                            /* inferred */
+    /* 0x0C */ s32 unkC;                            /* inferred */
+    /* 0x10 */ s32 unk10;                           /* inferred */
+    /* 0x14 */ s32 unk14;                           /* inferred */
+} sndCSeSeq;                                        /* size >= 0x18 */
+extern "C" void AllNoteOff__9sndCSeSeqFv(sndCSeSeq *objet);
+extern "C" void Stop__9sndCSeSeqFv(sndCSeSeq *objet) {
+    AllNoteOff__9sndCSeSeqFv(objet);
+    objet->unk14 = 0;
+    objet->unk10 = 0;
+    objet->unk8 = 0;
+    objet->unkC = 0;
+}
 INCLUDE_ASM("nonmatchings/sdk/csound", Step__9sndCSeSeqFf);
 INCLUDE_ASM("nonmatchings/sdk/csound", chk_trk__9sndCSeSeqFi);
 INCLUDE_ASM("nonmatchings/sdk/csound", NoteOn__9sndCSeSeqFiii);
@@ -132,7 +176,14 @@ INCLUDE_ASM("nonmatchings/sdk/csound", sndWaitTransBd__Fv);
 INCLUDE_ASM("nonmatchings/sdk/csound", CSndStep__Fv);
 INCLUDE_ASM("nonmatchings/sdk/csound", CSndStepWait__Fv);
 INCLUDE_ASM("nonmatchings/sdk/csound", sndStep__Ff);
-INCLUDE_ASM("nonmatchings/sdk/csound", sndFlush__Fv);
+extern "C" void CSndStep__Fv();
+extern "C" void sndSignalSema__Fv();
+extern "C" void sndWaitSema__Fv();
+extern "C" void sndFlush__Fv(void) {
+    sndWaitSema__Fv();
+    CSndStep__Fv();
+    sndSignalSema__Fv();
+}
 INCLUDE_ASM("nonmatchings/sdk/csound", SeAllStop_Sub__Fi);
 INCLUDE_ASM("nonmatchings/sdk/csound", sndSeAllStop__Fi);
 INCLUDE_ASM("nonmatchings/sdk/csound", sndGetSeDefVol__FUii);
