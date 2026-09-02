@@ -33,6 +33,7 @@ from __future__ import annotations
 import argparse
 import collections
 import json
+import signal
 import sys
 import time
 from pathlib import Path
@@ -106,6 +107,12 @@ def main(argv: list[str]) -> int:
                          help="s'arrête après N unités")
     parseur.add_argument("--reprendre", action="store_true")
     options = parseur.parse_args(argv)
+
+    # `docker stop` envoie SIGTERM, que Python termine sans dérouler les `finally`
+    # — la fonction en cours reste alors posée dans sa source sans avoir été
+    # mesurée, et `make build` s'écarte de 77 % pour seize octets manquants.
+    # `sys.exit` lève `SystemExit`, qui les déroule : la sonde rend sa source.
+    signal.signal(signal.SIGTERM, lambda *_: sys.exit(1))
 
     etat = charge(options.reprendre)
     groupes = par_unite(options.mini, options.maxi)
