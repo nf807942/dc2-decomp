@@ -84,6 +84,71 @@ def nettoie_declarations(declarations: str) -> str:
     return _INTERRO_SEULE.sub("s32", rendu)
 
 
+# `    ? spDC;` — m2c déclare bien la variable, mais sans savoir son type. La
+# ligne est seule de son espèce : un `?` en tête de déclaration ne peut pas être
+# un ternaire, et c'est ce qui permet de le traduire ici sans risque.
+_LOCALE_INCONNUE = re.compile(
+    r"^(\s+)\?(\d*)\s*(\**)\s*(\w+)(\s*\[[^\]]*\])?\s*;\s*$", re.M)
+_LARGEUR = {"": "s32", "8": "s8", "16": "s16", "32": "s32", "64": "s64"}
+
+
+def nettoie_locales(corps: str) -> str:
+    """Donne un type aux locales que m2c déclare sans en connaître un.
+
+    Sans cela, MWCC répond « expression syntax error » sur la déclaration et
+    perd la fonction. La largeur, quand m2c la donne, est sûre ; à défaut, celle
+    d'un registre. Un pointeur reste un pointeur, c'est la seule chose certaine.
+    """
+    def pose(marque: re.Match) -> str:
+        marge, largeur, etoiles, nom, tableau = marque.groups()
+        type_ = "void" if etoiles else _LARGEUR.get(largeur, "s32")
+        return "%s%s %s%s%s;" % (marge, type_, etoiles, nom, tableau or "")
+
+    return _LOCALE_INCONNUE.sub(pose, corps)
+
+
+# `&sp40[0]` — un emplacement de pile que m2c localise sans le typer, et qu'il
+# n'introduit donc jamais. MWCC répond « undefined identifier 'sp40' ».
+_PILE = re.compile(r"\bsp([0-9A-Fa-f]+)\b")
+
+
+def declare_les_piles(corps: str) -> str:
+    """Introduit les emplacements de pile que m2c emploie sans les déclarer.
+
+    m2c sait où vit la variable — le décalage est dans son nom — mais pas sa
+    taille ni son type ; il l'écrit alors `&sp40[0]` sans jamais l'annoncer. Le
+    décalage, lui, est sûr, et deux décalages consécutifs bornent le premier :
+    `sp40` suivi de `sp60` occupe trente-deux octets. Le dernier n'a pas de
+    borne, et reçoit la taille d'un vecteur — seize octets, l'unité du R5900.
+
+    La disposition ainsi devinée ne sera juste que par chance, et c'est assumé :
+    une fonction qui compile entre dans la mesure, où l'écart se lit et se
+    corrige, là où l'absence la laissait au rebut sans le moindre chiffre.
+    """
+    corps_seul = corps.split("{", 1)[-1]
+    offsets = sorted({int(t, 16) for t in _PILE.findall(corps_seul)})
+    if not offsets:
+        return corps
+    deja = set(types_locaux(corps))
+    manquants = [o for o in offsets if ("sp%X" % o) not in deja
+                 and ("sp%x" % o) not in deja]
+    if not manquants:
+        return corps
+
+    lignes = []
+    for rang, decalage in enumerate(manquants):
+        suivant = (manquants[rang + 1] if rang + 1 < len(manquants)
+                   else decalage + 16)
+        nom = "sp%X" % decalage if ("sp%X" % decalage) in corps else "sp%x" % decalage
+        lignes.append("    u8 %s[0x%X];" % (nom, max(suivant - decalage, 1)))
+
+    # Les déclarations se posent en tête de corps, où m2c met les siennes.
+    ouvre = corps.find("{")
+    if ouvre < 0:
+        return corps
+    return corps[:ouvre + 1] + "\n" + "\n".join(lignes) + corps[ouvre + 1:]
+
+
 def cast_les_affectations(corps: str) -> str:
     """Pose un cast vers le type déclaré, quand un pointeur est en jeu."""
     types = types_locaux(corps)

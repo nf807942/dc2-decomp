@@ -35,7 +35,8 @@ from lib.project import (ROOT, functions, grafted_by_source,  # noqa: E402
                          run, unit_of)
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from conversions import (cast_les_affectations,  # noqa: E402
-                         nettoie_declarations)
+                         declare_les_piles, nettoie_declarations,
+                         nettoie_locales)
 
 # `typedef struct X {` … `} X;` — la structure que m2c infère d'un pointeur.
 # m2c fait suivre l'accolade fermante d'un commentaire de taille — `} X;
@@ -427,6 +428,8 @@ def normalise(texte: str, symbole: str, vues: set[str],
     structs, corps = complete_structures(structs, corps)
     # MWCC, en C++, refuse la conversion implicite que le C tolere : c'est la
     # premiere cause d'echec de compilation de la chaine.
+    corps = nettoie_locales(corps)
+    corps = declare_les_piles(corps)
     corps = cast_les_affectations(corps)
 
     declarations = "\n".join(en_tete + structs + externes)
