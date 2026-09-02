@@ -349,11 +349,11 @@ def normalise(texte: str, symbole: str, vues: set[str],
         if nom in (vues if declarees is None else declarees):
             neuf = nom + "_infere"
             renommes[nom] = neuf
-            bloc = re.sub(r"%s" % re.escape(nom), neuf, bloc)
+            bloc = re.sub(r"\b%s\b" % re.escape(nom), neuf, bloc)
         structs.append(bloc)
     reste = _STRUCT.sub("", texte)
     for ancien, neuf in renommes.items():
-        reste = re.sub(r"%s" % re.escape(ancien), neuf, reste)
+        reste = re.sub(r"\b%s\b" % re.escape(ancien), neuf, reste)
 
     externes = []
     for retour, nom, params in _EXTERN.findall(reste):
@@ -511,7 +511,7 @@ def eprouve(symbole: str, unite: str, taille: int,
             # greffée, la compilation réussissait forcément, et le score rendait
             # un 100 % qui était celui du code d'origine.
             for declaree in list(neuves):
-                for kind in re.findall(r"([A-Za-z_]\w*)\s*\*", declaree):
+                for kind in re.findall(r"\b([A-Za-z_]\w*)\s*\*", declaree):
                     if kind in _BASE or kind in vus_types:
                         continue
                     vus_types.add(kind)

@@ -135,6 +135,29 @@ def sources_absentes() -> list[str]:
 # suppose `make setup` à jour. Une passe qui vient de rendre des fonctions à
 # l'assembleur réclame un désassemblage que le `setup` précédent avait retiré :
 # la contrôler avant de le refaire rendrait 122 fautes qui n'en sont pas.
+def outils_corrompus() -> list[str]:
+    """Les scripts qui portent un caractere de controle.
+
+    Un `\b` ecrit dans un patch mal echappe devient l'octet 8, et le motif
+    cherche alors un retour arriere que rien ne porte : la substitution ne fait
+    plus rien, en silence. Trois lignes de `sonde_m2c.py` l'ont ete pendant
+    toute une moisson, et c'est ce qui a laisse passer les redefinitions de tag
+    — la logique etait juste, le motif ne l'etait plus.
+
+    Le controle est trivial et le defaut invisible a la lecture : c'est
+    exactement ce qu'une verification automatique doit prendre en charge.
+    """
+    fautes = []
+    for chemin in sorted((ROOT / "scripts").rglob("*.py")):
+        octets = chemin.read_bytes()
+        suspects = {o for o in octets if o < 9 or o in (11, 12) or 14 <= o < 32}
+        if suspects:
+            fautes.append("%s porte %s"
+                          % (chemin.relative_to(ROOT).as_posix(),
+                             ", ".join("l'octet %d" % o for o in sorted(suspects))))
+    return fautes
+
+
 CONTROLES = [
     ("en-têtes engendrés", entetes_manquants, False),
     ("greffes sans désassemblage", greffes_sans_desassemblage, True),
@@ -142,6 +165,7 @@ CONTROLES = [
     ("greffes hors plage", greffes_hors_plage, False),
     ("plages qui se chevauchent", plages_qui_se_chevauchent, False),
     ("sources et unités", sources_absentes, False),
+    ("outils corrompus", outils_corrompus, False),
 ]
 
 
