@@ -78,10 +78,11 @@ dix ans praticable là où la force brute ne l'est pas.
 Quatre voies ont été outillées puis mesurées. Deux ne produisent pas, et les
 inscrire ici évite de les rouvrir.
 
-**La chaîne entièrement automatique ne produit pas.** Sur quarante fonctions de
-150 à 400 octets, la normalisation automatique en amène **deux** à compiler et
-**une** à 100 %. Les trente-huit autres butent sur des causes hétérogènes —
-aucune ne domine, chacune demande son diagnostic. m2c lui-même renonce sur huit.
+**La chaîne entièrement automatique ne produit que sur les petites fonctions.**
+Elle gagne 10,8 % des fonctions de 32 à 64 octets et **rien au-delà de 512** ;
+le détail est plus bas. Sur les moyennes, quatre-vingts pour cent des jets ne
+compilent pas, et les causes sont hétérogènes — aucune ne domine, chacune
+demande son diagnostic. m2c lui-même renonce sur un sur six.
 
 **Le permuteur ne rattrape pas un jet m2c.** Sur la meilleure candidate, **121
 essais n'ont pas bougé de 93,21 %** : l'écart était un décalage de branchement
@@ -130,6 +131,42 @@ l'`INCLUDE_ASM` est encore là.
 - **`scripts/diff/petites.py`**, le traducteur déterministe, a produit **158
   fonctions** vérifiées. C'est la seule voie entièrement automatique qui ait
   jamais rien donné.
+
+---
+
+## Ce que la moisson automatique peut, et où elle s'arrête
+
+`make chaine` passe m2c sur chaque fonction greffée, normalise, compile, mesure,
+et **ne garde que ce qui rend exactement les octets du disque**. Elle coûte 3,1 s
+par fonction et tourne sans surveillance. Son rendement a été mesuré sur 1 320
+fonctions, et il s'effondre avec la taille :
+
+| tranche | éprouvées | gagnées | taux |
+|---|---|---|---|
+| 32–64 o | 231 | 25 | **10,8 %** |
+| 64–128 o | 339 | 11 | 3,2 % |
+| 128–256 o | 309 | 2 | 0,6 % |
+| 256–512 o | 165 | 1 | 0,6 % |
+| 512–1024 o | 75 | **0** | **0 %** |
+| 1024–2048 o | 29 | **0** | **0 %** |
+
+**Au-delà de 512 octets, elle ne gagne rien** — et c'est là que sont 59 % des
+octets restants (970 fonctions). Extrapolée sur tout le binaire, la moisson
+plafonne à :
+
+```
++161 fonctions,  +12 300 octets
+709 / 7 840 fonctions = 9,0 %      des octets = 1,74 %
+```
+
+**C'est une passe finie.** Une fois qu'elle a traversé les 7 300 fonctions, il
+n'y a plus rien à en tirer : les mêmes échoueront aux mêmes endroits. Elle ne se
+relance que sur ce qu'une correction de la normalisation vient de débloquer.
+
+Ce qu'elle laisse derrière elle vaut autant que ce qu'elle gagne : **99 fonctions
+qui compilent sans apparier**, dont 41 au-dessus de 90 % et 27 au-dessus de
+95 %. C'est le vivier de l'étape 2, et le moyen le moins cher d'enrichir le
+corpus.
 
 ---
 
