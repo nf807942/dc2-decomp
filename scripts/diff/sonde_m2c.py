@@ -516,7 +516,11 @@ def eprouve(symbole: str, unite: str, taille: int,
             # La source porte deja les declarations des fonctions que
             # cette unite a gagnees avant celle-ci : les reposer ferait
             # surcharger un nom `extern "C"`, ce que MWCC refuse.
-            fragment = assemble(ajoutees, declarations, corps, avant)
+            # Seul ce qui precede le point de greffe compte : une
+            # declaration posee plus bas dans le fichier ne vaut pas ici,
+            # et l ecarter laissait cinq fonctions sans leur appele.
+            fragment = assemble(ajoutees, declarations, corps,
+                                avant.split(ligne)[0])
             source.write_text(avant.replace(ligne, fragment), encoding="utf-8")
             if objet.exists():
                 objet.unlink()
@@ -613,7 +617,12 @@ def declaration(nom: str, corps: str = "") -> str | None:
     if fonction is not None:
         symbole = demangle(nom)
         if symbole is None:
-            return None
+            # Un nom C pur — `printf`, `memcpy` — ne porte pas de
+            # mangling, donc pas de signature. La liste variadique dit
+            # ce que nous savons : la fonction existe, ses parametres
+            # nous echappent. Sept fonctions de la moisson butaient sur
+            # « undefined identifier 'printf' » faute de cette ligne.
+            return 'extern "C" s32 %s(...);' % nom
         # `this` d'abord quand c'en est une méthode : sous `extern "C"`, il
         # n'est qu'un paramètre de plus, et son type importe peu à l'appel.
         params = (["void *"] if symbole.cls else []) + list(symbole.params)
@@ -631,7 +640,13 @@ def declaration(nom: str, corps: str = "") -> str | None:
         # — et si le corps le déréférence, MWCC le dira au tour suivant.
         if corps and re.search(r"\b%s\s*\*" % re.escape(nom), corps):
             return "struct %s;" % nom
-        return None
+        # Employe sans etoile — `sizeof(CSaveData)`, une locale par
+        # valeur — il lui faut un type complet, non une declaration en
+        # avant. L en-tete du projet le donne, l atlas a defaut.
+        porteur = entete_du_type(nom)
+        if porteur:
+            return '#include "%s"' % porteur
+        return definition_atlas(nom)
     largeur = {1: "u8", 2: "u16", 4: "u32", 8: "u64"}.get(taille)
     if largeur is None:
         return 'extern "C" u8 %s[%d];' % (nom, taille)
