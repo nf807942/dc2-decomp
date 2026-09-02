@@ -297,11 +297,33 @@ INCLUDE_ASM("nonmatchings/sdk/csound", sndSetSeVolPrKr__FUiiiii);
 INCLUDE_ASM("nonmatchings/sdk/csound", sndSetSePanPrKr__FUiiiii);
 INCLUDE_ASM("nonmatchings/sdk/csound", sndSetSePitchPrKr__FUiiiii);
 INCLUDE_ASM("nonmatchings/sdk/csound", sndSePlayPBPrKr__Fiiiiiiiii);
-INCLUDE_ASM("nonmatchings/sdk/csound", sndSeStopPBPrKr__Fiiiii);
+extern "C" u8 CSnd;
+extern "C" s32 SE_Stop__6CSoundFiiiii(void *, s32, s32, s32, s32, s32);
+extern "C" void sndSeStopPBPrKr__Fiiiii(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4) {
+    sndWaitSema__Fv();
+    SE_Stop__6CSoundFiiiii(&CSnd, arg0, arg1, arg2, arg3, arg4);
+    sndSignalSema__Fv();
+}
 INCLUDE_ASM("nonmatchings/sdk/csound", sndSetSeVolPBPrKr__Fiiiiii);
-INCLUDE_ASM("nonmatchings/sdk/csound", sndSetSePanPBPrKr__Fiiiiii);
-INCLUDE_ASM("nonmatchings/sdk/csound", sndSetSePitchPBPrKr__Fiiiiii);
-INCLUDE_ASM("nonmatchings/sdk/csound", sndSqPlay__Fiii);
+extern "C" u8 CSnd;
+extern "C" s32 SE_SetPan__6CSoundFiiiiii(void *, s32, s32, s32, s32, s32, s32);
+extern "C" void sndSetSePanPBPrKr__Fiiiiii(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
+    sndWaitSema__Fv();
+    SE_SetPan__6CSoundFiiiiii(&CSnd, arg0, arg1, arg2, arg3, arg4, arg5);
+    sndSignalSema__Fv();
+}
+extern "C" s32 SE_SetPitch__6CSoundFiiiiii(void *, s32, s32, s32, s32, s32, s32);
+extern "C" void sndSetSePitchPBPrKr__Fiiiiii(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
+    sndWaitSema__Fv();
+    SE_SetPitch__6CSoundFiiiiii(&CSnd, arg0, arg1, arg2, arg3, arg4, arg5);
+    sndSignalSema__Fv();
+}
+extern "C" s32 SQ_Play__6CSoundFiii(void *, s32, s32, s32);
+extern "C" void sndSqPlay__Fiii(s32 arg0, s32 arg1, s32 arg2) {
+    sndWaitSema__Fv();
+    SQ_Play__6CSoundFiii(&CSnd, arg0, arg1, arg2);
+    sndSignalSema__Fv();
+}
 INCLUDE_ASM("nonmatchings/sdk/csound", sndSqStop__Fii);
 INCLUDE_ASM("nonmatchings/sdk/csound", sndSetSqVol__Fiii);
 INCLUDE_ASM("nonmatchings/sdk/csound", sndSqRePlay__Fii);
@@ -315,16 +337,60 @@ sndSeInfo::sndSeInfo(void) {
 INCLUDE_ASM("nonmatchings/sdk/csound", LoadVolInfoTxt__11sndPortInfoFiPci);
 INCLUDE_ASM("nonmatchings/sdk/csound", sndStopSeSeq__Fi);
 INCLUDE_ASM("nonmatchings/sdk/csound", PlaySeSeq__FUiP13sndCSeSeqDatai);
-INCLUDE_ASM("nonmatchings/sdk/csound", StopSeSeq__Fi);
+extern "C" s32 GetSeSeq__Fi(s32);
+extern "C" void StopSeSeq__Fi(s32 arg0) {
+    sndCSeSeq *temp_v0;
+
+    temp_v0 = (sndCSeSeq *) (GetSeSeq__Fi(arg0));
+    if (temp_v0 != NULL) {
+        Stop__9sndCSeSeqFv(temp_v0);
+    }
+}
 INCLUDE_ASM("nonmatchings/sdk/csound", SetVolSeSeq__Fii);
 INCLUDE_ASM("nonmatchings/sdk/csound", sndStreamOpenFast__FPc);
-INCLUDE_ASM("nonmatchings/sdk/csound", sndStreamOpenState__Fv);
-INCLUDE_ASM("nonmatchings/sdk/csound", sndStreamStandBy__Fv);
+extern "C" s32 StreamOpenState__6CSoundFv(void *);
+extern "C" s32 sndStreamOpenState__Fv(void) {
+    s32 temp_s0;
+
+    sndWaitSema__Fv();
+    temp_s0 = StreamOpenState__6CSoundFv(&CSnd);
+    sndSignalSema__Fv();
+    return temp_s0;
+}
+extern "C" s32 StreamStandBy__6CSoundFi(void *, s32);
+extern "C" void sndStreamStandBy__Fv(void) {
+    sndWaitSema__Fv();
+    StreamStandBy__6CSoundFi(&CSnd, 1);
+    sndSignalSema__Fv();
+}
 INCLUDE_ASM("nonmatchings/sdk/csound", sndStreamSetVol__Fff);
-INCLUDE_ASM("nonmatchings/sdk/csound", sndStreamPlay__Fv);
-INCLUDE_ASM("nonmatchings/sdk/csound", sndStreamPause__Fv);
-INCLUDE_ASM("nonmatchings/sdk/csound", sndStreamRePlay__Fv);
-INCLUDE_ASM("nonmatchings/sdk/csound", sndStreamGetState__Fv);
+extern "C" s32 StreamPlay__6CSoundFi(void *, s32);
+extern "C" void sndStreamPlay__Fv(void) {
+    sndWaitSema__Fv();
+    StreamPlay__6CSoundFi(&CSnd, 1);
+    sndSignalSema__Fv();
+}
+extern "C" s32 StreamPause__6CSoundFi(void *, s32);
+extern "C" void sndStreamPause__Fv(void) {
+    sndWaitSema__Fv();
+    StreamPause__6CSoundFi(&CSnd, 1);
+    sndSignalSema__Fv();
+}
+extern "C" s32 StreamRePlay__6CSoundFi(void *, s32);
+extern "C" void sndStreamRePlay__Fv(void) {
+    sndWaitSema__Fv();
+    StreamRePlay__6CSoundFi(&CSnd, 1);
+    sndSignalSema__Fv();
+}
+extern "C" s32 StreamGetState__6CSoundFi(void *, s32);
+extern "C" s32 sndStreamGetState__Fv(void) {
+    s32 temp_s0;
+
+    sndWaitSema__Fv();
+    temp_s0 = StreamGetState__6CSoundFi(&CSnd, 1);
+    sndSignalSema__Fv();
+    return temp_s0;
+}
 INCLUDE_ASM("nonmatchings/sdk/csound", sndStreamClose__Fv);
 INCLUDE_ASM("nonmatchings/sdk/csound", __ct__9sndCSeSeqFv);
 INCLUDE_ASM("nonmatchings/sdk/csound", __ct__11sndPortInfoFv);

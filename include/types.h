@@ -21,6 +21,10 @@ typedef double f64;
 /* Le quadmot est le registre naturel du R5900 : 128 bits, que `lq` et `sq`
  * transportent d'un coup. MWCC l'expose sous ce nom. */
 typedef unsigned int u128 __attribute__((mode(TI)));
+/* m2c nomme `s128` ce que le quadmot transporte quand il en lit le signe. Le
+ * nom lui est propre ; le type est le même, et sans ce synonyme onze fonctions
+ * de la moisson s'arrêtaient sur « undefined identifier 's128' ». */
+typedef signed int s128 __attribute__((mode(TI)));
 
 typedef int BOOL;
 

@@ -350,8 +350,16 @@ def normalise(texte: str, symbole: str, vues: set[str],
                                             m.group(3)),
                       bloc)
         nom = _NOM_STRUCT.search(bloc).group(1)
-        if nom in (vues if declarees is None else declarees):
-            neuf = nom + "_infere"
+        occupes = vues if declarees is None else declarees
+        if nom in occupes:
+            # Le nom se cherche libre, non fixe : la chaine cumule les
+            # fonctions d une unite, chacune infere ses propres champs, et
+            # deux `X_infere` de contenus differents ne peuvent pas
+            # coexister. Garder la premiere laisserait la seconde parler
+            # de champs que rien ne declare.
+            neuf, rang = nom + "_infere", 2
+            while neuf in occupes:
+                neuf, rang = "%s_infere%d" % (nom, rang), rang + 1
             renommes[nom] = neuf
             bloc = re.sub(r"\b%s\b" % re.escape(nom), neuf, bloc)
         structs.append(bloc)
