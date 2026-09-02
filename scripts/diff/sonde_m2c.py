@@ -643,7 +643,14 @@ def declaration(nom: str, corps: str = "") -> str | None:
             return 'extern "C" s32 %s(...);' % nom
         # `this` d'abord quand c'en est une méthode : sous `extern "C"`, il
         # n'est qu'un paramètre de plus, et son type importe peu à l'appel.
-        params = (["void *"] if symbole.cls else []) + list(symbole.params)
+        # Tout pointeur se declare `void *`. Le nom du type ne peut pas
+        # servir ici : la structure inferee est renommee au cas par cas —
+        # `X_infere` pour une fonction, `X_infere2` pour la suivante —, et
+        # deux declarations divergentes du meme appelé font repondre
+        # « illegal function overloading ». `void *` recoit tout pointeur
+        # et ne depend d aucun renommage.
+        params = (["void *"] if symbole.cls else []) + [
+            "void *" if "*" in p else p for p in symbole.params]
         # Le retour se rend `s32`, non `void` : le mangling C++ n'encode pas le
         # type de retour, et `void` fait echouer tout appel dont la valeur sert
         # — « illegal explicit conversion from 'void' to ». `s32` est la largeur

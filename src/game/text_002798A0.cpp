@@ -168,7 +168,12 @@ s32 _GEOSTONE_ANIME_OFF(RS_STACKDATA * arg0, s32 arg1) {
     GeoStone.field_0x668 = 0;
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/text_002798A0", _GEOSTONE_SET_FLAG__FP12RS_STACKDATAi);
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(RS_STACKDATA *);
+extern "C" s32 SetFlag__9CGeoStoneFi(void *, s32);
+extern "C" s32 _GEOSTONE_SET_FLAG__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    SetFlag__9CGeoStoneFi(&GeoStone, GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _GEOSTONE_SET_REFERENCE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _GEOSTONE_DEL_REFERENCE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _GET_ROBO_MOVE_TYPE__FP12RS_STACKDATAi);
@@ -287,7 +292,13 @@ INCLUDE_ASM("nonmatchings/game/text_002798A0", _SET_MPCHARA_MOTION__FP12RS_STACK
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _FUNC_POINT_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _PARTS_NAME_STRCMP__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _GET_TRIAL_VERSION__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002798A0", _SET_FLOOR_EPISODE__FP12RS_STACKDATAi);
+extern "C" u8 StartupEpisodeTitle[24];
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(RS_STACKDATA *);
+extern "C" s32 Switch__20CStartupEpisodeTitleFi(void *, s32);
+extern "C" s32 _SET_FLOOR_EPISODE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    Switch__20CStartupEpisodeTitleFi(&StartupEpisodeTitle, GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _FUNC_POINT_GET_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _FUNC_POINT_GET_ROT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _ACTCHR_SET_DEF_MOTION__FP12RS_STACKDATAi);
