@@ -259,7 +259,9 @@ n'a en revanche été rangée à tort dans le jeu. Le détail : le runtime
 Metrowerks (81 176 o, dont 2 264 ont leur source dans l'installateur
 CodeWarrior), la MSL C (`memcpy`, `sprintf`, `_dtoa`), le SDK Sony (142 304 o —
 `ps2sdk` donne les prototypes exacts, mais son code n'apparie pas), le
-middleware `mg*` (108 348 o, signatures transposables depuis DCDecomp). **Un
+middleware `mg*` (108 348 o, sans oracle connu : DCDecomp, sur le premier
+*Dark Cloud*, n'a decompile ni `mg*` ni le SDK, contrairement a ce que ce
+plan a longtemps affirme). **Un
 chiffre les désigne** : sur les 831 fonctions que le traducteur refuse pour
 cause de mangling, **381 sont des noms C purs** — `abort`, `atof`, `fabsf` — qui
 n'ont pas de signature manglée et n'en auront jamais.
@@ -349,7 +351,10 @@ une reconstruction.
   format attendu. Notre règle interdisant de publier le désassemblage, il faudra
   publier le rapport seul. C'est le préalable à tout contributeur, et la CI est
   désormais là.
-- **Le rapprochement avec DCDecomp** sur le middleware `mg*`.
+- **Le rapprochement avec DCDecomp**, dont l'apport est a etablir : le depot
+  couvre le premier *Dark Cloud*, meme studio et meme middleware, mais son
+  code decompile est celui du jeu, non celui de `mg*`. Ce qu'il peut donner
+  est de la connaissance de structures, pas des signatures toutes faites.
 - **Questions ouvertes** : la liaison 13 que portent 193 `FUNC` et 27 `OBJECT` ;
   `-sdatathreshold` ; la compression du mangling que `P1P1i` révèle et que le
   démangleur lit mal. **`.mwcats` n'en est plus une** : c'est la table des

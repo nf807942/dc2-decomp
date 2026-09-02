@@ -42,7 +42,11 @@ _STRUCT = re.compile(r"^typedef struct .*?^\} \w+;[^\n]*$", re.MULTILINE | re.DO
 _EXTERN = re.compile(
     r"^(\S+) ([A-Za-z_]\w*)\((.*?)\);\s*/\* (?:extern|static) \*/$", re.MULTILINE)
 # L'en-tête de la fonction rendue, dont le nom est le symbole manglé.
-_ENTETE = re.compile(r"^(\S+) (%s)\((.*?)\) \{$", re.MULTILINE)
+# `\S+ ` ne voyait pas un retour pointeur : m2c ecrit `void *Nom(`, l'asterisque
+# collee au nom, et le motif cherchait alors un symbole commencant par `*`. Les
+# 134 « sortie illisible » de la moisson etaient exactement les fonctions a
+# retour pointeur, jamais tentees une seule fois.
+_ENTETE = re.compile(r"^([A-Za-z_]\w*\s*\**)\s*(%s)\((.*?)\) \{$", re.MULTILINE)
 
 INCLUDE_ASM = 'INCLUDE_ASM("nonmatchings/%s", %s);'
 
@@ -362,8 +366,14 @@ def normalise(texte: str, symbole: str, vues: set[str],
         # c'est un pointeur. On vise `? *`, jamais un `?` isolé, qui serait
         # un opérateur ternaire.
         params = re.sub(r"\?\s*\*", "void *", params)
+        # Le retour se rend `s32`, non `void` : m2c ecrit `?` quand il n'a pas
+        # tranche, et c'est le plus souvent parce que la valeur *sert*. `void`
+        # fait alors echouer tout appel qui l'emploie — « illegal implicit
+        # conversion from 'void' » —, la ou `s32` est la largeur de $v0 et se
+        # laisse ignorer quand la valeur ne sert pas. Le type declare d'un
+        # retour entier ne change pas l'appel : les octets n'en dependent pas.
         externes.append('extern "C" %s %s(%s);'
-                        % ("void" if retour == "?" else retour, nom,
+                        % ("s32" if retour == "?" else retour, nom,
                            re.sub(r"\bthis\b", "objet", params)))
     reste = _EXTERN.sub("", reste)
 
