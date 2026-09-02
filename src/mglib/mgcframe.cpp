@@ -100,7 +100,40 @@ INCLUDE_ASM("nonmatchings/mglib/mgcframe", AddHeight__15mgCCameraFollowFf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetFollowOffset__15mgCCameraFollowFfff);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetFollow__15mgCCameraFollowFPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetFollowOffset__15mgCCameraFollowFPf);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", __ct__15mgCCameraFollowFffff);
+extern "C" s32 __ct__9mgCCameraFf(void *, f32);
+extern "C" u8 __vt__15mgCCameraFollow[36];
+struct inferred;
+typedef struct mgCCameraFollow_infere {
+    /* 0x00 */ char pad0[0x60];
+    /* 0x60 */ void *unk60;                            /* inferred */
+    /* 0x64 */ char pad64[0x1C];                    /* maybe part of unk60[8]void */
+    /* 0x80 */ f32 unk80;                           /* inferred */
+    /* 0x84 */ char pad84[0xC];                     /* maybe part of unk80[4]void */
+    /* 0x90 */ f32 unk90;                           /* inferred */
+    /* 0x94 */ f32 unk94;                           /* inferred */
+    /* 0x98 */ f32 unk98;                           /* inferred */
+    /* 0x9C */ f32 unk9C;                           /* inferred */
+    /* 0xA0 */ s32 unkA0;                           /* inferred */
+    /* 0xA4 */ char padA4[0xC];                     /* maybe part of unkA0[4]void */
+    /* 0xB0 */ s32 unkB0;                           /* inferred */
+    /* 0xB4 */ s32 unkB4;                           /* inferred */
+    /* 0xB8 */ s32 unkB8;                           /* inferred */
+} mgCCameraFollow_infere;                                  /* size >= 0xBC */
+extern "C" s32 mgZeroVector__FPf(f32 *arg0);
+extern "C" mgCCameraFollow_infere *__ct__15mgCCameraFollowFffff(mgCCameraFollow_infere *objet, f32 arg0, f32 arg1, f32 arg2, f32 arg3) {
+    __ct__9mgCCameraFf((mgCCamera *) objet, arg3);
+    objet->unk60 = &__vt__15mgCCameraFollow;
+    objet->unkB0 = 0;
+    objet->unkB4 = 0;
+    objet->unkB8 = 0;
+    objet->unk98 = arg2;
+    objet->unk9C = arg2;
+    objet->unk90 = arg0;
+    objet->unk94 = arg1;
+    objet->unkA0 = 1;
+    mgZeroVector__FPf(&objet->unk80);
+    return objet;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Iam__15mgCCameraFollowFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Suspend__9mgCCameraFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Resume__9mgCCameraFv);

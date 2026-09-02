@@ -13,7 +13,17 @@
 #include "gen/sndTrack.hpp"
 
 INCLUDE_ASM("nonmatchings/sdk/csound", StopVoice__6CSoundFi);
-INCLUDE_ASM("nonmatchings/sdk/csound", SndInReverb__6CSoundFb);
+struct CSound;
+extern "C" s32 sceSdRemote(s32, s32, s32, s32);
+extern "C" void SndInReverb__6CSoundFb(CSound *objet, s32 arg0) {
+    if (arg0 != 0) {
+        sceSdRemote(1, 0x8010, 0x800, -4);
+        sceSdRemote(1, 0x8010, 0x801, -4);
+        return;
+    }
+    sceSdRemote(1, 0x8010, 0x800, -0x34);
+    sceSdRemote(1, 0x8010, 0x801, -0x34);
+}
 INCLUDE_ASM("nonmatchings/sdk/csound", SetReverb__6CSoundFiii);
 INCLUDE_ASM("nonmatchings/sdk/csound", set_spu__Fiiii);
 INCLUDE_ASM("nonmatchings/sdk/csound", TransHdBd__Fiiii);
@@ -48,7 +58,12 @@ extern "C" void SetVol__6CSoundFii(CSound *objet, s32 arg0, s32 arg1) {
     ezMidi__Fii(arg0 + 0xB0, var_a2);
 }
 INCLUDE_ASM("nonmatchings/sdk/csound", SetStereoMode__6CSoundFi);
-INCLUDE_ASM("nonmatchings/sdk/csound", SetMasterVol__6CSoundFii);
+struct CSound;
+extern "C" s32 sceSdRemote(s32, s32, s32, s32);
+extern "C" void SetMasterVol__6CSoundFii(CSound *objet, s32 arg0, s32 arg1) {
+    sceSdRemote(1, 0x8010, arg0 | 0x980, arg1);
+    sceSdRemote(1, 0x8010, arg0 | 0xA80, arg1);
+}
 INCLUDE_ASM("nonmatchings/sdk/csound", LoadHdBd__6CSoundFiiiii);
 INCLUDE_ASM("nonmatchings/sdk/csound", LoadHdBd2__6CSoundFiiiii);
 INCLUDE_ASM("nonmatchings/sdk/csound", LoadHdBdAdd__6CSoundFiiiii);
@@ -93,7 +108,30 @@ void sndCSeSeqData::Initialize(void) {
 INCLUDE_ASM("nonmatchings/sdk/csound", LoadSMF__13sndCSeSeqDataFPciP9mgCMemory);
 INCLUDE_ASM("nonmatchings/sdk/csound", Initialize__9sndCSeSeqFv);
 INCLUDE_ASM("nonmatchings/sdk/csound", SetSeID__9sndCSeSeqFi);
-INCLUDE_ASM("nonmatchings/sdk/csound", Count__9sndCSeSeqFf);
+struct inferred;
+typedef struct sndCSeSeq_infere {
+    /* 0x00 */ char pad0[8];
+    /* 0x08 */ void *unk8;                          /* inferred */
+    /* 0x0C */ char padC[4];
+    /* 0x10 */ s32 unk10;                           /* inferred */
+    /* 0x14 */ s32 unk14;                           /* inferred */
+} sndCSeSeq_infere;                                        /* size >= 0x18 */
+struct temp_v1_champs {
+    char pad0[0x4];
+    /* 0x4 */ s32 unk4;
+};
+extern "C" s32 fptosi(f32);
+extern "C" void Count__9sndCSeSeqFf(sndCSeSeq_infere *objet, f32 arg0) {
+    s32 temp_v0;
+    struct temp_v1_champs *temp_v1;
+
+    temp_v1 = (struct temp_v1_champs *) (objet->unk8);
+    if (temp_v1 != NULL) {
+        temp_v0 = (s32) (fptosi(((f32) temp_v1->unk4 * arg0) / 60.0f));
+        objet->unk10 += temp_v0;
+        objet->unk14 += temp_v0;
+    }
+}
 typedef struct sndCSeSeq {
     /* 0x00 */ char pad0[8];
     /* 0x08 */ s32 unk8;                            /* inferred */
@@ -124,7 +162,22 @@ INCLUDE_ASM("nonmatchings/sdk/csound", SendPitch__9sndCSeSeqFi);
 INCLUDE_ASM("nonmatchings/sdk/csound", SaerchVoice__8sndTrackFii);
 INCLUDE_ASM("nonmatchings/sdk/csound", GetEmptyVoice__8sndTrackFv);
 INCLUDE_ASM("nonmatchings/sdk/csound", NoteOn__8sndTrackFii);
-INCLUDE_ASM("nonmatchings/sdk/csound", NoteOff__8sndTrackFii);
+extern "C" s32 SaerchVoice__8sndTrackFii(void *, s32, s32);
+struct inferred;
+typedef struct sndTrack_infere {
+    /* 0x0 */ char pad0[2];
+    /* 0x2 */ s8 unk2;                              /* inferred */
+} sndTrack_infere;                                         /* size >= 0x3 */
+extern "C" s32 NoteOff__8sndTrackFii(sndTrack_infere *objet, s32 arg0, s32 arg1) {
+    s8 *temp_v0;
+
+    temp_v0 = (s8 *) (SaerchVoice__8sndTrackFii(objet, (s32) objet->unk2, arg0));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    *temp_v0 = 0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/sdk/csound", CtrlChg__8sndTrackFii);
 s32 sndTrack::ProgChg(s32 arg0) {
     this->field_0x2 = arg0;
@@ -205,7 +258,27 @@ INCLUDE_ASM("nonmatchings/sdk/csound", sndSePlayVf__FUiifi);
 INCLUDE_ASM("nonmatchings/sdk/csound", sndSePause__FUii);
 INCLUDE_ASM("nonmatchings/sdk/csound", sndGetSeStatus__FUii);
 INCLUDE_ASM("nonmatchings/sdk/csound", sndPortSqPause__Fi);
-INCLUDE_ASM("nonmatchings/sdk/csound", sndPortSqReplay__Fi);
+extern "C" s32 GetPortInfo__Fi(s32);
+struct temp_v0_champs {
+    char pad0[0x4];
+    /* 0x4 */ s32 unk4;
+    char pad8[0x204];
+    /* 0x20C */ s32 unk20C;
+    /* 0x210 */ s32 unk210;
+    /* 0x214 */ s32 unk214;
+};
+extern "C" s32 sndSetSqVol__Fiii(s32 arg0, s32 arg1, s32 arg2);
+extern "C" s32 sndSqRePlay__Fii(s32 arg0, s32 arg1);
+extern "C" void sndPortSqReplay__Fi(s32 arg0) {
+    struct temp_v0_champs *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs *) (GetPortInfo__Fi(arg0));
+    if ((temp_v0 != NULL) && (temp_v0->unk210 == 3)) {
+        sndSqRePlay__Fii(temp_v0->unk4, temp_v0->unk20C);
+        sndSetSqVol__Fiii(temp_v0->unk4, temp_v0->unk20C, temp_v0->unk214);
+        temp_v0->unk210 = 1;
+    }
+}
 INCLUDE_ASM("nonmatchings/sdk/csound", sndSeCheck__FUii);
 INCLUDE_ASM("nonmatchings/sdk/csound", sndSePlaySeID__FUiiiiiii);
 INCLUDE_ASM("nonmatchings/sdk/csound", sndSeStop__FUiii);

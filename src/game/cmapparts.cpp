@@ -417,7 +417,18 @@ INCLUDE_ASM("nonmatchings/game/cmapparts", mapFIX_CAMERA_POS2__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFIX_CAMERA_OFF_GROUP__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFIX_CAMERA_RECT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", SetCollision__9CColFrameFP10CCollision);
-INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__10CCollisionFv);
+extern "C" u8 __vt__10CCollision[36];
+struct inferred;
+typedef struct CCollision {
+    /* 0x00 */ char pad0[0x30];
+    /* 0x30 */ void *unk30;                            /* inferred */
+} CCollision;                                       /* size >= 0x34 */
+extern "C" s32 Initialize__10CCollisionFv(CCollision *objet);
+extern "C" CCollision *__ct__10CCollisionFv(CCollision *objet) {
+    objet->unk30 = &__vt__10CCollision;
+    Initialize__10CCollisionFv(objet);
+    return objet;
+}
 extern "C" u32 mapCameraInfoIdx;
 extern "C" s32 IsAddMode__Fv();
 extern "C" s32 mapFIX_CAMERA_END__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
@@ -474,7 +485,17 @@ s32 cfgWATER_SHAKE(SPI_STACK *stack, int argc) {
 }
 INCLUDE_ASM("nonmatchings/game/cmapparts", cfgWATER_SURFACE_END__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", cfgWATER_DRAW_NUM__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__9CMapWaterFv);
+extern "C" s32 __ct__7CObjectFv(void *);
+extern "C" u8 __vt__9CMapWater[116];
+struct inferred;
+typedef struct CMapWater {
+    /* 0x0 */ void *unk0;                              /* inferred */
+} CMapWater;                                        /* size >= 0x4 */
+extern "C" CMapWater *__ct__9CMapWaterFv(CMapWater *objet) {
+    __ct__7CObjectFv((CObject *) objet);
+    objet->unk0 = &__vt__9CMapWater;
+    return objet;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", cfgWATER_DRAW__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", LoadCfgFile__4CMapFPciP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cmapparts", Initialize__11CCameraInfoFv);

@@ -213,7 +213,40 @@ INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Draw__17CSWordAfterEffectFv)
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", CreatPointList__17CSWordAfterEffectFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", SetTexture__17CSWordAfterEffectFiP10mgCTextureiiii);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", SetTexture__17CSWordAfterEffectFiiii);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", StartEffect__17CSWordAfterEffectFP8mgCFrameP8mgCFrameiii);
+extern "C" u8 _356_00377D08[10];
+struct inferred;
+#include "gen/mgCFrame.hpp"
+typedef struct CSWordAfterEffect_infere {
+    /* 0x00 */ mgCFrame *unk0;                      /* inferred */
+    /* 0x04 */ mgCFrame *unk4;                      /* inferred */
+    /* 0x08 */ char pad8[0x54];                     /* maybe part of unk4[0x16]void */
+    /* 0x5C */ s32 unk5C;                           /* inferred */
+    /* 0x60 */ char pad60[0x18];                    /* maybe part of unk5C[7]void */
+    /* 0x78 */ s32 unk78;                           /* inferred */
+    /* 0x7C */ s32 unk7C;                           /* inferred */
+    /* 0x80 */ s32 unk80;                           /* inferred */
+    /* 0x84 */ s32 unk84;                           /* inferred */
+    /* 0x88 */ s32 unk88;                           /* inferred */
+    /* 0x8C */ s32 unk8C;                           /* inferred */
+    /* 0x90 */ s32 unk90;                           /* inferred */
+    /* 0x94 */ s32 unk94;                           /* inferred */
+    /* 0x98 */ f32 unk98;                           /* inferred */
+} CSWordAfterEffect_infere;                                /* size >= 0x9C */
+extern "C" s32 printf(void *);
+extern "C" void StartEffect__17CSWordAfterEffectFP8mgCFrameP8mgCFrameiii(CSWordAfterEffect_infere *objet, mgCFrame *arg0, mgCFrame *arg1, s32 arg2, s32 arg3, s32 arg4) {
+    objet->unk0 = arg0;
+    objet->unk4 = arg1;
+    objet->unk8C = arg2;
+    objet->unk90 = arg4;
+    objet->unk88 = 1;
+    objet->unk94 = 0x3F800000;
+    objet->unk98 = 1.0f / (f32) arg3;
+    objet->unk5C = 0;
+    objet->unk7C = 0;
+    objet->unk80 = objet->unk78 - 1;
+    objet->unk84 = objet->unk78 - 1;
+    printf(&_356_00377D08);
+}
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", AddPoint__17CSWordAfterEffectFPfPf);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Step__17CSWordAfterEffectFv);
 void CSWordAfterEffect::Clear(void) {
