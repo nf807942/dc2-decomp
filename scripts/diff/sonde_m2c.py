@@ -235,7 +235,8 @@ def score(symbole: str, unite: str) -> float | None:
     return None
 
 
-def eprouve(symbole: str, unite: str, taille: int) -> dict:
+def eprouve(symbole: str, unite: str, taille: int,
+            garde: bool = False) -> dict:
     """Traduit, pose, compile et mesure une fonction. Rend le compte rendu."""
     verdict = {"symbole": symbole, "unite": unite, "taille": taille}
 
@@ -282,8 +283,13 @@ def eprouve(symbole: str, unite: str, taille: int) -> dict:
             # f(void *, CFuncPointCheck *)` —, et l'unité ne les connaît pas
             # davantage. Le contexte les a donnés à m2c, qui a cessé de les
             # réémettre : c'est ici qu'il faut les rattraper.
-            for ligne in list(neuves):
-                for kind in re.findall(r"([A-Za-z_]\w*)\s*\*", ligne):
+            # La variable de boucle ne s'appelle pas `ligne` : ce nom porte
+            # l'`INCLUDE_ASM` à remplacer, et l'écraser faisait que la pose du
+            # tour suivant ne trouvait plus rien. La source redevenait alors
+            # greffée, la compilation réussissait forcément, et le score rendait
+            # un 100 % qui était celui du code d'origine.
+            for declaree in list(neuves):
+                for kind in re.findall(r"([A-Za-z_]\w*)\s*\*", declaree):
                     if kind in _BASE or kind in vus_types:
                         continue
                     vus_types.add(kind)
@@ -296,12 +302,33 @@ def eprouve(symbole: str, unite: str, taille: int) -> dict:
         else:
             return {**verdict, "issue": "ne compile pas",
                     "cause": "déclarations sans fin"}
+        # Avant de mesurer, prouver que la fonction n'est plus greffée. Sans
+        # cette garde, toute erreur de pose rend un 100 % qui est celui du
+        # disque : l'unité compile son propre assembleur, et objdiff compare le
+        # commerce à lui-même. C'est le faux appariement contre lequel tout le
+        # dépôt met en garde, revenu par la porte de la mesure individuelle.
+        if ligne in source.read_text(encoding="utf-8"):
+            verdict["issue"] = "pose sans effet"
+            return verdict
+
         part = score(symbole, unite)
         if part is None:
-            return {**verdict, "issue": "mesure impossible"}
-        return {**verdict, "issue": "mesurée", "part": part}
+            verdict["issue"] = "mesure impossible"
+            return verdict
+        # Le fragment retenu voyage avec le verdict : `chaine.py` le garde tel
+        # quel quand la fonction apparie, sans refaire le chemin.
+        verdict.update({"issue": "mesurée", "part": part,
+                        "fragment": fragment, "declarations": ajoutees})
+        return verdict
     finally:
-        source.write_text(avant, encoding="utf-8")
+        # `garde` laisse en place ce qui apparie : la chaîne cumule les
+        # fonctions d'une même unité, et chacune doit compiler *avec* les
+        # précédentes. Mesurer isolément puis appliquer en bloc laissait les
+        # déclarations se télescoper, et un fragment figé vieillissait dès que
+        # le contexte changeait.
+        if not (garde and verdict.get("issue") == "mesurée"
+                and (verdict.get("part") or 0) >= 99.999):
+            source.write_text(avant, encoding="utf-8")
 
 
 _INCONNU = re.compile(r"undefined identifier '(\w+)'")
