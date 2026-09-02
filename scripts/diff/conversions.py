@@ -149,6 +149,70 @@ def declare_les_piles(corps: str) -> str:
     return corps[:ouvre + 1] + "\n" + "\n".join(lignes) + corps[ouvre + 1:]
 
 
+# Ce qu'un bloc de déclaration nomme, et qui ne peut l'être qu'une fois.
+_TYPEDEF = re.compile(r"^typedef struct (\w+)")
+_AVANT = re.compile(r"^struct (\w+);")
+_FONCTION = re.compile(r'^extern "C" .*?\b(\w+)\s*\(')
+
+
+def _cle(bloc: str) -> tuple[str, str] | None:
+    """Ce que ce bloc déclare, sous une forme comparable."""
+    tete = bloc.lstrip().split("\n", 1)[0]
+    for motif, genre in ((_TYPEDEF, "type"), (_AVANT, "type"),
+                         (_FONCTION, "fonction")):
+        marque = motif.match(tete)
+        if marque:
+            return genre, marque.group(1)
+    return None
+
+
+def _blocs(declarations: str) -> list[str]:
+    """Découpe les déclarations en blocs, une structure comptant pour un."""
+    rendu: list[str] = []
+    courant: list[str] = []
+    profondeur = 0
+    for ligne in declarations.splitlines():
+        courant.append(ligne)
+        profondeur += ligne.count("{") - ligne.count("}")
+        if profondeur <= 0 and ligne.rstrip().endswith(";"):
+            rendu.append("\n".join(courant))
+            courant, profondeur = [], 0
+    if courant:
+        rendu.append("\n".join(courant))
+    return rendu
+
+
+def assemble(ajoutees: list[str], declarations: str, corps: str,
+             source: str) -> str:
+    """Le fragment à poser, sans ce que la source déclare déjà.
+
+    **La chaîne cumule les fonctions d'une même unité**, et chacune apporte ses
+    déclarations. La suivante redéclare alors les mêmes noms, souvent autrement :
+    MWCC répond « illegal function overloading » — un nom `extern "C"` ne se
+    surcharge pas — ou « tag redefined ». Mesuré sur les causes enregistrées :
+    90 fonctions pour la première, 47 pour la seconde, soit 44 % des échecs de
+    compilation restants.
+
+    Le remède n'est pas de choisir la meilleure déclaration mais de n'en garder
+    qu'une : la première posée a déjà servi à compiler ce qui l'entoure.
+    """
+    pris: set[tuple[str, str]] = set()
+    for bloc in _blocs(source):
+        cle = _cle(bloc)
+        if cle:
+            pris.add(cle)
+
+    gardes = []
+    for bloc in _blocs("\n".join([b for b in ajoutees + [declarations] if b])):
+        cle = _cle(bloc)
+        if cle is not None:
+            if cle in pris:
+                continue
+            pris.add(cle)
+        gardes.append(bloc)
+    return "\n".join(gardes + [corps])
+
+
 def cast_les_affectations(corps: str) -> str:
     """Pose un cast vers le type déclaré, quand un pointeur est en jeu."""
     types = types_locaux(corps)

@@ -376,6 +376,15 @@ def normalise(texte: str, symbole: str, vues: set[str],
         # conversion from 'void' » —, la ou `s32` est la largeur de $v0 et se
         # laisse ignorer quand la valeur ne sert pas. Le type declare d'un
         # retour entier ne change pas l'appel : les octets n'en dependent pas.
+        # La declaration que le mangling donne passe avant celle que m2c
+        # infere : elle est deterministe, donc identique dans toutes les
+        # fonctions de l unite. Deux formes divergentes du meme nom
+        # `extern "C"` font repondre « illegal function overloading », et
+        # la chaine cumule les fonctions d une meme unite.
+        depuis_mangling = declaration(nom) if nom in functions() else None
+        if depuis_mangling:
+            externes.append(depuis_mangling)
+            continue
         externes.append('extern "C" %s %s(%s);'
                         % ("s32" if retour == "?" else retour, nom,
                            re.sub(r"\bthis\b", "objet", params)))
@@ -496,8 +505,10 @@ def eprouve(symbole: str, unite: str, taille: int,
         for _tour in range(5):
             # Les déclarations trouvées en chemin passent devant : un type que
             # m2c emploie dans une structure inférée doit exister avant elle.
-            fragment = "\n".join(
-                ajoutees + [d for d in [declarations] if d] + [corps])
+            # La source porte deja les declarations des fonctions que
+            # cette unite a gagnees avant celle-ci : les reposer ferait
+            # surcharger un nom `extern "C"`, ce que MWCC refuse.
+            fragment = assemble(ajoutees, declarations, corps, avant)
             source.write_text(avant.replace(ligne, fragment), encoding="utf-8")
             if objet.exists():
                 objet.unlink()
