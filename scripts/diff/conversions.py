@@ -213,6 +213,78 @@ def assemble(ajoutees: list[str], declarations: str, corps: str,
     return "\n".join(gardes + [corps])
 
 
+# `extern "C" s32 f(RS_STACKDATA *, s32);` — ce que la déclaration attend.
+_PROTO = re.compile(r'^extern "C" [^\n(]*?\b(\w+)\s*\(([^)]*)\)\s*;', re.M)
+# `f()` — l'appel que m2c écrit quand il n'a vu passer aucun argument.
+_APPEL_VIDE = re.compile(r"\b(\w+)\(\)")
+
+
+def remplit_les_appels(declarations: str, corps: str) -> str:
+    """Rend à un appel les arguments que m2c n'a pas vus passer.
+
+    m2c écrit `GetStackInt__FP12RS_STACKDATA_00262DA0()` là où le mangling dit
+    que la fonction prend un `RS_STACKDATA *`. Ce n'est pas une contradiction :
+    **l'argument était déjà dans le registre**, transmis tel quel depuis
+    l'appelant, et aucune instruction ne le pose au site d'appel. m2c n'a donc
+    rien vu à nommer ; la source d'origine, elle, le nommait.
+
+    MWCC répond « function call 'f()' does not match 'f(RS_STACKDATA *)' » et
+    perd la fonction : première cause d'échec de compilation sur la fenêtre
+    utile, 87 cas sur 278.
+
+    Le remplissage prend les paramètres de l'appelant dans l'ordre, ce qui est
+    exactement ce que le passage par registre signifie. Il ne touche qu'un appel
+    *sans aucun* argument : dès qu'il en porte un, on ne sait plus lesquels
+    manquent, et deviner serait changer le sens.
+    """
+    attendus = {nom: len([p for p in params.split(",") if p.strip()
+                          and p.strip() != "void"])
+                for nom, params in _PROTO.findall(declarations)}
+    if not attendus:
+        return corps
+
+    entete = corps.split("\n", 1)[0]
+    ouvre = entete.find("(")
+    miens = []
+    if ouvre > 0:
+        for morceau in entete[ouvre + 1:].split(","):
+            marque = re.match(r"\s*[A-Za-z_][\w ]*?\s*\**\s*(\w+)\s*\)?\s*$",
+                              morceau)
+            if marque:
+                miens.append(marque.group(1))
+    if not miens:
+        return corps
+
+    def pose(marque: re.Match) -> str:
+        nom = marque.group(1)
+        combien = attendus.get(nom, 0)
+        if not combien or combien > len(miens):
+            return marque.group(0)
+        return "%s(%s)" % (nom, ", ".join(miens[:combien]))
+
+    # La ligne d'en-tête reste hors du remplacement : elle porte la signature,
+    # non un appel.
+    tete, reste = corps.split("\n", 1)
+    return tete + "\n" + _APPEL_VIDE.sub(pose, reste)
+
+
+def renomme(texte: str, renommes: dict[str, str]) -> str:
+    """Applique à un texte les renommages de structures inférées.
+
+    Une déclaration tirée du mangling nomme le type du projet — `RS_STACKDATA *`
+    —, mais le corps parle de la structure inférée que l'on a dû renommer pour
+    éviter la collision. MWCC répond alors « function call 'f(RS_STACKDATA_infere
+    *)' does not match 'f(RS_STACKDATA *)' ». Dans ce fragment, les deux noms
+    désignent la même chose.
+
+    **Les bornes de mot sont obligatoires** : le nom du type vit à l'intérieur du
+    symbole manglé, entre le compte de caractères et les paramètres.
+    """
+    for ancien, neuf in renommes.items():
+        texte = re.sub(r"\b%s\b" % re.escape(ancien), neuf, texte)
+    return texte
+
+
 def cast_les_affectations(corps: str) -> str:
     """Pose un cast vers le type déclaré, quand un pointeur est en jeu."""
     types = types_locaux(corps)

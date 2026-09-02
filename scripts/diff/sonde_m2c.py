@@ -36,6 +36,7 @@ from lib.project import (ROOT, functions, grafted_by_source,  # noqa: E402
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from conversions import (cast_les_affectations,  # noqa: E402
                          assemble, declare_les_piles, nettoie_declarations,
+                         remplit_les_appels, renomme,
                          nettoie_locales)
 
 # `typedef struct X {` … `} X;` — la structure que m2c infère d'un pointeur.
@@ -391,7 +392,10 @@ def normalise(texte: str, symbole: str, vues: set[str],
         # la chaine cumule les fonctions d une meme unite.
         depuis_mangling = declaration(nom) if nom in functions() else None
         if depuis_mangling:
-            externes.append(depuis_mangling)
+            # Le renommage vaut aussi pour elle : le corps parle de la
+            # structure inferee, la declaration du type du projet, et les
+            # deux designent la meme chose dans ce fragment.
+            externes.append(renomme(depuis_mangling, renommes))
             continue
         externes.append('extern "C" %s %s(%s);'
                         % ("s32" if retour == "?" else retour, nom,
@@ -446,6 +450,11 @@ def normalise(texte: str, symbole: str, vues: set[str],
     # MWCC, en C++, refuse la conversion implicite que le C tolere : c'est la
     # premiere cause d'echec de compilation de la chaine.
     corps = nettoie_locales(corps)
+    # Un appel sans argument que sa declaration attend n est pas une
+    # contradiction : la valeur etait deja dans le registre.
+    corps = remplit_les_appels(
+        nettoie_declarations(chr(10).join(en_tete + structs + externes)),
+        corps)
     corps = declare_les_piles(corps)
     corps = cast_les_affectations(corps)
 
