@@ -137,36 +137,57 @@ l'`INCLUDE_ASM` est encore là.
 ## Ce que la moisson automatique peut, et où elle s'arrête
 
 `make chaine` passe m2c sur chaque fonction greffée, normalise, compile, mesure,
-et **ne garde que ce qui rend exactement les octets du disque**. Elle coûte 3,1 s
-par fonction et tourne sans surveillance. Son rendement a été mesuré sur 1 320
-fonctions, et il s'effondre avec la taille :
+et **ne garde que ce qui rend exactement les octets du disque**. Elle tourne sans
+surveillance, reprend après coupure, et enregistre la *cause* de chaque échec —
+c'est cette dernière qui l'a fait sortir du plateau où elle semblait enfermée.
 
-| tranche | éprouvées | gagnées | taux |
-|---|---|---|---|
-| 32–64 o | 231 | 25 | **10,8 %** |
-| 64–128 o | 339 | 11 | 3,2 % |
-| 128–256 o | 309 | 2 | 0,6 % |
-| 256–512 o | 165 | 1 | 0,6 % |
-| 512–1024 o | 75 | **0** | **0 %** |
-| 1024–2048 o | 29 | **0** | **0 %** |
+**Le rendement se lit en entonnoir**, et c'est la seule façon utile de le lire :
 
-**Au-delà de 512 octets, elle ne gagne rien** — et c'est là que sont 59 % des
-octets restants (970 fonctions). Extrapolée sur tout le binaire, la moisson
-plafonne à :
+| étape | part | ce qui la borne |
+|---|---|---|
+| m2c traduit | 94 % | ce qu'il avoue ne pas savoir rendre |
+| la sortie compile | 46 % | la normalisation — le vrai goulot |
+| les octets appariaient | 46 à 73 % des mesurées | la forme du C++ écrit |
 
-```
-+161 fonctions,  +12 300 octets
-709 / 7 840 fonctions = 9,0 %      des octets = 1,74 %
-```
+**Le goulot est la compilation, pas l'appariement.** Une fonction qui compile
+rend les octets du disque une fois sur deux au moins ; une fonction qui ne
+compile pas ne rapporte rien. Chaque point de compilabilité gagné vaut donc
+environ un demi-point de fonction acquise, et c'est là que va l'effort.
 
-**C'est une passe finie.** Une fois qu'elle a traversé les 7 300 fonctions, il
-n'y a plus rien à en tirer : les mêmes échoueront aux mêmes endroits. Elle ne se
-relance que sur ce qu'une correction de la normalisation vient de débloquer.
+Le taux d'appariement se dégrade à mesure que la compilabilité monte — 73 % sur
+les premières mesurées, 46 % quand la chaîne en atteint deux fois plus. Les
+fonctions que la normalisation débloque en dernier sont les plus difficiles ;
+extrapoler le premier chiffre surestime le gain.
 
-Ce qu'elle laisse derrière elle vaut autant que ce qu'elle gagne : **99 fonctions
-qui compilent sans apparier**, dont 41 au-dessus de 90 % et 27 au-dessus de
-95 %. C'est le vivier de l'étape 2, et le moyen le moins cher d'enrichir le
-corpus.
+### Le plateau était celui de l'outil, non de la méthode
+
+Une version de ce plan concluait : « c'est une passe finie ; les mêmes
+échoueront aux mêmes endroits ». C'était faux, et le diagnostic par cause l'a
+montré. Sur un témoin de soixante fonctions figé — même population, même
+échantillon, seule comparaison qui vaille —, la compilabilité est passée de
+**8 % à 33 %** en corrigeant sept défauts, dont aucun ne tenait à la difficulté
+du code :
+
+- trois octets de contrôle, un `` devenu retour arrière dans des expressions
+  régulières, qui annulaient le renommage anti-collision *en silence* ;
+- le nommage des registres, o32 dans le désassemblage contre EABI dans m2c ;
+- les conversions implicites que le C tolère et que le C++ refuse ;
+- les `?` que m2c laisse dans les déclarations ;
+- le retour `void` là où le mangling C++ n'encode aucun type de retour ;
+- les déclarations cumulées d'une même unité, qui se surchargeaient ;
+- les noms de structures inférées, qui doivent se chercher libres.
+
+**La leçon vaut au-delà de ces sept-là** : tant que la chaîne échoue sans dire
+pourquoi, on prend son outillage pour une propriété du binaire. `causes.py`
+répond à la question hors de `src/`, pendant qu'une moisson tourne.
+
+### Ce qu'elle laisse derrière elle
+
+Les fonctions qui compilent sans apparier sont le vivier de l'étape 2, et le
+moyen le moins cher d'enrichir le corpus d'idiomes. L'affinage automatique n'y
+a pour l'instant rien converti — trois idiomes contre une quinzaine de
+candidates —, ce qui confirme que le corpus, non le mécanisme, est ce qui
+manque.
 
 ---
 
