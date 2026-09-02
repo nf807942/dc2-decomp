@@ -159,6 +159,44 @@ les premières mesurées, 46 % quand la chaîne en atteint deux fois plus. Les
 fonctions que la normalisation débloque en dernier sont les plus difficiles ;
 extrapoler le premier chiffre surestime le gain.
 
+### Ce que la moisson corrigée peut rapporter
+
+Le rendement, mesuré sur 556 fonctions après les sept correctifs, et comparé à
+ce que ce plan affirmait avant eux :
+
+| tranche | restent | avant | **après** |
+|---|---|---|---|
+| 32–64 o | 1 074 | 10,8 % | **60,5 %** |
+| 64–128 o | 1 709 | 3,2 % | **24,5 %** |
+| 128–256 o | 1 675 | 0,6 % | **9,8 %** |
+| 256–512 o | 1 009 | 0,6 % | 1,5 % |
+| 512–1024 o | 558 | 0 % | **0 %** |
+| 1024–2048 o | 266 | 0 % | **0 %** |
+
+**Le plafond de 512 octets tient**, lui, et il est net : au-delà, la moisson ne
+gagne rien, et l'y envoyer coûte trois quarts d'heure par millier de fonctions
+pour zéro. La fenêtre utile est donc `--mini 32 --maxi 512`.
+
+En dessous, tout a changé d'ordre de grandeur. Extrapolée sur ce qui reste :
+
+```
++1 248 fonctions,  +103 900 octets
+1 847 / 7 840 fonctions = 23,6 %      des octets = 5,89 %
+```
+
+contre les `+161 fonctions, +12 300 octets` que ce plan annonçait — **huit fois
+plus, sans que le binaire ait changé**. La différence est entièrement dans la
+normalisation.
+
+Cette projection est à prendre pour ce qu'elle est : les taux viennent d'une
+population qui mêle des fonctions fraîches et d'autres remises en file après un
+échec, donc plutôt plus difficiles que la moyenne. Elle sera revue quand la
+passe aura traversé le binaire entier.
+
+Restent hors fenêtre 756 fonctions de moins de 32 octets — le domaine du
+traducteur déterministe — et 146 de plus de 2 048, qui pèsent à elles seules
+532 516 octets.
+
 ### Le plateau était celui de l'outil, non de la méthode
 
 Une version de ce plan concluait : « c'est une passe finie ; les mêmes
