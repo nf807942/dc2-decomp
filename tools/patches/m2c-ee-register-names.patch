@@ -1,0 +1,51 @@
+Le nommage o32 des registres, que le désassemblage emploie, rendu à la cible
+Emotion Engine de m2c.
+
+Deux conventions se recouvrent en se décalant de quatre. L'EABI du R5900 nomme
+`$a4`…`$a7` les registres 8 à 11 et `$t0`…`$t3` les registres 12 à 15 — c'est
+la table que la cible `mipsee` de m2c porte. Notre désassemblage, lui, s'en
+tient aux noms o32 : `$t0` y désigne le registre 8. Mesuré sur ce dépôt,
+8 492 occurrences de `$t0` et pas une seule de `$a4`.
+
+Sans traduction, m2c lit donc `$t0` comme *son* `t0`, qui est un autre registre
+physique : les registres 8 à 11 et 12 à 15 se confondent deux à deux. La faute
+se voit surtout sur les appels à cinq arguments entiers ou plus, dont le
+cinquième passe par le registre 8 — m2c ne le voit jamais posé et rend
+`M2C_ERROR(/* Read from unset register $a4 */)`, ce qui condamne la fonction
+entière. Sur `_LOAD_IMG__FP12RS_STACKDATAi`, l'appel à `EnterIMGFile` retrouve
+son `NULL` final, celui que le binaire écrit dans le créneau de délai.
+
+La traduction se pose à la lecture, là où m2c résout déjà `s8` en `fp` : elle
+ne change pas son modèle de l'EABI, seulement les noms sous lesquels il
+l'atteint.
+diff --git a/m2c/arch_mips.py b/m2c/arch_mips.py
+index fdd13ef..a68f0ae 100644
+--- a/m2c/arch_mips.py
++++ b/m2c/arch_mips.py
+@@ -2092,7 +2092,25 @@ class MipseeArch(MipsArch):
+         "31": Register("ra"),
+     }
+ 
+-    aliased_regs = {**eabi64_float_regs, **aliased_gp_regs, **numeric_regs}
++    # Le desassembleur du projet nomme les registres a l'o32 : `$t0` designe le
++    # registre 8, la ou l'EABI du R5900 l'appelle `$a4`. Sans cette table, m2c
++    # lit `$t0` comme *son* `t0`, qui est le registre 12 : deux registres
++    # distincts se confondent, et le cinquieme argument entier d'un appel n'est
++    # jamais vu — « Read from unset register $a4 ». Mesure sur ce depot :
++    # 8 492 occurrences de `$t0` dans le desassemblage, et pas une de `$a4`.
++    o32_gp_names = {
++        "t0": Register("a4"),
++        "t1": Register("a5"),
++        "t2": Register("a6"),
++        "t3": Register("a7"),
++        "t4": Register("t0"),
++        "t5": Register("t1"),
++        "t6": Register("t2"),
++        "t7": Register("t3"),
++    }
++
++    aliased_regs = {**eabi64_float_regs, **aliased_gp_regs, **numeric_regs,
++                    **o32_gp_names}
+ 
+     def default_function_abi_candidate_slots(self) -> List[AbiArgSlot]:
+         return [
