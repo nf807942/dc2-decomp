@@ -248,6 +248,11 @@ def prototypes(definis: set[str]) -> tuple[set[str], list[str]]:
         # nuit plus qu'il ne sert : m2c cesse d'inférer la structure, et le
         # compilateur reçoit un type incomplet. Mieux vaut alors n'en donner
         # aucun et laisser m2c faire ce qu'il faisait bien.
+        # Un type que le contexte ne définit pas devient `void *` plutôt que de
+        # faire écarter tout le prototype : sans prototype, m2c ne sait plus que
+        # le premier paramètre est la classe et réinfère une structure anonyme —
+        # `objet->unk32C` là où le contexte disait `field_32C`. Un pointeur reste
+        # un pointeur ; seul un type passé par valeur reste rédhibitoire.
         nommes = set()
         for param in params:
             # `CMap **` compte autant que `CMap *` : une étoile de plus ne
@@ -257,9 +262,13 @@ def prototypes(definis: set[str]) -> tuple[set[str], list[str]]:
             # comme `CDC2Mes`. Seule la liste des types de base tranche.
             if trouve and trouve.group(1) not in _BASES_NOMMEES:
                 nommes.add(trouve.group(1))
-        if nommes - definis:
+        manquants = nommes - definis
+        if any(m in p and not p.rstrip(" *").endswith("*") and "*" not in p
+               for m in manquants for p in params):
             continue
-        types |= nommes
+        params = [("void *" if any(m in p for m in manquants) else p)
+                  for p in params]
+        types |= nommes & definis
         # Le type de retour n'est pas manglé : `void` n'engage rien de plus que
         # ce que le binaire dit, et m2c le corrigera de lui-même s'il voit la
         # valeur employée.

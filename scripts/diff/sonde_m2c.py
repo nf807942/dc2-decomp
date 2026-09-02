@@ -256,6 +256,7 @@ def eprouve(symbole: str, unite: str, taille: int) -> dict:
 
     objet = ROOT / "build" / "src" / (unite + ".o")
     ajoutees: list[str] = []
+    vus_types: set[str] = set()
     try:
         # Le compilateur dit ce qui manque, la table des symboles dit quoi
         # écrire, et l'on recommence. Cinq tours suffisent : chacun déclare
@@ -274,8 +275,20 @@ def eprouve(symbole: str, unite: str, taille: int) -> dict:
             if bati.returncode == 0:
                 break
             manquants = {nom for nom in _INCONNU.findall(sortie)}
-            neuves = [d for d in (declaration(nom, declarations + corps) for nom in sorted(manquants))
+            neuves = [d for d in (declaration(nom, declarations + corps)
+                                  for nom in sorted(manquants))
                       if d and d not in ajoutees]
+            # Une déclaration ajoutée cite ses propres types — `extern "C" void
+            # f(void *, CFuncPointCheck *)` —, et l'unité ne les connaît pas
+            # davantage. Le contexte les a donnés à m2c, qui a cessé de les
+            # réémettre : c'est ici qu'il faut les rattraper.
+            for ligne in list(neuves):
+                for kind in re.findall(r"([A-Za-z_]\w*)\s*\*", ligne):
+                    if kind in _BASE or kind in vus_types:
+                        continue
+                    vus_types.add(kind)
+                    bloc = definition_atlas(kind)
+                    neuves.append(bloc if bloc else "struct %s;" % kind)
             if not neuves:
                 return {**verdict, "issue": "ne compile pas",
                         "cause": premiere_erreur(sortie)}

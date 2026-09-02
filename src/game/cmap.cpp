@@ -14,6 +14,68 @@
 
 class CMap {
 public:
+    char pad_0[0x98];
+    s32 field_98;
+    s32 field_9C;
+    s32 field_A0;
+    char pad_A4[0x1C];
+    s32 field_C0;
+    s32 field_C4;
+    f32 field_C8;
+    s32 field_CC;
+    s32 field_D0;
+    char pad_D4[0x4];
+    s32 field_D8;
+    f32 field_DC;
+    f32 field_E0;
+    s32 field_E4;
+    s32 field_E8;
+    s32 field_EC;
+    f32 field_F0;
+    f32 field_F4;
+    f32 field_F8;
+    char pad_FC[0xC];
+    s32 field_108;
+    char pad_10C[0x200];
+    s32 field_30C;
+    s32 field_310;
+    s32 field_314;
+    s32 field_318;
+    s32 field_31C;
+    s32 field_320;
+    s32 field_324;
+    s32 field_328;
+    char pad_32C[0x4];
+    s32 field_330;
+    s32 field_334;
+    char pad_338[0x8];
+    f32 field_340;
+    char pad_344[0xC];
+    f32 field_350;
+    char pad_354[0xC];
+    s32 field_360;
+    char pad_364[0x4];
+    s32 field_368;
+    char pad_36C[0x304];
+    s32 field_670;
+    char pad_674[0x60C];
+    s32 field_C80;
+    char pad_C84[0x4];
+    f32 field_C88;
+    s32 field_C8C;
+    char pad_C90[0x4];
+    s32 field_C94;
+    s32 field_C98;
+    char pad_C9C[0xC];
+    s32 field_CA8;
+    s32 field_CAC;
+    char pad_CB0[0x34];
+    f32 field_CE4;
+    s32 field_CE8;
+    s32 field_CEC;
+    s32 field_CF0;
+    s32 field_CF4;
+
     s32 Iam();
 };
 
