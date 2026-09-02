@@ -211,7 +211,151 @@ INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetCosInfo__Fi);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", CreatSmoothPassSW__FPA4_fPA4_fiiii);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Draw__17CSWordAfterEffectFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", CreatPointList__17CSWordAfterEffectFv);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", SetTexture__17CSWordAfterEffectFiP10mgCTextureiiii);
+struct mgCTexture {
+    s16 field_0;
+    s16 field_2;
+    s16 field_4;
+    s16 field_6;
+    char pad_8[0x4];
+    s32 field_C;
+    s32 field_10;
+    s16 field_14;
+    char pad_16[0x2];
+    s32 field_18;
+    s32 field_1C;
+    char pad_20[0x8];
+    s32 field_28;
+    s32 field_2C;
+    s32 field_30;
+    char pad_34[0x4];
+    s64 field_38;
+    s64 field_40;
+    s64 field_48;
+    s32 field_50;
+    f32 field_54;
+    f32 field_58;
+    f32 field_5C;
+    s32 field_60;
+    s32 field_64;
+    s32 field_68;
+    char pad_6C[0xA4];
+    s32 field_110;
+    s32 field_114;
+    s32 field_118;
+    s16 field_11C;
+    s8 field_11E;
+    s8 field_11F;
+    s16 field_120;
+    s16 field_122;
+    s32 field_124;
+    s32 field_128;
+    s8 field_12C;
+    s8 field_12D;
+    char pad_12E[0x2];
+    s32 field_130;
+    s32 field_134;
+    s32 field_138;
+    s32 field_13C;
+    char pad_140[0x4];
+    s32 field_144;
+    s32 field_148;
+    s32 field_14C;
+    s32 field_150;
+    s32 field_154;
+    s32 field_158;
+    s32 field_15C;
+    s32 field_160;
+    s32 field_164;
+    s32 field_168;
+    s32 field_16C;
+    s32 field_170;
+    s32 field_174;
+    s32 field_178;
+    s32 field_17C;
+    s32 field_180;
+    s32 field_184;
+    s32 field_188;
+    s32 field_18C;
+    s32 field_190;
+    char pad_194[0x60];
+    s32 field_1F4;
+    s32 field_1F8;
+    s32 field_1FC;
+    s8 field_200;
+    s8 field_201;
+    s16 field_202;
+    s32 field_204;
+    s8 field_208;
+    s8 field_209;
+    char pad_20A[0x2];
+    s32 field_20C;
+    s32 field_210;
+    s32 field_214;
+    s32 field_218;
+    s32 field_21C;
+    char pad_220[0xC];
+    s32 field_22C;
+    s32 field_230;
+    s32 field_234;
+    s32 field_238;
+    s32 field_23C;
+    s32 field_240;
+    char pad_244[0x4];
+    s32 field_248;
+    s16 field_24C;
+    s16 field_24E;
+    char pad_250[0x6];
+    s16 field_256;
+    f32 field_258;
+    f32 field_25C;
+    char pad_260[0x4];
+    f32 field_264;
+    f32 field_268;
+    f32 field_26C;
+    char pad_270[0x4];
+    f32 field_274;
+    f32 field_278;
+    char pad_27C[0x68];
+    s32 field_2E4;
+    char pad_2E8[0x74];
+    s32 field_35C;
+    s32 field_360;
+    s32 field_364;
+};
+typedef struct CSWordAfterEffect_infere2 {
+    /* 0x00 */ char pad0[0x20];
+    /* 0x20 */ s32 unk20;                           /* inferred */
+    /* 0x24 */ s32 unk24;                           /* inferred */
+    /* 0x28 */ s32 unk28;                           /* inferred */
+    /* 0x2C */ s32 unk2C;                           /* inferred */
+    /* 0x30 */ s32 unk30;                           /* inferred */
+    /* 0x34 */ s32 unk34;                           /* inferred */
+    /* 0x38 */ s32 unk38;                           /* inferred */
+    /* 0x3C */ s32 unk3C;                           /* inferred */
+    /* 0x40 */ char pad40[0x20];                    /* maybe part of unk3C[9]void */
+    /* 0x60 */ s32 unk60;                           /* inferred */
+    /* 0x64 */ mgCTexture *unk64;                   /* inferred */
+    /* 0x68 */ s32 unk68;                           /* inferred */
+    /* 0x6C */ s32 unk6C;                           /* inferred */
+    /* 0x70 */ s32 unk70;                           /* inferred */
+    /* 0x74 */ s32 unk74;                           /* inferred */
+} CSWordAfterEffect_infere2;                                /* size >= 0x78 */
+extern "C" void SetTexture__17CSWordAfterEffectFiP10mgCTextureiiii(CSWordAfterEffect_infere2 *objet, s32 arg0, mgCTexture *arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5) {
+    objet->unk60 = arg0;
+    objet->unk64 = arg1;
+    objet->unk68 = arg2;
+    objet->unk6C = arg3;
+    objet->unk70 = arg4;
+    objet->unk74 = arg5;
+    objet->unk2C = 0x80;
+    objet->unk28 = 0x80;
+    objet->unk24 = 0x80;
+    objet->unk20 = 0x80;
+    objet->unk3C = 0x80;
+    objet->unk38 = 0x80;
+    objet->unk34 = 0x80;
+    objet->unk30 = 0x80;
+}
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", SetTexture__17CSWordAfterEffectFiiii);
 extern "C" u8 _356_00377D08[10];
 struct inferred;
@@ -271,7 +415,13 @@ INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetPlaceEditPartsNum__9CSave
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetMapFlag__9CSaveDataFi);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", InitBitCtrl__9CSaveDataFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", SetBitCtrl__9CSaveDataFi);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", ResetBitCtrl__9CSaveDataFi);
+typedef struct CSaveData_infere2 {
+    /* 0x00000 */ char pad0[0x643C8];
+    /* 0x643C8 */ u8 unk643C8;                      /* inferred */
+} CSaveData_infere2;                                        /* size >= 0x643C9 */
+extern "C" void ResetBitCtrl__9CSaveDataFi(CSaveData_infere2 *objet, s32 arg0) {
+    objet->unk643C8 &= ~arg0 & 0xFF;
+}
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetBitCtrl__9CSaveDataFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetItem__9CSaveDataFii);
 typedef struct CSaveData {
@@ -291,7 +441,19 @@ extern "C" void ForceBootTour__9CSaveDataFii(CSaveData *objet, s32 arg0, s32 arg
     objet->unk643DA = (s8) arg1;
     objet->unk643DB = 0;
 }
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", CheckEventDay__9CSaveDataFi);
+typedef struct CSaveData_infere3 {
+    /* 0x00000 */ char pad0[0x643DC];
+    /* 0x643DC */ s32 unk643DC;                     /* inferred */
+} CSaveData_infere3;                                        /* size >= 0x643E0 */
+extern "C" s32 CheckEventDay__9CSaveDataFi(CSaveData_infere3 *objet, s32 arg0) {
+    s32 temp_v0;
+
+    temp_v0 = (s32) (objet->unk643DC);
+    if (temp_v0 < 0) {
+        return -1;
+    }
+    return arg0 - temp_v0;
+}
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", CheckTourBoot__9CSaveDataFi);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", CheckNowTourEvent__9CSaveDataFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", CheckNowTourType__9CSaveDataFv);

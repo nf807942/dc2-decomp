@@ -358,7 +358,21 @@ extern "C" void SetChild__8mgCFrameFP8mgCFrame(mgCFrame_infere *objet, mgCFrame_
     }
 }
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", DeleteParent__8mgCFrameFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetReference__8mgCFrameFP8mgCFrame);
+typedef struct mgCFrame_infere3 {
+    /* 0x000 */ char pad0[0x40];
+    /* 0x040 */ s32 unk40;                          /* inferred */
+    /* 0x044 */ char pad44[0x10];                   /* maybe part of unk40[5]void */
+    /* 0x054 */ mgCFrame_infere3 *unk54;                    /* inferred */
+    /* 0x058 */ char pad58[0xA4];                   /* maybe part of unk54[0x2A]void */
+    /* 0x0FC */ s32 unkFC;                          /* inferred */
+} mgCFrame_infere3;                                         /* size >= 0x100 */
+extern "C" void SetReference__8mgCFrameFP8mgCFrame(mgCFrame_infere3 *objet, mgCFrame_infere3 *arg0) {
+    if ((objet->unk54 == NULL) && (arg0 != NULL)) {
+        objet->unk54 = arg0;
+        objet->unkFC = 1;
+        objet->unk40 = 1;
+    }
+}
 void mgCFrame::DeleteReference(void) {
     this->field_0x54 = 0;
     this->field_0xFC = 0;
@@ -370,7 +384,18 @@ INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetBBoardMatrix__8mgCFrameFiPA4_fP13m
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetLWMatrix__8mgCFrameFPA4_f);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetLWMatrixTopBottom__8mgCFrameFPA4_f);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetInverseMatrix__8mgCFrameFPA4_f);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetTransMatrix__8mgCFrameFPA4_f);
+typedef struct mgCFrame_infere2 {
+    /* 0x00 */ char pad0[0x40];
+    /* 0x40 */ s32 unk40;                           /* inferred */
+    /* 0x44 */ char pad44[0x6C];                    /* maybe part of unk40[0x1C]void */
+    /* 0xB0 */ char unkB0;                             /* inferred */
+    /* 0xB0 */ char padB0[1];
+} mgCFrame_infere2;                                         /* size >= 0xB1 */
+extern "C" s32 sceVu0CopyMatrix(void *);
+extern "C" void SetTransMatrix__8mgCFrameFPA4_f(mgCFrame_infere2 *objet, f32 (*arg0)[4]) {
+    sceVu0CopyMatrix(&objet->unkB0);
+    objet->unk40 = 1;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", StrCmp__FPcPc);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgFrameNameComp__FPcPc);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SearchFrame__8mgCFrameFPc);
@@ -380,7 +405,16 @@ INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetWorldPosition0__8mgCFrameFPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetWorldDir__8mgCFrameFPfPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetRotation__8mgCFrameFPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetRotation__8mgCFrameFfff);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetRotType__8mgCFrameFi);
+typedef struct mgCFrame_infere4 {
+    /* 0x000 */ char pad0[0x100];
+    /* 0x100 */ s32 unk100;                         /* inferred */
+} mgCFrame_infere4;                                         /* size >= 0x104 */
+extern "C" void SetRotType__8mgCFrameFi(mgCFrame_infere4 *objet, s32 arg0) {
+    objet->unk100 = arg0;
+    if (arg0 & 2) {
+        objet->unk100 |= 1;
+    }
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetAttrParam__8mgCFrameFR12mgCFrameAttrii);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetAttrParamObjAlpha__8mgCFrameFfi);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetAttrParamDraw__8mgCFrameFii);

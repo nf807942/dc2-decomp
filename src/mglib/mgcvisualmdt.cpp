@@ -20,7 +20,19 @@ extern "C" mgCDrawEnv *__ct__10mgCDrawEnvFv(mgCDrawEnv *objet) {
     Initialize__10mgCDrawEnvFi(objet, 0);
     return objet;
 }
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", __as__10mgCDrawEnvFR10mgCDrawEnv);
+typedef struct mgCDrawEnv_infere {
+    /* 0x00 */ s128 unk0;                           /* inferred */
+    /* 0x10 */ s128 unk10;                          /* inferred */
+    /* 0x20 */ s128 unk20;                          /* inferred */
+    /* 0x30 */ s128 unk30;                          /* inferred */
+} mgCDrawEnv_infere;                                       /* size >= 0x40 */
+extern "C" mgCDrawEnv_infere *__as__10mgCDrawEnvFR10mgCDrawEnv(mgCDrawEnv_infere *objet, mgCDrawEnv_infere *arg0) {
+    objet->unk0 = arg0->unk0;
+    objet->unk10 = arg0->unk10;
+    objet->unk20 = arg0->unk20;
+    objet->unk30 = arg0->unk30;
+    return objet;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Initialize__10mgCDrawEnvFi);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetAlpha__10mgCDrawEnvFi);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", GetAlphaMacroID__10mgCDrawEnvFv);
@@ -136,7 +148,43 @@ INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", DataAssignMDT__12mgCShadowMDTFP10
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", CreateRenderInfoPacket__12mgCShadowMDTFPUiPA4_fP13mgRENDER_INFO);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", CreateRenderInfoPacket__11mgC3DSpriteFPUiPA4_fP13mgRENDER_INFO);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Draw__11mgC3DSpriteFPUiPA4_fP14mgCDrawManager);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", BeginCreatePacket__11mgC3DSpriteFiP14mgCDrawManager);
+extern "C" u8 mgDrawManager[128];
+struct inferred;
+typedef struct mgC3DSprite_infere {
+    /* 0x00 */ char pad0[0x20];
+    /* 0x20 */ s32 unk20;                           /* inferred */
+    /* 0x24 */ void *unk24;                         /* inferred */
+    /* 0x28 */ s32 unk28;                           /* inferred */
+    /* 0x2C */ s32 unk2C;                           /* inferred */
+    /* 0x30 */ char pad30[0x14];                    /* maybe part of unk2C[6]void */
+    /* 0x44 */ s32 unk44;                           /* inferred */
+    /* 0x48 */ s32 unk48;                           /* inferred */
+} mgC3DSprite_infere;                                      /* size >= 0x4C */
+typedef struct mgCDrawManager {
+    /* 0x00 */ char pad0[0x60];
+    /* 0x60 */ void *unk60;                         /* inferred */
+} mgCDrawManager;                                   /* size >= 0x64 */
+struct temp_a2_champs {
+    char pad0[0x20];
+    /* 0x20 */ s32 unk20;
+    /* 0x24 */ s32 unk24;
+};
+extern "C" void BeginCreatePacket__11mgC3DSpriteFiP14mgCDrawManager(mgC3DSprite_infere *objet, s32 arg0, mgCDrawManager *arg1) {
+    mgCDrawManager *var_a2;
+    struct temp_a2_champs *temp_a2;
+
+    var_a2 = (mgCDrawManager *) (arg1);
+    if (var_a2 == NULL) {
+        var_a2 = (mgCDrawManager *) (&mgDrawManager);
+    }
+    objet->unk24 = var_a2->unk60;
+    temp_a2 = (struct temp_a2_champs *) (objet->unk24);
+    objet->unk20 = temp_a2->unk20 + (temp_a2->unk24 * 0x10);
+    objet->unk28 = objet->unk20 | 0x20000000;
+    objet->unk2C = objet->unk28;
+    objet->unk44 = arg0;
+    objet->unk48 = 0;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", CPSetDrawEnv__11mgC3DSpriteFP10mgCDrawEnv);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", CPSetTexture__11mgC3DSpriteFP10mgCTexture);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", BeginCPSprite__11mgC3DSpriteFv);

@@ -588,7 +588,27 @@ INCLUDE_ASM("nonmatchings/game/cmapparts", DrawScreenFunc__9CMapPartsFP8mgCFrame
 INCLUDE_ASM("nonmatchings/game/cmapparts", Step__9CMapPartsFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", AnimeStep__9CMapPartsFP15CFuncPointCheckP12CObjAnimeEnv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", StepFuncPoint__9CMapPartsFR15CFuncPointCheck);
-INCLUDE_ASM("nonmatchings/game/cmapparts", CopyFuncPointCheck__9CMapPartsFR15CFuncPointCheck);
+typedef struct CFuncPointCheck {
+    /* 0x0 */ f32 unk0;                             /* inferred */
+    /* 0x4 */ s32 unk4;                             /* inferred */
+} CFuncPointCheck;                                  /* size >= 0x8 */
+typedef struct CMapParts_infere2 {
+    /* 0x000 */ char pad0[0x1E0];
+    /* 0x1E0 */ f32 unk1E0;                         /* inferred */
+    /* 0x1E4 */ char pad1E4[0x118];                 /* maybe part of unk1E0[0x47]void */
+    /* 0x2FC */ f32 unk2FC;                         /* inferred */
+    /* 0x300 */ s32 unk300;                         /* inferred */
+} CMapParts_infere2;                                        /* size >= 0x304 */
+extern "C" void CopyFuncPointCheck__9CMapPartsFR15CFuncPointCheck(CMapParts_infere2 *objet, CFuncPointCheck *arg0) {
+    f32 temp_f1;
+
+    objet->unk2FC = arg0->unk0;
+    objet->unk300 = arg0->unk4;
+    temp_f1 = (f32) (objet->unk1E0);
+    if (!(temp_f1 < 0.0f)) {
+        objet->unk2FC = temp_f1;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", Copy__9CMapPartsFR9CMapPartsP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cmapparts", AssignFuncAnime__9CMapPartsFP9mgCMemory);
 void CList_9CObjAnime_::Initialize(void) {
