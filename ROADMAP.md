@@ -1,321 +1,319 @@
 # Feuille de route
 
-Ce qui reste entre l'état d'aujourd'hui et un code entièrement maîtrisé. Les
-chiffres sont ceux du 5 août 2026 ; ils se refont par `make progress`,
-`make carve` et `make report`.
+Ce qui reste entre l'état d'aujourd'hui et un code entièrement maîtrisé, ordonné
+selon ce que chaque étape débloque **en débit** — non selon la logique des
+jalons. Les chiffres sont ceux du 2 septembre 2026 ; ils se refont par
+`make etat` (une demi-seconde), `make report`, `make carve`.
 
 Ce document dit aussi ce qui n'est pas mesuré. Une étape dont le coût n'a pas
 été éprouvé le déclare — c'est ce qui la distingue d'une étape planifiée.
 
 ---
 
-## L'état visé
-
-« Maîtrisé » se décompose en quatre propriétés, qui ne s'obtiennent pas
-ensemble et ne dépendent pas des mêmes travaux.
-
-| Propriété | Ce qu'elle exige |
-|---|---|
-| **Lisible** | chaque fonction existe en C++ et le compilateur en rend les octets du disque |
-| **Éditable** | changer un corps ne demande pas de retoucher le découpage |
-| **Renommable** | un symbole se renomme sans que le lien ni le mangling s'en trouvent faux |
-| **Sans contrainte de taille** | une fonction peut grossir, rétrécir ou disparaître, et le binaire reste cohérent |
-
-La dernière est la plus lointaine et la moins évidente : elle ne tient pas à la
-décompilation mais à ce qui reste adressé en dur.
-
----
-
-## Où on en est
+## Où on en est réellement
 
 ```
-code reconstruit : 13 240 octets sur 2 215 100     0,598 %     298 fonctions
-unités ouvertes  : 319, 2 208 852 octets           99,7 %    7 791 fonctions
-code mappé       : 100,000 % — chaque octet de code appartient à une unité
+fonctions connues     7 840        2 215 100 octets
+écrites en C++          456 (5,82 %)   16 748 o   0,756 %
+greffées              7 335        2 192 104 o
+hors unité               49            6 248 o   (les __sinit_*)
 ```
 
-Au 2 septembre 2026, et `make etat` le refait en une demi-seconde. Le journal
-`progress/journal.jsonl` en garde la trace jour par jour ; il a été reconstitué
-depuis l'historique git, et il dit la cadence :
+Ce qui reste, par provenance :
+
+| Provenance | fn | octets | part |
+|---|---|---|---|
+| `game` | 5 648 | 1 860 276 | 84,9 % |
+| `sdk` | 905 | 142 304 | 6,5 % |
+| `mglib` | 555 | 108 348 | 4,9 % |
+| `runtime` | 227 | 81 176 | 3,7 % |
+
+Et deux distributions qui décident de la stratégie :
+
+- **Par taille** — 3 769 fonctions ≤ 128 o ne pèsent que **11 %** des octets
+  restants ; les **410 fonctions > 1 Ko en pèsent 41 %**. Le nombre et le poids
+  ne se traitent pas de la même façon, et c'est la leçon la plus coûteuse de
+  l'été : la passe automatique a fait passer le compte de fonctions de 298 à
+  456 sans que la courbe des octets bouge d'un millimètre.
+- **Par classe** — 288 classes portent encore 926 816 o ; **100 classes font
+  86 %** de ce total. Les 4 477 fonctions libres ou statiques pèsent, elles,
+  1 265 288 o — davantage que toutes les classes réunies.
+
+Les dix classes les plus lourdes, qui font à elles seules 31 % des octets de
+classe : `ClsMes` (41 436 o), `CEditMap` (35 272), `CMenuItemInfo` (34 412),
+`CActionChara` (33 768), `CScene` (33 552), `CMenuInvent` (30 952), `CAquarium`
+(24 172), `CMap` (20 048), `CMonsterMan` (19 332), `CMenuChrCngMenu` (16 800).
+
+**La mesure est désormais fiable et gratuite.** `make etat` compte ce que les
+sources écrivent, sans rien construire, et tombe sur le même chiffre que
+`make report` par un chemin indépendant. Le journal `progress/journal.jsonl`,
+versionné, garde la trace jour par jour ; il a été reconstitué depuis
+l'historique git.
+
+---
+
+## Le calcul de cadence, qui cadre tout
 
 ```
-pour finir en 2 ans :  10,3 fn/jour    3 008 o/jour
-rythme observé      :  11,9 fn/jour      668 o/jour   (sur 29 jours)
-fin projetée        :  2035-09-01
+pour finir en 2 ans :  10,0 fn/jour    3 003 o/jour
+rythme observé      :  15,7 fn/jour      574 o/jour
+fin projetée        :  2037
 ```
 
-**Le compte de fonctions tient la cadence ; les octets sont 4,5 fois trop
-lents.** Les deux mesures ne disent pas la même chose et il faut les lire
-ensemble : reconstruire les petites fonctions avance le nombre sans peser sur
-le poids.
+**Le compte de fonctions est en avance de 57 % sur ce qu'il faudrait ; le poids
+est 5,2 fois trop lent.** Tout ce qui suit découle de ce déséquilibre. Une
+étape qui n'avance que le nombre de fonctions ne rapproche plus l'échéance :
+elle ne se justifie que par ce qu'elle apprend ou débloque.
 
-Ce qui reste dehors : les 49 initialiseurs statiques, les microprogrammes
-vectoriels et les données.
-
----
-
-## Jalon 1 — Finir le découpage du texte
-
-**Le compte passe de 72 unités à 319**, et `make build` rend les octets du disque.
-Chaque octet de code appartient désormais à une unité — le rapport donne 100,000 %
-de code mappé. Il ne reste dehors que les 49 initialiseurs statiques, et ceux-là
-vivent après les données : ce n'est pas du texte.
-
-Le découpage ne s'arrête plus aux plages du jeu, et ce n'était pas un choix :
-**le remplacement fonction par fonction demande un sous-segment `cpp` et un
-`INCLUDE_ASM`, donc une fonction hors unité ne peut pas s'écrire en C++.** Le
-jalon 4 réclamant le SDK, le runtime et la bibliothèque C, leur découpage en
-était la condition. Le coût, mesuré, était bien moindre qu'estimé : les 988
-fonctions restantes n'occupaient que 182 contributions d'objet, non 926.
-
-`src/` se range désormais par provenance — `game/`, `sdk/`, `runtime/`,
-`mglib/` —, et le nom d'une unité porte son dossier.
-
-**Ce qui reste** :
-
-- **Les 49 initialiseurs statiques `__sinit_*`**, 6 248 octets. Ce sont des
-  `FUNC`, mais elles vivent après les données, en `0x00379680` : ouvertes en
-  unité, le script de lien rangerait leur `.text` avec celui du jeu et tout ce
-  qui les sépare des données glisserait. Le remède tient au jalon 3, où leur
-  parcours par le runtime est déjà à établir.
-- **`.vutext`**, 18 208 octets de microprogrammes vectoriels en six blocs
-  d'octets. Aucun assembleur de la chaîne ne les relit. Il faudrait un
-  désassembleur VU dédié ; rien n'y oblige tant qu'on ne veut pas les modifier.
-- **Le classement par dossier est une heuristique** : il vote sur le poids des
-  octets, et `cscriptinterpreter` rangé au middleware ou `csound` au SDK sont à
-  revoir. `config/units.txt` est fait pour être corrigé à la main.
-- **Les unités d'une seule fonction**, qu'une frontière de contribution isole ou
-  que le resserrement d'une plage de lecture seule a détachées — 124 des 182
-  contributions de bibliothèque sont dans ce cas, et c'est leur nature. Les
-  réunir ne tient qu'à la lisibilité de `config/units.txt`.
-
-**Non résolu, et c'est une limite du jalon 4 plus que de celui-ci** : MWCC aligne
-sur seize octets la section de toute fonction qu'il *compile*, et mwccgap ne peut
-rien y faire faute de connaître son adresse. Les treize auxiliaires du runtime que
-les plages du jeu englobent — `__divdi3`, `fpmul`, `sitofp`, `__swsetup` — sont
-donc ouverts mais devront rester greffés. La mesure vaut plus largement : **92 des
-182 contributions de bibliothèque seulement commencent sur un multiple de seize**,
-donc les 90 autres s'ouvrent sans pouvoir s'écrire tant que ce point tient.
-
-**Critère de sortie** : chaque octet de `.text` appartient à une unité.
-**Atteint** — le rapport donne 100,000 % de code mappé. Les 49 initialiseurs
-statiques restent dehors, mais ils vivent après les données et ne sont pas du
-texte ; le remplissage que laisse une unité achevée n'est pas du code, et le
-rapport ne le compte plus.
+Le plan ne tient que si la machine fait le gros et si l'humain ne traite que ce
+qu'elle refuse. C'est déjà vrai du côté du coût unitaire — voir « Ce que coûte
+un pas » dans `CLAUDE.md` — mais pas encore du côté du volume.
 
 ---
 
-## Jalon 2 — Découper les données
+## Ce que T0 et T1.1 ont appris, et qui change le plan
 
-C'est le jalon dont dépend la liberté de taille. Son ampleur est désormais
-mesurée, et sa difficulté n'est pas celle qu'on croyait.
+Quatre enseignements, tous payés par l'expérience, tous vérifiables.
 
-**Le bss est fait.** Un sous-segment unique — `bss/0037CD80`, de la fin du
-fichier à `0x01F64A00` — le couvre d'un seul tenant, et le compte des symboles
-que le lien reçoit par adresse absolue passe de **2 503 à 55**. La couverture
-devait être entière, le script de lien concaténant les `.bss` sans adresse : un
-segment isolé n'atterrissait pas à la sienne, et rendait 1 327 plages
-divergentes.
+**1. m2c n'est pas le problème ; les déclarations le sont.** La sonde
+`scripts/diff/sonde_m2c.py` a mesuré ce que m2c fait seul sur vingt fonctions de
+150 à 400 octets : **une seule compile, mais elle apparie à 97,43 %**, sans
+permuteur. Tous les échecs sont des identifiants, des types ou des signatures
+que rien ne déclare — jamais une mauvaise traduction. La chaîne de T1 doit donc
+investir dans le contexte et la normalisation, pas dans la recherche.
 
-**La queue de `.vutext` est rendue aux données.** Un bloc vectoriel n'a pas de
-symbole dimensionné, donc rien ne bornait son sous-segment : il courait jusqu'à la
-contribution suivante. La borne juste est le premier symbole dimensionné qui le
-suit — `0x0032A380` —, et le compte tombe à **51**.
+**2. La chaîne ne peut pas être mécanique tant que les dispositions de classe ne
+sont pas capitalisées.** m2c retrouve les vrais champs d'une classe et les
+propose ; nos classes restent des coquilles ne portant que les méthodes déjà
+écrites, et rien ne recueille ce qu'il découvre. `class CMap` ne porte
+aujourd'hui qu'une méthode et aucun champ. **C'est le verrou principal du
+projet**, et il fait remonter l'ancien jalon 4 avant la chaîne.
 
-**Les octets isolés sont typés.** Dix symboles d'un octet se suivent en
-`0x00364548`, et le désassembleur n'étiquette qu'aux multiples de quatre quand il
-rend une section en mots : `type:u8` les fait rendre en `.byte`, chacun sous son
-`dlabel`. Sept seulement des 8 201 objets du binaire étaient dans ce cas.
-`normalize.py` retire ensuite du script les symboles qu'une section définit —
-splat les y laissait, sa règle étant `not s.defined` là où spimdisasm les écrit.
+**3. Un contexte ne doit contenir que ce qu'il sait.** Un type déclaré sans
+définition, ou défini sans aucun champ, fait *plus de mal* que son absence :
+m2c le tient pour connu et cesse d'inférer. La même règle vaut pour les
+prototypes — un prototype nommant un type inconnu vaut moins que pas de
+prototype.
 
-**Les deux queues de blocs vectoriels sont rendues aux données**, `.vutext` en
-`0x0032A380` et `.vudata` en `0x00363580`, cette dernière emmenant quatre tables
-de saut que la plage `rodata:0x00363660-0x003637B0` rend à `runtime/std`.
-
-**Les noms en double sont écartés** — `configure.py` ne renomme plus une adresse
-que `symbol_addrs.txt` nomme —, et **les blocs d'octets suivent leur objet** :
-`normalize.py` pose `<nom> = .;` devant eux dans le script de lien, ce qui
-rattache `Vu_progmain`, `Vu_prog_wtr` et `My_dma_start0` à la position que le
-lien leur donne, au lieu de les figer.
-
-Le compte tombe à **16 : les 15 fenêtres matérielles, et `_xlaunch`.**
-
-**Le critère de sortie est donc atteint à un symbole près**, et celui-là est
-mesuré. `_xlaunch` est une étiquette au milieu de `_kTLBException`, que le
-binaire déclare `OBJECT` de taille nulle. `type:label` la fait poser par le
-désassembleur, mais la construction diverge alors de six octets en `0x00118798` :
-l'étiquette est locale à la section greffée, et son `%hi`/`%lo` ne se résout plus
-comme le commerce l'encode. Le remède est du côté de mwccgap, qui répare les
-relocations d'une section greffée — c'est là qu'il faudra regarder.
-
-- **95 sous-segments `.rodata`, 147 `rodata` et 32 `data`** vivent hors de toute
-  unité. Chacun devra rejoindre celle qui l'emploie, comme les plages de lecture
-  seule déjà migrées — sans quoi une donnée renommée ou supprimée n'a pas de
-  propriétaire.
-
-**Critère de sortie** : `undefined_syms_auto.ld` ne porte plus que les quinze
-fenêtres matérielles.
-
-**Non mesuré** : le coût de rattacher chaque donnée à son unité. Les 8 201
-symboles `OBJECT` du binaire disent leur taille, mais pas qui les emploie ;
-l'établir demande de lire les relocations, ce qui n'a pas encore été outillé.
-
-**Le point dur, et il est connu d'avance** : `_gp = 0x3846F0` tombe au milieu du
-bss, et les 15 869 relocations `GPREL16` n'ont que ±32 Kio de fenêtre. Déplacer
-la moindre petite donnée les casse, ce qui rattache ce jalon au verrou nº 2 du
-suivant.
+**4. Une passe en bloc paie l'échec d'une fonction au prix de son unité.** La
+première passe a perdu 122 fonctions pour une vingtaine de fautives. Le remède
+tient en deux gestes : refuser en amont ce qu'on ne sait pas justifier, et
+**laisser le compilateur désigner la ligne fautive** pour retirer cette
+fonction-là et recommencer. Le compte d'unités en échec est tombé de 24 à 0.
 
 ---
 
-## Jalon 3 — Libérer les tailles
+## T0 — Le débit — **fait**
 
-Une bonne nouvelle est déjà acquise : **le script de lien ne fixe qu'une seule
-adresse**, `.main 0x100000`. Tout le reste est concaténé, et l'éditeur de liens
-réajuste les relocations. La relocation du texte est donc en place — c'est ce
-qui a rendu visible l'alignement à seize, puisqu'un décalage se propage.
+Acquis, mesuré, en place :
 
-Des trois verrous, **deux sont levés** — `_gp` est calculé, et le parcours des
-initialiseurs statiques est établi. Le troisième, la fenêtre de `$gp`, est
-**mesuré** : seize octets de marge d'un côté, cinquante-six mille de l'autre. Le
-lever demande de recentrer `_gp`, donc de renoncer à l'identité au disque.
+| | avant | après |
+|---|---|---|
+| `make diff S=…` | 15,4 s | **4,8 s** |
+| `make build` complet | 7 min 49 s | **1 min 10 s** |
+| une unité recompilée | — | 2,1 s + 8,5 ms par greffe |
+| `make etat` / `make controle` | n'existait pas | **0,5 s, sur l'hôte** |
 
-1. ~~**`_gp = 0x3846F0` est écrit en dur**~~ — **levé**. `normalize.py` le rend
-   relatif à la fin du contenu du fichier, qui est aussi le début du bss :
-   `_gp = main_BSS_START + 0x7970`, l'écart étant mesuré et non supposé. La
-   valeur reste `0x003846F0` tant que rien ne bouge, ce que `make build`
-   vérifie, et elle suivra sinon. `gp_value` reste en dur dans le découpage, et
-   c'est autre chose : l'assembleur en a besoin pour réencoder les mêmes octets.
-2. **La fenêtre de `$gp` ne porte que ±32 Kio**, et elle est **mesurée, non
-   levée**. Sur les 1 920 symboles qu'un `%gp_rel` atteint, le plus bas est
-   `sin_table_num` en `0x0037C700`, soit `_gp - 32752` : **seize octets de
-   marge**. Le plus haut est à `_gp - 23580`, si bien que **la moitié haute de la
-   fenêtre est entièrement inutilisée** — 56 347 octets. Toutes les petites
-   données tiennent en 9 172 octets sur les 65 535 adressables.
+- **La mesure est honnête** : `make etat` sépare l'écrit du greffé, et compte
+  une fonction comme faite seulement si une unité déclarée la couvre. Les deux
+  rapports ne s'écrasent plus dans le même fichier.
+- **La boucle courte** vient de ce que l'adresse d'un symbole suffit à trouver
+  son unité et sa source : `config/units.txt` le dit, il n'y avait rien à
+  chercher. Au passage, `make diff` ne rend plus « identique » sur une fonction
+  greffée.
+- **Le parallélisme** est le défaut (`MAKEFLAGS += -j$(nproc) -Otarget`).
+- **La non-régression** : `make ci` enchaîne six contrôles textuels et la
+  construction ; `.githooks/pre-push` la lance avant toute poussée. Aucun
+  service distant ne peut le faire — il lui faudrait le binaire du commerce.
 
-   Éprouvé en déplaçant `_gp` : `+16` passe, `+32` rend dix « relocation
-   truncated to fit ». La mesure analytique et le lien s'accordent à l'octet.
-
-   Le remède se déduit du déséquilibre — **recentrer `_gp` rendrait environ
-   28 Kio de marge de chaque côté** —, mais il change les octets que le lien
-   encode. **Il ne se prendra donc pas**, et c'est une décision du projet, non
-   une limite technique : l'identité au disque se garde tant que tout n'est pas
-   recompilé, parce qu'elle est le seul oracle qui dise qu'une source est juste.
-   La perdre pour gagner de la marge reviendrait à scier la branche.
-
-   La conséquence est nette et il faut la tenir : **les petites données ne
-   peuvent pas grossir de plus de seize octets** tant que cette règle vaut. Le
-   texte, lui, est libre — il pousse les petites données avec `_gp`.
-   `-sdatathreshold` reste entier.
-3. ~~**Comment le runtime parcourt les 49 initialiseurs statiques**~~ —
-   **établi**, et la réponse lève le verrou. `mwInit` (`0x00100190`) appelle
-   `__initialize_cpp_rts(début, fin, …)`, qui lit un pointeur, l'appelle par
-   `jalr`, avance de quatre et boucle : c'est une **table de pointeurs**, les 49
-   `_p__sinit_*` de `0x0037AFE0` à `0x0037B0A4`, distincte des corps
-   `__sinit_*` qui vivent de `0x00379680` à `0x0037AFDC`.
-
-   Ce qui compte pour la liberté de taille : **`mwInit` charge ses bornes par
-   `%hi`/`%lo`**, donc ce sont des symboles que le lien reloge, non des
-   constantes. Ajouter ou retirer une unité de traduction demande d'ajouter ou
-   d'ôter son pointeur dans cette table ; la borne de fin suit d'elle-même.
-
-   Reste que ces corps sont des `FUNC` situées après les données, et que le
-   script de lien range tous les `.text` ensemble : les ouvrir en unité ferait
-   glisser tout ce qui les sépare des données, jusqu'au débordement `%gp_rel`.
-   C'est ce qui les tient hors du jalon 1, et c'est mesuré.
-
-**Critère de sortie**, et c'est une mesure, non un raisonnement : faire grossir
-une fonction d'une instruction, reconstruire, et vérifier que le jeu tourne dans
-un émulateur. `make elf` et `make iso` produisent déjà de quoi le faire.
-
-**Tout est acquis sauf l'émulateur.** Sur `CGamePad::WaitEnable` : une instruction
-de plus ne change rien — l'alignement à seize de MWCC l'absorbe —, mais treize
-déplacent tout, et proprement. Le texte finit en `0x00325CE0` au lieu de
-`0x00325C80`, le binaire fait 2 608 608 octets, **`_gp` suit de lui-même** à
-`0x00384750`, et le lien ne signale aucun débordement `%gp_rel`.
-
-**`pack.py` sait désormais porter cet exécutable jusqu'à la console.** Il
-refusait toute taille différente ; `grow_section` répare maintenant l'ELF autour
-de la section agrandie — sa taille, les `filesz`/`memsz` du segment chargé, et
-chaque offset au-delà du point d'insertion. Deux faits s'y sont révélés :
-
-- **le `heap` commence exactement où le bss finit**, en `0x01F64A00`, si bien
-  qu'un texte plus long l'y recouvrait sans que `readelf` s'en plaigne. Ce qui
-  vit au-delà du segment chargé se décale donc d'autant — c'est la réponse au
-  « non mesuré » ci-dessous ;
-- **l'image a 524 octets de marge**, ISO 9660 allouant des secteurs entiers.
-  Au-delà, sa table des fichiers serait à refaire, et `pack.py` le dit. En deçà,
-  il corrige la taille déclarée, en petit- et gros-boutiste.
-
-Le test fait grossir le *texte*, qui pousse les petites données avec `_gp` : la
-fenêtre de ±32 Kio n'est donc pas éprouvée par lui, et ne le sera qu'en
-grossissant `.sdata` elle-même.
-
-**Ce qui reste ne dépend plus du dépôt** : l'image se produit, l'éprouver demande
-un émulateur et un BIOS PS2.
-
-**Mesuré depuis** : le tas ne commence pas *après* le bss avec de la marge, il
-commence **exactement** où celui-ci finit, en `0x01F64A00`. Un texte plus long l'y
-recouvre, et rien dans l'ELF ne s'en plaint — c'est `pack.py` qui décale
-désormais ce qui vit au-delà du segment chargé. Ce que la console fait ensuite de
-ce tas déplacé reste, lui, à éprouver.
+**Ce qui n'a pas été fait, et pourquoi** : le cache d'objets greffés dans
+mwccgap. Mesuré et écarté — le coût d'une unité est fixe à 2,1 s et marginal à
+8,5 ms par greffe, si bien qu'un cache ne rendrait que 1,7 s sur la pire unité.
 
 ---
 
-## Jalon 4 — Recompiler
+## T1 — La chaîne d'abattage — **étape 1 faite, le reste ouvert**
 
-C'est le gros du travail, et le seul qui se compte en années-personnes : 7 837
-fonctions, 32 faites.
+**Fait** : le traducteur déterministe de `scripts/diff/petites.py`, fiabilisé et
+épuisé. 298 → 456 fonctions, `make build` identique au disque. Un idiome neuf en
+est sorti — *une globale hors de la fenêtre de `$gp` s'atteint comme un champ de
+structure, jamais comme un tableau indexé*, 54 % contre 100 % — et il a débloqué
+à lui seul 139 fonctions.
 
-**Par où** — le rapport trie déjà les fonctions par taille dans chaque unité,
-et c'est l'ordre le plus rentable. Deux réserves :
+Outillage produit, réutilisable par tout ce qui suit :
+`scripts/build/essai_petites.py` (applique, compile, écarte la fonction fautive,
+rend l'état — deux minutes au lieu de vingt), `scripts/build/contexte.py`
+(`make contexte`), `scripts/diff/sonde_m2c.py`.
 
-- une classe se reconstruit mieux d'un bloc que fonction par fonction : la
-  disposition d'une structure, une fois établie, sert toutes ses méthodes, et
-  un type de champ faux se paye sur chacune ;
-- une fonction qui saute par table demande sa plage `rodata:` et se
-  reconstruit d'un coup.
+**Ce qui reste, par ordre de rendement mesuré :**
 
-**Ce qu'il faut construire à côté du code** :
+**T1.2 — élargir le traducteur.** `petites.py resume` classe les refus par
+motif, et c'est le tableau de bord : on lève le plus lourd, on relance, on
+mesure. Restent les appels terminaux dont la cible est manglée (~124 fn), les
+instructions arithmétiques simples (`slt`, `andi`, `sll`, somme de deux
+registres, ~150 fn), les arguments au-delà du quatrième (99 fn). **On s'arrête
+aux branchements et à la pile** : 3 131 refus « registre `sp` sans provenance »
+et ~430 refus de branchement sont le domaine de m2c, et les traiter ici
+reviendrait à réécrire un décompilateur. C'est la frontière du jalon, et elle
+est nette.
 
-- **Les en-têtes.** `CGameDataUsed`, `CBaseMenuClass`, `MENU_SYS_DATA` n'ont
-  aujourd'hui que les champs qu'une fonction appariée a exigés. Chaque
-  disposition établie est un acquis réutilisable ; chaque champ deviné est une
-  dette. La règle du dépôt vaut ici plus qu'ailleurs : ne pas surinterpréter,
-  et dire dans le code ce qui n'est pas prouvé.
-- **Le runtime Metrowerks**, 48 228 octets, dont 2 264 correspondent à des
-  sources présentes dans l'installateur CodeWarrior — à réécrire d'après elles,
-  non à recopier.
+**T1.3 — le pendant du contexte, côté compilation.** m2c connaît désormais les
+types ; l'unité compilée, elle, ne les voit pas. Il faut poser dans l'unité la
+définition de ce que le corps emploie — la structure inférée quand le projet
+n'en a pas, l'en-tête du projet quand il en a un. **Bloqué par T2** : tant que
+les dispositions ne sont pas capitalisées, poser une structure inférée entre en
+conflit avec la coquille que l'unité déclare déjà.
+
+**T1.4 — le pilote.** m2c → normalisation → compilation → score → permuteur si
+< 100 % → gardé si 100 %, rendu à l'assembleur sinon. **Le parallélisme se prend
+par unité, pas par fonction** : une unité est un fichier, deux ouvriers ne
+peuvent pas y écrire ensemble, mais vingt unités se compilent de front. Tourner
+sans surveillance demande trois choses : un état repris après coupure, `make
+controle` après chaque unité avec retour à l'état d'avant en cas d'échec, et un
+rapport au réveil classant les motifs.
+
+**T1.5 — le permuteur en lot.** `permute.py` sait chercher mais il est
+séquentiel et réécrit la source en place, à ~10 min par fonction. Deux
+changements suffisent : une file triée par octets à gagner, et le travail sur
+une copie que le pilote confie.
+
+**Sortie visée**, revue à la lumière de la sonde : non plus « 74 % des
+fonctions » — ce chiffre-là ne rapproche plus l'échéance — mais **25 % des
+octets**, obtenus surtout par temps machine.
+
+---
+
+## T2 — Les types et les tables virtuelles — **le verrou, et il est passé devant**
+
+C'était le jalon 4 ; la sonde m2c l'a fait remonter. **Rien de ce qui suit ne
+peut être mécanique tant que ce chantier n'est pas ouvert.**
+
+- **Capitaliser les dispositions de classe.** Une classe reconstruite doit
+  accumuler ses champs à mesure qu'on les établit, et servir toutes ses
+  méthodes. Aujourd'hui `include/gen/` porte ce qu'un accesseur a exigé, et
+  `class CMap` ne porte aucun champ. Ce que m2c infère — offsets, types,
+  tailles — doit s'y déverser au lieu de se perdre à chaque fonction.
+- **Posséder les tables virtuelles.** Dès qu'une classe est déclarée polymorphe
+  — ce que le commerce impose pour retrouver l'ordonnancement d'un constructeur
+  —, MWCC émet `__vt__<classe>` dans notre objet et le lien la voit deux fois.
+  Le chemin est repéré : une clé `vtables:` dans `config/units.txt` que
+  `make carve` sache lire, un segment qui retire ces octets du bloc brut de
+  `00379358`, et la ligne `(.vtables)` posée par `normalize.py`. MWCC émet la
+  table dans une section à elle, distincte de `.rodata`.
+  `__ct__14CCameraControlFv` est reconstruit à 100 % et attend cela sous un
+  `#if 0`.
+- **Relever qui emploie chaque donnée, par les relocations.** Non outillé
+  aujourd'hui ; T6 en dépend aussi.
+- **Déduire l'héritage des chaînes de constructeurs.**
+
+**Sortie** : une classe se reconstruit d'un bloc, sans repayer la disposition à
+chaque méthode ; un constructeur de classe polymorphe devient possible.
+
+**Non mesuré** : le coût de faire converger une structure inférée et une
+déclaration tenue à la main. C'est la seule inconnue sérieuse du plan.
+
+---
+
+## T3 — Les bibliothèques externes — 332 Ko, un oracle extérieur
+
+15 % du code, et **indépendant de T2** : à confier à un contributeur distinct
+dès que possible.
+
+- **Le runtime Metrowerks**, 81 176 o, dont 2 264 correspondent à des sources
+  présentes dans l'installateur CodeWarrior — à réécrire d'après elles.
 - **La bibliothèque C** (`MSLGCC_PS2.LIB`), fournie compilée : `memcpy`,
-  `sprintf`, `_dtoa` restent à décompiler entièrement.
-- **Le SDK Sony**, 127 688 octets. `ps2sdk` en donne les prototypes et les
-  structures exacts, ce qui est la moitié du travail, mais son code est une
-  réimplémentation et n'apparie pas.
-- **Le middleware `mg*`**, 95 680 octets, partagé avec Dark Cloud 1 : ce sont
-  les signatures qui se transposent depuis DCDecomp, pas les implémentations.
+  `sprintf`, `_dtoa` entièrement à faire.
+- **Le SDK Sony**, 142 304 o. `ps2sdk` en donne les prototypes et structures
+  exacts — la moitié du travail —, mais son code est une réimplémentation et
+  n'apparie pas.
+- **Le middleware `mg*`**, 108 348 o, partagé avec Dark Cloud 1 : ce sont les
+  signatures qui se transposent depuis DCDecomp, pas les implémentations.
 
-**Les drapeaux non éprouvés** — `-inline`, `-enum`, `-RTTI` n'ont rien changé
-sur le code déjà apparié, mais celui-ci n'exerce ni patrons ni fonctions
-virtuelles. Le premier code à en porter les tranchera.
+**Un chiffre qui désigne ce chantier** : sur les 831 fonctions que le traducteur
+refuse pour cause de mangling, **381 sont des noms C purs** — `abort`, `atof`,
+`fabsf`, `fprintf`. Elles n'ont pas de signature manglée et n'en auront jamais ;
+leur oracle est ici, pas dans le binaire.
 
 ---
 
-## Jalon 5 — Renommer
+## T4 — Les 100 classes lourdes — le gros
 
-Le renommage est le dernier, parce qu'il dépend de tous les autres : tant
-qu'une fonction est greffée, son nom est celui que le binaire porte, et le
-changer casse la greffe.
+Une classe par lot, dans l'ordre du poids. Dix classes = 31 % des octets de
+classe, vingt-cinq = 52 %, cinquante = 71 %, cent = 86 %. Chaque classe achevée
+referme ses champs et rend les suivantes moins chères — mais **seulement si T2
+est là pour les retenir**.
 
-- **1 293 noms désignent plusieurs adresses**, tous à liaison locale. Le
-  découpage les départage aujourd'hui par leur adresse ; une fois l'unité
-  reconstruite, le `static` d'origine les rend de nouveau distincts et le
-  suffixe disparaît.
-- **Le nom des unités elles-mêmes** est à revoir à mesure qu'on les comprend :
-  `make carve` les nomme d'après leur classe la plus lourde, ce qui range
-  `InitDungeonMain` dans `cdamagescore`. C'est un point de départ, pas une
-  conclusion, et `config/units.txt` est fait pour être corrigé à la main.
-- **`jtbl_00377F10`** est le seul endroit où le projet s'écarte du nom que le
-  binaire porte, parce que m2c l'exige. À reverser une fois la fonction écrite.
+C'est ici que passe l'essentiel du temps humain, et la seule tâche qui se mesure
+sans se planifier.
+
+---
+
+## T5 — Les fonctions libres lourdes — 1 265 288 o
+
+Plus lourdes que toutes les classes réunies, et sans disposition à établir : du
+graphe de contrôle, donc le terrain du permuteur et de `make measure`. Les 410
+fonctions de plus de 1 Ko y sont pour l'essentiel du poids.
+
+Chevauche T4 ; ne dépend pas de T2.
+
+---
+
+## T6 — Données, tailles, renommage — en fin de course
+
+Ces tâches ne peuvent pas précéder la recompilation.
+
+**Les données.** Le bss est fait — un sous-segment unique le couvre, et les
+symboles livrés au lien par adresse absolue sont passés de 2 503 à **16 : les
+quinze fenêtres matérielles, et `_xlaunch`**. Ce dernier est une étiquette au
+milieu de `_kTLBException` que le binaire déclare `OBJECT` de taille nulle ;
+`type:label` la fait poser mais la construction diverge alors de six octets en
+`0x00118798`, et le remède est du côté de mwccgap. **Restent 95 sous-segments
+`.rodata`, 147 `rodata` et 32 `data` hors de toute unité** : chacun doit
+rejoindre celle qui l'emploie, et c'est l'outil de T2 qui le dira.
+
+**Les tailles.** Deux verrous sur trois sont levés : `_gp` est calculé
+(`main_BSS_START + 0x7970`) et le parcours des 49 initialiseurs statiques est
+établi — `mwInit` charge ses bornes par `%hi`/`%lo`, ce sont donc des symboles
+que le lien reloge. Le troisième est **mesuré, non levé** : la fenêtre de `$gp`
+n'a que seize octets de marge en bas et 56 347 inutilisés en haut. Recentrer
+`_gp` rendrait ~28 Kio de chaque côté mais changerait les octets que le lien
+encode — **ce ne sera pas fait**, l'identité au disque étant le seul oracle qui
+dise qu'une source est juste. Conséquence à tenir : les petites données ne
+peuvent pas grossir de plus de seize octets ; le texte, lui, est libre.
+`pack.py` sait déjà porter un exécutable agrandi jusqu'à l'image, qui a 524
+octets de marge.
+
+**Les 49 `__sinit_*`**, 6 248 o, vivent après les données : les ouvrir en unité
+ferait glisser tout ce qui les en sépare, jusqu'au débordement `%gp_rel`.
+
+**Le renommage** vient en dernier : 1 293 noms désignent plusieurs adresses,
+tous à liaison locale, et le `static` d'origine les redistinguera une fois
+l'unité reconstruite. `jtbl_00377F10` est le seul endroit où le projet s'écarte
+du nom que le binaire porte, parce que m2c l'exige ; à reverser.
+
+**Le critère de sortie du projet** reste une mesure, non un raisonnement : faire
+grossir une fonction d'une instruction, reconstruire, et vérifier que le jeu
+tourne dans un émulateur. Tout est acquis sauf l'émulateur — éprouvé sur
+`CGamePad::WaitEnable`, treize instructions de plus déplacent tout proprement,
+`_gp` suit de lui-même et le lien ne signale aucun débordement.
+
+---
+
+## Ordre et dépendances
+
+```
+T0 (fait) ──→ T1.2 ─────────────────────────────┐
+              T1.3 ──┐                          │
+                     ├── T1.4 ── T1.5 ──────────┤
+T2 (types, vtables) ─┘         │                ├──→ T6
+                               └── T4 (classes) ┤
+T3 (bibliothèques) ────────────────────────────┤
+T5 (fonctions libres) ─────────────────────────┘
+```
+
+T3 et T5 ne dépendent de rien : ce sont les deux chantiers à ouvrir en parallèle
+si quelqu'un d'autre s'y met. **T2 est sur le chemin critique** de tout ce qui
+touche aux classes, c'est-à-dire de 926 816 octets.
 
 ---
 
@@ -325,83 +323,69 @@ Par ordre de ce que chacun débloque.
 
 | Chantier | Ce qu'il débloque |
 |---|---|
+| **Capitaliser les dispositions de classe** | T1.3, T1.4 et T4 — le chemin critique |
 | **Posséder les tables virtuelles** | tout constructeur de classe polymorphe |
-| **Relever qui emploie chaque donnée, par les relocations** | le jalon 2 en entier |
+| **Relever qui emploie chaque donnée, par les relocations** | T6 en entier |
 | **mwccgap : abaisser l'alignement d'une fonction compilée** | les treize auxiliaires du runtime, qui ne peuvent qu'être greffés |
-| **Un test d'exécution en émulateur** | le critère de sortie du jalon 3 |
-| ~~**Intégration continue**~~ | **fait** — `make ci` enchaîne `make controle` et `make build`, et `.githooks/pre-push` le lance avant toute poussée. Aucun service distant ne peut le faire : il lui faudrait le binaire du commerce. |
-| **`make carve` : réunir une unité d'une fonction à sa voisine** | la lisibilité de `config/units.txt` |
-
-`tools/patches/` porte ce que le projet corrige dans les outils tiers, `make patch`
-le pose, et `make patch PATCH_ARGS=--update` le réécrit depuis l'état du
-sous-module. Un commit ne retient d'un sous-module que sa référence : le correctif
-est ce qui se versionne, et son en-tête dit ce qu'il y aurait à reverser en amont.
+| **mwccgap : réparer les relocations d'une section greffée** | `_xlaunch`, dernier symbole absolu |
+| **Un test d'exécution en émulateur** | le critère de sortie du projet |
+| ~~Intégration continue~~ | **fait** — `make ci` et `.githooks/pre-push` |
+| ~~Boucle de mesure courte~~ | **fait** — 4,8 s |
 
 Un prédicat sur ce que fait le désassembleur s'éprouve contre `asm/nonmatchings/`,
 non contre une reconstruction : la comparaison coûte une seconde là où
-`make setup && make build` en coûte un quart d'heure. C'est ce qui a trouvé le
-troisième terme de la règle de migration, et deux erreurs de lecture de la
-référence avec lui.
+reconstruire en coûte une minute dix. Et une hypothèse sur ce que fait le
+compilateur se compte d'abord sur le désassemblage entier — c'est ce qui a
+débloqué `CSphida::SetUp` après 450 essais vains du permuteur.
 
-`scripts/setup/normalize.py` est une rustine assumée : il corrige après coup ce
-que le désassembleur écrit autrement pour les fonctions greffées. Il disparaîtra
-si splat rend l'accumulateur vectoriel avec son dollar dans les deux chemins.
-
-Les deux outils de recherche gardent leurs rôles distincts : `make measure`
-répond à une question posée, `make permute` cherche seul quand on ne sait plus
-quoi essayer.
-
-Posséder les tables virtuelles est le prochain verrou du jalon 2, et il ne se
-contourne pas : dès qu'une classe est déclarée polymorphe — ce que le commerce
-impose pour retrouver l'ordonnancement de son constructeur —, MWCC émet
-`__vt__<classe>` dans notre objet, et l'éditeur de liens la voit deux fois tant
-que le disque la porte. `__ct__14CCameraControlFv` est reconstruit à 100 % et
-attend cela sous un `#if 0`. Le chemin est repéré, et il ne se
-confond pas avec les plages `rodata:` existantes : MWCC émet la table dans une
-section `.vtables` à elle, distincte de `.rodata`, ce qui tombe bien — l'unité
-`ceditmap_002F0E80` possède déjà `rodata:0x00377810-0x00377848`, et une section
-ne se place qu'une fois. Il faut donc trois choses : une clé `vtables:` dans
-`config/units.txt` que `make carve` sache lire, un segment de découpage qui
-retire ces trente-six octets du bloc brut de 00379358, et la ligne
-`(.vtables)` posée à la bonne adresse dans le script de lien —
-`scripts/setup/normalize.py` retouche déjà ce script ligne à ligne, dans
-exactement cette forme. La table se retrouve en déclarant les virtuelles dans
-l'ordre des créneaux, les deux premières entrées étant réservées : pour
-`CCameraControl`, six dans `mgCCamera` (`Step`, `Suspend`, `Resume`, `Stay`,
-`GetCameraMatrix`, `Iam`), une dans `mgCCameraFollow` (`SetFollow`), et quatre
-redéfinitions.
+`make measure` répond à une question posée ; `make permute` cherche seul quand
+on ne sait plus quoi demander ; `make etat` dit où en est le compte ;
+`essai_petites.py` dit si un plan compile, en deux minutes.
 
 ---
 
 ## Transverse
 
-- **Passer le dépôt en public et l'inscrire sur decomp.dev.** Le rapport est
-  déjà au format attendu ; l'inscription se fait une fois à la main sur
-  `/manage/new`, et le service lit un artefact d'intégration continue nommé
-  `<EXÉCUTABLE>_report`. Notre règle interdisant de publier le désassemblage, il
-  faudra publier le rapport seul — c'est un choix, non une contrainte.
+- **Passer le dépôt en public et l'inscrire sur decomp.dev.** Le rapport est au
+  format attendu ; l'inscription se fait une fois à la main. Notre règle
+  interdisant de publier le désassemblage, il faudra publier le rapport seul.
+  **C'est le préalable à tout contributeur**, et la CI est désormais là.
 - **Le rapprochement avec DCDecomp** sur le middleware `mg*`.
-- **Questions restées ouvertes** : la liaison 13 que portent 193 `FUNC` et 27
-  `OBJECT` ; `.mwcats`, 56 392 octets propres à Metrowerks ; `-sdatathreshold`.
-- **Retrouver les 49 unités de traduction d'origine.** Le découpage actuel ne
-  le prétend pas. Les pistes non éprouvées restent l'appariement avec `.rodata`,
-  l'ordre des `__sinit_` et le couplage des appels.
+- **Questions ouvertes** : la liaison 13 que portent 193 `FUNC` et 27 `OBJECT` ;
+  `.mwcats`, 56 392 octets propres à Metrowerks ; `-sdatathreshold` ; la
+  compression du mangling que `P1P1i` révèle et que le démangleur lit mal.
+- **Retrouver les 49 unités de traduction d'origine.** Le découpage actuel ne le
+  prétend pas. Pistes non éprouvées : l'appariement avec `.rodata`, l'ordre des
+  `__sinit_`, le couplage des appels.
 
 ---
 
-## Ordre et dépendances
+## Ce qu'il faut se dire franchement
 
-```
-Jalon 1 (texte) ──┬─→ Jalon 4 (recompiler) ──→ Jalon 5 (renommer)
-                  │
-Jalon 2 (données) ┴─→ Jalon 3 (tailles libres)
-```
+Deux ans à une personne pour 2,2 Mo de PS2 en *matching*, c'est le haut de la
+fourchette ; les projets comparables tiennent trois à cinq ans, à plusieurs. Un
+mois de travail a produit 456 fonctions et 0,756 % des octets — le compte de
+fonctions tient la cadence, le poids non.
 
-Les jalons 1 et 2 sont indépendants et peuvent avancer en parallèle. Le jalon 4
-est le seul qui n'a pas de fin proche : il se mesure, il ne se planifie pas. Le
-jalon 3 est celui que vous visez, et il ne demande pas que tout soit recompilé —
-seulement que plus rien ne soit adressé en dur.
+Les deux leviers qui ramènent dans la fenêtre restent les mêmes, mais leur ordre
+a changé :
 
-Le jalon 1 borne de moins en moins le jalon 4 : une fonction qui vit dans une
-unité peut s'écrire sans que le découpage soit à refaire, et c'est le cas de la
-grande majorité de celles du jeu.
+1. **T2 avant la chaîne.** L'été a montré que le temps machine ne remplace le
+   temps humain qu'une fois les dispositions de classe capitalisées. Bâtir le
+   pilote avant cela, c'est bâtir sur une coquille.
+2. **L'ouverture à des contributeurs**, dont T3 et T5 sont les portes d'entrée
+   naturelles — ni l'un ni l'autre ne dépend du chemin critique.
+
+Sans l'un des deux, vise plutôt trois ans. Et si le choix doit se faire, **c'est
+T2 qui décide** : il commande 926 816 octets de code de classe et conditionne
+toute automatisation.
+
+---
+
+## Prochaine action concrète
+
+Ouvrir T2 par le bout mesurable : **faire converger une structure inférée par
+m2c et la déclaration que l'unité porte déjà**. `CMap` est le cas d'école — m2c
+en donne les champs (`0x32C`, `0x330`, `0xC8C`, `0xC90`), `src/game/cmap.cpp`
+n'en déclare aucun. Le jour où les deux se rejoignent sans casser
+`make build`, T1.3 et T1.4 se débloquent d'un coup, et le pilote peut s'écrire.
