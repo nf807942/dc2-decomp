@@ -69,13 +69,31 @@ def deja_vues(unite: str) -> set[str]:
     if not source.exists():
         return set()
     texte = source.read_text(encoding="utf-8", errors="replace")
-    vues = set(_DECLARE.findall(texte))
+    vues = _avec_champs(texte)
     for inclus in _INCLUDE.findall(texte):
         chemin = ROOT / "include" / inclus
         if chemin.exists():
-            vues.update(_DECLARE.findall(
-                chemin.read_text(encoding="utf-8", errors="replace")))
+            vues |= _avec_champs(
+                chemin.read_text(encoding="utf-8", errors="replace"))
     return vues
+
+
+# Un type déclaré sans le moindre champ n'apprend rien : le tenir pour « vu »
+# empêche de poser la structure que m2c infère, et le corps parle alors d'un
+# `unk904` que rien ne définit. C'est la même règle que pour le contexte.
+_CORPS = re.compile(r"(?:class|struct)\s+(\w+)\s*(?::[^{;]*)?\{(.*?)^\}",
+                    re.DOTALL | re.MULTILINE)
+_UN_CHAMP = re.compile(r"^\s+[A-Za-z_][\w ():*&\[\]]*;", re.MULTILINE)
+
+
+def _avec_champs(texte: str) -> set[str]:
+    """Les types que ce texte déclare *avec* au moins un champ de donnée."""
+    trouve = set()
+    for nom, corps in _CORPS.findall(texte):
+        lignes = [l for l in _UN_CHAMP.findall(corps) if "(" not in l]
+        if lignes:
+            trouve.add(nom)
+    return trouve
 
 
 _PORTEURS: dict[str, str] | None = None
@@ -243,6 +261,16 @@ def eprouve(symbole: str, unite: str, taille: int,
     texte = decompile(symbole)
     if texte is None:
         return {**verdict, "issue": "m2c refuse"}
+
+    # m2c signale lui-même ce qu'il n'a pas su traduire : `M2C_ERROR` pour une
+    # instruction, `bitwise` pour une conversion qu'il ne sait pas rendre, un
+    # registre sauvegardé laissé nu. Aucune de ces fonctions n'appariera par
+    # cette voie, et les compter parmi les échecs de plomberie fausse le
+    # diagnostic : elles relèvent du permuteur ou de la main.
+    for aveu in ("M2C_ERROR", "M2C_UNK", "bitwise", "saved_reg_"):
+        if aveu in texte:
+            return {**verdict, "issue": "m2c ne sait pas traduire",
+                    "cause": aveu}
 
     rendu = normalise(texte, symbole, deja_vues(unite))
     if rendu is None:

@@ -19,6 +19,7 @@ Le fichier est engendré, jamais tenu à la main : la vérité reste dans
 
 from __future__ import annotations
 
+import argparse
 import json
 import re
 import sys
@@ -212,7 +213,8 @@ def depuis_atlas(deja: set[str]) -> tuple[set[str], list[str]]:
     return noms, blocs
 
 
-def prototypes(definis: set[str]) -> tuple[set[str], list[str]]:
+def prototypes(definis: set[str],
+               anonyme: bool = False) -> tuple[set[str], list[str]]:
     """Les signatures que le mangling donne, sous le nom que le binaire porte.
 
     m2c apparie un appel à son prototype par le nom du symbole : c'est donc le
@@ -269,14 +271,28 @@ def prototypes(definis: set[str]) -> tuple[set[str], list[str]]:
         params = [("void *" if any(m in p for m in manquants) else p)
                   for p in params]
         types |= nommes & definis
-        # Le type de retour n'est pas manglé : `void` n'engage rien de plus que
-        # ce que le binaire dit, et m2c le corrigera de lui-même s'il voit la
-        # valeur employée.
-        lignes.append("void %s(%s);" % (nom, ", ".join(params) or "void"))
+        # Le type de retour n'est pas manglé, et le choix qu'on fait ici pèse
+        # lourd. `void` semblait le plus prudent : il n'affirme rien. Mais m2c
+        # en conclut que l'appel ne définit pas `$v0`, et toute lecture du
+        # retour devient « Read from unset register » — quarante-trois fois sur
+        # vingt-cinq fonctions, soit la moitié d'entre elles rendues
+        # intraduisibles. `s32` laisse la valeur exister ; une fonction qui ne
+        # rend rien la laisse simplement inemployée.
+        if anonyme:
+            # Aucun type du jeu n'est nommé : m2c doit tout inférer, et
+            # seul le type de retour l'intéresse ici.
+            params = ["void *" if p.rstrip(" *") not in _BASES_NOMMEES
+                      else p for p in params]
+        lignes.append("s32 %s(%s);" % (nom, ", ".join(params) or "void"))
     return types, lignes
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    parseur = argparse.ArgumentParser(description=__doc__)
+    parseur.add_argument("--sans-structures", action="store_true",
+                         help="ne garder que les prototypes et les typedefs")
+    options = parseur.parse_args(argv)
+
     morceaux = [
         "/* Engendré par scripts/build/contexte.py — ne pas modifier à la main.",
         " * La vérité est dans include/ ; ce fichier n'en est que la vue que",
@@ -341,15 +357,36 @@ def main() -> int:
                 if kind not in _BASES_NOMMEES:
                     nommes.add(kind)
 
-    cites, signatures = prototypes(connus)
-    morceaux.append("/* Les noms de type, avant tout emploi. */")
-    morceaux += ["typedef struct %s %s;" % (nom, nom)
-                 for nom in sorted(nommes | cites)]
+    cites, signatures = prototypes(connus,
+                                   anonyme=options.sans_structures)
+    # Un typedef, même opaque, suffit à faire cesser l'inférence de m2c : il
+    # tient le type pour connu et n'en émet plus la structure. En mode réduit,
+    # aucun type du jeu n'est donc nommé.
+    if not options.sans_structures:
+        morceaux.append("/* Les noms de type, avant tout emploi. */")
+        morceaux += ["typedef struct %s %s;" % (nom, nom)
+                     for nom in sorted(nommes | cites)]
     morceaux.append("")
-    morceaux += corps
-    morceaux.append("")
-    morceaux.append("/* Les signatures que le mangling donne. */")
-    morceaux += signatures
+    # Une structure *partielle* dans le contexte est pire que son absence : m2c
+    # s'en sert et invente un `unkXX` pour ce qu'elle ne dit pas, que l'unité ne
+    # définit nulle part. Sans structure du tout, il infère l'ensemble et émet
+    # une déclaration complète, qu'on peut poser. Mesuré sur
+    # `Initialize__16CMenuPosDataFormFv` : 97,43 % sans, ne compile pas avec.
+    if not options.sans_structures:
+        morceaux += corps
+        morceaux.append("")
+        morceaux.append("/* Les signatures que le mangling donne. */")
+        morceaux += signatures
+    else:
+        # Le seul apport prouvé du contexte est le *type de retour* : sans lui,
+        # m2c tient `$v0` pour indéfini après un appel et rend `M2C_ERROR` —
+        # vingt-deux fonctions sur quarante en étaient là, huit après. Tout le
+        # reste — types nommés, structures, typedefs — le fait cesser d'inférer
+        # et lui fait écrire des `unkXX` que personne ne définit. On garde donc
+        # les signatures en effaçant leurs types : `void *` ne nomme rien.
+        morceaux.append("/* Les signatures, réduites à ce qu'elles apportent :")
+        morceaux.append(" * un type de retour, et le nombre d'arguments. */")
+        morceaux += signatures
 
     SORTIE.parent.mkdir(parents=True, exist_ok=True)
     SORTIE.write_text("\n".join(morceaux) + "\n", encoding="utf-8")
@@ -360,4 +397,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main(sys.argv[1:]))
