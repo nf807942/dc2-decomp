@@ -25,12 +25,23 @@ struct mgCDrawManager;
 
 class CColFrame {
 public:
+    char pad_0[0xF0];
+    s32 field_F0;
+    char pad_F4[0x1C];
+    s32 field_110;
+
     s32 Draw(mgCDrawManager *manager);
     s32 Draw(u32 *mask, mgCDrawManager *manager);
 };
 
 class CCollision {
 public:
+    s32 field_0;
+    char pad_4[0xC];
+    f32 field_10;
+    char pad_14[0xC];
+    f32 field_20;
+
     s32 GetMaxY(f32 *y);
     s32 Intersection(f32 *a, f32 *b, f32 *c);
     s32 PickUpNearPoly(CCPoly *poly, const mgVu0FBOX &box, s32 flag);

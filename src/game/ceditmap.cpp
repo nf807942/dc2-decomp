@@ -11,6 +11,67 @@
 
 class CEditMap {
 public:
+    char pad_0[0xC88];
+    f32 field_C88;
+    char pad_C8C[0xA8];
+    s32 field_D34;
+    s32 field_D38;
+    char pad_D3C[0x4];
+    s32 field_D40;
+    s32 field_D44;
+    char pad_D48[0x200];
+    s32 field_F48;
+    s32 field_F4C;
+    s32 field_F50;
+    char pad_F54[0x10];
+    s32 field_F64;
+    s32 field_F68;
+    char pad_F6C[0x14];
+    s32 field_F80;
+    s32 field_F84;
+    s32 field_F88;
+    s32 field_F8C;
+    s32 field_F90;
+    char pad_F94[0x4];
+    s32 field_F98;
+    s32 field_F9C;
+    s32 field_FA0;
+    s32 field_FA4;
+    s32 field_FA8;
+    s32 field_FAC;
+    s32 field_FB0;
+    s32 field_FB4;
+    s32 field_FB8;
+    s32 field_FBC;
+    s32 field_FC0;
+    s32 field_FC4;
+    s32 field_FC8;
+    s32 field_FCC;
+    s32 field_FD0;
+    s32 field_FD4;
+    s32 field_FD8;
+    s32 field_FDC;
+    s32 field_FE0;
+    s32 field_FE4;
+    s32 field_FE8;
+    s32 field_FEC;
+    s32 field_FF0;
+    s32 field_FF4;
+    s32 field_FF8;
+    s32 field_FFC;
+    char pad_1000[0x20];
+    s32 field_1020;
+    char pad_1024[0x2C];
+    s32 field_1050;
+    char pad_1054[0x20];
+    f32 field_1074;
+    char pad_1078[0xC];
+    f32 field_1084;
+    char pad_1088[0xC];
+    f32 field_1094;
+    char pad_1098[0xC];
+    f32 field_10A4;
+
     s32 Iam();
 };
 

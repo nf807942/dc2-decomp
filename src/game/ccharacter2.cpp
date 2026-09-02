@@ -15,6 +15,13 @@
  * déréférencés, donc leur disposition reste à établir. */
 class CDACollision {
 public:
+    char pad_0[0x4];
+    s32 field_4;
+    char pad_8[0x8];
+    f32 field_10;
+    char pad_14[0xC];
+    f32 field_20;
+
     s32 CheckHit(f32 *point);
 };
 

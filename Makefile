@@ -135,7 +135,7 @@ O_FILES   := $(addprefix $(BUILD_DIR)/, $(S_FILES:.s=.o) $(BIN_FILES:.bin=.o) \
              $(addsuffix .o, $(basename $(SRC_FILES))))
 
 .PHONY: all setup tools patch split build objects check diff decompile measure \
-        atlas carve clean distclean contexte controle ci etat progress report
+        atlas carve clean distclean contexte injecte controle ci etat progress report
 
 all: build
 
@@ -294,6 +294,12 @@ units:
 # lui que le contexte se construit ensuite.
 atlas:
 	@$(PYTHON) scripts/build/atlas.py $(ARGS)
+
+# Verse les champs de l'atlas dans les classes que le dépôt déclare vides. Une
+# disposition ne change les octets que si le code l'emploie — sauf pour une
+# classe de base, dont l'élargissement décale ses dérivées. `make build` tranche.
+injecte:
+	@$(PYTHON) scripts/build/injecte_atlas.py $(ARGS)
 
 # Le contexte que m2c lit pour typer ce qu'il décompile, engendré depuis
 # `include/` et l'atlas. Sans lui, m2c invente un nom de champ par décalage.

@@ -22,6 +22,22 @@ struct sceMpegCbDataError;
 
 class CMovie {
 public:
+    char pad_0[0x14];
+    s32 field_14;
+    s32 field_18;
+    s32 field_1C;
+    s32 field_20;
+    char pad_24[0x5C];
+    s32 field_80;
+    s32 field_84;
+    char pad_88[0x40];
+    s32 field_C8;
+    s32 field_CC;
+    char pad_D0[0x8830];
+    u8 field_8900;
+    char pad_8901[0x1AFFF];
+    u8 field_23900;
+
     s32 IsStarted();
     s32 GetViBufTagSize();
 };

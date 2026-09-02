@@ -14,6 +14,27 @@
  * déréférencés, donc leur disposition reste à établir. */
 class mgCVisualMotionMDT {
 public:
+    char pad_0[0x8];
+    s32 field_8;
+    char pad_C[0x4];
+    s32 field_10;
+    s32 field_14;
+    char pad_18[0x8];
+    s32 field_20;
+    char pad_24[0xC];
+    s32 field_30;
+    s32 field_34;
+    s32 field_38;
+    s32 field_3C;
+    s32 field_40;
+    s32 field_44;
+    s32 field_48;
+    char pad_4C[0x8];
+    s32 field_54;
+    char pad_58[0xA8];
+    s32 field_100;
+    s32 field_104;
+
     s32 Iam();
 };
 extern s32 FLS_FLOOR_ID;
