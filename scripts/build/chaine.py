@@ -112,7 +112,11 @@ def main(argv: list[str]) -> int:
             faits += 1
             part = verdict.get("part")
             etat["eprouvees"][symbole] = {
-                "issue": verdict["issue"], "part": part, "taille": taille}
+                "issue": verdict["issue"], "part": part, "taille": taille,
+                # La cause, et non la seule issue : c'est elle qui dit quelle
+                # correction paierait le plus au tour suivant, et la relever
+                # après coup demanderait de tout réexécuter.
+                "cause": verdict.get("cause", ""), "unite": unite}
 
             if part is not None and part >= 99.999:
                 gagnees += 1

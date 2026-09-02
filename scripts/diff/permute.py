@@ -36,6 +36,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from lib.project import ROOT, find_symbol, run  # noqa: E402
+from idiomes import IDIOMES  # noqa: E402
 
 # Une déclaration simple en tête de bloc : « int i; », « PAD_REPEAT *rep; ».
 DECL = re.compile(r"^(\s*)((?:[A-Za-z_]\w*\s+)+\*?\w+(?:\[[^\]]*\])?);\s*$")
@@ -825,7 +826,11 @@ def compare_zero_rewrite(text: str, _rng: random.Random) -> list[str]:
     return out
 
 
+# Les transformations tirees d'idiomes mesures passent en tete : chacune vient
+# d'une forme dont on a mesure qu'elle change les octets, sur une fonction
+# nommee. Une transformation aveugle qui paie ne dit rien ; celles-la si.
 TRANSFORMS = [
+    *IDIOMES,
     reorder_declarations,
     statement_into_for,
     initialiser_into_for,
