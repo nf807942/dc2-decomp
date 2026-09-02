@@ -7,6 +7,10 @@
  */
 
 #include "common.h"
+#include "gen/CEditInfoMngr.hpp"
+struct CEditPartsInfo;
+struct ePlaceData;
+
 
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", TitleModeDraw__Fv);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", TitleMapDraw__Fv);
@@ -31,13 +35,27 @@ INCLUDE_ASM("nonmatchings/game/ceditinfomngr", TitleLangSelKey__Fv);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", GetSelectLanguageNo__Fv);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", TitleLangSelDraw__Fv);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", InitSoundViewerMain__F13INIT_LOOP_ARG);
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", FinishSoundVieweMain__Fv);
+void FinishSoundVieweMain(void) {
+}
 s32 LoopSoundViewerMain(void) {
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", Initialize__13CEditInfoMngrFv);
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", SetePartsInfoTable__13CEditInfoMngrFP14CEditPartsInfoi);
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", SeteFixPartsTable__13CEditInfoMngrFP10ePlaceDatai);
+void CEditInfoMngr::Initialize(void) {
+    this->field_0x0 = 0;
+    this->field_0x4 = 0;
+    this->field_0x8 = 0;
+    this->field_0xC = 0;
+    this->field_0x10 = 0;
+    this->field_0x14 = 0;
+}
+void CEditInfoMngr::SetePartsInfoTable(CEditPartsInfo * arg0, s32 arg1) {
+    this->field_0x0 = arg1;
+    this->field_0x4 = arg0;
+}
+void CEditInfoMngr::SeteFixPartsTable(ePlaceData * arg0, s32 arg1) {
+    this->field_0x8 = arg1;
+    this->field_0xC = arg0;
+}
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", GetePartsInfo__13CEditInfoMngrFi);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", GetePartsInfo__13CEditInfoMngrFPc);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", GetePartsInfoAtID__13CEditInfoMngrFi);

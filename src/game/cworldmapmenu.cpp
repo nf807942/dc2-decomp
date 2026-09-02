@@ -7,6 +7,7 @@
  */
 
 #include "common.h"
+#include "gen/MENU_BGREAD_INFO2.hpp"
 
 INCLUDE_ASM("nonmatchings/game/cworldmapmenu", SetMsgBuffer__13CWorldMapMenuFv);
 INCLUDE_ASM("nonmatchings/game/cworldmapmenu", KeyStep__13CWorldMapMenuFv);
@@ -22,7 +23,12 @@ INCLUDE_ASM("nonmatchings/game/cworldmapmenu", SphidaMenuDraw__Fv);
 INCLUDE_ASM("nonmatchings/game/cworldmapmenu", SphidaScoreViewInit__FP9mgCMemoryPii);
 INCLUDE_ASM("nonmatchings/game/cworldmapmenu", SphidaScoreViewKey__Fv);
 INCLUDE_ASM("nonmatchings/game/cworldmapmenu", SphidaScoreViewDraw__Fv);
-INCLUDE_ASM("nonmatchings/game/cworldmapmenu", InitMenuBGReadInfo2__FP17MENU_BGREAD_INFO2);
+void InitMenuBGReadInfo2(MENU_BGREAD_INFO2 * arg0) {
+    arg0->field_0x70 = 0;
+    arg0->field_0x74 = 0;
+    arg0->field_0x0 = 0;
+    arg0->field_0x20 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cworldmapmenu", MenuLoadFileCheck__FPP17MENU_BGREAD_INFO2);
 INCLUDE_ASM("nonmatchings/game/cworldmapmenu", MenuBGReadInfo2Malloc__FP9mgCMemoryPi);
 INCLUDE_ASM("nonmatchings/game/cworldmapmenu", ConvertCharaLoadDataPhase__Fii);

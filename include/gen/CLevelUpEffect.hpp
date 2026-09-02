@@ -10,9 +10,13 @@
  * déclarer une virtuelle ferait émettre une table que le disque
  * porte déjà. */
 struct CLevelUpEffect {
-    u8 field_0x0;
+    s8 field_0x0;
+    u8 pad_0x1[0x1F];
+    s32 field_0x20;
+    s32 field_0x24;
 
     u8 IsRun(void);
+    void Initialize(void);
 };
 
 #endif /* GEN_CLEVELUPEFFECT_HPP */

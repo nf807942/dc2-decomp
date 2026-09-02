@@ -28,7 +28,7 @@ import sys
 from dataclasses import dataclass, field
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from lib.mangling import Symbol, demangle  # noqa: E402
+from lib.mangling import BASE, Symbol, demangle  # noqa: E402
 
 RACINE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -54,6 +54,12 @@ LARGEUR = {"s8": 1, "u8": 1, "s16": 2, "u16": 2, "s32": 4, "u32": 4,
 
 OBJET = re.compile(r"^(\w+) = 0x[0-9A-Fa-f]+; // size:0x([0-9A-Fa-f]+)")
 GP_REL = re.compile(r"^\$(\w+), %gp_rel\((\w+)\)\(\$gp\)$")
+# `$v0, %lo(EdEventInfo + 0x126C)($at)` — un champ d'une globale trop grosse
+# pour la fenêtre de `$gp`, que le `lui` précédent a préparée dans `$at`.
+HI_LO = re.compile(
+    r"^\$(\w+), %lo\((\w+)(?:\s*\+\s*(0x[0-9A-Fa-f]+|\d+))?\)\(\$(\w+)\)$")
+# Ce que ce `lui` porte : la moitié haute d'une adresse, non une constante.
+HI = re.compile(r"^\$(\w+), %hi\((\w+)(?:\s*\+\s*(?:0x[0-9A-Fa-f]+|\d+))?\)$")
 DECALE = re.compile(r"^\$(\w+), (-?(?:0x)?[0-9A-Fa-f]+)\(\$(\w+)\)$")
 TROIS = re.compile(r"^\$(\w+), \$(\w+), (\S+)$")
 DEUX = re.compile(r"^\$(\w+), \$(\w+)$")
@@ -105,6 +111,22 @@ RUNTIME = {
 }
 
 
+def plus_precis(ancien: str | None, neuf: str) -> str:
+    """Départage deux types vus au même décalage.
+
+    Le premier accès nommait le champ, et le suivant ne pouvait plus rien y
+    changer. Mais tous les accès ne se valent pas : `lw` dit seulement « quatre
+    octets », tandis qu'un rangement de pointeur dit *ce que le champ contient*.
+    Laisser gagner le premier venu donnait un champ `s32` recevant un
+    `CEditPartsInfo *`, que MWCC refuse de convertir.
+    """
+    if ancien is None:
+        return neuf
+    if neuf.endswith("*") and not ancien.endswith("*"):
+        return neuf
+    return ancien
+
+
 @dataclass
 class Besoin:
     """Ce qu'une source réclame avant de compiler."""
@@ -116,7 +138,7 @@ class Besoin:
         table = self.champs.setdefault(type_nomme, {})
         # Le premier accès nomme le champ ; un accès plus étroit ne le rétrécit
         # pas, faute de quoi deux accesseurs du même champ se contrediraient.
-        table.setdefault(offset, largeur)
+        table[offset] = plus_precis(table.get(offset), largeur)
         return "field_0x%X" % offset
 
 
@@ -148,6 +170,8 @@ class Interprete:
         self.effets: list[str] = []
         self.regs: dict[str, Valeur] = {"zero": Valeur("0", "s32")}
         self.globales: dict[str, str] = {}
+        # Les globales atteintes par `%hi`/`%lo`, et la structure qui les décrit.
+        self.structures: dict[str, str] = {}
         self.appel: str | None = None
 
         # `$a0` porte `this` pour une méthode ; sinon le premier paramètre. Les
@@ -183,9 +207,31 @@ class Interprete:
         if not valeur.type or not valeur.type.endswith("*"):
             raise Abandon("base %s de type inconnu" % registre)
         nomme = valeur.type.rstrip(" *")
-        if nomme in ("void", "char", "u8", "s8"):
-            raise Abandon("base sans type nommé")
+        # Un pointeur vers un type de base n'est pas une structure : `s32 *`
+        # déréférencé est un tableau d'entiers, et l'accès devrait s'écrire par
+        # indice. Le prendre pour un type nommé engendrait un `struct s32 {…}`,
+        # que MWCC accueillait par « typename redefined ».
+        if nomme in BASE.values() or nomme in ("void", "char"):
+            raise Abandon("base sans type nommé (%s)" % nomme)
         return valeur.texte, nomme
+
+    def promeut(self, mnemonique: str, arguments: str, kind: str) -> None:
+        """Donne au champ que cet accès désigne un type plus juste.
+
+        Le type d'un champ vient de la largeur de l'accès, faute de mieux ; mais
+        ce qu'on y écrit en dit parfois davantage. Un `sw` qui range l'adresse
+        d'un autre champ ne range pas un entier, et MWCC refuse la conversion
+        implicite — treize unités échouaient là-dessus.
+        """
+        match = DECALE.match(arguments)
+        if not match:
+            return
+        _registre, decalage, source = match.groups()
+        valeur = self.regs.get(source)
+        if valeur is None or not valeur.type or not valeur.type.endswith("*"):
+            return
+        nomme = valeur.type.rstrip(" *")
+        self.besoin.champs.setdefault(nomme, {})[entier(decalage)] = kind
 
     def acces(self, mnemonique: str, arguments: str) -> tuple[str, str]:
         """L'accès `off($base)` rendu en `pointeur->champ`, et sa largeur."""
@@ -194,6 +240,27 @@ class Interprete:
         # Une globale s'atteint par `$gp`. Sa taille déclarée décide du `%gp_rel`
         # que le commerce porte : on ne la reconstruit que si l'accès la couvre
         # tout entière, faute de quoi la déclaration serait une invention.
+        # Une globale trop grosse pour la fenêtre de `$gp` s'atteint par
+        # `%hi`/`%lo`, et le commerce y accède *directement* : `lui $at,
+        # %hi(G+n)` puis `sw $zero, %lo(G+n)($at)`. Écrire `&G[n]` matérialise
+        # l'adresse dans un registre et rend trois instructions au lieu de deux
+        # — mesuré à 54 % sur `ResetNpcTalkMes`. C'est un *champ de structure*
+        # qu'il faut écrire, `G.field_0xN`, et la forme rend alors 100 %.
+        match = HI_LO.match(arguments)
+        if match:
+            registre, nom, decalage, base = match.groups()
+            if self.regs.get(base) is None or \
+                    self.regs[base].texte != "%hi(" + nom + ")":
+                raise Abandon("%%lo(%s) sans son %%hi" % nom)
+            offset = entier(decalage) if decalage else 0
+            taille = GLOBALES.get(nom)
+            if taille is None or offset + LARGEUR.get(largeur, 4) > taille:
+                raise Abandon("globale %s hors de sa taille déclarée" % nom)
+            structure = nom + "Data"
+            champ = self.besoin.champ(structure, offset, largeur)
+            self.structures[nom] = structure
+            return (registre, "%s.%s" % (nom, champ)), largeur
+
         match = GP_REL.match(arguments)
         if match:
             registre, nom = match.groups()
@@ -212,7 +279,11 @@ class Interprete:
         texte, nomme = self.base(source)
         offset = entier(decalage)
         champ = self.besoin.champ(nomme, offset, largeur)
-        return (registre, "%s->%s" % (texte, champ)), largeur
+        # Le type que porte le champ l'emporte sur celui de l'instruction : un
+        # `lw` sur un champ déjà connu pointeur rend un pointeur, et le ranger
+        # ailleurs promeut la destination au lieu d'échouer sur la conversion.
+        effectif = self.besoin.champs[nomme][offset]
+        return (registre, "%s->%s" % (texte, champ)), effectif
 
     # -- exécution --------------------------------------------------------
 
@@ -224,7 +295,21 @@ class Interprete:
 
         if mnemonique in ECRITURES:
             (registre, fleche), _largeur = self.acces(mnemonique, arguments)
-            self.effets.append("%s = %s;" % (fleche, self.lire(registre).texte))
+            valeur = self.lire(registre)
+            # Ce qu'on range dit le type du champ mieux que la largeur de
+            # l'instruction : une adresse ne se range pas dans un entier. Le
+            # type de la valeur est le plus informatif quand la signature le
+            # donne — `mgCTexture *` plutôt que `void *` —, et il est prouvé.
+            if mnemonique == "sw":
+                pointeur = (valeur.type if valeur.type and valeur.type.endswith("*")
+                            else "void *" if valeur.adresse_de is not None else None)
+                if pointeur and fleche in self.globales:
+                    # Une globale se déclare comme un champ : ce qu'on y range
+                    # dit son type mieux que la largeur de l'instruction.
+                    self.globales[fleche] = pointeur
+                elif pointeur:
+                    self.promeut(mnemonique, arguments, pointeur)
+            self.effets.append("%s = %s;" % (fleche, valeur.texte))
             return
 
         if mnemonique in ("addiu", "addi", "daddiu"):
@@ -259,6 +344,13 @@ class Interprete:
             return
 
         if mnemonique == "lui":
+            # `lui $at, %hi(G + n)` ne charge pas une constante : il prépare
+            # l'adresse que le `%lo` qui suit achèvera. Le registre retient de
+            # quelle globale il s'agit, et rien de plus.
+            haut = HI.match(arguments)
+            if haut:
+                self.regs[haut.group(1)] = Valeur("%hi(" + haut.group(2) + ")")
+                return
             match = re.match(r"^\$(\w+), (\S+)$", arguments)
             if not match or match.group(2).startswith("%"):
                 raise Abandon("lui %r" % arguments)
@@ -310,6 +402,14 @@ class Interprete:
             valeur = self.regs.get("a%d" % rang)
             if valeur is None:
                 raise Abandon("argument %d de %s inconnu" % (rang, cible))
+            # `strcpy(&this->field_0x40, …)` dit que ce champ est une suite de
+            # caractères, mais rien ici ne sait de quelle longueur : le champ
+            # reste un entier et MWCC refuse l'appel. `void *` accepte tout, et
+            # c'est ce que `memset` et `memcpy` demandent.
+            if (valeur.adresse_de is not None
+                    and kind.endswith("*") and not kind.startswith("void")):
+                raise Abandon("adresse de champ passée à %s de %s"
+                              % (kind, cible))
             arguments.append(valeur.texte)
         self.appel = cible
         return "%s(%s);" % (cible, ", ".join(arguments))
@@ -457,6 +557,15 @@ def traduire(entree: dict, besoin: Besoin) -> dict | None:
     if suite is None:
         return {"raison": "désassemblage absent"}
 
+    # Un paramètre d'un type nommé passé *par valeur* demande la disposition de
+    # ce type, que rien ici ne connaît : une déclaration en avant ne suffit pas,
+    # et MWCC répond « illegal use of incomplete struct ». Le pointeur, lui, se
+    # contente du nom. Trente-cinq unités entières échouaient là-dessus.
+    for param in sym.params:
+        if param.endswith("*") or param in BASE.values() or param == "...":
+            continue
+        return {"raison": "paramètre %s passé par valeur" % param}
+
     local = Besoin()
     try:
         interprete = Interprete(sym, local)
@@ -479,12 +588,17 @@ def traduire(entree: dict, besoin: Besoin) -> dict | None:
     for nomme, champs in local.champs.items():
         fusion = besoin.champs.setdefault(nomme, {})
         for offset, largeur in champs.items():
-            fusion.setdefault(offset, largeur)
+            fusion[offset] = plus_precis(fusion.get(offset), largeur)
 
     # Ce que l'unité doit connaître avant de compiler ce corps : la globale que
     # l'accès nomme, et la fonction C qu'un saut de queue vise.
     declarations = ["extern %s %s;" % (kind, nom)
                     for nom, kind in sorted(interprete.globales.items())]
+    # Une globale atteinte par `%hi`/`%lo` se déclare par la structure qui en
+    # décrit les champs ; l'en-tête de celle-ci s'engendre comme celui d'une
+    # classe, puisqu'elle vit dans `champs` sous le même mécanisme.
+    declarations += ["extern %s %s;" % (structure, nom)
+                     for nom, structure in sorted(interprete.structures.items())]
     if interprete.appel:
         declarations.append(RUNTIME[interprete.appel][0])
 

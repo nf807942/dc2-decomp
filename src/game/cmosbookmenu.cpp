@@ -7,6 +7,10 @@
  */
 
 #include "common.h"
+#include "gen/MnOnePictTexData.hpp"
+#include "gen/CMosBookMenu.hpp"
+extern MnOnePictTexData MnOnePictTex;
+
 
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", KeyMainCharaBG__Fv);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", DrawMainCharaBG__Fv);
@@ -21,7 +25,20 @@ INCLUDE_ASM("nonmatchings/game/cmosbookmenu", MenuCostumeInit__FP9mgCMemoryPii);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", MenuCostumeKey__Fv);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", MenuCostumeDraw__Fv);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", GetMonsterBaseInfoForMonsterMemoIndex__Fi);
-INCLUDE_ASM("nonmatchings/game/cmosbookmenu", InitMonsterInfo__12CMosBookMenuFv);
+void CMosBookMenu::InitMonsterInfo(void) {
+    this->field_0x7EC = 0;
+    this->field_0x82C = 0;
+    this->field_0x86C = 0;
+    this->field_0x904 = 0;
+    this->field_0x908 = 0;
+    this->field_0x90C = 0;
+    this->field_0x910 = 0;
+    this->field_0x914 = 0;
+    this->field_0x918 = 0;
+    this->field_0x939 = 0;
+    this->field_0x95A = 0;
+    this->field_0x8AC = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", SetMonsterInfo__12CMosBookMenuFP16BASE_MONSTER_TBL);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", InitEnd__12CMosBookMenuFv);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", Draw__12CMosBookMenuFv);
@@ -34,7 +51,16 @@ INCLUDE_ASM("nonmatchings/game/cmosbookmenu", InitMenuReturnMsg__FP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", SetMenuReturnMsgCtrl__Fi);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", DrawMenuReturnMsg__Fv);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", CheckOmakeVtuto__Fi);
-INCLUDE_ASM("nonmatchings/game/cmosbookmenu", InitMnOnePictTex__Fv);
+void InitMnOnePictTex(void) {
+    MnOnePictTex.field_0x0 = 0;
+    MnOnePictTex.field_0x4 = 0;
+    MnOnePictTex.field_0x8 = 0;
+    MnOnePictTex.field_0xC = 0;
+    MnOnePictTex.field_0x10 = 0;
+    MnOnePictTex.field_0x14 = 0;
+    MnOnePictTex.field_0x18 = 0;
+    MnOnePictTex.field_0x1C = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", MenuManualInit__FP9mgCMemoryPii);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", MenuManualKey__Fv);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", MenuManualDraw__Fv);

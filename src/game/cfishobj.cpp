@@ -14,6 +14,13 @@ extern s32 NowMode;
 extern s32 ShowHari;
 extern s32 ShowTakePhotoCnt;
 extern f32 WaterLevel;
+extern s32 ActionChanceCnt;
+extern s32 ActionChanceNextCnt;
+extern s32 AddLineSpeed;
+extern s32 BattleFlag;
+extern s32 CastingLureFlag;
+extern s32 CastingLureTime;
+
 
 INCLUDE_ASM("nonmatchings/game/cfishobj", NowTakePhoto__Fv);
 INCLUDE_ASM("nonmatchings/game/cfishobj", IsEnablePhotoMenu__Fv);
@@ -54,14 +61,23 @@ INCLUDE_ASM("nonmatchings/game/cfishobj", GetShowHari__Fv);
 INCLUDE_ASM("nonmatchings/game/cfishobj", SetLurePose__FP8mgCFrame);
 INCLUDE_ASM("nonmatchings/game/cfishobj", SetUkiPose__FP8mgCFrameP8mgCFrame);
 INCLUDE_ASM("nonmatchings/game/cfishobj", CastingLure__FPf);
-INCLUDE_ASM("nonmatchings/game/cfishobj", EndCastingLure__Fv);
+void EndCastingLure(void) {
+    CastingLureFlag = 0;
+    CastingLureTime = 0;
+    AddLineSpeed = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cfishobj", CatchLine__FPff);
 INCLUDE_ASM("nonmatchings/game/cfishobj", SlowLineVelo__Ff);
 INCLUDE_ASM("nonmatchings/game/cfishobj", ResetLineVelo__Fv);
 INCLUDE_ASM("nonmatchings/game/cfishobj", ResetLine__FPf);
 INCLUDE_ASM("nonmatchings/game/cfishobj", GetNextChanceCnt__Fv);
 INCLUDE_ASM("nonmatchings/game/cfishobj", InitFishBattle__Fv);
-INCLUDE_ASM("nonmatchings/game/cfishobj", EndFishBattle__Fv);
+s32 EndFishBattle(void) {
+    BattleFlag = 0;
+    ActionChanceNextCnt = 0;
+    ActionChanceCnt = 0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cfishobj", CheckRodActionChance__FiPi);
 INCLUDE_ASM("nonmatchings/game/cfishobj", FishBattle__FP6CSceneP6CCPolyi);
 INCLUDE_ASM("nonmatchings/game/cfishobj", GetFishPosVelo__FPfPf);

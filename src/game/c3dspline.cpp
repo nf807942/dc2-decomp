@@ -7,6 +7,8 @@
  */
 
 #include "common.h"
+#include "gen/EdEventInfoData.hpp"
+#include "gen/SPLINE_KEY.hpp"
 #include "gen/CCameraPas.hpp"
 #include "gen/CCharaPas.hpp"
 
@@ -14,6 +16,8 @@
  * qu'un code de retour ne la déréférencent pas : sa disposition reste à
  * établir. */
 struct SPI_STACK;
+extern EdEventInfoData EdEventInfo;
+
 
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_TEXDATA_CLEAR__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_FORM_CLEAR__FP9SPI_STACKi);
@@ -100,7 +104,10 @@ INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_EXE_RESET_TEXINFO__FP9SPI_STACK
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_DEBUG_PRINTF__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", MenuCommandAnalyze__FPciPc);
 INCLUDE_ASM("nonmatchings/game/c3dspline", LoadNpcTalkMes__FP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/c3dspline", ResetNpcTalkMes__Fv);
+void ResetNpcTalkMes(void) {
+    EdEventInfo.field_0x126C = 0;
+    EdEventInfo.field_0x1270 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", GetSquareEvent__Fv);
 INCLUDE_ASM("nonmatchings/game/c3dspline", InitEvent__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/c3dspline", SetEventScript__FPcPcP9mgCMemory);
@@ -114,7 +121,22 @@ INCLUDE_ASM("nonmatchings/game/c3dspline", EventLoop__Fv);
 INCLUDE_ASM("nonmatchings/game/c3dspline", GetEventMessage__Fi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", GetActiveCamera__Fv);
 INCLUDE_ASM("nonmatchings/game/c3dspline", GetCharacter__Fi);
-INCLUDE_ASM("nonmatchings/game/c3dspline", InitSplineKey__FP10SPLINE_KEY);
+void InitSplineKey(SPLINE_KEY * arg0) {
+    arg0->field_0x0 = 0;
+    arg0->field_0x4 = 0;
+    arg0->field_0x8 = 0;
+    arg0->field_0x14 = 0;
+    arg0->field_0x20 = 0;
+    arg0->field_0x2C = 0;
+    arg0->field_0xC = 0;
+    arg0->field_0x18 = 0;
+    arg0->field_0x24 = 0;
+    arg0->field_0x30 = 0;
+    arg0->field_0x10 = 0;
+    arg0->field_0x1C = 0;
+    arg0->field_0x28 = 0;
+    arg0->field_0x34 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", __ct__9C3DSplineFv);
 INCLUDE_ASM("nonmatchings/game/c3dspline", Initialize__9C3DSplineFv);
 INCLUDE_ASM("nonmatchings/game/c3dspline", SetUpSpline__9C3DSplineFPA4_fPiif);

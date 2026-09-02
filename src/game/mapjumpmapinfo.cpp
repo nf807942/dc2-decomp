@@ -7,6 +7,9 @@
  */
 
 #include "common.h"
+#include "gen/MainMapInfo_01F582A0Data.hpp"
+#include "gen/MapJumpMapInfo.hpp"
+#include "gen/SubMapInfoData.hpp"
 
 struct mgCMemory;
 
@@ -18,6 +21,9 @@ extern s32 NowSubMapNo;
 extern mgCMemory *ScriptBuffer_0037E568;
 
 #include "runscript.hpp"
+extern MainMapInfo_01F582A0Data MainMapInfo_01F582A0;
+extern SubMapInfoData SubMapInfo;
+
 
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", PaintEditParts__FP8CEditMapiiPf);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", CheckPlaceAlt__FiP8CEditMapPfiPf);
@@ -53,8 +59,22 @@ void ClearSubMapNo(void) {
     NowSubMapNo = -1;
 }
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", __ct__14MapJumpMapInfoFv);
-INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", SetMainMapInfo__FP14MapJumpMapInfo);
-INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", SetSubMapInfo__FP14MapJumpMapInfo);
+void SetMainMapInfo(MapJumpMapInfo * arg0) {
+    MainMapInfo_01F582A0.field_0x0 = arg0->field_0x0;
+    MainMapInfo_01F582A0.field_0x4 = arg0->field_0x4;
+    MainMapInfo_01F582A0.field_0x8 = arg0->field_0x8;
+    MainMapInfo_01F582A0.field_0xC = arg0->field_0xC;
+    MainMapInfo_01F582A0.field_0x10 = arg0->field_0x10;
+    MainMapInfo_01F582A0.field_0x14 = arg0->field_0x14;
+}
+void SetSubMapInfo(MapJumpMapInfo * arg0) {
+    SubMapInfo.field_0x0 = arg0->field_0x0;
+    SubMapInfo.field_0x4 = arg0->field_0x4;
+    SubMapInfo.field_0x8 = arg0->field_0x8;
+    SubMapInfo.field_0xC = arg0->field_0xC;
+    SubMapInfo.field_0x10 = arg0->field_0x10;
+    SubMapInfo.field_0x14 = arg0->field_0x14;
+}
 void SetScriptBuffer(mgCMemory *buffer) {
     ScriptBuffer_0037E568 = buffer;
 }

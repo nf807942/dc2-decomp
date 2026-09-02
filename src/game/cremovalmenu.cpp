@@ -7,6 +7,7 @@
  */
 
 #include "common.h"
+#include "gen/CCharaFrameMatching.hpp"
 
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", MenuGeoramaMakePush__FP12CMenuGeoramaii);
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", MenuGeoramaCheckPointPush__FP12CMenuGeoramaii);
@@ -16,7 +17,11 @@ INCLUDE_ASM("nonmatchings/game/cremovalmenu", MenuGeoramaPushKey__Fii);
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", MakeNPCList__12CRemovalMenuFv);
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", KeyStep__12CRemovalMenuFv);
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", MenuRemovalInit__FP9mgCMemoryPi);
-INCLUDE_ASM("nonmatchings/game/cremovalmenu", Initialize__19CCharaFrameMatchingFv);
+void CCharaFrameMatching::Initialize(void) {
+    this->field_0x0 = 0;
+    this->field_0x8 = 0;
+    this->field_0x4 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", MenuRemovalKey__Fv);
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", MenuRemovalDraw__Fv);
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", InitEnd__14CBaseMenuClassFv);

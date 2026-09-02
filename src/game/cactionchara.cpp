@@ -7,6 +7,8 @@
  */
 
 #include "common.h"
+#include "gen/CActionChara.hpp"
+#include "gen/CMapPiece.hpp"
 
 INCLUDE_ASM("nonmatchings/game/cactionchara", GetMotionStatus__11CCharacter2Fv);
 INCLUDE_ASM("nonmatchings/game/cactionchara", GetNowMotionName__11CCharacter2Fv);
@@ -20,7 +22,10 @@ INCLUDE_ASM("nonmatchings/game/cactionchara", GetCopySize__11CCharacter2Fv);
 INCLUDE_ASM("nonmatchings/game/cactionchara", SetPosition__11CCharacter2Ffff);
 INCLUDE_ASM("nonmatchings/game/cactionchara", AssignMds__9CMapPieceFP8CMdsInfo);
 INCLUDE_ASM("nonmatchings/game/cactionchara", GetPoly__9CMapPieceFiP6CCPolyR9mgVu0FBOXi);
-INCLUDE_ASM("nonmatchings/game/cactionchara", SetTimeBand__9CMapPieceFff);
+void CMapPiece::SetTimeBand(f32 arg0, f32 arg1) {
+    this->field_0x94 = arg0;
+    this->field_0x98 = arg1;
+}
 INCLUDE_ASM("nonmatchings/game/cactionchara", GetMaterial__9CMapPieceFi);
 INCLUDE_ASM("nonmatchings/game/cactionchara", Step__9CMapPieceFv);
 INCLUDE_ASM("nonmatchings/game/cactionchara", GetBoundBox__9CMapPieceFP9mgVu0FBOX);
@@ -65,7 +70,12 @@ INCLUDE_ASM("nonmatchings/game/cactionchara", Draw__12CObjectFrameFv);
 INCLUDE_ASM("nonmatchings/game/cactionchara", DrawDirect__12CObjectFrameFv);
 INCLUDE_ASM("nonmatchings/game/cactionchara", Copy__12CObjectFrameFR12CObjectFrameP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cactionchara", Initialize__12CObjectFrameFv);
-INCLUDE_ASM("nonmatchings/game/cactionchara", ResetAccele__12CActionCharaFv);
+void CActionChara::ResetAccele(void) {
+    this->field_0x788 = 0;
+    this->field_0x784 = 0;
+    this->field_0x780 = 0;
+    this->field_0x790 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cactionchara", ResetAction__12CActionCharaFv);
 INCLUDE_ASM("nonmatchings/game/cactionchara", ResetScript__12CActionCharaFv);
 INCLUDE_ASM("nonmatchings/game/cactionchara", CheckRunEvent__12CActionCharaFv);

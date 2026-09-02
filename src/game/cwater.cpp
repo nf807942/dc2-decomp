@@ -7,6 +7,10 @@
  */
 
 #include "common.h"
+#include "gen/CRunScript.hpp"
+#include "gen/CThunderEffect.hpp"
+#include "gen/CWater.hpp"
+#include "gen/dbgCJISFont.hpp"
 #include "gen/CWaterFrame.hpp"
 #include "gen/dbgCJISFont.hpp"
 
@@ -27,7 +31,12 @@ INCLUDE_ASM("nonmatchings/game/cwater", Step__11CFireRasterFv);
 INCLUDE_ASM("nonmatchings/game/cwater", SetTexture__11CFireRasterFP10mgCTexture);
 INCLUDE_ASM("nonmatchings/game/cwater", Draw__11CFireRasterFPfPf);
 INCLUDE_ASM("nonmatchings/game/cwater", Initialize__11CFireRasterFv);
-INCLUDE_ASM("nonmatchings/game/cwater", Init__14CThunderEffectFv);
+void CThunderEffect::Init(void) {
+    this->field_0x0 = 0;
+    this->field_0x90 = 0;
+    this->field_0x94 = 0;
+    this->field_0x98 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cwater", Hamon__6CWaterFv);
 INCLUDE_ASM("nonmatchings/game/cwater", SetVertex__6CWaterFPfPf);
 INCLUDE_ASM("nonmatchings/game/cwater", Shake__6CWaterFiif);
@@ -36,7 +45,12 @@ s32 CWaterFrame::GetWater(void) {
     return this->field_0xF8;
 }
 INCLUDE_ASM("nonmatchings/game/cwater", SetSize__6CWaterFiiP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/cwater", SetParam__6CWaterFffff);
+void CWater::SetParam(f32 arg0, f32 arg1, f32 arg2, f32 arg3) {
+    this->field_0x40 = arg0;
+    this->field_0x44 = arg1;
+    this->field_0x48 = arg2;
+    this->field_0x4C = arg3;
+}
 INCLUDE_ASM("nonmatchings/game/cwater", SetColor__6CWaterFUcUcUcUc);
 INCLUDE_ASM("nonmatchings/game/cwater", __ct__6CWaterFv);
 INCLUDE_ASM("nonmatchings/game/cwater", CreateRenderInfoPacket__6CWaterFPUiPA4_fP13mgRENDER_INFO);
@@ -54,7 +68,30 @@ INCLUDE_ASM("nonmatchings/game/cwater", SjisToJis__FUl);
 INCLUDE_ASM("nonmatchings/game/cwater", SjisToSerno__FUl);
 INCLUDE_ASM("nonmatchings/game/cwater", ascii2serno__FUc);
 INCLUDE_ASM("nonmatchings/game/cwater", __ct__11dbgCJISFontFv);
-INCLUDE_ASM("nonmatchings/game/cwater", Initialize__11dbgCJISFontFv);
+void dbgCJISFont::Initialize(void) {
+    this->field_0xC = -1;
+    this->field_0x8 = -1;
+    this->field_0x4 = -1;
+    this->field_0x0 = -1;
+    this->field_0x50 = 0;
+    this->field_0x30 = 0;
+    this->field_0x10 = 0;
+    this->field_0x74 = 0;
+    this->field_0x70 = 0;
+    this->field_0x7C = 16;
+    this->field_0x78 = 16;
+    this->field_0x88 = 0;
+    this->field_0x894 = 128;
+    this->field_0x890 = 128;
+    this->field_0x88C = 128;
+    this->field_0x888 = 128;
+    this->field_0x898 = 0;
+    this->field_0x8A4 = 0;
+    this->field_0x8A0 = 0;
+    this->field_0x89C = 0;
+    this->field_0x8A8 = 64;
+    this->field_0x8AC = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cwater", InitTexture__11dbgCJISFontFiPciPciPc);
 void dbgCJISFont::Clear(void) {
     this->field_0x88 = 0;
@@ -69,7 +106,11 @@ INCLUDE_ASM("nonmatchings/game/cwater", divby0error__Fv);
 INCLUDE_ASM("nonmatchings/game/cwater", modby0error__Fv);
 INCLUDE_ASM("nonmatchings/game/cwater", print__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cwater", __ct__10CRunScriptFv);
-INCLUDE_ASM("nonmatchings/game/cwater", DeleteProgram__10CRunScriptFv);
+void CRunScript::DeleteProgram(void) {
+    this->field_0x3C = 0;
+    this->field_0x40 = 0;
+    this->field_0x44 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cwater", check_stack__10CRunScriptFv);
 INCLUDE_ASM("nonmatchings/game/cwater", push__10CRunScriptF12RS_STACKDATA);
 INCLUDE_ASM("nonmatchings/game/cwater", push_int__10CRunScriptFi);

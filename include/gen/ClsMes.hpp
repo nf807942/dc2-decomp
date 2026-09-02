@@ -13,8 +13,20 @@ struct ClsMes {
     u8 pad_0x0[0x138];
     s32 field_0x138;
     s32 field_0x13C;
+    u8 pad_0x140[0x9C];
+    s32 field_0x1DC;
+    u8 pad_0x1E0[0x1C48];
+    s32 field_0x1E28;
+    s32 field_0x1E2C;
+    u8 pad_0x1E30[0xB1C];
+    s16 * field_0x294C;
+    s16 * field_0x2950;
 
+    s32 GetPageAutoFlg(void);
     s32 GetWindowMode(void);
+    void SetBuff(s16 * arg0);
+    void SetBuff_system(s16 * arg0);
+    void SetDefColor(u32 arg0);
     void SetWindowBgOpaqueFlg(s32 arg0);
 };
 

@@ -7,6 +7,7 @@
  */
 
 #include "common.h"
+#include "gen/mgRect_f_.hpp"
 
 /* Le corps ne rend qu'un code : ni la classe ni les arguments ne sont
  * déréférencés, donc leur disposition reste à établir. */
@@ -44,7 +45,12 @@ s32 CBaseMenuClass::ItemCmdAfter(s32 command, ITEMCMD_RET_PARA *para) {
     return 0;
 }
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", ExitEnd__14CBaseMenuClassFv);
-INCLUDE_ASM("nonmatchings/game/cmenutreemap", Set__9mgRect_f_Fffff);
+void mgRect_f_::Set(f32 arg0, f32 arg1, f32 arg2, f32 arg3) {
+    this->field_0x0 = arg0;
+    this->field_0x4 = arg1;
+    this->field_0x8 = arg2;
+    this->field_0xC = arg3;
+}
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", GetPenkiColor__FiPf);
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", ConvGeoramaDataNo__Fi);
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", CheckMenuLine__FPiPiii);

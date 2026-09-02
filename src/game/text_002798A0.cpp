@@ -7,10 +7,13 @@
  */
 
 #include "common.h"
+#include "gen/GeoStoneData.hpp"
 
 #include "runscript.hpp"
 extern s32 SwordEffect;
 struct RS_STACKDATA;
+
+extern GeoStoneData GeoStone;
 
 
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_SET_MINIMAP_FLAG__FP12RS_STACKDATAi);
@@ -115,7 +118,10 @@ INCLUDE_ASM("nonmatchings/game/text_002798A0", _GET_PARTS_FUNC_POS__FP12RS_STACK
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _RANDOM_CIRCLE_GET_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _RANDOM_CIRCLE_OFF__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _DNG_XCHG_MAP_LIGHT__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002798A0", _GEOSTONE_ANIME_OFF__FP12RS_STACKDATAi);
+s32 _GEOSTONE_ANIME_OFF(RS_STACKDATA * arg0, s32 arg1) {
+    GeoStone.field_0x668 = 0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _GEOSTONE_SET_FLAG__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _GEOSTONE_SET_REFERENCE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _GEOSTONE_DEL_REFERENCE__FP12RS_STACKDATAi);

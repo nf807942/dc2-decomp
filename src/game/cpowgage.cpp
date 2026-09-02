@@ -7,6 +7,7 @@
  */
 
 #include "common.h"
+#include "gen/CPowGage.hpp"
 
 #include "runscript.hpp"
 
@@ -79,4 +80,13 @@ INCLUDE_ASM("nonmatchings/game/cpowgage", SetEffectScript__FP10CRunScriptPcP9mgC
 INCLUDE_ASM("nonmatchings/game/cpowgage", SetEffectScriptFunc__Fv);
 INCLUDE_ASM("nonmatchings/game/cpowgage", GetSphidaClubDef__Fi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", DPrimEnterSprite__FP11mgCDrawPrimiiiiffff);
-INCLUDE_ASM("nonmatchings/game/cpowgage", Initialize__8CPowGageFv);
+void CPowGage::Initialize(void) {
+    this->field_0x4 = 0;
+    this->field_0x0 = 0;
+    this->field_0x8 = 0;
+    this->field_0xC = 0;
+    this->field_0x10 = 2;
+    this->field_0x14 = -10;
+    this->field_0x1C = -1;
+    this->field_0x20 = 0;
+}

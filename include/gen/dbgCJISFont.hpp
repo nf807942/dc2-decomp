@@ -10,10 +10,36 @@
  * déclarer une virtuelle ferait émettre une table que le disque
  * porte déjà. */
 struct dbgCJISFont {
-    u8 pad_0x0[0x88];
+    s32 field_0x0;
+    s32 field_0x4;
+    s32 field_0x8;
+    s32 field_0xC;
+    s8 field_0x10;
+    u8 pad_0x11[0x1F];
+    s8 field_0x30;
+    u8 pad_0x31[0x1F];
+    s8 field_0x50;
+    u8 pad_0x51[0x1F];
+    s32 field_0x70;
+    s32 field_0x74;
+    s32 field_0x78;
+    s32 field_0x7C;
+    u8 pad_0x80[0x8];
     s8 field_0x88;
+    u8 pad_0x89[0x7FF];
+    s32 field_0x888;
+    s32 field_0x88C;
+    s32 field_0x890;
+    s32 field_0x894;
+    s32 field_0x898;
+    s32 field_0x89C;
+    s32 field_0x8A0;
+    s32 field_0x8A4;
+    s32 field_0x8A8;
+    s32 field_0x8AC;
 
     void Clear(void);
+    void Initialize(void);
 };
 
 #endif /* GEN_DBGCJISFONT_HPP */

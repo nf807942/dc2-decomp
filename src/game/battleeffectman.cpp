@@ -7,6 +7,8 @@
  */
 
 #include "common.h"
+#include "gen/CAfterWire.hpp"
+#include "gen/CThunder.hpp"
 #include "gen/CHealingEffectMan.hpp"
 #include "gen/CMiniEffPrim.hpp"
 #include "gen/CPalletAnime.hpp"
@@ -15,7 +17,11 @@
 INCLUDE_ASM("nonmatchings/game/battleeffectman", SetPos__8CThunderFPfff);
 INCLUDE_ASM("nonmatchings/game/battleeffectman", Draw__8CThunderFv);
 INCLUDE_ASM("nonmatchings/game/battleeffectman", Step__8CThunderFv);
-INCLUDE_ASM("nonmatchings/game/battleeffectman", Initialize__8CThunderFv);
+void CThunder::Initialize(void) {
+    this->field_0xDB0 = 0;
+    this->field_0xDB1 = 0;
+    this->field_0xF4 = &this->field_0x110;
+}
 INCLUDE_ASM("nonmatchings/game/battleeffectman", Draw__12CSparcEffectFv);
 INCLUDE_ASM("nonmatchings/game/battleeffectman", Step__12CSparcEffectFv);
 void CSparcEffect::Initialize(void) {
@@ -52,7 +58,13 @@ INCLUDE_ASM("nonmatchings/game/battleeffectman", CreatPointList__16CSWordAfterIm
 INCLUDE_ASM("nonmatchings/game/battleeffectman", AddPoint__16CSWordAfterImageFPfPff);
 INCLUDE_ASM("nonmatchings/game/battleeffectman", Step__16CSWordAfterImageFv);
 INCLUDE_ASM("nonmatchings/game/battleeffectman", Initialize__16CSWordAfterImageFP9mgCMemoryii);
-INCLUDE_ASM("nonmatchings/game/battleeffectman", SetMode__10CAfterWireFi);
+void CAfterWire::SetMode(s32 arg0) {
+    this->field_0x0 = arg0;
+    this->field_0x116 = 0;
+    this->field_0x118 = 0;
+    this->field_0x112 = 0;
+    this->field_0x114 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/battleeffectman", SetPos__10CAfterWireFPf);
 INCLUDE_ASM("nonmatchings/game/battleeffectman", DrawWire__10CAfterWireFPA4_f);
 INCLUDE_ASM("nonmatchings/game/battleeffectman", StepWire__10CAfterWireFv);

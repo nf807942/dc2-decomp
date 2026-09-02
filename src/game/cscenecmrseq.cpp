@@ -7,6 +7,9 @@
  */
 
 #include "common.h"
+#include "gen/CEoh.hpp"
+#include "gen/CSceneCmrSeq.hpp"
+#include "gen/CSceneObjSeq.hpp"
 
 /* Le corps ne rend qu'un code : ni la classe ni les arguments ne sont
  * déréférencés, donc leur disposition reste à établir. */
@@ -19,7 +22,10 @@ INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsMoveAHD2__FP12_SEN_CMR_SEQP12CS
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsSetSyncObj__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsReleaseSyncObj__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsAHDSlowing__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsAHDKeep__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
+s32 scsAHDKeep(_SEN_CMR_SEQ * arg0, CSceneCmrSeq * arg1) {
+    arg1->field_0x34 = arg0;
+    return 0;
+}
 s32 scsAHDReturn(_SEN_CMR_SEQ *sequence, CSceneCmrSeq *owner) {
     return 2;
 }
@@ -28,7 +34,10 @@ INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsSetPasFrm__FP12_SEN_CMR_SEQP12C
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsAddPas__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsStartPas__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsPRSlowing__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsPRKeep__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
+s32 scsPRKeep(_SEN_CMR_SEQ * arg0, CSceneCmrSeq * arg1) {
+    arg1->field_0x30 = arg0;
+    return 0;
+}
 s32 scsPRReturn(_SEN_CMR_SEQ *sequence, CSceneCmrSeq *owner) {
     return 2;
 }
@@ -141,7 +150,9 @@ INCLUDE_ASM("nonmatchings/game/cscenecmrseq", __ct__12CSceneObjSeqFv);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", ZeroInitialize__12CSceneObjSeqFv);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Initialize__12CSceneObjSeqFP12_SEN_OBJ_SEQi);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Clear__12CSceneObjSeqFv);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SetEohNo__12CSceneObjSeqFi);
+void CSceneObjSeq::SetEohNo(s32 arg0) {
+    this->field_0x64 = arg0;
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SearchSeq__12CSceneObjSeqFv);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", GetNextSeq__12CSceneObjSeqFP12_SEN_OBJ_SEQ);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SearchNextPosSeq__12CSceneObjSeqFv);
@@ -191,7 +202,16 @@ INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SetScale__12CSceneObjSeqFPfi);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SeDelay__12CSceneObjSeqFi);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SePlay__12CSceneObjSeqFii);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", ResetDAPosition__12CSceneObjSeqFv);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", __ct__4CEohFv);
+CEoh::CEoh(void) {
+    this->field_0x0 = -1;
+    this->field_0x4 = -1;
+    this->field_0x8 = 1;
+    this->field_0xC = 0;
+    this->field_0xC = 0;
+    this->field_0xC = 0;
+    this->field_0xC = 0;
+    this->field_0xC = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Set__4CEohFiP7CObjecti);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Set__4CEohFiiP11CCharacter2);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Set__4CEohFiP13CEventSprite2);

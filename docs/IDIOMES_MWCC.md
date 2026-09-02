@@ -53,6 +53,27 @@ Le compilateur est `mwcps2-3.0-011126`, au niveau `-O4,p`, en `-lang c++`.
 
 ## Adressage
 
+- **Une globale hors de la fenêtre de `$gp` s'atteint comme un champ de
+  structure, jamais comme un tableau indexé.** `ResetNpcTalkMes` efface deux
+  mots de `EdEventInfo`, qui fait 4 768 octets ; le commerce y accède
+  directement, en deux instructions par écriture :
+
+  ```
+  lui  $at, %hi(EdEventInfo + 0x126C)
+  sw   $zero, %lo(EdEventInfo + 0x126C)($at)
+  ```
+
+  Déclarée `extern u8 EdEventInfo[]` et écrite `*(s32 *)&EdEventInfo[0x126C] = 0`,
+  la même chose rend un `lui` *et* un `addiu` avant le `sw` : l'indexation
+  matérialise l'adresse dans un registre. **54 %.** Déclarée en structure —
+  `struct EdEventInfoData { u8 pad_0x0[0x126C]; s32 field_0x126C; … };` avec
+  `extern EdEventInfoData EdEventInfo;` — et écrite `EdEventInfo.field_0x126C = 0`,
+  elle rend les octets du disque. **100 %.**
+
+  `scripts/diff/petites.py` engendre cette structure sous le nom
+  `<Globale>Data`, par le même mécanisme que les en-têtes de classe. C'est ce
+  qui a débloqué les 139 fonctions que le motif `lui` retenait.
+
 - **La taille déclarée d'une globale décide de son adressage.** `MenuMesForm`
   fait 0x24 octets et s'atteint par `%hi`/`%lo` ; `MenuCommonInfo` en fait
   quatre et passe par `$gp`. Déclarer le premier comme un simple pointeur le

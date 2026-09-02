@@ -7,6 +7,7 @@
  */
 
 #include "common.h"
+#include "gen/CGiftMark.hpp"
 #include "gen/CPiyori.hpp"
 
 INCLUDE_ASM("nonmatchings/game/cweaponelement", Initialize__14CWeaponElementFv);
@@ -46,7 +47,12 @@ INCLUDE_ASM("nonmatchings/game/cweaponelement", Step__7CPiyoriFv);
 INCLUDE_ASM("nonmatchings/game/cweaponelement", Set__9CGiftMarkFP11CCharacter2f);
 INCLUDE_ASM("nonmatchings/game/cweaponelement", Draw__9CGiftMarkFv);
 INCLUDE_ASM("nonmatchings/game/cweaponelement", Step__9CGiftMarkFv);
-INCLUDE_ASM("nonmatchings/game/cweaponelement", Initialize__9CGiftMarkFv);
+void CGiftMark::Initialize(void) {
+    this->field_0x0 = 0;
+    this->field_0xC = 0;
+    this->field_0x8 = 0;
+    this->field_0x10 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cweaponelement", Draw__13CEnemyGekirinFP10CPreSpriteii);
 INCLUDE_ASM("nonmatchings/game/cweaponelement", Step__13CEnemyGekirinFv);
 INCLUDE_ASM("nonmatchings/game/cweaponelement", SetView__14CEnemyLifeGageFi);

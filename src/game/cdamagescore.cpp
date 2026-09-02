@@ -7,9 +7,18 @@
  */
 
 #include "common.h"
+#include "gen/CDamageScore.hpp"
+#include "gen/CLockOnModel.hpp"
+#include "gen/CRedMarkModel.hpp"
+struct CScene;
+
 
 INCLUDE_ASM("nonmatchings/game/cdamagescore", SetValue__12CDamageScoreFPfi);
-INCLUDE_ASM("nonmatchings/game/cdamagescore", SetColor__12CDamageScoreFsss);
+void CDamageScore::SetColor(s16 arg0, s16 arg1, s16 arg2) {
+    this->field_0x48 = arg0;
+    this->field_0x4A = arg1;
+    this->field_0x4C = arg2;
+}
 INCLUDE_ASM("nonmatchings/game/cdamagescore", SetSprite__12CDamageScoreFPfiiii);
 INCLUDE_ASM("nonmatchings/game/cdamagescore", Draw__12CDamageScoreFv);
 INCLUDE_ASM("nonmatchings/game/cdamagescore", Step__12CDamageScoreFv);
@@ -21,17 +30,25 @@ INCLUDE_ASM("nonmatchings/game/cdamagescore", DrawMess__12CLockOnModelFi);
 INCLUDE_ASM("nonmatchings/game/cdamagescore", Step__12CLockOnModelFv);
 INCLUDE_ASM("nonmatchings/game/cdamagescore", Step__13CWarningGage2Fv);
 INCLUDE_ASM("nonmatchings/game/cdamagescore", Draw__13CWarningGage2Fv);
-INCLUDE_ASM("nonmatchings/game/cdamagescore", Initialize__12CLockOnModelFP6CScene);
+void CLockOnModel::Initialize(CScene * arg0) {
+    this->field_0x80 = arg0;
+    this->field_0x8C = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cdamagescore", GetWeaponEffect__Fv);
 INCLUDE_ASM("nonmatchings/game/cdamagescore", memoryInit__Fv);
 INCLUDE_ASM("nonmatchings/game/cdamagescore", InitDungeonMain__F13INIT_LOOP_ARG);
 INCLUDE_ASM("nonmatchings/game/cdamagescore", Initialize__13MoveCheckInfoFv);
-INCLUDE_ASM("nonmatchings/game/cdamagescore", Initialize__13CRedMarkModelFv);
+void CRedMarkModel::Initialize(void) {
+    this->field_0x80 = 0;
+    this->field_0x84 = 0;
+    this->field_0x70 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cdamagescore", __as__9mgCCameraFRC9mgCCamera);
 INCLUDE_ASM("nonmatchings/game/cdamagescore", __ct__14CActiveMonsterFv);
 INCLUDE_ASM("nonmatchings/game/cdamagescore", CommonStageClassInit__Fv);
 INCLUDE_ASM("nonmatchings/game/cdamagescore", CommonClassInit__Fv);
 INCLUDE_ASM("nonmatchings/game/cdamagescore", EntryEventScript__Fi);
-INCLUDE_ASM("nonmatchings/game/cdamagescore", FinishDungeonMain__Fv);
+void FinishDungeonMain(void) {
+}
 INCLUDE_ASM("nonmatchings/game/cdamagescore", LoopDungeonMain__Fv);
 INCLUDE_ASM("nonmatchings/game/cdamagescore", DngMainDraw__Fv);

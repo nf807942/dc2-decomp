@@ -7,6 +7,8 @@
  */
 
 #include "common.h"
+#include "gen/DebugInfoData.hpp"
+#include "gen/CDataItem.hpp"
 #include "gen/CDataRoboPart.hpp"
 
 /* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
@@ -17,6 +19,14 @@ extern s32 LoopNo;
 extern s32 PlayTimeCountFlag;
 extern s32 SubGameSaveData;
 extern s32 SystemSND_ID;
+extern s32 event_view;
+extern s32 future_sel;
+extern s32 hdd_sel;
+extern s32 menu_mode;
+
+extern DebugInfoData DebugInfo;
+struct SPI_STACK;
+
 
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetDebugFont__Fv);
 s32 GetCaptureMode(void) {
@@ -58,7 +68,12 @@ INCLUDE_ASM("nonmatchings/game/cgamedata", MainLoop__Fv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", MenuInit__F13INIT_LOOP_ARG);
 INCLUDE_ASM("nonmatchings/game/cgamedata", MenuLoop__Fv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", MenuExit__Fv);
-INCLUDE_ASM("nonmatchings/game/cgamedata", InitEventSelect__Fv);
+void InitEventSelect(void) {
+    event_view = 0;
+    future_sel = 0;
+    menu_mode = 2;
+    hdd_sel = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cgamedata", EventSelect__Fv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetFontTexture__Fi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", LoadFontTexture__Fv);
@@ -85,7 +100,10 @@ INCLUDE_ASM("nonmatchings/game/cgamedata", gcBIT_FLAG_ON__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcBIT_FLAG_OFF__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcSTART_EVENT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcGEO_COMPLETE__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cgamedata", gcGEO_DEBUG__FP9SPI_STACKi);
+s32 gcGEO_DEBUG(SPI_STACK * arg0, s32 arg1) {
+    DebugInfo.field_0x8 = 1;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcITEM_SET__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcGET_ITEM__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcGET_N_ITEM__FP9SPI_STACKi);
@@ -103,7 +121,13 @@ INCLUDE_ASM("nonmatchings/game/cgamedata", gcACTIVE_CHARA__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", __ct__16CUserDataManagerFv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", __ct__9CEditDataFv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetGameDataPt__Fv);
-INCLUDE_ASM("nonmatchings/game/cgamedata", __ct__9CDataItemFv);
+CDataItem::CDataItem(void) {
+    this->field_0x4 = 0;
+    this->field_0x0 = 0;
+    this->field_0xA = 0;
+    this->field_0xC = 0;
+    this->field_0xE = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cgamedata", __ct__11CDataAttachFv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", __ct__11CDataWeaponFv);
 u8 CDataRoboPart::GetOffsetNo(void) {

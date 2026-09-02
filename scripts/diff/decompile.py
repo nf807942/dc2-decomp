@@ -106,7 +106,9 @@ def main(argv: list[str]) -> int:
 
     # Le contexte, quand il existe, donne à m2c les structures et prototypes
     # déjà reconstruits ; sans lui il invente des types plausibles.
-    context = ROOT / "build" / "ctx.cpp"
+    # `ctx.c` et non `.cpp` : m2c lit du C par pycparser, et
+    # `scripts/build/contexte.py` engendre exactement cette vue-là.
+    context = ROOT / "build" / "ctx.c"
     if context.exists():
         command += ["--context", str(context)]
 

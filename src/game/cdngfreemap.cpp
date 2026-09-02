@@ -7,6 +7,7 @@
  */
 
 #include "common.h"
+#include "gen/CDngFreeMap.hpp"
 
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", _CHECK_PAUSE__FP12RS_STACKDATAi_001E8790);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", _GET_BIT_FLAG__FP12RS_STACKDATAi);
@@ -52,7 +53,13 @@ INCLUDE_ASM("nonmatchings/game/cdngfreemap", SetupRobo__FP6CSceneP16CUserDataMan
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", GetRoboPartsInfo__FP16CUserDataManager);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", SetupMonster__FP6CSceneP16CUserDataManager);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", Initialize__11CDngFreeMapFv);
-INCLUDE_ASM("nonmatchings/game/cdngfreemap", InitTexture__11CDngFreeMapFv);
+void CDngFreeMap::InitTexture(void) {
+    this->field_0xD8 = 0;
+    this->field_0xDC = 0;
+    this->field_0xE0 = 0;
+    this->field_0xD4 = 0;
+    this->field_0xD0 = -1;
+}
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", SetUserGlid__11CDngFreeMapFi);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", CalcGlidPutPos__11CDngFreeMapFP9GLID_INFORfRfi);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", CheckIsViewMove__11CDngFreeMapFiiRfRf);

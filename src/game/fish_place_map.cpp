@@ -16,9 +16,21 @@ extern s32 MenuOpenFlag;
 extern s32 SubGame;
 struct FISH_DATA;
 
+extern s32 RodActFlag;
+extern s32 UkiCameraFlag;
+extern s32 UkiMode;
+extern s32 UkiModeCnt;
+struct CScene;
+
 
 INCLUDE_ASM("nonmatchings/game/fish_place_map", CastingLoop__FP6CSceneP11CPadControl);
-INCLUDE_ASM("nonmatchings/game/fish_place_map", InitUkiWait__FP6CScene);
+s32 InitUkiWait(CScene * arg0) {
+    RodActFlag = 0;
+    UkiMode = 0;
+    UkiModeCnt = 0;
+    UkiCameraFlag = 0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/fish_place_map", ResetUkiCamera__FP14CCameraControl);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", UkiWaitLoop__FP6CSceneP11CPadControl);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", InitBattle__FP6CScene);

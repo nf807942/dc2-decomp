@@ -17,6 +17,15 @@ extern s32 PartsInfoID;
 extern s32 PreMenuCount;
 extern s32 PreMenuMaxCount;
 
+extern s32 CursorLockCnt;
+extern s32 EditHelpMesNo;
+extern s32 EditHelpMesParam2;
+extern s32 EditHelpMesParam;
+extern s32 PlaceRiverCnt;
+extern s32 RemoveMtnCnt;
+extern s32 SysMesCnt;
+extern s32 SysMesNo;
+
 
 INCLUDE_ASM("nonmatchings/game/cfont", CheckKanjiFont__5CFontFi);
 INCLUDE_ASM("nonmatchings/game/cfont", CheckHalfFont__5CFontFi);
@@ -87,14 +96,21 @@ s32 CheckControl(void) {
 }
 INCLUDE_ASM("nonmatchings/game/cfont", EditModeControlLock__Fv);
 INCLUDE_ASM("nonmatchings/game/cfont", EditModeControlUnLock__Fv);
-INCLUDE_ASM("nonmatchings/game/cfont", SetHelpMes__Fiii);
+void SetHelpMes(s32 arg0, s32 arg1, s32 arg2) {
+    EditHelpMesNo = arg0;
+    EditHelpMesParam = arg1;
+    EditHelpMesParam2 = arg2;
+}
 INCLUDE_ASM("nonmatchings/game/cfont", GetUserData__Fv_002DD7A0);
 INCLUDE_ASM("nonmatchings/game/cfont", ConvColor__Ff);
 INCLUDE_ASM("nonmatchings/game/cfont", ConvColorV__FPf);
 INCLUDE_ASM("nonmatchings/game/cfont", emSearchColorCode__FPf);
 INCLUDE_ASM("nonmatchings/game/cfont", emGetPenkiItemNo__Fi);
 INCLUDE_ASM("nonmatchings/game/cfont", emGetPenkiItemNo__FPf);
-INCLUDE_ASM("nonmatchings/game/cfont", IntiSystemMes__Fv);
+void IntiSystemMes(void) {
+    SysMesCnt = 0;
+    SysMesNo = -1;
+}
 INCLUDE_ASM("nonmatchings/game/cfont", OpenSystemMes__FP6CSceneii);
 INCLUDE_ASM("nonmatchings/game/cfont", SystemMesClose__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/cfont", SystemMesStep__FP6CScene);
@@ -108,7 +124,11 @@ INCLUDE_ASM("nonmatchings/game/cfont", LoadEditCursor__FP9mgCMemoryi);
 s32 GetSelPartsInfoID(void) {
     return PartsInfoID;
 }
-INCLUDE_ASM("nonmatchings/game/cfont", ClearEditStepCnt__Fv);
+void ClearEditStepCnt(void) {
+    PlaceRiverCnt = 0;
+    CursorLockCnt = 0;
+    RemoveMtnCnt = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cfont", ClearUndoFlag__Fv);
 INCLUDE_ASM("nonmatchings/game/cfont", ClearEditFlag__Fv);
 INCLUDE_ASM("nonmatchings/game/cfont", InitEditFlag__Fv);

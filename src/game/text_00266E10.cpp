@@ -7,8 +7,14 @@
  */
 
 #include "common.h"
+#include "gen/EdEventInfoData.hpp"
+#include "gen/MenuArgData.hpp"
 
 #include "runscript.hpp"
+extern EdEventInfoData EdEventInfo;
+extern MenuArgData MenuArg;
+struct RS_STACKDATA;
+
 
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_CURRENT_DIR__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _CHANGE_DIR__FP12RS_STACKDATAi);
@@ -31,7 +37,11 @@ INCLUDE_ASM("nonmatchings/game/text_00266E10", _LOAD_ITEM__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _GOTO_USE_ITEM__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_LOCAL_FLAG__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_LOCAL_FLAG__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _GOTO_SELECT_PARTY__FP12RS_STACKDATAi);
+s32 _GOTO_SELECT_PARTY(RS_STACKDATA * arg0, s32 arg1) {
+    MenuArg.field_0x28 = 4;
+    EdEventInfo.field_0xD0 = 3;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_LOADBG_FILE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_LOADBG_FILE_MONS_TALK__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _CHECK_LOADBG_FILE__FP12RS_STACKDATAi);

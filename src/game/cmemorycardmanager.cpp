@@ -7,6 +7,7 @@
  */
 
 #include "common.h"
+#include "gen/CSWordAfterEffect.hpp"
 #include "gen/CGeyserEffectPoint.hpp"
 #include "gen/CSphidaData.hpp"
 #include "gen/CSubGameData.hpp"
@@ -18,6 +19,15 @@ public:
     s32 Convert();
 };
 extern "C" void *memset(void *destination, s32 value, u32 size);
+
+extern s32 fade_cnt;
+extern s32 next_thunder_cnt;
+extern s32 rea_chara_id;
+extern s32 rea_mtn_step;
+extern s32 sound_cnt;
+extern s32 sound_flag;
+extern s32 start_thunder;
+extern s32 thunder_count;
 
 
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", __ct__18CMemoryCardManagerFv);
@@ -74,7 +84,11 @@ INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", SetTexture__17CSWordAfterEff
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", StartEffect__17CSWordAfterEffectFP8mgCFrameP8mgCFrameiii);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", AddPoint__17CSWordAfterEffectFPfPf);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Step__17CSWordAfterEffectFv);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Clear__17CSWordAfterEffectFv);
+void CSWordAfterEffect::Clear(void) {
+    this->field_0x88 = 0;
+    this->field_0x4 = 0;
+    this->field_0x0 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Initialize__17CSWordAfterEffectFP9mgCMemoryii);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Copy__17CSWordAfterEffectFR17CSWordAfterEffectP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", InitSV_CONFIG_OPTION__FP16SV_CONFIG_OPTION);
@@ -139,8 +153,18 @@ INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetFloorInfoPtr__16CSaveData
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Initialize__16CSaveDataDungeonFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", SetFloorID__16CSaveDataDungeonFi);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", EditExceptionStep__FiP6CScene);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", InitNpcCameraReaction__Fv);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", InitS51Thunder__Fv);
+void InitNpcCameraReaction(void) {
+    rea_mtn_step = 0;
+    rea_chara_id = -1;
+}
+void InitS51Thunder(void) {
+    thunder_count = 0;
+    start_thunder = 0;
+    next_thunder_cnt = 60;
+    fade_cnt = 0;
+    sound_cnt = 0;
+    sound_flag = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", S51Thunder__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", InitFirePowder__FiP6CSceneiP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", StepFirePowder__FP6CScene);

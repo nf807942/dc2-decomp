@@ -7,6 +7,7 @@
  */
 
 #include "common.h"
+#include "gen/CRocketLauncher.hpp"
 
 class CEditMap {
 public:
@@ -21,6 +22,10 @@ extern s32 CEditMapName;
  * qu'un code de retour ne la déréférencent pas : sa disposition reste à
  * établir. */
 struct SPI_STACK;
+extern s32 emapInit;
+extern s32 emapInitIdx;
+extern s32 emapInitNum;
+
 
 s32 CEditMap::Iam(void) {
     return CEditMapName;
@@ -93,7 +98,12 @@ INCLUDE_ASM("nonmatchings/game/ceditmap", emapFIX_EPARTS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceditmap", emapFIX_EPARTS_END__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceditmap", emapINIT_EPARTS_START__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceditmap", emapINIT_EPARTS__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ceditmap", emapINIT_EPARTS_END__FP9SPI_STACKi);
+s32 emapINIT_EPARTS_END(SPI_STACK * arg0, s32 arg1) {
+    emapInitNum = 0;
+    emapInitIdx = 0;
+    emapInit = 0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap", LoadEditInfo__8CEditMapFPciP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/ceditmap", __ct__14CEditPartsInfoFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap", Initialize__14CEditPartsInfoFv);
@@ -127,4 +137,11 @@ INCLUDE_ASM("nonmatchings/game/ceditmap", EditPartsCmpColor__FPfPf);
 INCLUDE_ASM("nonmatchings/game/ceditmap", SetPos__15CRocketLauncherFPfPfPf);
 INCLUDE_ASM("nonmatchings/game/ceditmap", Step__15CRocketLauncherFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap", Draw__15CRocketLauncherFv);
-INCLUDE_ASM("nonmatchings/game/ceditmap", Initialize__15CRocketLauncherFv);
+void CRocketLauncher::Initialize(void) {
+    this->field_0x0 = -1;
+    this->field_0x150 = 0;
+    this->field_0x154 = 0;
+    this->field_0x174 = 0;
+    this->field_0x160 = -1;
+    this->field_0x164 = 0;
+}

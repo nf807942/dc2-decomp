@@ -7,6 +7,8 @@
  */
 
 #include "common.h"
+#include "gen/VideoDec.hpp"
+#include "gen/VoBuf.hpp"
 
 /* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
  * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
@@ -91,7 +93,10 @@ INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", pcmCallback__FP7sceMpegP16sce
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", vblankHandler__Fi);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", handler_endimage__Fi);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", voBufCreate__FP5VoBufP6VoDataP5VoTagi);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", voBufReset__FP5VoBuf);
+void voBufReset(VoBuf * arg0) {
+    arg0->field_0xC = 0;
+    arg0->field_0x10 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", voBufIsFull__FP5VoBuf);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", voBufIncCount__FP5VoBuf);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", voBufGetData__FP5VoBuf);
@@ -139,5 +144,7 @@ INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", changeInputVolume__FUi);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", startDisplay__Fi);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", switchThread__Fv);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", videoDecSetState__FP8VideoDecUi);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", videoDecGetState__FP8VideoDec);
+s32 videoDecGetState(VideoDec * arg0) {
+    return arg0->field_0xA8;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", decBs0__FP8VideoDec);

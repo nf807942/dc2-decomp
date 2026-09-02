@@ -150,22 +150,30 @@ def _read_params(text: str) -> list[str] | None:
 
 
 def demangle(mangled: str) -> Symbol | None:
-    """Rend la signature d'un symbole, ou `None` si elle n'est pas sûre."""
+    """Rend la signature d'un symbole, ou `None` si elle n'est pas sûre.
+
+    Le nom et la queue se séparent sur un `__`, mais lequel ? Un nom peut en
+    porter — `__ALPHA__FP9SPI_STACKi` s'appelle `__ALPHA`, et `_MENU_END__F…`
+    en cache un au milieu. Le découpage juste est celui dont la queue s'analyse,
+    et il n'y a qu'à les essayer : couper au premier `__` laissait 219 symboles
+    illisibles sur les 7 840 du binaire.
+    """
     # Le désambiguïsateur du désassemblage ajoute l'adresse en suffixe ; elle ne
     # fait pas partie du mangling, mais le nom qu'elle porte est celui à écrire.
     stem = re.sub(r"_00[0-9A-F]{6}$", "", mangled)
 
-    if "__" not in stem:
-        return None
-    name, _, tail = stem.partition("__")
+    for coupe in (index for index in range(len(stem) - 1)
+                  if stem[index:index + 2] == "__"):
+        lu = _lire(mangled, stem[:coupe], stem[coupe + 2:])
+        if lu is not None:
+            return lu
+    return None
+
+
+def _lire(mangled: str, name: str, tail: str) -> Symbol | None:
+    """Lit un découpage nom/queue donné, ou rend `None` s'il ne tient pas."""
     if not name:
-        # `__ct__8CGamePadFv` : le nom lui-même commence par deux blancs.
-        for special in SPECIAL:
-            if stem.startswith(special + "__"):
-                name, tail = special, stem[len(special) + 2:]
-                break
-        else:
-            return None
+        return None
 
     kind = SPECIAL.get(name, "fonction")
 

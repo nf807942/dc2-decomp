@@ -7,12 +7,27 @@
  */
 
 #include "common.h"
+#include "gen/mgRenderInfoData.hpp"
+#include "gen/CScriptInterpreter.hpp"
+#include "gen/input_str.hpp"
+extern s32 draw_performance_meter;
+extern s32 rot_priority;
+struct SPI_STACK;
 
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgPerformanceMeter__Fi);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetPerformanceMeterFlag__Fv);
+extern mgRenderInfoData mgRenderInfo;
+
+
+void mgPerformanceMeter(s32 arg0) {
+    draw_performance_meter = arg0;
+}
+s32 mgGetPerformanceMeterFlag(void) {
+    return draw_performance_meter;
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", VSyncCallBack__Fi_00141870);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgInitVSyncCallBack__FPFi_i);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetRotateThread__Fi);
+void mgSetRotateThread(s32 arg0) {
+    rot_priority = arg0;
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", WaitVSync__Fii);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetVSyncCount__Fv);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", GetScreenSize__FiPiPiPiPiPiPi);
@@ -46,7 +61,9 @@ INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgBeginDrawShadow__FP10mgCT
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgEndDrawShadow__FP10mgCTextureP10mgCTexture);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetRenderInfo__Ffff);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetProjection__Ff);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetProjection__Fv);
+f32 mgGetProjection(void) {
+    return mgRenderInfo.field_0x0;
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetBackGround__FPf);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetBackGround__Fffff);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgInitLighting__Fv);
@@ -70,7 +87,9 @@ INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetPlightEnable__Fv);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetFogParam__FffUcUcUcff);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetFogParam__FP11mgFOG_PARAM);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetFogParam__FP11mgFOG_PARAM);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetAllScissorFlag__Fi);
+void mgSetAllScissorFlag(s32 arg0) {
+    mgRenderInfo.field_0xFA0 = arg0;
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgFlushRenderInfo__Fv);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetPkTextureRepeat__Fi);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetPkTextureRepeat__F10sceGsClamp);
@@ -117,14 +136,26 @@ INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", spiGetStackVector__FPfP9SPI
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", PushStack__18CScriptInterpreterF9SPI_STACK);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", __as__9SPI_STACKFRC9SPI_STACK);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", GetNextTAG__18CScriptInterpreterFi);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", SetStack__18CScriptInterpreterFP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", SetStringBuff__18CScriptInterpreterFPci);
+void CScriptInterpreter::SetStack(SPI_STACK * arg0, s32 arg1) {
+    this->field_0x14 = arg0;
+    this->field_0x10 = arg1;
+    this->field_0xC = 0;
+}
+void CScriptInterpreter::SetStringBuff(char * arg0, s32 arg1) {
+    this->field_0x20 = arg0;
+    this->field_0x18 = arg1;
+    this->field_0x1C = this->field_0x20;
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", Run__18CScriptInterpreterFv);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", hash__18CScriptInterpreterFPc);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", SetTag__18CScriptInterpreterFP13SPI_TAG_PARAM);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", SetScript__18CScriptInterpreterFPci);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", __ct__18CScriptInterpreterFv);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", __ct__9input_strFv);
+input_str::input_str(void) {
+    this->field_0x4 = 0;
+    this->field_0x8 = 0;
+    this->field_0x0 = 0;
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", GetArgBin__18CScriptInterpreterFv);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", GetArg__18CScriptInterpreterFv);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", back__9input_strFv);

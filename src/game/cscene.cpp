@@ -7,6 +7,7 @@
  */
 
 #include "common.h"
+#include "gen/CSceneData.hpp"
 #include "gen/CRain.hpp"
 #include "gen/mgCObjectStack_21CList_12EMAP_MESSAGE__.hpp"
 
@@ -20,7 +21,14 @@ INCLUDE_ASM("nonmatchings/game/cscene", Step__5CRainFv);
 INCLUDE_ASM("nonmatchings/game/cscene", Init__5CRainFv);
 INCLUDE_ASM("nonmatchings/game/cscene", DrawScreenRain__Fv);
 INCLUDE_ASM("nonmatchings/game/cscene", Draw__5CRainFv);
-INCLUDE_ASM("nonmatchings/game/cscene", Initialize__10CSceneDataFv);
+void CSceneData::Initialize(void) {
+    this->field_0x0 = 0;
+    this->field_0x8 = 0;
+    this->field_0x30 = 0;
+    this->field_0x28 = -1;
+    this->field_0x2C = 0;
+    this->field_0x4 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cscene", AssignData__15CSceneCharacterFP11CCharacter2Pc);
 INCLUDE_ASM("nonmatchings/game/cscene", Initialize__15CSceneCharacterFv);
 INCLUDE_ASM("nonmatchings/game/cscene", Initialize__9CSceneMapFv);

@@ -14,9 +14,11 @@ struct CDynamicAnime {
     s32 field_0x68;
     u8 pad_0x6C[0x1C];
     s32 field_0x88;
+    f32 field_0x8C;
 
     void ResetFloor(void);
     void ResetWind(void);
+    void SetFloor(f32 arg0);
 };
 
 #endif /* GEN_CDYNAMICANIME_HPP */

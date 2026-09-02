@@ -7,6 +7,7 @@
  */
 
 #include "common.h"
+#include "gen/EditAnalyzeDataSrc.hpp"
 extern s32 eaAnaData;
 extern s32 eaAnaSrc;
 struct SPI_STACK;
@@ -83,7 +84,22 @@ INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", SePlayFoot__6CSceneFiiPf);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetLine__FPPcPcPc_002AC650);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", LoadSndRevInfo__6CSceneFPci);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", LoadSndFileInfo__6CSceneFPci);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", Init__18EditAnalyzeDataSrcFv);
+void EditAnalyzeDataSrc::Init(void) {
+    this->field_0x0 = 0;
+    this->field_0x4 = 0;
+    this->field_0x6 = 0;
+    this->field_0x8 = -1;
+    this->field_0x9 = -1;
+    this->field_0xA = -1;
+    this->field_0xB = -1;
+    this->field_0xC = -1;
+    this->field_0xD = -1;
+    this->field_0xE = -1;
+    this->field_0xF = -1;
+    this->field_0x10 = -1;
+    this->field_0x14 = 0;
+    this->field_0x18 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", Init__14EditAnalyzeSrcFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetAnalyzeDataSrc__Fii);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", Initialize__9CEditDataFv);

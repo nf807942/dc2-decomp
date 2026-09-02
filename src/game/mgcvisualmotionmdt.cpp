@@ -7,6 +7,8 @@
  */
 
 #include "common.h"
+#include "gen/CStartupEpisodeTitle.hpp"
+#include "gen/MessageTaskManager.hpp"
 
 /* Le corps ne rend qu'un code : ni la classe ni les arguments ne sont
  * déréférencés, donc leur disposition reste à établir. */
@@ -14,6 +16,9 @@ class mgCVisualMotionMDT {
 public:
     s32 Iam();
 };
+extern s32 FLS_FLOOR_ID;
+struct SPI_STACK;
+
 
 s32 LoadFileSocket(char *path, u32 *size) {
     return 0;
@@ -48,12 +53,50 @@ INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", StreamOpenState__6CSoundFv);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", DrawEpisode__20CStartupEpisodeTitleFii);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Switch__20CStartupEpisodeTitleFi);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Step__20CStartupEpisodeTitleFv);
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Initialize__20CStartupEpisodeTitleFv);
+void CStartupEpisodeTitle::Initialize(void) {
+    this->field_0x14 = 0;
+    this->field_0x0 = 0;
+    this->field_0x2 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Draw__18MessageTaskManagerFv);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Step__18MessageTaskManagerFv);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Print__18MessageTaskManagerFPciii);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Clear__18MessageTaskManagerFv);
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Initialize__18MessageTaskManagerFv);
+void MessageTaskManager::Initialize(void) {
+    this->field_0x4 = 0;
+    this->field_0x368 = 0;
+    this->field_0x0 = 0;
+    this->field_0x8 = 0;
+    this->field_0x8C = 0;
+    this->field_0x8E = 0;
+    this->field_0x92 = 8;
+    this->field_0x94 = 0;
+    this->field_0x98 = 0;
+    this->field_0x11C = 0;
+    this->field_0x11E = 0;
+    this->field_0x122 = 8;
+    this->field_0x124 = 0;
+    this->field_0x128 = 0;
+    this->field_0x1AC = 0;
+    this->field_0x1AE = 0;
+    this->field_0x1B2 = 8;
+    this->field_0x1B4 = 0;
+    this->field_0x1B8 = 0;
+    this->field_0x23C = 0;
+    this->field_0x23E = 0;
+    this->field_0x242 = 8;
+    this->field_0x244 = 0;
+    this->field_0x248 = 0;
+    this->field_0x2CC = 0;
+    this->field_0x2CE = 0;
+    this->field_0x2D2 = 8;
+    this->field_0x2D4 = 0;
+    this->field_0x2D8 = 0;
+    this->field_0x35C = 0;
+    this->field_0x35E = 0;
+    this->field_0x362 = 8;
+    this->field_0x364 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Draw__13CRedMarkModelFv);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Step__13CRedMarkModelFv);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", GeoDraw__9CGeoStoneFPf);
@@ -111,7 +154,10 @@ INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", AutoSetTreasureBox__FiPff);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", AutoSetTreasureBox__Fv);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", _FLS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", _FL__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", _FLE__FP9SPI_STACKi);
+s32 _FLE(SPI_STACK * arg0, s32 arg1) {
+    FLS_FLOOR_ID = -1;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", CreatMonsterFloorInfo__FPci);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", AutoSetMonster__Fv);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", AutoSetMonster__FiPfPfi);

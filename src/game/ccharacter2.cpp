@@ -7,6 +7,8 @@
  */
 
 #include "common.h"
+#include "gen/CCharaLOD.hpp"
+#include "gen/CDynamicAnime.hpp"
 #include "gen/CDynamicAnime.hpp"
 
 /* Le corps ne rend qu'un code : ni la classe ni les arguments ne sont
@@ -98,7 +100,14 @@ INCLUDE_ASM("nonmatchings/game/ccharacter2", _SKIN_MODEL__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", CreateChangeFrame__FP10mgLoadDataP8mgCFrame);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _SKIN_MOTION__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _LOD_MODEL_START__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", __ct__9CCharaLODFv);
+CCharaLOD::CCharaLOD(void) {
+    this->field_0x10 = 0;
+    this->field_0x14 = 0;
+    this->field_0xC = 0;
+    this->field_0x0 = 0;
+    this->field_0x8 = 0;
+    this->field_0x4 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _LOD_MODEL__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _LOD_MODEL_END__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", ChangeLOD__11CCharacter2Fi);
@@ -114,7 +123,10 @@ INCLUDE_ASM("nonmatchings/game/ccharacter2", SetWind__13CDynamicAnimeFfPf);
 void CDynamicAnime::ResetWind(void) {
     this->field_0x68 = 0;
 }
-INCLUDE_ASM("nonmatchings/game/ccharacter2", SetFloor__13CDynamicAnimeFf);
+void CDynamicAnime::SetFloor(f32 arg0) {
+    this->field_0x88 = 1;
+    this->field_0x8C = arg0;
+}
 void CDynamicAnime::ResetFloor(void) {
     this->field_0x88 = 0;
 }

@@ -7,6 +7,7 @@
  */
 
 #include "common.h"
+#include "gen/CVillagerInfo.hpp"
 
 /* La pile de l'interpréteur de script d'objet. Les commandes qui ne rendent
  * qu'un code de retour ne la déréférencent pas : sa disposition reste à
@@ -74,7 +75,15 @@ s32 niPLACE(SPI_STACK *stack, int argc) {
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", niNOON_PLACE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", niNIGHT_PLACE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", niNPC_INFO_NUM__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", __ct__13CVillagerInfoFv);
+CVillagerInfo::CVillagerInfo(void) {
+    this->field_0x0 = -1;
+    this->field_0x4 = 0;
+    this->field_0x8 = 0;
+    this->field_0x10 = 0;
+    this->field_0xC = 0;
+    this->field_0x18 = -1;
+    this->field_0x14 = -1;
+}
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", niNPC_INFO__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", LoadNPCInfo__FPciP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", LoadPlaceInfo__FPciP9mgCMemory);

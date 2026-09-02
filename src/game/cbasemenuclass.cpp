@@ -7,8 +7,20 @@
  */
 
 #include "common.h"
+#include "gen/CMENU_USERPARAM.hpp"
+#include "gen/CMenuInter.hpp"
 
-INCLUDE_ASM("nonmatchings/game/cbasemenuclass", Initialize__10CMenuInterFi);
+void CMenuInter::Initialize(s32 arg0) {
+    this->field_0x10 = 1;
+    this->field_0x0 = 0;
+    this->field_0x4 = 6;
+    this->field_0xC = 0;
+    this->field_0x12 = 0;
+    this->field_0x13 = 30;
+    this->field_0x14 = 1;
+    this->field_0x8 = -1;
+    this->field_0x15 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", MenuCommonBaseDataEnter__FP9mgCMemoryPUiii);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", MenuBaseTextureReEnter__Fv);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", InitEnd__10CMenuInterFv);
@@ -54,7 +66,14 @@ INCLUDE_ASM("nonmatchings/game/cbasemenuclass", SetPreCmdTrush__FP14CBaseMenuCla
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", SetPreCmdSpectolBreak__FP14CBaseMenuClassiP16CMenuPosDataFormP13CGameDataUsedP13CGameDataUsed);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", SetPreCmdGiftBoxSelect__FP14CBaseMenuClassP13CGameDataUsed);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", CheckFishCondition__Fv);
-INCLUDE_ASM("nonmatchings/game/cbasemenuclass", Initialize__15CMENU_USERPARAMFv);
+void CMENU_USERPARAM::Initialize(void) {
+    this->field_0x4 = 0;
+    this->field_0x0 = 0;
+    this->field_0x8 = 0;
+    this->field_0xC = 0;
+    this->field_0x10 = 0;
+    this->field_0x14 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", AttachInfo__15CMENU_USERPARAMFv);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", Initialize__17MENU_ASKMODE_PARAFv);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", __ct__17MENU_ASKMODE_PARAFv);

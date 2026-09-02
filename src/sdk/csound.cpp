@@ -7,6 +7,10 @@
  */
 
 #include "common.h"
+#include "gen/CLoopSeMngr.hpp"
+#include "gen/sndCSeSeqData.hpp"
+#include "gen/sndSeInfo.hpp"
+#include "gen/sndTrack.hpp"
 
 INCLUDE_ASM("nonmatchings/sdk/csound", StopVoice__6CSoundFi);
 INCLUDE_ASM("nonmatchings/sdk/csound", SndInReverb__6CSoundFb);
@@ -51,7 +55,11 @@ INCLUDE_ASM("nonmatchings/sdk/csound", ezTransToIOP2__FPvPvi);
 INCLUDE_ASM("nonmatchings/sdk/csound", BigToLittle__FPvPvi);
 INCLUDE_ASM("nonmatchings/sdk/csound", GetDeltaTime__FPcPi);
 INCLUDE_ASM("nonmatchings/sdk/csound", Initialize__8sndTrackFv);
-INCLUDE_ASM("nonmatchings/sdk/csound", Initialize__13sndCSeSeqDataFv);
+void sndCSeSeqData::Initialize(void) {
+    this->field_0x4 = 1;
+    this->field_0x8 = 0;
+    this->field_0xC = 0;
+}
 INCLUDE_ASM("nonmatchings/sdk/csound", LoadSMF__13sndCSeSeqDataFPciP9mgCMemory);
 INCLUDE_ASM("nonmatchings/sdk/csound", Initialize__9sndCSeSeqFv);
 INCLUDE_ASM("nonmatchings/sdk/csound", SetSeID__9sndCSeSeqFi);
@@ -74,11 +82,21 @@ INCLUDE_ASM("nonmatchings/sdk/csound", GetEmptyVoice__8sndTrackFv);
 INCLUDE_ASM("nonmatchings/sdk/csound", NoteOn__8sndTrackFii);
 INCLUDE_ASM("nonmatchings/sdk/csound", NoteOff__8sndTrackFii);
 INCLUDE_ASM("nonmatchings/sdk/csound", CtrlChg__8sndTrackFii);
-INCLUDE_ASM("nonmatchings/sdk/csound", ProgChg__8sndTrackFi);
-INCLUDE_ASM("nonmatchings/sdk/csound", PitchBend__8sndTrackFii);
+s32 sndTrack::ProgChg(s32 arg0) {
+    this->field_0x2 = arg0;
+    return 0;
+}
+s32 sndTrack::PitchBend(s32 arg0, s32 arg1) {
+    this->field_0x4 = arg1;
+    this->field_0x5 = arg0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/sdk/csound", Create__11CLoopSeMngrFiP9mgCMemory);
 INCLUDE_ASM("nonmatchings/sdk/csound", __ct__15SND_LOOP_SE_SEQFv);
-INCLUDE_ASM("nonmatchings/sdk/csound", Initialize__11CLoopSeMngrFv);
+void CLoopSeMngr::Initialize(void) {
+    this->field_0x0 = 0;
+    this->field_0x4 = 0;
+}
 INCLUDE_ASM("nonmatchings/sdk/csound", Clear__11CLoopSeMngrFv);
 INCLUDE_ASM("nonmatchings/sdk/csound", GetLoopSe__11CLoopSeMngrFPiUii);
 INCLUDE_ASM("nonmatchings/sdk/csound", SeLoopPlayStop__11CLoopSeMngrFUiiii);
@@ -162,7 +180,10 @@ INCLUDE_ASM("nonmatchings/sdk/csound", sndSqRePlay__Fii);
 INCLUDE_ASM("nonmatchings/sdk/csound", GetLine__FPPcPcPc_00190D90);
 INCLUDE_ASM("nonmatchings/sdk/csound", SearchSeq__11sndBankInfoFPcPi);
 INCLUDE_ASM("nonmatchings/sdk/csound", LoadSeInfoTxt__11sndPortInfoFiPciP9mgCMemory);
-INCLUDE_ASM("nonmatchings/sdk/csound", __ct__9sndSeInfoFv);
+sndSeInfo::sndSeInfo(void) {
+    this->field_0x0 = 0;
+    this->field_0x4 = 0;
+}
 INCLUDE_ASM("nonmatchings/sdk/csound", LoadVolInfoTxt__11sndPortInfoFiPci);
 INCLUDE_ASM("nonmatchings/sdk/csound", sndStopSeSeq__Fi);
 INCLUDE_ASM("nonmatchings/sdk/csound", PlaySeSeq__FUiP13sndCSeSeqDatai);

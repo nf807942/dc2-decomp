@@ -7,6 +7,7 @@
  */
 
 #include "common.h"
+#include "gen/ClsMes.hpp"
 
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", CheckPosInOutFor2P__Fffffff);
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", CalcIntersectionPointLineAndLine__FffffffffPfPf);
@@ -21,7 +22,9 @@ INCLUDE_ASM("nonmatchings/game/clsmes_00151690", DrawFukidashi__6ClsMesFiii);
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", SetDrawSpeed__6ClsMesFv);
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", GetDrawSpeedDef__6ClsMesFv);
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", GetCaptionOff__6ClsMesFv);
-INCLUDE_ASM("nonmatchings/game/clsmes_00151690", GetPageAutoFlg__6ClsMesFv);
+s32 ClsMes::GetPageAutoFlg(void) {
+    return this->field_0x1DC;
+}
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", GetScrPosFromChar__FP11CCharacter2Pi);
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", GetStrWidth__6ClsMesFPc);
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", GetStrWidth__6ClsMesFi);
@@ -33,7 +36,14 @@ INCLUDE_ASM("nonmatchings/game/clsmes_00151690", AutoSet__6ClsMesFPi);
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", GetBuffMesIdPtr__FPcii);
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", SetHalfFontWPercent__6ClsMesFf);
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", __ct__6ClsMesFv);
-INCLUDE_ASM("nonmatchings/game/clsmes_00151690", SetBuff__6ClsMesFPs);
-INCLUDE_ASM("nonmatchings/game/clsmes_00151690", SetBuff_system__6ClsMesFPs);
-INCLUDE_ASM("nonmatchings/game/clsmes_00151690", SetDefColor__6ClsMesFUi);
+void ClsMes::SetBuff(s16 * arg0) {
+    this->field_0x294C = arg0;
+}
+void ClsMes::SetBuff_system(s16 * arg0) {
+    this->field_0x2950 = arg0;
+}
+void ClsMes::SetDefColor(u32 arg0) {
+    this->field_0x1E28 = arg0;
+    this->field_0x1E2C = this->field_0x1E28;
+}
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", Preset__6ClsMesFi);

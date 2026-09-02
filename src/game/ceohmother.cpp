@@ -7,6 +7,10 @@
  */
 
 #include "common.h"
+#include "gen/EdEventInfoData.hpp"
+#include "gen/CRaster.hpp"
+extern EdEventInfoData EdEventInfo;
+
 
 INCLUDE_ASM("nonmatchings/game/ceohmother", CalcPosWorldCoordGyaku__FPf);
 INCLUDE_ASM("nonmatchings/game/ceohmother", SetCamWorldCoord__FP9mgCCamera);
@@ -68,7 +72,19 @@ INCLUDE_ASM("nonmatchings/game/ceohmother", GetArgInt__FP8ARG_DATA);
 INCLUDE_ASM("nonmatchings/game/ceohmother", GetArgFloat__FP8ARG_DATA);
 INCLUDE_ASM("nonmatchings/game/ceohmother", GetArgString__FP8ARG_DATA);
 INCLUDE_ASM("nonmatchings/game/ceohmother", GetArgVector__FPfP8ARG_DATA);
-INCLUDE_ASM("nonmatchings/game/ceohmother", Initialize__7CRasterFv);
+void CRaster::Initialize(void) {
+    this->field_0x0 = 0;
+    this->field_0x8 = 0;
+    this->field_0x4 = 0;
+    this->field_0x10 = 0;
+    this->field_0xC = 0;
+    this->field_0x18 = 0;
+    this->field_0x14 = 0;
+    this->field_0x20 = 0;
+    this->field_0x1C = 0;
+    this->field_0x24 = -1;
+    this->field_0x28 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/ceohmother", SetParam__7CRasterFfff);
 INCLUDE_ASM("nonmatchings/game/ceohmother", StartRaster__7CRasterFfffi);
 INCLUDE_ASM("nonmatchings/game/ceohmother", StopRaster__7CRasterFfffi);
@@ -101,11 +117,21 @@ INCLUDE_ASM("nonmatchings/game/ceohmother", EdEventDraw__Fv);
 INCLUDE_ASM("nonmatchings/game/ceohmother", EdEventFirstDraw__Fv);
 INCLUDE_ASM("nonmatchings/game/ceohmother", EdEventFinish__Fv);
 INCLUDE_ASM("nonmatchings/game/ceohmother", EdEventStep__Fv);
-INCLUDE_ASM("nonmatchings/game/ceohmother", InitDramaScene__Fv);
-INCLUDE_ASM("nonmatchings/game/ceohmother", CancelDramaScene__Fv);
+void InitDramaScene(void) {
+    EdEventInfo.field_0xE0 = 0;
+    EdEventInfo.field_0xE4 = 0;
+    EdEventInfo.field_0xD4 = 1;
+    EdEventInfo.field_0xD8 = 15;
+    EdEventInfo.field_0xE8 = 0;
+    EdEventInfo.field_0xEC = 0;
+}
+void CancelDramaScene(void) {
+    EdEventInfo.field_0xD4 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/ceohmother", EdEventMenuExit__Fv);
 INCLUDE_ASM("nonmatchings/game/ceohmother", EdEventLoopInit__Fv);
-INCLUDE_ASM("nonmatchings/game/ceohmother", EdSetBrokenObject__Fv);
+void EdSetBrokenObject(void) {
+}
 INCLUDE_ASM("nonmatchings/game/ceohmother", ResetMesFileBuffAll__Fv);
 INCLUDE_ASM("nonmatchings/game/ceohmother", EdEventMapInit__Fv);
 INCLUDE_ASM("nonmatchings/game/ceohmother", EdEventTermination__Fv);

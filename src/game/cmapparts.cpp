@@ -7,6 +7,14 @@
  */
 
 #include "common.h"
+#include "gen/CCameraDrawInfo.hpp"
+#include "gen/CList_9CMapParts_.hpp"
+#include "gen/CList_9CMapPiece_.hpp"
+#include "gen/CList_9CObjAnime_.hpp"
+#include "gen/CMapInfo.hpp"
+#include "gen/CMapParts.hpp"
+#include "gen/CMapPiece.hpp"
+#include "gen/CObjectFrame.hpp"
 
 /* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
  * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
@@ -24,6 +32,10 @@ public:
  * qu'un code de retour ne la déréférencent pas : sa disposition reste à
  * établir. */
 struct SPI_STACK;
+extern s32 LightingInfo;
+extern s32 mapNowFuncPoint;
+struct PieceMaterial;
+
 
 INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__15CMapTreasureBoxFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetTrBox__4CMapFi);
@@ -60,7 +72,9 @@ INCLUDE_ASM("nonmatchings/game/cmapparts", GetLightInfo__4CMapFP16CMapLightingIn
 INCLUDE_ASM("nonmatchings/game/cmapparts", __as__16CMapLightingInfoFRC16CMapLightingInfo);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetLightingInfo__4CMapFi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetActiveLightNo__4CMapFv);
-INCLUDE_ASM("nonmatchings/game/cmapparts", GetActiveLightNo__8CMapInfoFv);
+s32 CMapInfo::GetActiveLightNo(void) {
+    return this->field_0x98;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetLightInfo__4CMapFP16CMapLightingInfoPfi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mgAbs__Ff);
 s32 mapDummy(SPI_STACK *stack, int argc) {
@@ -70,9 +84,14 @@ s32 IsAddMode(void) {
     return mapAddMode;
 }
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPARTS__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", pGetData__17CList_9CMapParts_Fv);
+void * CList_9CMapParts_::pGetData(void) {
+    return &this->field_0x10;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__17CList_9CMapParts_Fv);
-INCLUDE_ASM("nonmatchings/game/cmapparts", Initialize__17CList_9CMapParts_Fv);
+void CList_9CMapParts_::Initialize(void) {
+    this->field_0x4 = 0;
+    this->field_0x0 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__7CObjectFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__9mgCObjectFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", algn16_size__FUi);
@@ -80,17 +99,31 @@ INCLUDE_ASM("nonmatchings/game/cmapparts", mapFAR_CLIP__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapLIGHT_FLAG__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapMOVE_FLAG__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapLOD_START__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", SetLODDist__9CMapPartsFPfi);
+void CMapParts::SetLODDist(f32 * arg0, s32 arg1) {
+    this->field_0x1D0 = arg1;
+    this->field_0x1D8 = arg0;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapLOD_BLEND__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", SetLODBlend__9CMapPartsFi);
+void CMapParts::SetLODBlend(s32 arg0) {
+    this->field_0x1D4 = arg0;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapLOD_PIECE__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", GetLODBlend__9CMapPartsFv);
+s32 CMapParts::GetLODBlend(void) {
+    return this->field_0x1D4;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapLOD_END__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", SetName__9CMapPieceFPc);
-INCLUDE_ASM("nonmatchings/game/cmapparts", pGetData__17CList_9CMapPiece_Fv);
+void CMapPiece::SetName(char * arg0) {
+    this->field_0x80 = arg0;
+}
+void * CList_9CMapPiece_::pGetData(void) {
+    return &this->field_0x10;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__17CList_9CMapPiece_Fv);
-INCLUDE_ASM("nonmatchings/game/cmapparts", Initialize__17CList_9CMapPiece_Fv);
+void CList_9CMapPiece_::Initialize(void) {
+    this->field_0x4 = 0;
+    this->field_0x0 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__9CMapPieceFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__12CObjectFrameFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE_NAME__FP9SPI_STACKi);
@@ -98,12 +131,17 @@ INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE_POS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE_ROT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE_SCALE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE_MATERIAL_START__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", SetMaterial__9CMapPieceFP13PieceMateriali);
+void CMapPiece::SetMaterial(PieceMaterial * arg0, s32 arg1) {
+    this->field_0x90 = arg0;
+    this->field_0x8C = arg1;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__13PieceMaterialFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", Initialize__13PieceMaterialFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE_MATERIAL__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetMaterial__8mgCFrameFi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", GetFrame__12CObjectFrameFv);
+s32 CObjectFrame::GetFrame(void) {
+    return this->field_0x70;
+}
 s32 mapPIECE_MATERIAL_END(SPI_STACK *stack, int argc) {
     return 1;
 }
@@ -125,7 +163,10 @@ s32 map_MAP_INFO_TOP(SPI_STACK *stack, int argc) {
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapCAMERA_INFO__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__11CCameraInfoFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__15CCameraDrawInfoFv);
-INCLUDE_ASM("nonmatchings/game/cmapparts", Initialize__15CCameraDrawInfoFv);
+void CCameraDrawInfo::Initialize(void) {
+    this->field_0x4 = 0;
+    this->field_0x0 = -1;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFIX_CAMERA__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFIX_CAMERA_POS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFIX_CAMERA_POS2__FP9SPI_STACKi);
@@ -159,7 +200,10 @@ INCLUDE_ASM("nonmatchings/game/cmapparts", cfgDRAW_OFF_RECT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", cfgOCCLUSION_PLANE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", cfgFUNC_DATA__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", cfgFUNC_EVENT_DATA__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", cfgFUNC_DATA_END__FP9SPI_STACKi);
+s32 cfgFUNC_DATA_END(SPI_STACK * arg0, s32 arg1) {
+    mapNowFuncPoint = 0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", cfgWATER_SURFACE_NUM__FP9SPI_STACKi);
 s32 cfgWATER_SURFACE_START(SPI_STACK *stack, int argc) {
     return 1;
@@ -195,7 +239,10 @@ INCLUDE_ASM("nonmatchings/game/cmapparts", mapLIGHT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPLIGHT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFOG_ENABLE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFOG__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapLIGHT_SET_END__FP9SPI_STACKi);
+s32 mapLIGHT_SET_END(SPI_STACK * arg0, s32 arg1) {
+    LightingInfo = 0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFLOOR__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapCHARA_POS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapTIME_FLAG__FP9SPI_STACKi);
@@ -247,7 +294,10 @@ INCLUDE_ASM("nonmatchings/game/cmapparts", StepFuncPoint__9CMapPartsFR15CFuncPoi
 INCLUDE_ASM("nonmatchings/game/cmapparts", CopyFuncPointCheck__9CMapPartsFR15CFuncPointCheck);
 INCLUDE_ASM("nonmatchings/game/cmapparts", Copy__9CMapPartsFR9CMapPartsP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cmapparts", AssignFuncAnime__9CMapPartsFP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/cmapparts", Initialize__17CList_9CObjAnime_Fv);
+void CList_9CObjAnime_::Initialize(void) {
+    this->field_0x4 = 0;
+    this->field_0x0 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", Initialize__15CMapTreasureBoxFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", AssignFuncPoint__15CMapTreasureBoxFP10CFuncPointP9CMapParts);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetWorldPosition__15CMapTreasureBoxFPf);

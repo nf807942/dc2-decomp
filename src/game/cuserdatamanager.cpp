@@ -8,6 +8,10 @@
 
 #include "common.h"
 #include "gen/CBattleCharaInfo.hpp"
+#include "gen/CFishingTournament.hpp"
+#include "gen/CBattleCharaInfo.hpp"
+extern "C" void *memset(void *destination, s32 value, u32 size);
+
 
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", Initialize__13CFishAquariumFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetAquariumFishTop__13CFishAquariumFi);
@@ -36,8 +40,12 @@ INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetConvertIndexFromFishNo__Fi)
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", __ct__14CFishingRecordFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetFishRecord__14CFishingRecordFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", CheckRecordFish__14CFishingRecordFiff);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", Initialize__18CFishingTournamentFv);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", ResetRecord__18CFishingTournamentFv);
+void CFishingTournament::Initialize(void) {
+    memset(this, 0, 112);
+}
+void CFishingTournament::ResetRecord(void) {
+    memset(&this->field_0x20, 0, 80);
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", EntryFish__18CFishingTournamentFiii);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", EntryRemain__18CFishingTournamentFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetRecord__18CFishingTournamentFi);
@@ -168,7 +176,17 @@ INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetMagicSwordElem__16CBattleCh
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetMagicSwordPow__16CBattleCharaInfoFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetMagicSwordCounterNow__16CBattleCharaInfoFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetMagicSwordCounterMax__16CBattleCharaInfoFv);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", ClearMagicSwordPow__16CBattleCharaInfoFv);
+void CBattleCharaInfo::ClearMagicSwordPow(void) {
+    this->field_0x18 = -1;
+    this->field_0x1A = 0;
+    this->field_0x1C = 0;
+    this->field_0x1E = 0;
+    this->field_0x20 = 0;
+    this->field_0x22 = 0;
+    this->field_0x24 = 0;
+    this->field_0x26 = 0;
+    this->field_0x28 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AddAbs__16CBattleCharaInfoFifPi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AddAbsRate__16CBattleCharaInfoFifPi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetNowAbs__16CBattleCharaInfoFiPi);

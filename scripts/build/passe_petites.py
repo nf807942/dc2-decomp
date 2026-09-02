@@ -10,9 +10,14 @@ chaque fonction, puis réécrit les sources en ne gardant que celles qui rendent
 les octets du disque. Rien n'est laissé à moitié : une fonction qui n'apparie
 pas retrouve son `INCLUDE_ASM`.
 
-L'état d'avant est copié dans `progress/petites_avant/` au premier pas, et
+L'état d'avant est copié sous `progress/passes/<horodatage>/` au premier pas, et
 chaque réécriture repart de cette copie : annuler n'est jamais qu'appliquer un
 sous-ensemble, ce qui évite d'avoir à retrouver dans le texte ce qu'on y a mis.
+
+**L'instantané est propre à l'exécution**, et c'est essentiel : un dossier
+partagé entre passes garderait l'état d'avant la *première*, si bien qu'une
+seconde passe rendrait à l'assembleur les fonctions que la première avait
+gagnées, sans le dire.
 """
 
 from __future__ import annotations
@@ -24,12 +29,17 @@ import re
 import shutil
 import subprocess
 import sys
+from datetime import datetime
 
 RACINE = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.insert(0, os.path.join(RACINE, "scripts"))
 from lib.project import find_symbol  # noqa: E402
-AVANT = os.path.join(RACINE, "progress", "petites_avant")
+PASSES = os.path.join(RACINE, "progress", "passes")
 GEN = os.path.join(RACINE, "include", "gen")
+
+# L'instantané de cette exécution. Fixé au démarrage par `ouvre_instantane()`,
+# jamais réemployé d'une passe à l'autre.
+AVANT = ""
 
 INCLUDE_ASM = 'INCLUDE_ASM("nonmatchings/%s", %s);'
 ENTETE_ENGENDREE = "/* Déclaration engendrée par `scripts/diff/petites.py`."
@@ -63,8 +73,16 @@ def deja_declaree(classe: str) -> str | None:
     return None
 
 
-def entete(classe: str, champs: dict[int, str], membres: list[str]) -> str:
-    """La déclaration provisoire d'une classe, champs connus et remplissage."""
+def entete(classe: str, champs: dict[int, str], membres: list[str],
+           types: set[str] | None = None) -> str:
+    """La déclaration provisoire d'une classe, champs connus et remplissage.
+
+    Les types nommés qu'emploient les membres se déclarent ici, en avant : la
+    source qui inclut cet en-tête les déclarait bien, mais *après* lui, et MWCC
+    lisait alors `void SetTexture(mgCTexture *, …)` sans savoir ce qu'est un
+    `mgCTexture` — « illegal function definition », puis la méthode redéclarée
+    comme `void ()`. Dix-huit erreurs venaient de là.
+    """
     largeur = {"s8": 1, "u8": 1, "s16": 2, "u16": 2, "s32": 4, "u32": 4,
                "f32": 4, "s64": 8, "u64": 8}
     lignes, position = [], 0
@@ -79,12 +97,24 @@ def entete(classe: str, champs: dict[int, str], membres: list[str]) -> str:
         position = offset + largeur.get(kind, 4)
 
     garde = "GEN_%s_HPP" % classe.upper()
+    # Un champ peut porter un type nommé — `mgCTexture *field_0x28` — sans
+    # qu'aucune signature ne le mentionne : ce que la structure emploie doit se
+    # déclarer ici, au même titre que ce que ses méthodes emploient.
+    # Un type de base ne se déclare pas en avant : `struct s16;` vaut à MWCC un
+    # « typename redefined », `s16` étant déjà un typedef de `common.h`.
+    dans_les_champs = {
+        kind.rstrip(" *") for kind in champs.values()
+        if kind.endswith("*")
+        and kind.rstrip(" *") not in set(largeur) | {"void", "char", "bool"}
+    }
+    avant = sorted(((types or set()) | dans_les_champs) - {classe})
     return "\n".join([
         "#ifndef %s" % garde,
         "#define %s" % garde,
         "",
         '#include "common.h"',
         "",
+        *(["struct %s;" % nom for nom in avant] + [""] if avant else []),
         ENTETE_ENGENDREE,
         " * Seuls les champs qu'un accesseur touche sont connus ; leur nom dit",
         " * leur décalage, faute de mieux, et le reste est du remplissage. Ni",
@@ -111,16 +141,60 @@ def ecris_entetes(classes: set[str], fonctions: list[dict]) -> None:
     """
     for classe in sorted(classes):
         champs: dict[int, str] = {}
-        membres = []
+        membres: list[str] = []
+        types: set[str] = set()
         for fonction in fonctions:
+            # Les champs viennent de toute fonction qui en touche, méthode ou
+            # non : `InitSplineKey(SPLINE_KEY *)` est une fonction libre, et
+            # n'en retenir que les méthodes engendrait une structure vide, donc
+            # autant d'« undefined identifier 'field_0x0' ».
+            for offset, kind in (fonction.get("champs", {}).get(classe, {})).items():
+                # Le pointeur l'emporte sur l'entier de même largeur : `lw` dit
+                # la taille, un rangement de pointeur dit le contenu.
+                ancien = champs.get(int(offset))
+                if ancien is None or (kind.endswith("*") and not ancien.endswith("*")):
+                    champs[int(offset)] = kind
+            # Les méthodes, elles, n'appartiennent qu'à leur propre classe.
             if fonction.get("classe") != classe:
                 continue
             if fonction.get("membre"):
                 membres.append(fonction["membre"])
-            for offset, kind in (fonction.get("champs", {}).get(classe, {})).items():
-                champs.setdefault(int(offset), kind)
+            types.update(fonction.get("types", []))
         with open(os.path.join(GEN, classe + ".hpp"), "w", encoding="utf-8") as sortie:
-            sortie.write(entete(classe, champs, membres))
+            sortie.write(entete(classe, champs, membres, types))
+
+
+def types_a_declarer(fonctions: list[dict]) -> set[str]:
+    """Les types dont ces fonctions réclament la disposition.
+
+    La classe d'une méthode, et tout type nommé dont un corps touche les champs.
+    Les deux se déclarent pareil : seul l'endroit d'où vient le besoin diffère.
+    """
+    besoin: set[str] = set()
+    for fonction in fonctions:
+        if fonction.get("classe"):
+            besoin.add(fonction["classe"])
+        besoin.update(fonction.get("champs", {}))
+    return besoin
+
+
+def inclus_ailleurs(classe: str) -> bool:
+    """Dit si une source inclut encore l'en-tête engendré de cette classe.
+
+    La question porte sur l'état du disque après réécriture, non sur le plan :
+    une source que cette passe n'a pas touchée peut fort bien inclure l'en-tête
+    d'une classe dont la passe vient de retirer toutes les fonctions.
+    """
+    besoin = '#include "gen/%s.hpp"' % classe
+    for racine, _sous, fichiers in os.walk(os.path.join(RACINE, "src")):
+        for fichier in fichiers:
+            if not fichier.endswith((".c", ".cpp")):
+                continue
+            with open(os.path.join(racine, fichier),
+                      encoding="utf-8", errors="replace") as source:
+                if besoin in source.read():
+                    return True
+    return False
 
 
 def engendrable(classe: str) -> bool:
@@ -134,8 +208,23 @@ def engendrable(classe: str) -> bool:
 
 # -- application ----------------------------------------------------------
 
+def ouvre_instantane() -> str:
+    """Ouvre le dossier d'instantané de cette exécution, et le rend.
+
+    Les passes anciennes sont gardées : elles disent ce qu'une source portait
+    avant chaque tentative, et c'est la seule trace qui survive à une annulation.
+    """
+    global AVANT
+    AVANT = os.path.join(PASSES, datetime.now().strftime("%Y%m%d-%H%M%S"))
+    return AVANT
+
+
 def original(source: str) -> str:
-    """Le texte d'avant la passe, copié une fois pour toutes."""
+    """Le texte d'avant la passe, copié une fois pour cette exécution.
+
+    Le dossier ne naît qu'à la première copie : un essai à blanc ne laisse
+    ainsi pas de trace vide derrière lui.
+    """
     copie = os.path.join(AVANT, source.replace("/", "__"))
     if not os.path.exists(copie):
         os.makedirs(AVANT, exist_ok=True)
@@ -148,21 +237,30 @@ def applique(source: str, fonctions: list[dict]) -> None:
     """Réécrit une source depuis son état d'avant, avec ce sous-ensemble."""
     texte = origine = original(source)
 
+    # Une fonction que l'instantané porte déjà écrite n'a rien à recevoir : son
+    # corps, son include et ses déclarations y sont. Le plan la garde pour que
+    # l'en-tête de sa classe la connaisse, non pour la réécrire — et l'y
+    # chercher sous forme d'`INCLUDE_ASM` ferait échouer la passe.
+    a_poser = []
     for fonction in fonctions:
         ligne = INCLUDE_ASM % (fonction["chemin_asm"], fonction["symbole"])
-        if ligne not in texte:
-            raise SystemExit("%s : %s introuvable" % (source, fonction["symbole"]))
-        texte = texte.replace(ligne, fonction["cpp"])
+        if ligne in texte:
+            texte = texte.replace(ligne, fonction["cpp"])
+            a_poser.append(fonction)
 
-    # Les en-têtes des classes touchées, et les types nommés que les signatures
-    # emploient sans que l'unité les connaisse.
-    includes = sorted({'#include "gen/%s.hpp"' % f["classe"]
-                       for f in fonctions if f.get("classe")})
+    fonctions = a_poser
+
+    # Les en-têtes des types dont un corps touche les champs — la classe d'une
+    # méthode comme le paramètre d'une fonction libre —, puis les types nommés
+    # que les seules signatures emploient, qu'une déclaration en avant suffit à
+    # satisfaire.
+    declares = types_a_declarer(fonctions)
+    includes = sorted('#include "gen/%s.hpp"' % nom for nom in declares)
     avant = [nom for fonction in fonctions for nom in fonction.get("types", [])]
     declarations = sorted({
         "struct %s;" % nom for nom in avant
         if not re.search(r"\b(?:class|struct)\s+%s\b" % re.escape(nom), origine)
-        and not any(nom == f.get("classe") for f in fonctions)
+        and nom not in declares
     })
     # Une globale ou une fonction C que l'unité connaît déjà ne se redéclare
     # pas : deux déclarations d'un même nom se contrediraient sur son type.
@@ -196,12 +294,28 @@ def construit(sources: list[str]) -> bool:
     tienne. La construction continue malgré une erreur, pour que l'échec d'une
     unité n'emporte pas la mesure des autres.
     """
+    # Les contrôles qui ne dépendent pas du désassemblage passent d'abord : ils
+    # lisent le texte en une demi-seconde et écartent ce qu'une construction
+    # mettrait une minute à découvrir, souvent en nommant autre chose que la
+    # vraie cause. Ceux qui portent sur le désassemblage attendent `make setup`,
+    # sans quoi une fonction qu'on vient de rendre à l'assembleur paraîtrait
+    # orpheline — c'est précisément ce que ce `setup` va réparer.
+    if lance(["python3", "scripts/build/controle.py",
+              "--avant-setup"]).returncode != 0:
+        print("les contrôles échouent sur l'état appliqué")
+        return False
+
     for source in sources:
         objet = os.path.join(RACINE, "build", os.path.splitext(source)[0] + ".o")
         if os.path.exists(objet):
             os.remove(objet)
 
     if lance(["make", "setup"], stdout=subprocess.DEVNULL).returncode != 0:
+        return False
+
+    # Le désassemblage est à jour : ce qui manque désormais manque pour de bon.
+    if lance(["python3", "scripts/build/controle.py"]).returncode != 0:
+        print("les contrôles échouent après le découpage")
         return False
 
     journal = os.path.join(RACINE, "progress", "passe_build.log")
@@ -291,6 +405,22 @@ def main(argv: list[str]) -> int:
     with open(os.path.join(RACINE, options.plan), encoding="utf-8") as fichier:
         plan = json.load(fichier)
 
+    # Le drapeau `greffee` du plan vieillit dès qu'une passe écrit : une
+    # fonction gagnée depuis n'a plus d'`INCLUDE_ASM`, et la chercher arrêtait
+    # la passe en plein milieu, sources à moitié réécrites. La source est le
+    # seul état qui fasse foi ; le plan n'en est qu'une vue d'un instant.
+    textes: dict[str, str] = {}
+    for fonction in plan["fonctions"]:
+        chemin = fonction["source"]
+        if chemin not in textes:
+            with open(os.path.join(RACINE, chemin), encoding="utf-8") as source:
+                textes[chemin] = source.read()
+        fonction["greffee"] = (
+            INCLUDE_ASM % (fonction["chemin_asm"], fonction["symbole"])
+        ) in textes[chemin]
+
+    instantane = ouvre_instantane()
+
     # Une classe que le projet déclare déjà à la main est hors d'atteinte : ses
     # champs portent de vrais noms, et l'accesseur devra les employer.
     tenues, ecartees = {}, {}
@@ -301,8 +431,18 @@ def main(argv: list[str]) -> int:
         else:
             tenues[classe] = {int(k): v for k, v in plan["champs"][classe].items()}
 
-    fonctions = [f for f in plan["fonctions"]
-                 if not f.get("classe") or f["classe"] in tenues]
+    # Un type dont la fonction touche les champs demande sa disposition, qu'il
+    # soit la classe d'une méthode ou le paramètre d'une fonction libre. Une
+    # déclaration en avant suffit à passer un pointeur, pas à le déréférencer :
+    # `InitSplineKey(SPLINE_KEY *)` échouait sur « illegal use of incomplete
+    # struct », et avec elle toute son unité.
+    def connus(fonction: dict) -> bool:
+        besoin = set(fonction.get("champs", {}))
+        if fonction.get("classe"):
+            besoin.add(fonction["classe"])
+        return besoin <= set(tenues)
+
+    fonctions = [f for f in plan["fonctions"] if connus(f)]
     if options.source:
         fonctions = [f for f in fonctions if options.source in f["source"]]
     if options.limite:
@@ -322,8 +462,15 @@ def main(argv: list[str]) -> int:
             print("  %-34s %3d fonctions" % (source, len(lot)))
         return 0
 
+    # Le plan voyage avec l'instantané : sans lui, l'état d'avant ne dit pas ce
+    # qu'on avait tenté d'y poser, et une passe ancienne devient illisible.
+    os.makedirs(instantane, exist_ok=True)
+    shutil.copyfile(os.path.join(RACINE, options.plan),
+                    os.path.join(instantane, "plan.json"))
+    print("instantané : %s" % os.path.relpath(instantane, RACINE))
+
     os.makedirs(GEN, exist_ok=True)
-    besoins = {f["classe"] for f in fonctions if f.get("classe")}
+    besoins = types_a_declarer(fonctions)
     ecris_entetes(besoins, fonctions)
 
     for source, lot in par_source.items():
@@ -336,7 +483,14 @@ def main(argv: list[str]) -> int:
         return 1
 
     parts = mesure()
-    gardees = [f for f in fonctions if parts.get(f["symbole"], 0) >= 99.999]
+    # Une fonction que la source portait déjà écrite est acquise : elle n'a pas
+    # été posée par cette passe et rien ici ne peut la retirer. La compter parmi
+    # les gardées est ce qui maintient sa déclaration dans l'en-tête de sa
+    # classe — l'en oublier laissait la source définir une méthode que plus rien
+    # ne déclarait, et l'unité ne compilait plus.
+    acquises = [f for f in fonctions if not f.get("greffee", True)]
+    gardees = [f for f in fonctions
+               if f in acquises or parts.get(f["symbole"], 0) >= 99.999]
     perdues = [f for f in fonctions if f not in gardees]
 
     # Une fonction que seul son remplissage sépare du commerce ne se juge pas à
@@ -380,10 +534,14 @@ def main(argv: list[str]) -> int:
             retenues.setdefault(fonction["source"], []).append(fonction)
         for source in par_source:
             applique(source, retenues.get(source, []))
-        restantes = {f["classe"] for f in ensemble if f.get("classe")}
+        restantes = types_a_declarer(ensemble)
         for classe in sorted(besoins - restantes):
             chemin = os.path.join(GEN, classe + ".hpp")
-            if os.path.exists(chemin):
+            # Un en-tête qu'une source inclut encore ne se supprime pas, quoi
+            # que la passe ait décidé de ses fonctions. C'est ce retrait qui a
+            # laissé `clsmes_00153980.cpp` inclure un `gen/ClsMes.hpp` absent,
+            # et la construction échouait sur un message parlant de `this`.
+            if os.path.exists(chemin) and not inclus_ailleurs(classe):
                 os.remove(chemin)
         # Les champs et les méthodes d'une classe suivent ce qui reste défini :
         # un membre déclaré sans définition ne gêne pas le compilateur, mais il

@@ -7,12 +7,15 @@
  */
 
 #include "common.h"
+#include "gen/PlaceAnimeData.hpp"
 
 /* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
  * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
 extern s32 NextCharaMode;
 extern s32 RetCode;
 struct CScene;
+
+extern PlaceAnimeData PlaceAnime;
 
 
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", GetActiveFloorInfo__16CDngFloorManagerFv);
@@ -41,7 +44,17 @@ INCLUDE_ASM("nonmatchings/game/cdngfloormanager", Draw__11CStarEffectFv);
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", ParamInit__12CPaintEffectFf);
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", Step__12CPaintEffectFv);
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", Draw__12CPaintEffectFv);
-INCLUDE_ASM("nonmatchings/game/cdngfloormanager", EditInitPlaceAnime__Fv);
+void EditInitPlaceAnime(void) {
+    PlaceAnime.field_0x0 = 0;
+    PlaceAnime.field_0x4 = 0;
+    PlaceAnime.field_0x8 = 0;
+    PlaceAnime.field_0x90 = 0;
+    PlaceAnime.field_0x94 = 0;
+    PlaceAnime.field_0x98 = 0;
+    PlaceAnime.field_0x120 = 0;
+    PlaceAnime.field_0x124 = 0;
+    PlaceAnime.field_0x128 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", EditNowPlaceAnime__Fv);
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", EditSetPlaceAnime__FiP9CMapParts);
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", EditPlaceAnime__Fv);

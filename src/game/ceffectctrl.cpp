@@ -7,9 +7,17 @@
  */
 
 #include "common.h"
+#include "gen/CEffectCtrl.hpp"
+#include "gen/CEffectManager.hpp"
+#include "gen/CFadeInOut.hpp"
+#include "gen/COutLineDraw.hpp"
+struct mgCFrame;
+
 
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", Initialize__12COutLineDrawFv);
-INCLUDE_ASM("nonmatchings/game/ceffectctrl", SetFrame__12COutLineDrawFP8mgCFrame);
+void COutLineDraw::SetFrame(mgCFrame * arg0) {
+    this->field_0x34 = arg0;
+}
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", Draw__12COutLineDrawFPfff);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", Draw__12COutLineDrawFff);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", DrawDivSprite__FP11mgCDrawPrim9mgRect_i_P10mgCTexturePiiiii);
@@ -21,15 +29,32 @@ INCLUDE_ASM("nonmatchings/game/ceffectctrl", GetEffectVisual__11CEffectListFi);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", Step__11CEffectListFv);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", CreatePacket__11CEffectListFv);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", CreatePacket__14CEffectManagerFP11mgC3DSprite);
-INCLUDE_ASM("nonmatchings/game/ceffectctrl", Initialize__10CFadeInOutFv);
-INCLUDE_ASM("nonmatchings/game/ceffectctrl", ResetFade__10CFadeInOutFv);
+void CFadeInOut::Initialize(void) {
+    this->field_0xC = 0;
+    this->field_0x8 = 0;
+    this->field_0x4 = 0;
+    this->field_0x0 = 0;
+    this->field_0x10 = 0;
+    this->field_0x18 = 0;
+    this->field_0x14 = 0;
+    this->field_0x20 = 0;
+    this->field_0x28 = 0;
+    this->field_0x2C = 0;
+}
+void CFadeInOut::ResetFade(void) {
+    this->field_0x10 = 0;
+    this->field_0xC = 0;
+    this->field_0x20 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", FadeIn__10CFadeInOutFifff);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", FadeIn__10CFadeInOutFi);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", FadeOut__10CFadeInOutFifff);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", CrossFade__10CFadeInOutFif);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", CrossFadeIn__10CFadeInOutFiif);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", CrossFadeOut__10CFadeInOutFiif);
-INCLUDE_ASM("nonmatchings/game/ceffectctrl", FadeCheck__10CFadeInOutFv);
+s32 CFadeInOut::FadeCheck(void) {
+    return this->field_0x14;
+}
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", NowFade__10CFadeInOutFv);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", FadeStep__10CFadeInOutFv);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", SetCrossTexture__10CFadeInOutFP10mgCTextureP1);
@@ -51,7 +76,11 @@ INCLUDE_ASM("nonmatchings/game/ceffectctrl", __ct__11CEffectCtrlFv);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", __dt__11CEffectCtrlFv);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", Ctrl__11CEffectCtrlFP7CEffecti);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", Initialize__11CEffectCtrlFv);
-INCLUDE_ASM("nonmatchings/game/ceffectctrl", Run__11CEffectCtrlFv);
+void CEffectCtrl::Run(void) {
+    this->field_0x10 = 1;
+    this->field_0x50 = 0;
+    this->field_0x64 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", SetOrigin__11CEffectCtrlFPf);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", __as__11CEffectCtrlFRC11CEffectCtrl);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", __BUFFER_SIZE__FP9SPI_STACKi);
@@ -104,7 +133,10 @@ INCLUDE_ASM("nonmatchings/game/ceffectctrl", __GRAVITY__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", __ct__14CEffectManagerFv);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", Initialize__14CEffectManagerFv);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", EntryEffCtrls__14CEffectManagerFP7CEffectiP11CEffectCtrli);
-INCLUDE_ASM("nonmatchings/game/ceffectctrl", SetEffectNums__14CEffectManagerFii);
+void CEffectManager::SetEffectNums(s32 arg0, s32 arg1) {
+    this->field_0x24 = arg0;
+    this->field_0x2C = arg1;
+}
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", Ctrl__14CEffectManagerFv);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", Step__14CEffectManagerFi);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", Draw__14CEffectManagerFv);

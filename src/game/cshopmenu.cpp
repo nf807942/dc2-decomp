@@ -7,6 +7,9 @@
  */
 
 #include "common.h"
+#include "gen/CEventSprite.hpp"
+#include "gen/CEventSprite2.hpp"
+#include "gen/CMarker.hpp"
 
 INCLUDE_ASM("nonmatchings/game/cshopmenu", LoadDungeonMapFile__FPcPci);
 INCLUDE_ASM("nonmatchings/game/cshopmenu", MinimapDoorEnable__FPf);
@@ -15,13 +18,26 @@ INCLUDE_ASM("nonmatchings/game/cshopmenu", LoadMonsterFile__Fii);
 INCLUDE_ASM("nonmatchings/game/cshopmenu", ParabolicInitialVectorY__Fffff);
 INCLUDE_ASM("nonmatchings/game/cshopmenu", CalcPosParabolicJump__FPfPfPffff);
 INCLUDE_ASM("nonmatchings/game/cshopmenu", Draw__7CMarkerFv);
-INCLUDE_ASM("nonmatchings/game/cshopmenu", Set__7CMarkerFi);
+void CMarker::Set(s32 arg0) {
+    this->field_0x0 = arg0;
+}
 INCLUDE_ASM("nonmatchings/game/cshopmenu", Init__7CMarkerFv);
 INCLUDE_ASM("nonmatchings/game/cshopmenu", SetName__12CEventSpriteFPc);
-INCLUDE_ASM("nonmatchings/game/cshopmenu", SetDraw__12CEventSpriteFi);
+void CEventSprite::SetDraw(s32 arg0) {
+    this->field_0x0 = arg0;
+}
 INCLUDE_ASM("nonmatchings/game/cshopmenu", SetGet__12CEventSpriteFiiii);
 INCLUDE_ASM("nonmatchings/game/cshopmenu", SetPut__12CEventSpriteFiiii);
-INCLUDE_ASM("nonmatchings/game/cshopmenu", SetMove__12CEventSpriteFiii);
+void CEventSprite::SetMove(s32 arg0, s32 arg1, s32 arg2) {
+    this->field_0x78 = -1;
+    this->field_0x7C = -1;
+    this->field_0x80 = -1;
+    this->field_0x84 = -1;
+    this->field_0x78 = 0;
+    this->field_0x7C = arg0;
+    this->field_0x80 = arg1;
+    this->field_0x84 = arg2;
+}
 INCLUDE_ASM("nonmatchings/game/cshopmenu", SetFade__12CEventSpriteFii);
 INCLUDE_ASM("nonmatchings/game/cshopmenu", SetColor__12CEventSpriteFiiii);
 INCLUDE_ASM("nonmatchings/game/cshopmenu", Step__12CEventSpriteFv);
@@ -41,20 +57,38 @@ INCLUDE_ASM("nonmatchings/game/cshopmenu", Init__18CEventSpriteMotherFv);
 INCLUDE_ASM("nonmatchings/game/cshopmenu", __ct__13CEventSprite2Fv);
 INCLUDE_ASM("nonmatchings/game/cshopmenu", Initialize__13CEventSprite2Fv);
 INCLUDE_ASM("nonmatchings/game/cshopmenu", SetTexture__13CEventSprite2FPci);
-INCLUDE_ASM("nonmatchings/game/cshopmenu", SetDrawFlag__13CEventSprite2Fi);
-INCLUDE_ASM("nonmatchings/game/cshopmenu", SetSpriteType__13CEventSprite2Fi);
+void CEventSprite2::SetDrawFlag(s32 arg0) {
+    this->field_0x0 = arg0;
+}
+void CEventSprite2::SetSpriteType(s32 arg0) {
+    this->field_0x4 = arg0;
+}
 INCLUDE_ASM("nonmatchings/game/cshopmenu", SetPosition__13CEventSprite2FPf);
 INCLUDE_ASM("nonmatchings/game/cshopmenu", SetColor__13CEventSprite2FPf);
-INCLUDE_ASM("nonmatchings/game/cshopmenu", SetPutSize__13CEventSprite2Fii);
+void CEventSprite2::SetPutSize(s32 arg0, s32 arg1) {
+    this->field_0x54 = arg0;
+    this->field_0x58 = arg1;
+}
 INCLUDE_ASM("nonmatchings/game/cshopmenu", SetUvSize__13CEventSprite2Fiiii);
-INCLUDE_ASM("nonmatchings/game/cshopmenu", SetScale__13CEventSprite2Fff);
+void CEventSprite2::SetScale(f32 arg0, f32 arg1) {
+    this->field_0x6C = arg0;
+    this->field_0x70 = arg1;
+}
 INCLUDE_ASM("nonmatchings/game/cshopmenu", GetScale__13CEventSprite2FPfPf);
 INCLUDE_ASM("nonmatchings/game/cshopmenu", GetPosition__13CEventSprite2FPf);
 INCLUDE_ASM("nonmatchings/game/cshopmenu", GetColor__13CEventSprite2FPf);
-INCLUDE_ASM("nonmatchings/game/cshopmenu", GetType__13CEventSprite2Fv);
-INCLUDE_ASM("nonmatchings/game/cshopmenu", SetAlphaBlend__13CEventSprite2Fi);
-INCLUDE_ASM("nonmatchings/game/cshopmenu", SetRotZ__13CEventSprite2Ff);
-INCLUDE_ASM("nonmatchings/game/cshopmenu", GetRotZ__13CEventSprite2Fv);
+s32 CEventSprite2::GetType(void) {
+    return this->field_0x4;
+}
+void CEventSprite2::SetAlphaBlend(s32 arg0) {
+    this->field_0x2C = arg0;
+}
+void CEventSprite2::SetRotZ(f32 arg0) {
+    this->field_0x50 = arg0;
+}
+f32 CEventSprite2::GetRotZ(void) {
+    return this->field_0x50;
+}
 INCLUDE_ASM("nonmatchings/game/cshopmenu", NormalDraw__13CEventSprite2Fv);
 INCLUDE_ASM("nonmatchings/game/cshopmenu", FirstDraw__13CEventSprite2Fv);
 INCLUDE_ASM("nonmatchings/game/cshopmenu", Draw__13CEventSprite2Fv);

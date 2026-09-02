@@ -135,7 +135,7 @@ O_FILES   := $(addprefix $(BUILD_DIR)/, $(S_FILES:.s=.o) $(BIN_FILES:.bin=.o) \
              $(addsuffix .o, $(basename $(SRC_FILES))))
 
 .PHONY: all setup tools patch split build objects check diff decompile measure \
-        carve clean distclean controle ci etat progress report
+        carve clean distclean contexte controle ci etat progress report
 
 all: build
 
@@ -288,6 +288,11 @@ carve:
 # `make units S=mgCFrame` détaille une classe.
 units:
 	@$(PYTHON) scripts/build/units.py $(S) $(UNITS_ARGS)
+
+# Le contexte que m2c lit pour typer ce qu'il décompile, engendré depuis
+# `include/`. Sans lui, m2c invente un nom de champ par décalage.
+contexte:
+	@$(PYTHON) scripts/build/contexte.py
 
 # Ce qu'une construction paierait cher, décelé sans compiler : un en-tête
 # engendré absent, une greffe sans désassemblage, deux unités qui se

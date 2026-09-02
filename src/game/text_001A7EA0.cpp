@@ -12,13 +12,20 @@
  * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
 extern s32 EditDebugFlag;
 extern s32 LEditFlag;
+extern s32 EditDebugTexb;
+extern s32 Select;
+
 
 INCLUDE_ASM("nonmatchings/game/text_001A7EA0", LadderControl__FP6CSceneP11CPadControl);
 INCLUDE_ASM("nonmatchings/game/text_001A7EA0", EditStepChara__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/text_001A7EA0", EditDrawShadowChara__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/text_001A7EA0", EditDrawChara__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/text_001A7EA0", EditDrawEffectChara__FP6CScene);
-INCLUDE_ASM("nonmatchings/game/text_001A7EA0", EditDebugInit__Fv);
+void EditDebugInit(void) {
+    EditDebugFlag = 0;
+    Select = 0;
+    EditDebugTexb = -1;
+}
 s32 EditDebugMode(void) {
     return EditDebugFlag;
 }

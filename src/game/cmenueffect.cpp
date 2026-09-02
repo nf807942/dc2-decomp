@@ -7,6 +7,7 @@
  */
 
 #include "common.h"
+#include "gen/CMenuEffect.hpp"
 
 /* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
  * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
@@ -15,12 +16,23 @@ extern s8 MenuLoopType;
 extern s32 MenuPrim;
 extern s32 mgFrameRate;
 
-INCLUDE_ASM("nonmatchings/game/cmenueffect", Initialize__11CMenuEffectFv);
+void CMenuEffect::Initialize(void) {
+    this->field_0x0 = 0;
+    this->field_0x4 = 0;
+    this->field_0x9 = -1;
+    this->field_0xA = 0;
+    this->field_0xC = 0;
+    this->field_0x10 = 0;
+    this->field_0x34 = 128;
+}
 INCLUDE_ASM("nonmatchings/game/cmenueffect", PresetEffect__11CMenuEffectFP9mgCMemoryP10mgCTextureiPi);
 INCLUDE_ASM("nonmatchings/game/cmenueffect", SetMemory__11CMenuEffectFP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cmenueffect", SetTexInfo__11CMenuEffectFP10mgCTexturePi);
 INCLUDE_ASM("nonmatchings/game/cmenueffect", SetBaseInfo__11CMenuEffectFPiiii);
-INCLUDE_ASM("nonmatchings/game/cmenueffect", EffectStart__11CMenuEffectFv);
+void CMenuEffect::EffectStart(void) {
+    this->field_0xA = 1;
+    this->field_0x36 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cmenueffect", PresetInfoAll__11CMenuEffectFi);
 INCLUDE_ASM("nonmatchings/game/cmenueffect", PresetInfo__11CMenuEffectFP16MENU_EFFECT_INFOii);
 INCLUDE_ASM("nonmatchings/game/cmenueffect", Step__11CMenuEffectFv);

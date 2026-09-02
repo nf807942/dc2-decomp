@@ -7,6 +7,9 @@
  */
 
 #include "common.h"
+#include "gen/mgC3DSprite.hpp"
+#include "gen/mgCVisualMDT.hpp"
+#include "gen/mgRENDER_INFO.hpp"
 
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", __ct__10mgCDrawEnvFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", __as__10mgCDrawEnvFR10mgCDrawEnv);
@@ -30,10 +33,18 @@ INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", GetAmbient__13mgRENDER_INFOFPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetPlight__13mgRENDER_INFOFiPfPfff);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetPlight__13mgRENDER_INFOFiP13mgPOINT_LIGHT);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", GetPlight__13mgRENDER_INFOFiP13mgPOINT_LIGHT);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", FogEnable__13mgRENDER_INFOFi);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", GetFogEnable__13mgRENDER_INFOFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", PlightEnable__13mgRENDER_INFOFi);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", GetPlightEnable__13mgRENDER_INFOFv);
+void mgRENDER_INFO::FogEnable(s32 arg0) {
+    this->field_0xFA4 = arg0;
+}
+s32 mgRENDER_INFO::GetFogEnable(void) {
+    return this->field_0xFA4;
+}
+void mgRENDER_INFO::PlightEnable(s32 arg0) {
+    this->field_0xFA8 = arg0;
+}
+s32 mgRENDER_INFO::GetPlightEnable(void) {
+    return this->field_0xFA8;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetFogParam__13mgRENDER_INFOFffUcUcUcff);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", __as__9mgVu0FBOXFR9mgVu0FBOX);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", MG_ADDRESS_CHECK__FPvPc);
@@ -75,7 +86,14 @@ INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Draw__9mgCSpriteFPUiPA4_fP14mgCDr
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Draw__9mgCSpriteFPA4_fP14mgCDrawManager);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Iam__13mgCVisualPrimFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Draw__11mgC3DSpriteFPA4_fP14mgCDrawManager);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Initialize__11mgC3DSpriteFv);
+void mgC3DSprite::Initialize(void) {
+    this->field_0x20 = 0;
+    this->field_0x0 = 0;
+    this->field_0x4 = 0;
+    this->field_0x8 = 0;
+    this->field_0x14 = 0;
+    this->field_0x10 = 0;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", __ct__15mgCTexAnimeDataFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Initialize__15mgCTexAnimeDataFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", TexAnime__15mgCTextureAnimeFiP13sceVif1Packet);
@@ -120,7 +138,26 @@ INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Initialize__13mgCVisualAttrFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", __ct__13mgCVisualAttrFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", GetTextureManager__9mgCVisualFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetDrawEnvGifTag__9mgCVisualFP1P13mgRENDER_INFOP10mgCDrawEnv);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Initialize__12mgCVisualMDTFv);
+void mgCVisualMDT::Initialize(void) {
+    this->field_0x20 = 0;
+    this->field_0x30 = 0;
+    this->field_0x24 = 0;
+    this->field_0x34 = 0;
+    this->field_0x28 = 0;
+    this->field_0x38 = 0;
+    this->field_0x2C = 0;
+    this->field_0x3C = 0;
+    this->field_0x40 = 0;
+    this->field_0x44 = 0;
+    this->field_0x48 = 0;
+    this->field_0x0 = 0;
+    this->field_0x4 = 0;
+    this->field_0x8 = 0;
+    this->field_0x14 = 0;
+    this->field_0x10 = 0;
+    this->field_0x10 = 60;
+    this->field_0x14 = 180;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", CopyMaterial__FP10mgMaterialP13MDT_MATERIAL_P17mgCTextureManager);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", CopyMDTData__12mgCVisualMDTFP10MDT_HEADERP9mgCMemory);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", CopyMDTDataPointer__12mgCVisualMDTFP10MDT_HEADERP9mgCMemory);

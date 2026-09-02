@@ -7,6 +7,8 @@
  */
 
 #include "common.h"
+#include "gen/GyoracerIndexNoData.hpp"
+#include "gen/GyoracerTacticsNoData.hpp"
 
 /* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
  * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
@@ -15,6 +17,14 @@ extern s8 GyoRaceClass;
 extern s8 GyoRaceProgressNum;
 extern s8 GyoRaceRankingData;
 extern s32 GyoraceFish;
+extern s16 FishTournamentGoodsNum;
+extern s32 FishTournamentGoods;
+extern s32 fish_prize_buildstack;
+extern s32 spi_fish_prize_info;
+
+extern GyoracerIndexNoData GyoracerIndexNo;
+extern GyoracerTacticsNoData GyoracerTacticsNo;
+
 
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", MenuAquaInit__FP9mgCMemoryPii);
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", MenuAquaKey__Fv);
@@ -52,7 +62,12 @@ INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", GetRaceFish__16CGyoraceFishDat
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", _PRIZE_LISTNUM__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", _PRIZE_GROUP__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", _PRIZE__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", InitFishPrize__Fv);
+void InitFishPrize(void) {
+    fish_prize_buildstack = 0;
+    FishTournamentGoods = 0;
+    FishTournamentGoodsNum = 0;
+    spi_fish_prize_info = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", LoadFishPrize__Fi);
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", LoadFishPrize__FiP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", RefreshFishPrize__Fv);
@@ -65,7 +80,20 @@ INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", GetOmakeGyoracer2__Fi);
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", GetOmakeGyoracerTactics__Fi);
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", SetOmakeGyoracerTactics__Fii);
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", GyoracerListUpdate__Fv);
-INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", GyoraceSubGameInitData__Fv);
+void GyoraceSubGameInitData(void) {
+    GyoracerIndexNo.field_0x0 = -1;
+    GyoracerTacticsNo.field_0x0 = -1;
+    GyoracerIndexNo.field_0x2 = -1;
+    GyoracerTacticsNo.field_0x2 = -1;
+    GyoracerIndexNo.field_0x4 = -1;
+    GyoracerTacticsNo.field_0x4 = -1;
+    GyoracerIndexNo.field_0x6 = -1;
+    GyoracerTacticsNo.field_0x6 = -1;
+    GyoracerIndexNo.field_0x8 = -1;
+    GyoracerTacticsNo.field_0x8 = -1;
+    GyoracerIndexNo.field_0xA = -1;
+    GyoracerTacticsNo.field_0xA = -1;
+}
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", GyoraceMenuInit__FP9mgCMemoryPii);
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", OmakeGyoraceSelect__Fi);
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", ForceSetGyoList__Fv);

@@ -1,0 +1,320 @@
+#!/usr/bin/env python3
+"""Mesure ce que m2c fait seul : combien compile, et à quel point ça apparie.
+
+    scripts/host/dc2 python3 scripts/diff/sonde_m2c.py --combien 20
+    scripts/host/dc2 python3 scripts/diff/sonde_m2c.py --mini 400 --maxi 900
+
+La question est chiffrée, et le plan de la chaîne en dépend : *quelle part du
+chemin m2c fait-il seul ?* Si sa sortie ne compile pas neuf fois sur dix, une
+chaîne qui l'enchaîne à un permuteur n'a pas de sens ; si elle apparie souvent
+d'emblée, le permuteur n'est qu'un rattrapage.
+
+La sonde n'écrit rien de durable : chaque unité est rendue telle qu'elle était.
+
+**Le raccourci qu'elle prend, et sa réserve.** Une méthode est déclarée
+`extern "C"` sous son nom manglé, `this` devenant un paramètre ordinaire. Le
+symbole émis est alors exactement celui du disque, sans avoir à déclarer la
+classe ni sa table virtuelle. C'est l'ABI d'une méthode non virtuelle, mais le
+dépôt a déjà mesuré qu'un constructeur de classe polymorphe n'ordonne pas ses
+constantes flottantes comme une fonction libre : ce que la sonde mesure est
+donc un plancher, pas un plafond.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import random
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from lib.project import (ROOT, functions, grafted_by_source,  # noqa: E402
+                         run, unit_of)
+
+# `typedef struct X {` … `} X;` — la structure que m2c infère d'un pointeur.
+# m2c fait suivre l'accolade fermante d'un commentaire de taille — `} X;
+# /* size >= 0x48 */` —, que la fin de ligne doit donc admettre.
+_STRUCT = re.compile(r"^typedef struct .*?^\} \w+;[^\n]*$", re.MULTILINE | re.DOTALL)
+# `? f(...); /* extern */` — un appel dont m2c ignore le type de retour.
+_EXTERN = re.compile(
+    r"^(\S+) ([A-Za-z_]\w*)\((.*?)\);\s*/\* (?:extern|static) \*/$", re.MULTILINE)
+# L'en-tête de la fonction rendue, dont le nom est le symbole manglé.
+_ENTETE = re.compile(r"^(\S+) (%s)\((.*?)\) \{$", re.MULTILINE)
+
+INCLUDE_ASM = 'INCLUDE_ASM("nonmatchings/%s", %s);'
+
+# `typedef struct CColPrim {` — le nom que la structure inférée porte.
+_NOM_STRUCT = re.compile(r"^typedef struct (\w+)")
+# Ce qui n'est pas un type nommé du jeu, et ne se déclare donc pas en avant.
+_BASE = {"void", "char", "bool", "s8", "u8", "s16", "u16", "s32", "u32",
+         "s64", "u64", "f32", "f64", "int", "unsigned", "signed", "long",
+         "short", "float", "double", "struct", "const", "static", "extern",
+         "return", "sizeof", "typedef"}
+_DECLARE = re.compile(r"\b(?:class|struct)\s+(\w+)\s*(?::|\{)")
+_INCLUDE = re.compile(r'^#\s*include\s+"([^"]+)"', re.MULTILINE)
+
+
+def deja_vues(unite: str) -> set[str]:
+    """Les types que cette unité voit déjà déclarés.
+
+    La question porte sur ce que l'unité inclut, non sur le dépôt entier : un
+    type déclaré dans un en-tête qu'elle n'inclut pas lui reste inconnu, et
+    écarter la structure que m2c en donne la laisserait sans rien — c'est ce
+    qui avait fait retomber à zéro la seule fonction qui appariait.
+    """
+    source = ROOT / "src" / (unite + ".cpp")
+    if not source.exists():
+        return set()
+    texte = source.read_text(encoding="utf-8", errors="replace")
+    vues = set(_DECLARE.findall(texte))
+    for inclus in _INCLUDE.findall(texte):
+        chemin = ROOT / "include" / inclus
+        if chemin.exists():
+            vues.update(_DECLARE.findall(
+                chemin.read_text(encoding="utf-8", errors="replace")))
+    return vues
+
+
+def decompile(symbole: str) -> str | None:
+    """La sortie de m2c pour cette fonction, ou rien s'il refuse."""
+    resultat = run([sys.executable, "scripts/diff/decompile.py", symbole],
+                   capture_output=True, text=True)
+    if resultat.returncode != 0 or not resultat.stdout.strip():
+        return None
+    return resultat.stdout
+
+
+def normalise(texte: str, symbole: str,
+              vues: set[str]) -> tuple[str, str] | None:
+    """Rend (déclarations, définition) prêtes à compiler, ou rien.
+
+    Trois retouches, et pas une de plus : les structures inférées se gardent
+    telles quelles, les externes reçoivent un type de retour et le nom manglé
+    devient le symbole émis par `extern "C"`.
+    """
+    # Une structure que le projet déclare déjà ne se redéclare pas : MWCC
+    # répond « struct/union/enum/class tag 'CColPrim' redefined », et celle du
+    # projet porte de vrais noms de champs qu'il vaut mieux employer.
+    structs = [bloc for bloc in _STRUCT.findall(texte)
+               if _NOM_STRUCT.search(bloc).group(1) not in vues]
+    reste = _STRUCT.sub("", texte)
+
+    externes = []
+    for retour, nom, params in _EXTERN.findall(reste):
+        # `?` dit que m2c n'a pas tranché le type de retour ; un saut de queue
+        # ne le dit pas davantage, et `void` n'engage que la déclaration.
+        # Le prototype d'une méthode nomme `this` son premier paramètre, ce
+        # qu'un prototype `extern "C"` ne peut pas davantage qu'une définition.
+        externes.append('extern "C" %s %s(%s);'
+                        % ("void" if retour == "?" else retour, nom,
+                           re.sub(r"\bthis\b", "objet", params)))
+    reste = _EXTERN.sub("", reste)
+
+    entete = re.search(_ENTETE.pattern % re.escape(symbole), reste, re.MULTILINE)
+    if entete is None:
+        return None
+    corps = reste[entete.start():].rstrip()
+    # m2c nomme `this` le premier paramètre d'une méthode, ce qu'une fonction
+    # `extern "C"` ne peut pas faire : `this` est réservé, et MWCC répond
+    # « ')' expected » suivi d'une erreur par ligne du corps.
+    corps = re.sub(r"\bthis\b", "objet", corps)
+    corps = 'extern "C" ' + corps
+
+    # Tout type employé en pointeur doit exister avant qu'on l'emploie. Les
+    # attendre un par un ne marche pas : MWCC ne nomme que le *premier*
+    # identifiant inconnu, les suivants devenant des « declaration syntax
+    # error » anonymes, et cinq tours n'en déclaraient donc que cinq.
+    definis = {_NOM_STRUCT.search(bloc).group(1) for bloc in structs}
+    employes = set(re.findall(r"\b([A-Za-z_]\w*)\s*\*", "\n".join(externes) + corps))
+    avant = sorted(nom for nom in employes - definis - vues
+                   if nom not in _BASE and not nom.startswith("un"))
+
+    declarations = "\n".join(["struct %s;" % nom for nom in avant]
+                             + structs + externes)
+    return declarations, corps
+
+
+def score(symbole: str, unite: str) -> float | None:
+    """La part appariée de cette fonction, ou rien si la mesure échoue."""
+    cible = "build/ref/asm/text/%s.o" % unite
+    base = "build/src/%s.o" % unite
+    resultat = run(["objdiff-cli", "diff", "-1", cible, "-2", base,
+                    "-o", "-", "--format", "json", symbole],
+                   capture_output=True, text=True)
+    if resultat.returncode != 0:
+        return None
+    try:
+        charge = json.loads(resultat.stdout)
+    except json.JSONDecodeError:
+        return None
+    for entree in charge.get("left", {}).get("symbols", []):
+        if entree.get("name") == symbole:
+            return float(entree.get("match_percent") or 0.0)
+    return None
+
+
+def eprouve(symbole: str, unite: str, taille: int) -> dict:
+    """Traduit, pose, compile et mesure une fonction. Rend le compte rendu."""
+    verdict = {"symbole": symbole, "unite": unite, "taille": taille}
+
+    texte = decompile(symbole)
+    if texte is None:
+        return {**verdict, "issue": "m2c refuse"}
+
+    rendu = normalise(texte, symbole, deja_vues(unite))
+    if rendu is None:
+        return {**verdict, "issue": "sortie illisible"}
+    declarations, corps = rendu
+
+    source = ROOT / "src" / (unite + ".cpp")
+    avant = source.read_text(encoding="utf-8")
+    ligne = INCLUDE_ASM % (unite, symbole)
+    if ligne not in avant:
+        return {**verdict, "issue": "non greffée"}
+
+    objet = ROOT / "build" / "src" / (unite + ".o")
+    ajoutees: list[str] = []
+    try:
+        # Le compilateur dit ce qui manque, la table des symboles dit quoi
+        # écrire, et l'on recommence. Cinq tours suffisent : chacun déclare
+        # tout ce que le tour précédent a signalé.
+        for _tour in range(5):
+            # Les déclarations trouvées en chemin passent devant : un type que
+            # m2c emploie dans une structure inférée doit exister avant elle.
+            fragment = "\n".join(
+                ajoutees + [d for d in [declarations] if d] + [corps])
+            source.write_text(avant.replace(ligne, fragment), encoding="utf-8")
+            if objet.exists():
+                objet.unlink()
+            bati = run(["make", str(objet.relative_to(ROOT))],
+                       capture_output=True, text=True)
+            sortie = bati.stdout + bati.stderr
+            if bati.returncode == 0:
+                break
+            manquants = {nom for nom in _INCONNU.findall(sortie)}
+            neuves = [d for d in (declaration(nom, declarations + corps) for nom in sorted(manquants))
+                      if d and d not in ajoutees]
+            if not neuves:
+                return {**verdict, "issue": "ne compile pas",
+                        "cause": premiere_erreur(sortie)}
+            ajoutees.extend(neuves)
+        else:
+            return {**verdict, "issue": "ne compile pas",
+                    "cause": "déclarations sans fin"}
+        part = score(symbole, unite)
+        if part is None:
+            return {**verdict, "issue": "mesure impossible"}
+        return {**verdict, "issue": "mesurée", "part": part}
+    finally:
+        source.write_text(avant, encoding="utf-8")
+
+
+_INCONNU = re.compile(r"undefined identifier '(\w+)'")
+_OBJET = re.compile(r"^(\w+) = 0x[0-9A-Fa-f]+; // size:0x([0-9A-Fa-f]+)",
+                    re.MULTILINE)
+_TAILLES: dict[str, int] | None = None
+
+
+def objets() -> dict[str, int]:
+    """La taille de chaque donnée du binaire, qui décide de sa déclaration."""
+    global _TAILLES
+    if _TAILLES is None:
+        table = (ROOT / "config" / "elf_symbol_addrs.txt").read_text(encoding="utf-8")
+        _TAILLES = {nom: int(taille, 16) for nom, taille in _OBJET.findall(table)
+                    if "type:func" not in nom}
+    return _TAILLES
+
+
+def declaration(nom: str, corps: str = "") -> str | None:
+    """Ce qu'il faut écrire pour que ce symbole existe, d'après le binaire.
+
+    m2c ne déclare que ce que son contexte lui donne, et le nôtre est vide : les
+    globales et les fonctions de l'unité lui manquent. Le binaire, lui, les
+    nomme toutes — c'est la table des symboles qui répond, non une supposition.
+
+    `extern "C"` est indispensable : le nom est déjà manglé, et le remangler
+    viserait un symbole que rien ne définit.
+    """
+    from lib.mangling import demangle  # noqa: PLC0415
+
+    fonction = functions().get(nom)
+    if fonction is not None:
+        symbole = demangle(nom)
+        if symbole is None:
+            return None
+        # `this` d'abord quand c'en est une méthode : sous `extern "C"`, il
+        # n'est qu'un paramètre de plus, et son type importe peu à l'appel.
+        params = (["void *"] if symbole.cls else []) + list(symbole.params)
+        return 'extern "C" void %s(%s);' % (nom, ", ".join(params) or "void")
+
+    taille = objets().get(nom)
+    if taille is None:
+        # Ni fonction ni donnée : c'est un type que m2c nomme sans le définir.
+        # Tant qu'il n'apparaît qu'en pointeur, la déclaration en avant suffit
+        # — et si le corps le déréférence, MWCC le dira au tour suivant.
+        if corps and re.search(r"\b%s\s*\*" % re.escape(nom), corps):
+            return "struct %s;" % nom
+        return None
+    largeur = {1: "u8", 2: "u16", 4: "u32", 8: "u64"}.get(taille)
+    if largeur is None:
+        return 'extern "C" u8 %s[%d];' % (nom, taille)
+    return 'extern "C" %s %s;' % (largeur, nom)
+
+
+_ERREUR = re.compile(r"^#\s+([a-z'].*)$", re.MULTILINE)
+
+
+def premiere_erreur(sortie: str) -> str:
+    trouve = _ERREUR.findall(sortie)
+    return trouve[0][:70] if trouve else "inconnue"
+
+
+def main(argv: list[str]) -> int:
+    parseur = argparse.ArgumentParser(description=__doc__)
+    parseur.add_argument("--combien", type=int, default=20)
+    parseur.add_argument("--mini", type=int, default=150)
+    parseur.add_argument("--maxi", type=int, default=400)
+    parseur.add_argument("--graine", type=int, default=1)
+    options = parseur.parse_args(argv)
+
+    table = functions()
+    greffees = {nom for noms in grafted_by_source().values() for nom in noms}
+    lot = [(f.size, nom, unit_of(nom)) for nom, f in table.items()
+           if nom in greffees and options.mini <= f.size <= options.maxi
+           and unit_of(nom)]
+    random.Random(options.graine).shuffle(lot)
+    lot = lot[:options.combien]
+
+    print("sonde m2c : %d fonctions de %d à %d octets\n"
+          % (len(lot), options.mini, options.maxi))
+    comptes: dict[str, int] = {}
+    parts: list[float] = []
+    for taille, symbole, unite in lot:
+        verdict = eprouve(symbole, unite, taille)
+        comptes[verdict["issue"]] = comptes.get(verdict["issue"], 0) + 1
+        if "part" in verdict:
+            parts.append(verdict["part"])
+            detail = "%6.2f %%" % verdict["part"]
+        else:
+            detail = verdict.get("cause", "")
+        print("  %5d  %-46s %-16s %s"
+              % (taille, symbole[:46], verdict["issue"], detail))
+
+    print("\nrésumé")
+    for issue, compte in sorted(comptes.items(), key=lambda kv: -kv[1]):
+        print("  %-18s %3d  (%.0f %%)"
+              % (issue, compte, 100 * compte / len(lot)))
+    if parts:
+        parts.sort()
+        print("\n  appariement des %d mesurées : médiane %.1f %%, "
+              "meilleure %.1f %%, à 100 %% : %d"
+              % (len(parts), parts[len(parts) // 2], parts[-1],
+                 sum(1 for p in parts if p >= 99.999)))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

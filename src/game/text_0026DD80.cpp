@@ -7,6 +7,10 @@
  */
 
 #include "common.h"
+#include "gen/EdEventInfoData.hpp"
+extern EdEventInfoData EdEventInfo;
+struct RS_STACKDATA;
+
 
 INCLUDE_ASM("nonmatchings/game/text_0026DD80", _GET_SAVEDATA_ETC__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026DD80", _DEL_MONSTER__FP12RS_STACKDATAi);
@@ -16,7 +20,10 @@ INCLUDE_ASM("nonmatchings/game/text_0026DD80", _GET_ANALYZE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026DD80", _GET_DIORAMA_PERCENT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026DD80", _GEORAMA_FUNC__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026DD80", _GET_CHARA_ID__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_0026DD80", _GOTO_EDITMODE__FP12RS_STACKDATAi);
+s32 _GOTO_EDITMODE(RS_STACKDATA * arg0, s32 arg1) {
+    EdEventInfo.field_0xCC = 17;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_0026DD80", _GET_CHAPTER__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026DD80", _GET_NPC_TRAIN_ETC__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026DD80", _REGISTER_VILLAGER__FP12RS_STACKDATAi);

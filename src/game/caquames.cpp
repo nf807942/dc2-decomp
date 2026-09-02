@@ -7,7 +7,11 @@
  */
 
 #include "common.h"
+#include "gen/CAquaFishEff.hpp"
 #include "gen/CBubble.hpp"
+#include "gen/CBubble.hpp"
+struct mgCTexture;
+
 
 INCLUDE_ASM("nonmatchings/game/caquames", MenuInventDraw__Fv);
 INCLUDE_ASM("nonmatchings/game/caquames", Get_aquarium_paul_table__Fi);
@@ -17,7 +21,11 @@ INCLUDE_ASM("nonmatchings/game/caquames", GetUseableEsaNo__FPi);
 INCLUDE_ASM("nonmatchings/game/caquames", GetEsaInfo__Fi);
 INCLUDE_ASM("nonmatchings/game/caquames", Generate__7CBubbleFi);
 INCLUDE_ASM("nonmatchings/game/caquames", Generate__7CBubbleFPf);
-INCLUDE_ASM("nonmatchings/game/caquames", SetTexture__7CBubbleFP10mgCTextureii);
+void CBubble::SetTexture(mgCTexture * arg0, s32 arg1, s32 arg2) {
+    this->field_0x28 = arg0;
+    this->field_0x2C = arg1;
+    this->field_0x2E = arg2;
+}
 INCLUDE_ASM("nonmatchings/game/caquames", Step__7CBubbleFv);
 INCLUDE_ASM("nonmatchings/game/caquames", Draw__7CBubbleFv);
 INCLUDE_ASM("nonmatchings/game/caquames", Initialize__7CBubbleFP9mgCMemoryPfif);
@@ -45,7 +53,12 @@ INCLUDE_ASM("nonmatchings/game/caquames", MoveActionBattle__9CAquaFishFv);
 INCLUDE_ASM("nonmatchings/game/caquames", NextThink__9CAquaFishFiP16NEXT_THINK_PARAM);
 INCLUDE_ASM("nonmatchings/game/caquames", ParamStep__9CAquaFishFv);
 INCLUDE_ASM("nonmatchings/game/caquames", FishDraw__9CAquaFishFv);
-INCLUDE_ASM("nonmatchings/game/caquames", Initialize__12CAquaFishEffFv);
+void CAquaFishEff::Initialize(void) {
+    this->field_0x0 = 0;
+    this->field_0x4 = 0;
+    this->field_0x8 = 0;
+    this->field_0xC = 0;
+}
 INCLUDE_ASM("nonmatchings/game/caquames", StartFishEffect__12CAquaFishEffFi);
 INCLUDE_ASM("nonmatchings/game/caquames", Step__12CAquaFishEffFv);
 INCLUDE_ASM("nonmatchings/game/caquames", Draw__12CAquaFishEffFv);

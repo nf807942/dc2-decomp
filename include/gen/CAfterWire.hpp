@@ -11,8 +11,14 @@
  * porte déjà. */
 struct CAfterWire {
     s32 field_0x0;
+    u8 pad_0x4[0x10E];
+    s16 field_0x112;
+    s16 field_0x114;
+    s16 field_0x116;
+    s16 field_0x118;
 
     CAfterWire(void);
+    void SetMode(s32 arg0);
 };
 
 #endif /* GEN_CAFTERWIRE_HPP */

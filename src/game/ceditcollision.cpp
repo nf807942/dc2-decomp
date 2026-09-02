@@ -11,6 +11,8 @@
 /* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
  * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
 extern s32 LadderMode;
+extern s32 EyeViewCancelOnce;
+
 
 INCLUDE_ASM("nonmatchings/game/ceditcollision", GetBattleCharaInfo__Fv);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", ConvertItemAttrToCharaAttr__FiPiPi);
@@ -36,17 +38,20 @@ INCLUDE_ASM("nonmatchings/game/ceditcollision", LeaveMonicaItemCheck__Fv);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", AquaFishFatigueClear__Fv);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", DebugGetItem__FP16CUserDataManageri);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", InitCharaViewerMain__F13INIT_LOOP_ARG);
-INCLUDE_ASM("nonmatchings/game/ceditcollision", FinishCharaVieweMain__Fv);
+void FinishCharaVieweMain(void) {
+}
 s32 LoopCharaViewerMain(void) {
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/ceditcollision", InitTextuerViewerMain__F13INIT_LOOP_ARG);
-INCLUDE_ASM("nonmatchings/game/ceditcollision", FinishTextuerVieweMain__Fv);
+void FinishTextuerVieweMain(void) {
+}
 s32 LoopTextuerViewerMain(void) {
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/ceditcollision", MapViewInit__F13INIT_LOOP_ARG);
-INCLUDE_ASM("nonmatchings/game/ceditcollision", MapViewExit__Fv);
+void MapViewExit(void) {
+}
 s32 MapViewLoop(void) {
     return 1;
 }
@@ -75,7 +80,9 @@ INCLUDE_ASM("nonmatchings/game/ceditcollision", GetFootEffName__Fi);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", EditMoveChara__FP6CScenePfP17EditMoveCharaInfo);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", EditCameraControl__FP6CSceneP11CPadControlPA4_f);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", CharaControl__FP6CSceneP11CPadControl_001A6B90);
-INCLUDE_ASM("nonmatchings/game/ceditcollision", CancelEyeViewMode__Fv);
+void CancelEyeViewMode(void) {
+    EyeViewCancelOnce = 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceditcollision", CameraControl__FP6CSceneP11CPadControl);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", InitEyeCamera__FP11CCharacter2P14CCameraControl);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", ResetViewMode__FP6CScene);

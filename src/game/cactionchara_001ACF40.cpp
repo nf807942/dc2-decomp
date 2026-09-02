@@ -7,10 +7,16 @@
  */
 
 #include "common.h"
+extern s32 SubMapLoadBG;
+extern s32 now_load_map_no;
+
 
 INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", __ct__12CActionCharaFv);
 INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", EditExit__Fv);
-INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", InitSubMapLoadStep__Fv);
+void InitSubMapLoadStep(void) {
+    SubMapLoadBG = 0;
+    now_load_map_no = -1;
+}
 INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", SubMapLoadStep__Fv);
 INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", EditLoop__Fv);
 INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", InitEditEvent__Fv);

@@ -16,6 +16,7 @@ octets. Il écarte ce qui n'aurait jamais dû l'atteindre.
 
 from __future__ import annotations
 
+import argparse
 import re
 import sys
 from collections import defaultdict
@@ -130,19 +131,30 @@ def sources_absentes() -> list[str]:
     return fautes
 
 
+# Le troisième champ dit si le contrôle porte sur le désassemblage, donc s'il
+# suppose `make setup` à jour. Une passe qui vient de rendre des fonctions à
+# l'assembleur réclame un désassemblage que le `setup` précédent avait retiré :
+# la contrôler avant de le refaire rendrait 122 fautes qui n'en sont pas.
 CONTROLES = [
-    ("en-têtes engendrés", entetes_manquants),
-    ("greffes sans désassemblage", greffes_sans_desassemblage),
-    ("greffes en double", greffes_en_double),
-    ("greffes hors plage", greffes_hors_plage),
-    ("plages qui se chevauchent", plages_qui_se_chevauchent),
-    ("sources et unités", sources_absentes),
+    ("en-têtes engendrés", entetes_manquants, False),
+    ("greffes sans désassemblage", greffes_sans_desassemblage, True),
+    ("greffes en double", greffes_en_double, False),
+    ("greffes hors plage", greffes_hors_plage, False),
+    ("plages qui se chevauchent", plages_qui_se_chevauchent, False),
+    ("sources et unités", sources_absentes, False),
 ]
 
 
-def main() -> int:
+def main(argv: list[str] | None = None) -> int:
+    parseur = argparse.ArgumentParser(description=__doc__)
+    parseur.add_argument("--avant-setup", action="store_true",
+                         help="écarte ce qui suppose le désassemblage à jour")
+    options = parseur.parse_args(argv)
+
     total = 0
-    for nom, controle in CONTROLES:
+    for nom, controle, besoin_setup in CONTROLES:
+        if besoin_setup and options.avant_setup:
+            continue
         fautes = controle()
         total += len(fautes)
         # Des marques en ASCII : la console Windows rend en cp1252, où une

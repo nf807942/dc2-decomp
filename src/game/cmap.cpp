@@ -7,6 +7,8 @@
  */
 
 #include "common.h"
+#include "gen/CObjAnime.hpp"
+#include "gen/CPartsGroup.hpp"
 #include "gen/CList_14PartsGroupData_.hpp"
 #include "gen/CList_P9CMapParts_.hpp"
 
@@ -22,7 +24,12 @@ extern s32 CMapName;
 s32 CMap::Iam(void) {
     return CMapName;
 }
-INCLUDE_ASM("nonmatchings/game/cmap", Initialize__11CPartsGroupFv);
+void CPartsGroup::Initialize(void) {
+    this->field_0x0 = 0;
+    this->field_0x8 = 0;
+    this->field_0x4 = 0;
+    this->field_0xC = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cmap", Add__11CPartsGroupFP23CList_14PartsGroupData_);
 INCLUDE_ASM("nonmatchings/game/cmap", Initialize__9CMapWaterFv);
 INCLUDE_ASM("nonmatchings/game/cmap", Clear__9CMapWaterFv);
@@ -92,5 +99,12 @@ INCLUDE_ASM("nonmatchings/game/cmap", Step__4CMapFv);
 INCLUDE_ASM("nonmatchings/game/cmap", GetSeSrcVolPan__4CMapFPiPfPfi);
 INCLUDE_ASM("nonmatchings/game/cmap", CreateMap__4CMapFP11CMdsListSetP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cmap", AssignFuncPoint__4CMapFP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/cmap", __ct__9CObjAnimeFv);
+CObjAnime::CObjAnime(void) {
+    this->field_0x4 = 0;
+    this->field_0x8 = 0;
+    this->field_0xC = 0;
+    this->field_0x0 = 0;
+    this->field_0x14 = 0;
+    this->field_0x10 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cmap", CreateTrBox__4CMapFP15CMapTreasureBoxiP9mgCMemory);

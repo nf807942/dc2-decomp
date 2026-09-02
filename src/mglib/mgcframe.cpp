@@ -7,6 +7,9 @@
  */
 
 #include "common.h"
+#include "gen/mgCDrawPrim.hpp"
+#include "gen/mgCFrame.hpp"
+#include "gen/mgCObject.hpp"
 
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgRnd__Fv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgNRnd__Fv);
@@ -134,13 +137,19 @@ INCLUDE_ASM("nonmatchings/mglib/mgcframe", AlphaTest__11mgCDrawPrimFii);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", DAlphaTest__11mgCDrawPrimFii);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", DepthTestEnable__11mgCDrawPrimFi);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", DepthTest__11mgCDrawPrimFi);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", ZMask__11mgCDrawPrimFi);
+void mgCDrawPrim::ZMask(s32 arg0) {
+    this->field_0xCC = arg0;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", TextureMapEnable__11mgCDrawPrimFi);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", Bilinear__11mgCDrawPrimFi);
+void mgCDrawPrim::Bilinear(s32 arg0) {
+    this->field_0xC8 = arg0;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Shading__11mgCDrawPrimFi);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", AntiAliasing__11mgCDrawPrimFi);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", FogEnable__11mgCDrawPrimFi);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", Coord__11mgCDrawPrimFi);
+void mgCDrawPrim::Coord(s32 arg0) {
+    this->field_0xFC = arg0;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetOffset__11mgCDrawPrimFPiPi);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", __ct__14mgCDrawManagerFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetSortTable__14mgCDrawManagerFi);
@@ -174,7 +183,9 @@ INCLUDE_ASM("nonmatchings/mglib/mgcframe", Initialize__9mgCObjectFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", __ct__8mgCFrameFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Initialize__12mgCFrameBaseFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Initialize__8mgCFrameFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetName__8mgCFrameFPc);
+void mgCFrame::SetName(char * arg0) {
+    this->field_0x50 = arg0;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetTransMatrix__8mgCFrameFPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetBBox__8mgCFrameFPfPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetBBox__8mgCFrameFPfPf);
@@ -188,7 +199,11 @@ INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetBrother__8mgCFrameFP8mgCFrame);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetChild__8mgCFrameFP8mgCFrame);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", DeleteParent__8mgCFrameFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetReference__8mgCFrameFP8mgCFrame);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", DeleteReference__8mgCFrameFv);
+void mgCFrame::DeleteReference(void) {
+    this->field_0x54 = 0;
+    this->field_0xFC = 0;
+    this->field_0x40 = 1;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", ClearChildFlag__8mgCFrameFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetLocalMatrix__8mgCFrameFPA4_f);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetBBoardMatrix__8mgCFrameFiPA4_fP13mgRENDER_INFO);
@@ -213,7 +228,15 @@ INCLUDE_ASM("nonmatchings/mglib/mgcframe", Draw__8mgCFrameFPUi);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetDrawRect__8mgCFrameFP9mgVu0FBOXP14mgCDrawManager);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", __as__8mgCFrameFR8mgCFrame);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Draw__8mgCFrameFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", ChangeParam__9mgCObjectFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", UseParam__9mgCObjectFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", DrawDirect__9mgCObjectFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", Draw__9mgCObjectFv);
+void mgCObject::ChangeParam(void) {
+    this->field_0x40 = 1;
+}
+void mgCObject::UseParam(void) {
+    this->field_0x40 = 1;
+}
+s32 mgCObject::DrawDirect(void) {
+    return 0;
+}
+s32 mgCObject::Draw(void) {
+    return 0;
+}

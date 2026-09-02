@@ -8,6 +8,8 @@
 
 #include "common.h"
 #include "gen/CLevelUpEffect.hpp"
+#include "gen/CRepairEffect.hpp"
+#include "gen/CLevelUpEffect.hpp"
 
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Initialize__14CPosDataManageFv);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", GetTexGetInfo__14CPosDataManageFi);
@@ -56,7 +58,13 @@ INCLUDE_ASM("nonmatchings/game/cposdatamanage", InitializeCMenuPosDataManage__18
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", MenuCapture__FiP9mgCMemoryi);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", SetBGFrameForMenu__FiPc);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", MenuFrameImageDraw__FP11mgCDrawPrimP10mgCTexture9mgRect_f_9mgRect_i_iii);
-INCLUDE_ASM("nonmatchings/game/cposdatamanage", Initialize__13CRepairEffectFv);
+void CRepairEffect::Initialize(void) {
+    this->field_0x0 = 0;
+    this->field_0x18 = 0;
+    this->field_0x1C = 0;
+    this->field_0x20 = 0;
+    this->field_0x4 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Generate__13CRepairEffectFP9mgCMemoryi);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Step__13CRepairEffectFv);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Draw__13CRepairEffectFv);
@@ -72,7 +80,11 @@ INCLUDE_ASM("nonmatchings/game/cposdatamanage", IsRunModel__14CRepairManagerFv);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", IsRun__14CRepairManagerFv);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Step__14CRepairManagerFv);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Draw__14CRepairManagerFv);
-INCLUDE_ASM("nonmatchings/game/cposdatamanage", Initialize__14CLevelUpEffectFv);
+void CLevelUpEffect::Initialize(void) {
+    this->field_0x0 = 0;
+    this->field_0x24 = 0;
+    this->field_0x20 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Generate__14CLevelUpEffectFP10mgCTextureiii);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Generate__14CLevelUpEffectFP10mgCTextureiP11CCharacter2);
 u8 CLevelUpEffect::IsRun(void) {
