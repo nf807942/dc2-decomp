@@ -80,7 +80,20 @@ INCLUDE_ASM("nonmatchings/game/text_002D3110", mlMAP_NAME__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", LoadMapName__FiP1);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", GetMapNameInfo__Fi);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", GetMapPath__FPcPc);
-INCLUDE_ASM("nonmatchings/game/text_002D3110", GetMapType__Fi);
+extern "C" s32 GetMapNameInfo__Fi(s32);
+struct temp_v0_champs {
+    char pad0[0xC];
+    /* 0xC */ s32 unkC;
+};
+extern "C" s32 GetMapType__Fi(s32 arg0) {
+    struct temp_v0_champs *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs *) (GetMapNameInfo__Fi(arg0));
+    if (temp_v0 != NULL) {
+        return temp_v0->unkC;
+    }
+    return -1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002D3110", GetMapAreaNo__Fi);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", GetMapSelType__Fi);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", GetMapSndDataID__Fi);

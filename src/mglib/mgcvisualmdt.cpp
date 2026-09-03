@@ -43,17 +43,29 @@ INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetViewMatrix__13mgRENDER_INFOFPA
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetDropShadowMatrix__13mgRENDER_INFOFPfPfPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", ActiveLighting__13mgRENDER_INFOFii);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", GetpLightInfo__13mgRENDER_INFOFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", InitActiveLighting__13mgRENDER_INFOFv);
+struct inferred;
+typedef struct mgRENDER_INFO_infere {
+    /* 0x000 */ char pad0[0x3F0];
+    /* 0x3F0 */ s32 unk3F0;                         /* inferred */
+} mgRENDER_INFO_infere;                                    /* size >= 0x3F4 */
+extern "C" s32 memset(...);
+extern "C" s32 GetpLightInfo__13mgRENDER_INFOFv(...);
+extern "C" void InitActiveLighting__13mgRENDER_INFOFv(mgRENDER_INFO_infere *objet) {
+    objet->unk3F0 = 1;
+    memset(GetpLightInfo__13mgRENDER_INFOFv(objet), 0, 0x150);
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", InitLighting__13mgRENDER_INFOFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetLight__13mgRENDER_INFOFPA4_fPA4_f);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", GetLight__13mgRENDER_INFOFPA4_fPA4_f);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetLight__13mgRENDER_INFOFiPfPf);
-extern "C" void sceVu0CopyVector(s32, f32 *);
-extern "C" s32 GetpLightInfo__13mgRENDER_INFOFv(mgRENDER_INFO *objet);
+extern "C" void sceVu0CopyVector(...);
+extern "C" s32 GetpLightInfo__13mgRENDER_INFOFv(...);
 extern "C" void SetAmbient__13mgRENDER_INFOFPf(mgRENDER_INFO *objet, f32 *arg0) {
     sceVu0CopyVector(GetpLightInfo__13mgRENDER_INFOFv(objet) + 0x80, arg0);
 }
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", GetAmbient__13mgRENDER_INFOFPf);
+extern "C" void GetAmbient__13mgRENDER_INFOFPf(mgRENDER_INFO *objet, f32 *arg0) {
+    sceVu0CopyVector(arg0, GetpLightInfo__13mgRENDER_INFOFv(objet) + 0x80);
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetPlight__13mgRENDER_INFOFiPfPfff);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetPlight__13mgRENDER_INFOFiP13mgPOINT_LIGHT);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", GetPlight__13mgRENDER_INFOFiP13mgPOINT_LIGHT);
@@ -116,7 +128,7 @@ typedef struct mgCMemory {
     /* 0x24 */ s32 unk24;                           /* inferred */
     /* 0x28 */ s32 unk28;                           /* inferred */
 } mgCMemory;                                        /* size >= 0x2C */
-extern "C" void printf(void *, s32, s32, mgCMemory *);
+extern "C" void printf(...);
 extern "C" s32 stAllocTest__9mgCMemoryFi(mgCMemory *objet, s32 arg0) {
     s32 temp_a1;
     s32 temp_a2;

@@ -28,7 +28,17 @@ INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgInitVSyncCallBack__FPFi_i
 void mgSetRotateThread(s32 arg0) {
     rot_priority = arg0;
 }
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", WaitVSync__Fii);
+extern "C" s32 RotateThreadReadyQueue(...);
+extern "C" s32 mgGetVSyncCount__Fv(void);
+extern "C" void WaitVSync__Fii(s32 arg0, s32 arg1) {
+loop_1:
+    if ((mgGetVSyncCount__Fv() - arg0) < arg1) {
+        if (rot_priority > 0) {
+            RotateThreadReadyQueue(rot_priority);
+        }
+        goto loop_1;
+    }
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetVSyncCount__Fv);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", GetScreenSize__FiPiPiPiPiPiPi);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgInit__Fii);
@@ -53,10 +63,48 @@ INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgWaitFrame__Fv);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgDraw__FP8mgCFrame);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgDrawDirect__FP8mgCFrame);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgDrawDirect__FP9mgCVisualPA4_f);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgDrawDirectStart__Fv);
+extern "C" u32 ddraw_size;
+extern "C" u32 mgVif1Packet;
+extern "C" s32 sceVif1PkTerminate(...);
+extern "C" void mgDrawDirectStart__Fv(void) {
+    sceVif1PkTerminate(mgVif1Packet);
+    ddraw_size = 0;
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgDrawDirect2__FP8mgCFrame);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgDrawDirectEnd__Fv);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetDrawRect__FP8mgCFrameP9mgVu0FBOX);
+struct mgCDrawManager {
+    s32 field_0;
+    char pad_4[0x4];
+    s32 field_8;
+    s32 field_C;
+    char pad_10[0xC];
+    u32 field_1C;
+    s32 field_20;
+    f32 field_24;
+    f32 field_28;
+    f32 field_2C;
+    f32 field_30;
+    char pad_34[0x10];
+    f32 field_44;
+    f32 field_48;
+    f32 field_4C;
+    char pad_50[0x8];
+    s32 field_58;
+    char pad_5C[0x8];
+    s32 field_64;
+    s32 field_68;
+    s32 field_6C;
+    s32 field_70;
+};
+#include "gen/mgCFrame.hpp"
+#include "sphida.hpp"
+extern "C" s32 GetDrawRect__8mgCFrameFP9mgVu0FBOXP14mgCDrawManager(void *, mgVu0FBOX *, mgCDrawManager *);
+extern "C" s32 mgGetDrawRect__FP8mgCFrameP9mgVu0FBOX(mgCFrame *arg0, mgVu0FBOX *arg1) {
+    if (arg0 != NULL) {
+        return GetDrawRect__8mgCFrameFP9mgVu0FBOXP14mgCDrawManager(arg0, arg1, NULL);
+    }
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgBeginDrawShadow__FP10mgCTextureP10mgCTexture);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgEndDrawShadow__FP10mgCTextureP10mgCTexture);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetRenderInfo__Ffff);
@@ -66,8 +114,17 @@ f32 mgGetProjection(void) {
 }
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetBackGround__FPf);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetBackGround__Fffff);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgInitLighting__Fv);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgInitActiveLighting__Fv);
+extern "C" u32 mgChangeLight;
+extern "C" s32 InitLighting__13mgRENDER_INFOFv(void *);
+extern "C" void mgInitLighting__Fv(void) {
+    InitLighting__13mgRENDER_INFOFv(&mgRenderInfo);
+    mgChangeLight = 1;
+}
+extern "C" s32 InitActiveLighting__13mgRENDER_INFOFv(void *);
+extern "C" void mgInitActiveLighting__Fv(void) {
+    InitActiveLighting__13mgRENDER_INFOFv(&mgRenderInfo);
+    mgChangeLight = 1;
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgActiveLighting__Fii);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetLight__FPA4_fPA4_f);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetLight__FPA4_fPA4_f);
@@ -77,7 +134,30 @@ INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetAmbient__FPf);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetPlight__FiPfPfff);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetPlight__FiP13mgPOINT_LIGHT);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetPlight__FiP13mgPOINT_LIGHT);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgResetPlight__Fv);
+extern "C" u32 mgChangeLight;
+struct mgPOINT_LIGHT {
+    f32 field_0;
+    f32 field_4;
+    f32 field_8;
+    char pad_C[0x4];
+    f32 field_10;
+    f32 field_14;
+    f32 field_18;
+    f32 field_1C;
+    f32 field_20;
+    f32 field_24;
+};
+extern "C" s32 SetPlight__13mgRENDER_INFOFiP13mgPOINT_LIGHT(void *, s32, mgPOINT_LIGHT *);
+extern "C" void mgResetPlight__Fv(void) {
+    s32 var_s0;
+
+    mgChangeLight = 1;
+    var_s0 = 0;
+    do {
+        SetPlight__13mgRENDER_INFOFiP13mgPOINT_LIGHT(&mgRenderInfo, var_s0, NULL);
+        var_s0 += 1;
+    } while (var_s0 < 4);
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetViewMatrix__FPA4_fPf);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetDropShadowMatrix__FPfPfPf);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgFogEnable__Fi);
@@ -85,7 +165,21 @@ INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetFogEnable__Fv);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgPlightEnable__Fi);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetPlightEnable__Fv);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetFogParam__FffUcUcUcff);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetFogParam__FP11mgFOG_PARAM);
+struct inferred;
+typedef struct mgFOG_PARAM {
+    /* 0x00 */ f32 unk0;                            /* inferred */
+    /* 0x04 */ f32 unk4;                            /* inferred */
+    /* 0x08 */ u8 unk8;                             /* inferred */
+    /* 0x09 */ u8 unk9;                             /* inferred */
+    /* 0x0A */ u8 unkA;                             /* inferred */
+    /* 0x0B */ char padB[5];                        /* maybe part of unkA[6]void */
+    /* 0x10 */ f32 unk10;                           /* inferred */
+    /* 0x14 */ f32 unk14;                           /* inferred */
+} mgFOG_PARAM;                                      /* size >= 0x18 */
+extern "C" s32 SetFogParam__13mgRENDER_INFOFffUcUcUcff(void *, f32, f32, u8, u8, u8, f32, f32);
+extern "C" void mgSetFogParam__FP11mgFOG_PARAM(mgFOG_PARAM *arg0) {
+    SetFogParam__13mgRENDER_INFOFffUcUcUcff(&mgRenderInfo, arg0->unk0, arg0->unk4, arg0->unk8, arg0->unk9, arg0->unkA, arg0->unk10, arg0->unk14);
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetFogParam__FP11mgFOG_PARAM);
 void mgSetAllScissorFlag(s32 arg0) {
     mgRenderInfo.field_0xFA0 = arg0;
@@ -124,9 +218,23 @@ INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSendVuProg__FPUii);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetUserVuProg__FPP1i);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetUserVuProgAdr__FiP1);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", StoreImage__Fi);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgInitFont__Fv);
+extern "C" u32 font_cons;
+extern "C" u32 mgScreenOffx;
+extern "C" u32 mgScreenOffy;
+extern "C" s32 sceDevConsInit(...);
+extern "C" s32 sceDevConsOpen(...);
+extern "C" s32 mgInitFont__Fv(void) {
+    sceDevConsInit();
+    font_cons = sceDevConsOpen((mgScreenOffx + 8) * 0x10, (mgScreenOffy + 8) * 0x10, 0x28, 0x18);
+    return font_cons;
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgCloseFont__Fv);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", __ct__9mgCMemoryFv);
+#include "menu.hpp"
+extern "C" s32 Init__9mgCMemoryFv(void *);
+extern "C" mgCMemory *__ct__9mgCMemoryFv(mgCMemory *objet) {
+    Init__9mgCMemoryFv(objet);
+    return objet;
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", GetLine__9input_strFPciPc);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", get__9input_strFPi);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", spiGetStackInt__FP9SPI_STACK);
@@ -146,11 +254,37 @@ void CScriptInterpreter::SetStringBuff(char * arg0, s32 arg1) {
     this->field_0x18 = arg1;
     this->field_0x1C = this->field_0x20;
 }
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", Run__18CScriptInterpreterFv);
+extern "C" s32 GetNextTAG__18CScriptInterpreterFi(void *, s32);
+extern "C" void Run__18CScriptInterpreterFv(CScriptInterpreter *objet) {
+    do {
+
+    } while (GetNextTAG__18CScriptInterpreterFi(objet, 1) >= 0);
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", hash__18CScriptInterpreterFPc);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", SetTag__18CScriptInterpreterFP13SPI_TAG_PARAM);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", SetScript__18CScriptInterpreterFPci);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", __ct__18CScriptInterpreterFv);
+extern "C" s32 __ct__9input_strFv(void *);
+struct inferred;
+typedef struct CScriptInterpreter_infere {
+    /* 0x00 */ s32 unk0;                            /* inferred */
+    /* 0x04 */ s32 unk4;                            /* inferred */
+    /* 0x08 */ s32 unk8;                            /* inferred */
+    /* 0x0C */ s32 unkC;                            /* inferred */
+    /* 0x10 */ char pad10[4];
+    /* 0x14 */ s32 unk14;                           /* inferred */
+    /* 0x18 */ char pad18[0x14];                    /* maybe part of unk14[6]void */
+    /* 0x2C */ s32 unk2C;                           /* inferred */
+} CScriptInterpreter_infere;                               /* size >= 0x30 */
+extern "C" CScriptInterpreter_infere *__ct__18CScriptInterpreterFv(CScriptInterpreter_infere *objet) {
+    __ct__9input_strFv((input_str *) objet);
+    objet->unk0 = 0;
+    objet->unk4 = 0;
+    objet->unk8 = 0;
+    objet->unkC = 0;
+    objet->unk14 = 0;
+    objet->unk2C = 0;
+    return objet;
+}
 input_str::input_str(void) {
     this->field_0x4 = 0;
     this->field_0x8 = 0;

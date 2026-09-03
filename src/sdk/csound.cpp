@@ -12,9 +12,16 @@
 #include "gen/sndSeInfo.hpp"
 #include "gen/sndTrack.hpp"
 
-INCLUDE_ASM("nonmatchings/sdk/csound", StopVoice__6CSoundFi);
+extern "C" u8 _218[25];
 struct CSound;
-extern "C" s32 sceSdRemote(s32, s32, s32, s32);
+extern "C" void printf(...);
+extern "C" s32 sceSdRemote(...);
+extern "C" void StopVoice__6CSoundFi(CSound *objet, s32 arg0) {
+    sceSdRemote(1, 0x8030, arg0 | 0x1600, 0xFFFFFF);
+    printf(&_218, arg0);
+}
+struct CSound;
+extern "C" s32 sceSdRemote(...);
 extern "C" void SndInReverb__6CSoundFb(CSound *objet, s32 arg0) {
     if (arg0 != 0) {
         sceSdRemote(1, 0x8010, 0x800, -4);
@@ -39,7 +46,7 @@ INCLUDE_ASM("nonmatchings/sdk/csound", SE_Stop__6CSoundFiiiii);
 INCLUDE_ASM("nonmatchings/sdk/csound", Step__6CSoundFv);
 extern "C" u8 _733_00369110[15];
 struct CSound;
-extern "C" void printf(void *, s32);
+extern "C" void printf(...);
 extern "C" void ezMidi__Fii(s32 arg0, s32 arg1);
 extern "C" void Stop__6CSoundFi(CSound *objet, s32 arg0) {
     ezMidi__Fii(arg0 + 0x20, 0);
@@ -59,7 +66,7 @@ extern "C" void SetVol__6CSoundFii(CSound *objet, s32 arg0, s32 arg1) {
 }
 INCLUDE_ASM("nonmatchings/sdk/csound", SetStereoMode__6CSoundFi);
 struct CSound;
-extern "C" s32 sceSdRemote(s32, s32, s32, s32);
+extern "C" s32 sceSdRemote(...);
 extern "C" void SetMasterVol__6CSoundFii(CSound *objet, s32 arg0, s32 arg1) {
     sceSdRemote(1, 0x8010, arg0 | 0x980, arg1);
     sceSdRemote(1, 0x8010, arg0 | 0xA80, arg1);
@@ -347,7 +354,12 @@ extern "C" void StopSeSeq__Fi(s32 arg0) {
     }
 }
 INCLUDE_ASM("nonmatchings/sdk/csound", SetVolSeSeq__Fii);
-INCLUDE_ASM("nonmatchings/sdk/csound", sndStreamOpenFast__FPc);
+extern "C" s32 StreamOpenFast__6CSoundFiPc(...);
+extern "C" void sndStreamOpenFast__FPc(s8 *arg0) {
+    sndWaitSema__Fv();
+    StreamOpenFast__6CSoundFiPc(&CSnd, 1, arg0);
+    sndSignalSema__Fv();
+}
 extern "C" s32 StreamOpenState__6CSoundFv(void *);
 extern "C" s32 sndStreamOpenState__Fv(void) {
     s32 temp_s0;

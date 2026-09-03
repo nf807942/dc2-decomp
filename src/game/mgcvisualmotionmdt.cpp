@@ -60,7 +60,18 @@ INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", SetData5__FiiPPiP1P1P1P1P1P1
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", SetData6__FiiPPiP1P1P1P1P1P14mgVertexWeight);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", SetData7__FiiPPiP1P1P1P1P1P14mgVertexWeight);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", CreateFaceMotionPacket__18mgCVisualMotionMDTFPUiP7mgCFaceP14mgCVMotionData);
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", CreateRenderInfoPacket__18mgCVisualMotionMDTFPUiPA4_fP13mgRENDER_INFO);
+struct inferred;
+#include "gen/mgCVisualMDT.hpp"
+typedef struct mgRENDER_INFO {
+    /* 0x0000 */ char pad0[0x1010];
+    /* 0x1010 */ s32 unk1010;                       /* inferred */
+} mgRENDER_INFO;                                    /* size >= 0x1014 */
+extern "C" s32 CreateRenderInfoPacket__12mgCVisualMDTFPUiPA4_fP13mgRENDER_INFO(...);
+extern "C" void CreateRenderInfoPacket__18mgCVisualMotionMDTFPUiPA4_fP13mgRENDER_INFO(mgCVisualMotionMDT *objet, u32 *arg0, f32 (*arg1)[4], mgRENDER_INFO *arg2) {
+    arg2->unk1010 = 1;
+    CreateRenderInfoPacket__12mgCVisualMDTFPUiPA4_fP13mgRENDER_INFO((mgCVisualMDT *) objet, arg0, arg1, arg2);
+    arg2->unk1010 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", CreateExtRenderInfoPacket__18mgCVisualMotionMDTFPUiPA4_fP13mgRENDER_INFO);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", SetBaseBox__18mgCVisualMotionMDTFPfPf);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", CreateBBox__18mgCVisualMotionMDTFPfPfPA4_f);
@@ -79,7 +90,21 @@ void CStartupEpisodeTitle::Initialize(void) {
     this->field_0x0 = 0;
     this->field_0x2 = 0;
 }
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Draw__18MessageTaskManagerFv);
+#include "gen/ClsMes.hpp"
+struct inferred;
+typedef struct MessageTaskManager_infere {
+    /* 0x0 */ char pad0[4];
+    /* 0x4 */ ClsMes *unk4;                         /* inferred */
+} MessageTaskManager_infere;                               /* size >= 0x8 */
+extern "C" s32 DrawMesWin__6ClsMesFv(void *);
+extern "C" void Draw__18MessageTaskManagerFv(MessageTaskManager_infere *objet) {
+    ClsMes *temp_a0;
+
+    temp_a0 = (ClsMes *) (objet->unk4);
+    if (temp_a0 != NULL) {
+        DrawMesWin__6ClsMesFv(temp_a0);
+    }
+}
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Step__18MessageTaskManagerFv);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Print__18MessageTaskManagerFPciii);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Clear__18MessageTaskManagerFv);
@@ -138,7 +163,23 @@ INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Initialize__13CRandomCircleF
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Draw__12CTreasureBoxFPf);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", DrawShadow__12CTreasureBoxFPfPf);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", SetLargeModel__19CTreasureBoxManagerFP11CCharacter2i);
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", SetCollisionModel__19CTreasureBoxManagerFPUiP9mgCMemory);
+extern "C" u8 _1279_00372D88[11];
+extern "C" s32 GetPackFile__FPUiPcPi(...);
+struct MDS_HEADER {
+    u32 field_0;
+    char pad_4[0x4];
+    u32 field_8;
+};
+struct inferred;
+#include "menu.hpp"
+typedef struct CTreasureBoxManager {
+    /* 0x000 */ char pad0[0xA98];
+    /* 0xA98 */ s32 unkA98;                         /* inferred */
+} CTreasureBoxManager;                              /* size >= 0xA9C */
+extern "C" s32 LoadCollisionFile__FP10MDS_HEADERP9mgCMemory(...);
+extern "C" void SetCollisionModel__19CTreasureBoxManagerFPUiP9mgCMemory(CTreasureBoxManager *objet, u32 *arg0, mgCMemory *arg1) {
+    objet->unkA98 = LoadCollisionFile__FP10MDS_HEADERP9mgCMemory(GetPackFile__FPUiPcPi(arg0, &_1279_00372D88, NULL), arg1);
+}
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", PutTreasureBox__19CTreasureBoxManagerFiPffiiiii);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", CheckArea__19CTreasureBoxManagerFPff);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", DrawMiniMapSymbol__19CTreasureBoxManagerFP14CMiniMapSymbol);
@@ -152,7 +193,12 @@ INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", GetKeyDoorIndex__Fii);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Lamb2WolfManager__Fv);
 void LoopSoundManager(s32 arg0) {
 }
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", BattleSoundManager__Fv);
+extern "C" s32 BattleAreaBGMCtrl__Fv(void);
+extern "C" s32 StatusWarningSnd__Fv(void);
+extern "C" void BattleSoundManager__Fv(void) {
+    BattleAreaBGMCtrl__Fv();
+    StatusWarningSnd__Fv();
+}
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", StatusWarningSnd__Fv);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", BattleAreaBGMCtrl__Fv);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", ScriptDebugCommand__Fi);

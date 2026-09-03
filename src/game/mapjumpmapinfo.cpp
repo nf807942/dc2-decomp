@@ -33,10 +33,159 @@ INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", DrawEditCursorParts__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", DrawEditCursor__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", DrawEditHelpMes__Fv);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", CheckFocusBalanceParts__FP8CEditMapiPf);
-INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", InitBalanceDraw__FP6CScene);
+extern "C" s32 GetMap__6CSceneFi(void *, s32);
+extern "C" u8 now_balance_h[16];
+struct CEditMap {
+    char pad_0[0xC88];
+    f32 field_C88;
+    char pad_C8C[0xA8];
+    s32 field_D34;
+    s32 field_D38;
+    char pad_D3C[0x4];
+    s32 field_D40;
+    s32 field_D44;
+    char pad_D48[0x200];
+    s32 field_F48;
+    s32 field_F4C;
+    s32 field_F50;
+    char pad_F54[0x10];
+    s32 field_F64;
+    s32 field_F68;
+    char pad_F6C[0x14];
+    s32 field_F80;
+    s32 field_F84;
+    s32 field_F88;
+    s32 field_F8C;
+    s32 field_F90;
+    char pad_F94[0x4];
+    s32 field_F98;
+    s32 field_F9C;
+    s32 field_FA0;
+    s32 field_FA4;
+    s32 field_FA8;
+    s32 field_FAC;
+    s32 field_FB0;
+    s32 field_FB4;
+    s32 field_FB8;
+    s32 field_FBC;
+    s32 field_FC0;
+    s32 field_FC4;
+    s32 field_FC8;
+    s32 field_FCC;
+    s32 field_FD0;
+    s32 field_FD4;
+    s32 field_FD8;
+    s32 field_FDC;
+    s32 field_FE0;
+    s32 field_FE4;
+    s32 field_FE8;
+    s32 field_FEC;
+    s32 field_FF0;
+    s32 field_FF4;
+    s32 field_FF8;
+    s32 field_FFC;
+    char pad_1000[0x20];
+    s32 field_1020;
+    char pad_1024[0x2C];
+    s32 field_1050;
+    char pad_1054[0x20];
+    f32 field_1074;
+    char pad_1078[0xC];
+    f32 field_1084;
+    char pad_1088[0xC];
+    f32 field_1094;
+    char pad_1098[0xC];
+    f32 field_10A4;
+};
+struct inferred;
+typedef struct CScene {
+    /* 0x0000 */ char pad0[0x2E5C];
+    /* 0x2E5C */ s32 unk2E5C;                       /* inferred */
+} CScene;                                           /* size >= 0x2E60 */
+extern "C" s32 GroundBalance__8CEditMapFi(void *, s32);
+extern "C" s32 GetBalanceHeight__FP6CScenePf(...);
+extern "C" void InitBalanceDraw__FP6CScene(CScene *arg0) {
+    CEditMap *temp_v0;
+
+    temp_v0 = (CEditMap *) (GetMap__6CSceneFi(arg0, arg0->unk2E5C));
+    if (temp_v0 != NULL) {
+        GroundBalance__8CEditMapFi(temp_v0, 0);
+    }
+    GetBalanceHeight__FP6CScenePf(arg0, &now_balance_h);
+}
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", GetBalanceHeight__FP6CScenePf);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", DrawEditSystem__FiP6CScenePfi);
-INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", GetGeoCheckPts__FP4CMap);
+extern "C" u8 _2213_00377130[10];
+struct CMap {
+    char pad_0[0x98];
+    s32 field_98;
+    s32 field_9C;
+    s32 field_A0;
+    char pad_A4[0x1C];
+    s32 field_C0;
+    s32 field_C4;
+    f32 field_C8;
+    s32 field_CC;
+    s32 field_D0;
+    char pad_D4[0x4];
+    s32 field_D8;
+    f32 field_DC;
+    f32 field_E0;
+    s32 field_E4;
+    s32 field_E8;
+    s32 field_EC;
+    f32 field_F0;
+    f32 field_F4;
+    f32 field_F8;
+    char pad_FC[0xC];
+    s32 field_108;
+    char pad_10C[0x200];
+    s32 field_30C;
+    s32 field_310;
+    s32 field_314;
+    s32 field_318;
+    s32 field_31C;
+    s32 field_320;
+    s32 field_324;
+    s32 field_328;
+    char pad_32C[0x4];
+    s32 field_330;
+    s32 field_334;
+    char pad_338[0x8];
+    f32 field_340;
+    char pad_344[0xC];
+    f32 field_350;
+    char pad_354[0xC];
+    s32 field_360;
+    char pad_364[0x4];
+    s32 field_368;
+    char pad_36C[0x304];
+    s32 field_670;
+    char pad_674[0x60C];
+    s32 field_C80;
+    char pad_C84[0x4];
+    f32 field_C88;
+    s32 field_C8C;
+    char pad_C90[0x4];
+    s32 field_C94;
+    s32 field_C98;
+    char pad_C9C[0xC];
+    s32 field_CA8;
+    s32 field_CAC;
+    char pad_CB0[0x34];
+    f32 field_CE4;
+    s32 field_CE8;
+    s32 field_CEC;
+    s32 field_CF0;
+    s32 field_CF4;
+};
+extern "C" s32 GetPlaceParts__4CMapFPc(...);
+extern "C" s32 GetGeoCheckPts__FP4CMap(CMap *arg0) {
+    if (arg0 != NULL) {
+        return GetPlaceParts__4CMapFPc(arg0, &_2213_00377130);
+    }
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", GetGeoCheckCol__FP4CMapR9mgVu0FBOXP6CCPolyi);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", GetGeoCheckCamCol__FP4CMapR9mgVu0FBOXP6CCPolyi);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", CheckWalkToEdit__FP6CScenePf);
@@ -78,14 +227,26 @@ void SetSubMapInfo(MapJumpMapInfo * arg0) {
 void SetScriptBuffer(mgCMemory *buffer) {
     ScriptBuffer_0037E568 = buffer;
 }
-INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", PreLoadSync__Fv);
+extern "C" s32 ReadBGSync__Fv(void);
+extern "C" s32 ReadBG__Fv(void);
+extern "C" void PreLoadSync__Fv(void) {
+    ReadBG__Fv();
+    ReadBGSync__Fv();
+}
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", MapJump__FP6CSceneP17SCN_LOADMAP_INFO2i);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", GetLoadMapInfo__FP17SCN_LOADMAP_INFO2i);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", LoadSubMap__FP6CSceneii);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", LoadMapScript__FPc);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", ReloadMapScript__Fv);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", LoadScript__FPc);
-INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", GetOldInteriorMapNo__Fv);
+extern "C" u32 OldInteriorMapNo;
+extern "C" s32 InInterior__Fv(void);
+extern "C" s32 GetOldInteriorMapNo__Fv(void) {
+    if (InInterior__Fv() != 0) {
+        return -1;
+    }
+    return OldInteriorMapNo;
+}
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", InitInterior__Fv);
 s32 InInterior(void) {
     return InteriorFlag;

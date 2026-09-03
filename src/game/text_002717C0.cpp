@@ -16,7 +16,12 @@ INCLUDE_ASM("nonmatchings/game/text_002717C0", _SET_MODEL_LIGHT_SWITCH__FP12RS_S
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _SET_MODEL_LIGHT_COLOR__FP12RS_STACKDATAi_00271D30);
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _GET_OMAKE_FLAG__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _SET_WIND__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002717C0", _SET_OMAKE_FLAG__FP12RS_STACKDATAi);
+extern "C" u32 OmakeFlag;
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(RS_STACKDATA *);
+extern "C" s32 _SET_OMAKE_FLAG__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    OmakeFlag = GetStackInt__FP12RS_STACKDATA_00262DA0(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002717C0", GetCamera__Fv);
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _SET_CAMERA_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _GET_CAMERA_POS__FP12RS_STACKDATAi);
@@ -91,7 +96,20 @@ INCLUDE_ASM("nonmatchings/game/text_002717C0", _IMG_SET_MOVE__FP12RS_STACKDATAi)
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _IMG_SET_FADE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _IMG_SET_COLOR__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002717C0", GetEventSprite__Fi);
-INCLUDE_ASM("nonmatchings/game/text_002717C0", _SPRITE_INIT__FP12RS_STACKDATAi);
+extern "C" s32 GetEventSprite__Fi(s32);
+#include "gen/CEventSprite2.hpp"
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(RS_STACKDATA *);
+extern "C" s32 Initialize__13CEventSprite2Fv(void *);
+extern "C" s32 _SPRITE_INIT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    CEventSprite2 *temp_v0;
+
+    temp_v0 = (CEventSprite2 *) (GetEventSprite__Fi(GetStackInt__FP12RS_STACKDATA_00262DA0(arg0)));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    Initialize__13CEventSprite2Fv(temp_v0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _SPRITE_SET_DRAW__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _SPRITE_SET_TYPE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _SPRITE_SET_TEXTURE__FP12RS_STACKDATAi);
@@ -102,11 +120,26 @@ INCLUDE_ASM("nonmatchings/game/text_002717C0", _SPRITE_SET_COLOR__FP12RS_STACKDA
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _SPRITE_SET_SCALE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _SPRITE_SET_ALPHAB__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _CMRS_CHECK__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002717C0", _CMRS_INIT__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002717C0", _CMRS_PRDELAY__FP12RS_STACKDATAi);
+extern "C" u8 CameraSeq[2832];
+extern "C" s32 Clear__12CSceneCmrSeqFv(void *);
+extern "C" s32 _CMRS_INIT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    Clear__12CSceneCmrSeqFv(&CameraSeq);
+    return 1;
+}
+extern "C" u8 CameraSeq[2832];
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(RS_STACKDATA *);
+extern "C" s32 PRDelay__12CSceneCmrSeqFi(void *, s32);
+extern "C" s32 _CMRS_PRDELAY__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    PRDelay__12CSceneCmrSeqFi(&CameraSeq, GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _CMRS_SET_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _CMRS_SET_REF__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002717C0", _CMRS_AHDDELAY__FP12RS_STACKDATAi);
+extern "C" s32 AHDDelay__12CSceneCmrSeqFi(void *, s32);
+extern "C" s32 _CMRS_AHDDELAY__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    AHDDelay__12CSceneCmrSeqFi(&CameraSeq, GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _CMRS_SET_ANGLE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _CMRS_SET_HEIGHT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _CMRS_SET_DIST__FP12RS_STACKDATAi);

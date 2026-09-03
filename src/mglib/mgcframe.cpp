@@ -198,13 +198,23 @@ INCLUDE_ASM("nonmatchings/mglib/mgcframe", Initialize__11mgCDrawPrimFP9mgCMemory
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Begin__11mgCDrawPrimFi);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", BeginDma__11mgCDrawPrimFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", EndDma__11mgCDrawPrimFv);
-extern "C" void BeginDma__11mgCDrawPrimFv(mgCDrawPrim *objet);
-extern "C" void EndDma__11mgCDrawPrimFv(mgCDrawPrim *objet);
+extern "C" void BeginDma__11mgCDrawPrimFv(...);
+extern "C" void EndDma__11mgCDrawPrimFv(...);
 extern "C" void Flush__11mgCDrawPrimFv(mgCDrawPrim *objet) {
     EndDma__11mgCDrawPrimFv(objet);
     BeginDma__11mgCDrawPrimFv(objet);
 }
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", End__11mgCDrawPrimFv);
+typedef struct mgCDrawPrim_infere {
+    /* 0x00 */ char pad0[0xD0];
+    /* 0xD0 */ s32 unkD0;                           /* inferred */
+} mgCDrawPrim_infere;                                      /* size >= 0xD4 */
+extern "C" s32 End2__11mgCDrawPrimFv(void *);
+extern "C" void End__11mgCDrawPrimFv(mgCDrawPrim_infere *objet) {
+    if (objet->unkD0 == 0) {
+        EndDma__11mgCDrawPrimFv(objet);
+        End2__11mgCDrawPrimFv(objet);
+    }
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Begin2__11mgCDrawPrimFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", BeginPrim2__11mgCDrawPrimFi);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", BeginPrim2__11mgCDrawPrimFiUiUii);

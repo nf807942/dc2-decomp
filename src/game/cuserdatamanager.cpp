@@ -113,7 +113,28 @@ INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetCharaStatusAttirbute__16CUs
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetMonsterBajjiDataPtr__16CUserDataManagerFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetMonsterBajjiDataPtrMosId__16CUserDataManagerFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetItemBoardOverNum__16CUserDataManagerFv);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetItemBoardMaxNum__16CUserDataManagerFi);
+struct CUserDataManager;
+extern "C" s32 GetSaveData__Fv(void);
+extern "C" s32 GetBitFlag__9CSaveDataFi(...);
+extern "C" s32 GetItemBoardMaxNum__16CUserDataManagerFi(CUserDataManager *objet, s32 arg0) {
+    s32 var_s0;
+    s32 var_v0;
+
+    var_s0 = 0;
+    if (arg0 == 0) {
+        var_s0 = 0x8A;
+    }
+    if (GetBitFlag__9CSaveDataFi(GetSaveData__Fv(), 0xFE) == 1) {
+        if (arg0 == 0) {
+            var_s0 = 0x90;
+        }
+    }
+    var_v0 = var_s0;
+    if (arg0 == 1) {
+        var_v0 = 0x96;
+    }
+    return var_v0;
+}
 extern "C" s32 GetBattleCharaInfo__Fv(void);
 struct inferred;
 typedef struct CUserDataManager_infere2 {
