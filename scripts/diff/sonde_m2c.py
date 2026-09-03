@@ -97,6 +97,27 @@ def deja_declarees(unite: str) -> set[str]:
     return _parcourt(unite, lambda texte: set(_DECLARE.findall(texte)))
 
 
+# `int printf(const char *, ...);` — une fonction que l'unité voit déjà
+# déclarée, par elle-même ou par un en-tête qu'elle atteint.
+_DECLARE_FN = re.compile(r"^[^/#\n]*?\b(\w+)\s*\([^;()]*\)\s*;", re.M)
+
+
+def deja_prototypees(unite: str) -> set[str]:
+    """Les fonctions que cette unité voit déjà déclarées, en-têtes compris.
+
+    `declarations_portees` ne lit que la source, et un appelé déclaré dans un
+    en-tête lui échappe : nous en réémettons alors notre propre forme, et un
+    nom `extern "C"` ne se surcharge pas. `printf`, que le SDK déclare, en
+    est le cas type — MWCC répond « illegal function overloading », curseur en
+    fin de notre ligne.
+
+    Ne rien émettre est sans risque : si la déclaration manquait vraiment, MWCC
+    dit « undefined identifier » et la boucle de complétion la rattrape au tour
+    suivant.
+    """
+    return _parcourt(unite, lambda texte: set(_DECLARE_FN.findall(texte)))
+
+
 def _parcourt(unite: str, extrait) -> set[str]:
     """Applique `extrait` à l'unité et aux en-têtes qu'elle atteint.
 
@@ -323,7 +344,8 @@ def complete_structures(structs: list[str], corps: str) -> tuple[list[str], str]
 
 def normalise(texte: str, symbole: str, vues: set[str],
               declarees: set[str] | None = None,
-              portees: dict[str, str] | None = None) -> tuple[str, str] | None:
+              portees: dict[str, str] | None = None,
+              prototypees: set[str] | None = None) -> tuple[str, str] | None:
     """Rend (déclarations, définition) prêtes à compiler, ou rien.
 
     Trois retouches, et pas une de plus : les structures inférées se gardent
@@ -397,6 +419,9 @@ def normalise(texte: str, symbole: str, vues: set[str],
         # que le reste du fichier suppose.
         if portees and nom in portees:
             externes.append(portees[nom])
+            continue
+        # Un en-tete la declare deja : la reemettre surchargerait le nom.
+        if prototypees and nom in prototypees:
             continue
         depuis_mangling = declaration(nom) if nom in functions() else None
         if depuis_mangling:
@@ -513,7 +538,8 @@ def eprouve(symbole: str, unite: str, taille: int,
 
     rendu = normalise(texte, symbole, deja_vues(unite),
                       deja_declarees(unite),
-                      declarations_portees(avant))
+                      declarations_portees(avant),
+                      deja_prototypees(unite))
     if rendu is None:
         return {**verdict, "issue": "sortie illisible"}
     declarations, corps = rendu
@@ -712,7 +738,12 @@ def globales_m2c(texte: str) -> dict[str, str]:
     trouves: dict[str, str] = {}
     for type_, nom in _GLOBALE_M2C.findall(texte):
         if objets().get(nom) == 4:
-            trouves[nom] = 'extern "C" %s *%s;' % (type_, nom)
+            # La declaration en avant precede, dans le meme bloc : le type
+            # pointe n'existe pas encore, et MWCC repond « declaration syntax
+            # error » avec le curseur sur son nom. La boucle de completion ne
+            # rattrape pas cette faute-la — elle ne sait chasser qu'un
+            # identifiant declare inconnu, non une erreur de syntaxe.
+            trouves[nom] = 'struct %s;\nextern "C" %s *%s;' % (type_, type_, nom)
     return trouves
 
 
