@@ -596,8 +596,9 @@ def eprouve(symbole: str, unite: str, taille: int,
                     bloc = definition_atlas(kind)
                     neuves.append(bloc if bloc else "struct %s;" % kind)
             if not neuves:
+                message, extrait = erreur_detaillee(sortie)
                 return {**verdict, "issue": "ne compile pas",
-                        "cause": premiere_erreur(sortie)}
+                        "cause": message, "extrait": extrait}
             ajoutees.extend(neuves)
         else:
             return {**verdict, "issue": "ne compile pas",
@@ -726,9 +727,43 @@ def declaration(nom: str, corps: str = "") -> str | None:
 _ERREUR = re.compile(r"^#\s+([a-z'].*)$", re.MULTILINE)
 
 
+# La contre-oblique se pose par `chr(92)`, comme partout ici : ecrite en clair
+# dans un correctif mal echappe, elle devient l'octet 8 et le motif ne trouve
+# plus rien, en silence.
+_LIGNE_FAUTIVE = re.compile(r"^#\s+(\d+): ?(.*)$", re.M)
+_CURSEUR = re.compile(r"^#\s+Error:( *)\^", re.M)
+
+
 def premiere_erreur(sortie: str) -> str:
     trouve = _ERREUR.findall(sortie)
     return trouve[0][:70] if trouve else "inconnue"
+
+
+def erreur_detaillee(sortie: str) -> tuple[str, str]:
+    """Le message de MWCC, et le morceau de source qu'il désigne.
+
+    Le message seul ne dit pas quoi réparer : 93 « declaration syntax error »
+    se ressemblent et recouvrent des fautes sans rapport. MWCC, lui, pointe une
+    colonne — il imprime la ligne fautive, puis un curseur sous le caractère en
+    cause. C'est ce voisinage qui classe.
+
+    Le fragment ne se diagnostique plus hors de son unité : sur douze témoins
+    tirés des deux premières causes, douze compilent seuls. Les échecs qui
+    restent naissent de la rencontre avec l'unité, et seule la chaîne les voit.
+    """
+    message = premiere_erreur(sortie)
+    ligne = _LIGNE_FAUTIVE.search(sortie)
+    curseur = _CURSEUR.search(sortie)
+    if not (ligne and curseur):
+        return message, ""
+    brut = ligne.group(0)
+    colonne = len(curseur.group(0)) - 1
+    if not 0 <= colonne < len(brut):
+        return message, ligne.group(2).strip()[:70]
+    # Le curseur est le seul repere qui distingue deux lignes identiques
+    # fautives en des points differents : on le garde, marque par un chevron.
+    marque = brut[:colonne] + chr(187) + brut[colonne:]
+    return message, marque[max(0, colonne - 24):colonne + 25].strip()
 
 
 def main(argv: list[str]) -> int:

@@ -99,6 +99,34 @@ def recompile_et_mesure(symbole: str, unite: str) -> float | None:
     return sonde_m2c.score(symbole, unite)
 
 
+def profil(etat: dict) -> int:
+    """Ce que la moisson a rencontré, par cause puis par extrait.
+
+    Le message de MWCC ne suffit plus à décider quoi réparer : les deux
+    premières causes recouvrent des fautes sans rapport, et douze témoins sur
+    douze compilent hors de leur unité. C'est la ligne que le compilateur
+    désigne, chevron compris, qui range.
+    """
+    eprouvees = etat["eprouvees"]
+    issues = collections.Counter(v.get("issue") for v in eprouvees.values())
+    print("%d fonctions éprouvées" % len(eprouvees))
+    for nom, compte in issues.most_common():
+        octets = sum(v.get("taille") or 0 for v in eprouvees.values()
+                     if v.get("issue") == nom)
+        print("  %5d  %8d o  %s" % (compte, octets, nom))
+
+    for cause, _ in collections.Counter(
+            v.get("cause") for v in eprouvees.values()
+            if v.get("issue") == "ne compile pas").most_common(6):
+        extraits = collections.Counter(
+            (v.get("extrait") or "sans extrait")[:64]
+            for v in eprouvees.values() if v.get("cause") == cause)
+        print("\n%s — %d cas" % (cause, sum(extraits.values())))
+        for extrait, compte in extraits.most_common(5):
+            print("  %4d  %s" % (compte, extrait))
+    return 0
+
+
 def main(argv: list[str]) -> int:
     parseur = argparse.ArgumentParser(description=__doc__)
     # La fenetre utile, mesuree : 60,5 % de rendement entre 32 et 64 octets,
@@ -110,6 +138,8 @@ def main(argv: list[str]) -> int:
     parseur.add_argument("--unites", type=int, default=0,
                          help="s'arrête après N unités")
     parseur.add_argument("--reprendre", action="store_true")
+    parseur.add_argument("--profil", action="store_true",
+                         help="lit l'état et sort, sans rien éprouver")
     # Une comparaison avant/apres ne vaut que sur la meme population :
     # la moisson reecrit `chaine.json` en mesurant, et deux tirages du
     # meme rang y puisent alors des fonctions differentes. La liste fige
@@ -125,6 +155,9 @@ def main(argv: list[str]) -> int:
     signal.signal(signal.SIGTERM, lambda *_: sys.exit(1))
 
     etat = charge(options.reprendre)
+    if options.profil:
+        return profil(etat)
+
     groupes = par_unite(options.mini, options.maxi)
     if options.reprendre:
         groupes = {unite: [e for e in lot if e[1] not in etat["eprouvees"]]
