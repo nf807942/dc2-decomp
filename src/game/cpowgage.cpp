@@ -50,7 +50,12 @@ INCLUDE_ASM("nonmatchings/game/cpowgage", _MON_SE_PLAY2__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _MON_SE_STOP2__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _SET_LIGHT_FLAG__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _SCN_GET_CHR_ENTOBJ_POS__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/cpowgage", _CREATE_DAMAGE__FP12RS_STACKDATAi);
+extern "C" u8 _3398[62];
+extern "C" s32 printf(...);
+extern "C" s32 _CREATE_DAMAGE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    printf(&_3398);
+    return 0;
+}
 s32 _DELETE_DAMAGE(RS_STACKDATA *stack, int argc) {
     return 0;
 }
@@ -60,7 +65,10 @@ s32 _DMG_SET_POS(RS_STACKDATA *stack, int argc) {
 s32 _DMG_SET_FRONT_VECT(RS_STACKDATA *stack, int argc) {
     return 0;
 }
-INCLUDE_ASM("nonmatchings/game/cpowgage", _DMG_SET_DAMAGE__FP12RS_STACKDATAi);
+extern "C" s32 _DMG_SET_DAMAGE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    printf(&_3398);
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cpowgage", _COLPRIM_CREATE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _COLPRIM_SET_COORD__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _COLPRIM_DELETE__FP12RS_STACKDATAi);
@@ -79,7 +87,20 @@ INCLUDE_ASM("nonmatchings/game/cpowgage", _GET_EOH_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", SetEffectScript__FP10CRunScriptPcP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cpowgage", SetEffectScriptFunc__Fv);
 INCLUDE_ASM("nonmatchings/game/cpowgage", GetSphidaClubDef__Fi);
-INCLUDE_ASM("nonmatchings/game/cpowgage", DPrimEnterSprite__FP11mgCDrawPrimiiiiffff);
+#include "gen/mgCDrawPrim.hpp"
+extern "C" s32 TextureCrd__11mgCDrawPrimFii(void *, s32, s32);
+extern "C" s32 Vertex__11mgCDrawPrimFfff(void *, f32, f32, f32);
+extern "C" void DPrimEnterSprite__FP11mgCDrawPrimiiiiffff(mgCDrawPrim *arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, f32 arg5, f32 arg6, f32 arg7, f32 arg8) {
+    f32 temp_f20;
+    f32 temp_f21;
+
+    TextureCrd__11mgCDrawPrimFii(arg0, arg1, arg2);
+    temp_f21 = arg7 / 2.0f;
+    temp_f20 = arg8 / 2.0f;
+    Vertex__11mgCDrawPrimFfff(arg0, arg5 - temp_f21, arg6 - temp_f20, 0.0f);
+    TextureCrd__11mgCDrawPrimFii(arg0, arg1 + arg3, arg2 + arg4);
+    Vertex__11mgCDrawPrimFfff(arg0, arg5 + temp_f21, arg6 + temp_f20, 0.0f);
+}
 void CPowGage::Initialize(void) {
     this->field_0x4 = 0;
     this->field_0x0 = 0;

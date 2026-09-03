@@ -59,15 +59,86 @@ INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", Clear__9CEditGridFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", Initialize__9CEditGridFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", Check__9CEditGridFii);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", Get__9CEditGridFii);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", GetFast__9CEditGridFii);
+struct inferred;
+typedef struct CEditGrid_infere {
+    /* 0x0 */ s32 unk0;                             /* inferred */
+    /* 0x4 */ char pad4[4];
+    /* 0x8 */ s32 unk8;                             /* inferred */
+} CEditGrid_infere;                                        /* size >= 0xC */
+extern "C" s32 GetFast__9CEditGridFii(CEditGrid_infere *objet, s32 arg0, s32 arg1) {
+    return objet->unk8 + ((arg0 + (arg1 * objet->unk0)) * 0x14);
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", GetLPos__9CEditGridFPiff);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", GetWPos__9CEditGridFPfii);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", SetRiver__9CEditGridFff);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", ResetRiver__9CEditGridFff);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", SetRiver__9CEditGridFii);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", ResetRiver__9CEditGridFii);
+struct CEditGrid;
+extern "C" s32 Get__9CEditGridFii(void *, s32, s32);
+extern "C" s32 UpdateRiver__9CEditGridFii(void *, s32, s32);
+extern "C" s32 SetRiver__9CEditGridFii(CEditGrid *objet, s32 arg0, s32 arg1) {
+    s32 *temp_v0;
+
+    temp_v0 = (s32 *) (Get__9CEditGridFii(objet, arg0, arg1));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    *temp_v0 = 1;
+    UpdateRiver__9CEditGridFii(objet, arg0, arg1);
+    UpdateRiver__9CEditGridFii(objet, arg0 - 1, arg1);
+    UpdateRiver__9CEditGridFii(objet, arg0 + 1, arg1);
+    UpdateRiver__9CEditGridFii(objet, arg0, arg1 + 1);
+    UpdateRiver__9CEditGridFii(objet, arg0, arg1 - 1);
+    UpdateRiver__9CEditGridFii(objet, arg0 - 1, arg1 - 1);
+    UpdateRiver__9CEditGridFii(objet, arg0 + 1, arg1 - 1);
+    UpdateRiver__9CEditGridFii(objet, arg0 + 1, arg1 + 1);
+    UpdateRiver__9CEditGridFii(objet, arg0 - 1, arg1 + 1);
+    return 1;
+}
+extern "C" s32 Get__9CEditGridFii(void *, s32, s32);
+struct CEditGrid {
+    s32 field_0;
+    s32 field_4;
+    char pad_8[0x4];
+    f32 field_C;
+    f32 field_10;
+    char pad_14[0xC];
+    f32 field_20;
+    f32 field_24;
+    f32 field_28;
+};
+extern "C" s32 UpdateRiver__9CEditGridFii(void *, s32, s32);
+extern "C" s32 ResetRiver__9CEditGridFii(CEditGrid *objet, s32 arg0, s32 arg1) {
+    s32 *temp_v0;
+
+    temp_v0 = (s32 *) (Get__9CEditGridFii(objet, arg0, arg1));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    if (*temp_v0 == 0) {
+        return 0;
+    }
+    *temp_v0 = 0;
+    UpdateRiver__9CEditGridFii(objet, arg0, arg1);
+    UpdateRiver__9CEditGridFii(objet, arg0 - 1, arg1);
+    UpdateRiver__9CEditGridFii(objet, arg0 + 1, arg1);
+    UpdateRiver__9CEditGridFii(objet, arg0, arg1 + 1);
+    UpdateRiver__9CEditGridFii(objet, arg0, arg1 - 1);
+    UpdateRiver__9CEditGridFii(objet, arg0 - 1, arg1 - 1);
+    UpdateRiver__9CEditGridFii(objet, arg0 + 1, arg1 - 1);
+    UpdateRiver__9CEditGridFii(objet, arg0 + 1, arg1 + 1);
+    UpdateRiver__9CEditGridFii(objet, arg0 - 1, arg1 + 1);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", UpdateRiver__9CEditGridFii);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", River__9CEditGridFii);
+extern "C" s32 River__9CEditGridFii(CEditGrid *objet, s32 arg0, s32 arg1) {
+    s32 *temp_v0;
+
+    temp_v0 = (s32 *) (Get__9CEditGridFii(objet, arg0, arg1));
+    if (temp_v0 != NULL) {
+        return *temp_v0;
+    }
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", GetRiverPos__9CEditGridFiiPA4_f);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", GetRiverPos__9CEditGridFiiPf);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", GetRiverPoly__9CEditGridFP6CCPolyRC9mgVu0FBOXif);
@@ -76,7 +147,23 @@ INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", Load__6CMovieFPcPP9mgCMemoryi
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", Load__6CMovieFPcP9mgCMemoryiibb);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", Load__6CMovieFPcP9mgCMemoryiibbb);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", Play__6CMovieFPc);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", SwitchThread__6CMovieFv);
+struct inferred;
+typedef struct CMovie_infere {
+    /* 0x00000 */ char pad0[0x23900];
+    /* 0x23900 */ u8 unk23900;                      /* inferred */
+} CMovie_infere;                                           /* size >= 0x23901 */
+extern "C" s32 switchThread__Fv(void);
+extern "C" void SwitchThread__6CMovieFv(CMovie_infere *objet) {
+    s32 var_s0;
+
+    var_s0 = 0;
+    if (objet->unk23900 != 0) {
+        do {
+            switchThread__Fv();
+            var_s0 += 1;
+        } while (var_s0 < 4);
+    }
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", Term__6CMovieFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", EndCheck__6CMovieFv);
 s32 CMovie::IsStarted(void) {
@@ -91,7 +178,13 @@ INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", GetMpegWorkSize__6CMovieFii);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", GetReadBufSize__6CMovieFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", GetTagProgSize__6CMovieFii);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", videoDecCreate__6CMovieFP8VideoDecPUciP1P1iP9TimeStampi);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", videoDecSetStream__6CMovieFP8VideoDeciiPFP7sceMpegP13sceMpegCbDataPv_iPv);
+#include "mpeg.hpp"
+struct sceMpegCbData;
+extern "C" s32 sceMpegAddStrCallback(...);
+extern "C" s32 videoDecSetStream__6CMovieFP8VideoDeciiPFP7sceMpegP13sceMpegCbDataPv_iPv(CMovie *objet, VideoDec *arg0, s32 arg1, s32 arg2, s32 (*arg3)(sceMpeg *, sceMpegCbData *, void *), void *arg4) {
+    sceMpegAddStrCallback(arg0, arg1 & 0xFF, arg2, arg3, arg4);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", videoDecDelete__6CMovieFP8VideoDec);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", videoDecFlush__6CMovieFP8VideoDec);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", defMain__FPv);
@@ -149,28 +242,176 @@ INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", viBufModifyPts__FP5ViBufP9Tim
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", viBufPutTs__FP5ViBufP9TimeStamp);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", viBufGetTs__FP5ViBufP9TimeStamp);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", strFileOpen__FP7StrFilePc);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", strFileSeek__FP7StrFile);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", strFileClose__FP7StrFile);
+typedef struct StrFile {
+    /* 0x00 */ s32 unk0;                            /* inferred */
+    /* 0x04 */ char pad4[0x20];                     /* maybe part of unk0[9]void */
+    /* 0x24 */ s32 unk24;                           /* inferred */
+    /* 0x28 */ s32 unk28;                           /* inferred */
+} StrFile;                                          /* size >= 0x2C */
+extern "C" s32 sceCdStSeekF(...);
+extern "C" s32 sceLseek(...);
+extern "C" void strFileSeek__FP7StrFile(StrFile *arg0) {
+    if (arg0->unk28 != 0) {
+        sceCdStSeekF(arg0->unk0);
+        return;
+    }
+    sceLseek(arg0->unk24, 0, 0);
+}
+typedef struct StrFile_infere {
+    /* 0x00 */ char pad0[0x24];
+    /* 0x24 */ s32 unk24;                           /* inferred */
+    /* 0x28 */ s32 unk28;                           /* inferred */
+} StrFile_infere;                                          /* size >= 0x2C */
+extern "C" s32 sceCdStStop(...);
+extern "C" s32 sceClose(...);
+extern "C" s32 strFileClose__FP7StrFile(StrFile_infere *arg0) {
+    if (arg0->unk28 != 0) {
+        sceCdStStop();
+    } else {
+        sceClose(arg0->unk24);
+    }
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", strFileRead__FP7StrFilePvi);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", readBufCreate__FP7ReadBuf);
+typedef struct ReadBuf {
+    /* 0x00000 */ char pad0[0x50000];
+    /* 0x50000 */ s32 unk50000;                     /* inferred */
+    /* 0x50004 */ s32 unk50004;                     /* inferred */
+    /* 0x50008 */ s32 unk50008;                     /* inferred */
+} ReadBuf;                                          /* size >= 0x5000C */
+extern "C" void readBufCreate__FP7ReadBuf(ReadBuf *arg0) {
+    arg0->unk50004 = 0;
+    arg0->unk50000 = 0;
+    arg0->unk50008 = 0x50000;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", readBufBeginPut__FP7ReadBufPPUc);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", readBufEndPut__FP7ReadBufi);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", readBufBeginGet__FP7ReadBufPPUc);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", readBufEndGet__FP7ReadBufi);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", audioDecCreate__FP8AudioDecPUcii);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", audioDecDelete__FP8AudioDec);
+extern "C" u8 _0_buf[2048];
+extern "C" u8 _1109_003735B0[28];
+extern "C" u8 _1110_003735D0[41];
+struct inferred;
+typedef struct AudioDec {
+    /* 0x00 */ s32 unk0;                            /* inferred */
+    /* 0x04 */ char pad4[0x28];                     /* maybe part of unk0[0xB]void */
+    /* 0x2C */ s32 unk2C;                           /* inferred */
+    /* 0x30 */ u8 *unk30;                           /* inferred */
+    /* 0x34 */ s32 unk34;                           /* inferred */
+    /* 0x38 */ s32 unk38;                           /* inferred */
+    /* 0x3C */ s32 unk3C;                           /* inferred */
+    /* 0x40 */ s32 unk40;                           /* inferred */
+    /* 0x44 */ s32 unk44;                           /* inferred */
+    /* 0x48 */ s32 unk48;                           /* inferred */
+    /* 0x4C */ s32 unk4C;                           /* inferred */
+    /* 0x50 */ s32 unk50;                           /* inferred */
+    /* 0x54 */ s32 unk54;                           /* inferred */
+    /* 0x58 */ s32 unk58;                           /* inferred */
+} AudioDec;                                         /* size >= 0x5C */
+extern "C" s32 memset(...);
+extern "C" s32 printf(...);
+extern "C" s32 sceSifAllocIopHeap(...);
+extern "C" s32 sndSetMasterVol__Fif(s32, f32);
+extern "C" s32 changeMasterVolume__FUi(u32);
+extern "C" s32 sendToIOP__FiPUci(...);
+extern "C" s32 audioDecCreate__FP8AudioDecPUcii(AudioDec *arg0, u8 *arg1, s32 arg2, s32 arg3) {
+    s32 temp_a1;
+    s32 temp_a1_2;
+
+    arg0->unk0 = 0;
+    arg0->unk2C = 0;
+    arg0->unk30 = arg1;
+    arg0->unk34 = 0;
+    arg0->unk38 = 0;
+    arg0->unk3C = arg2;
+    arg0->unk40 = 0;
+    arg0->unk54 = 0;
+    arg0->unk48 = arg3;
+    arg0->unk4C = 0;
+    arg0->unk50 = 0;
+    arg0->unk44 = sceSifAllocIopHeap(arg3);
+    temp_a1 = (s32) (arg0->unk44);
+    if (temp_a1 < 0) {
+        printf(&_1109_003735B0, temp_a1);
+        return 0;
+    }
+    printf(&_1110_003735D0, temp_a1, arg3);
+    arg0->unk58 = sceSifAllocIopHeap(0x800);
+    temp_a1_2 = (s32) (arg0->unk58);
+    if (temp_a1_2 < 0) {
+        printf(&_1109_003735B0, temp_a1_2);
+        return 0;
+    }
+    printf(&_1110_003735D0, temp_a1_2, 0x800);
+    memset(&_0_buf, 0, 0x800);
+    sendToIOP__FiPUci(arg0->unk58, &_0_buf, 0x800);
+    changeMasterVolume__FUi(0x3FFFU);
+    sndSetMasterVol__Fif(0, 1.0f);
+    sndSetMasterVol__Fif(1, 1.0f);
+    return 1;
+}
+typedef struct AudioDec_infere2 {
+    /* 0x00 */ char pad0[0x44];
+    /* 0x44 */ s32 unk44;                           /* inferred */
+    /* 0x48 */ char pad48[0x10];                    /* maybe part of unk44[5]void */
+    /* 0x58 */ s32 unk58;                           /* inferred */
+} AudioDec_infere2;                                         /* size >= 0x5C */
+extern "C" s32 sceSifFreeIopHeap(...);
+extern "C" s32 audioDecDelete__FP8AudioDec(AudioDec_infere2 *arg0) {
+    sceSifFreeIopHeap(arg0->unk44);
+    sceSifFreeIopHeap(arg0->unk58);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", audioDecPause__FP8AudioDec);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", audioDecResume__FP8AudioDec);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", audioDecStart__FP8AudioDec);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", audioDecReset__FP8AudioDec);
+typedef struct AudioDec_infere {
+    /* 0x00 */ s32 unk0;                            /* inferred */
+    /* 0x04 */ char pad4[0x28];                     /* maybe part of unk0[0xB]void */
+    /* 0x2C */ s32 unk2C;                           /* inferred */
+    /* 0x30 */ char pad30[4];
+    /* 0x34 */ s32 unk34;                           /* inferred */
+    /* 0x38 */ s32 unk38;                           /* inferred */
+    /* 0x3C */ char pad3C[4];
+    /* 0x40 */ s32 unk40;                           /* inferred */
+    /* 0x44 */ char pad44[8];                       /* maybe part of unk40[3]void */
+    /* 0x4C */ s32 unk4C;                           /* inferred */
+    /* 0x50 */ s32 unk50;                           /* inferred */
+    /* 0x54 */ s32 unk54;                           /* inferred */
+} AudioDec_infere;                                         /* size >= 0x58 */
+extern "C" s32 audioDecPause__FP8AudioDec(AudioDec_infere *);
+extern "C" void audioDecReset__FP8AudioDec(AudioDec_infere *arg0) {
+    audioDecPause__FP8AudioDec(arg0);
+    arg0->unk0 = 0;
+    arg0->unk2C = 0;
+    arg0->unk34 = 0;
+    arg0->unk38 = 0;
+    arg0->unk40 = 0;
+    arg0->unk54 = 0;
+    arg0->unk4C = 0;
+    arg0->unk50 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", audioDecIsPreset__FP8AudioDec);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", audioDecSendToIOP__FP8AudioDec);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", iopGetArea__FPiPiPiPiP8AudioDeci);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", sendToIOP2area__FiiiiPUciPUci);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", sendToIOP__FiPUci);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", changeMasterVolume__FUi);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", changeInputVolume__FUi);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", startDisplay__Fi);
+extern "C" s32 sceSdRemote(...);
+extern "C" void changeInputVolume__FUi(u32 arg0) {
+    sceSdRemote(1, 0x8010, 0xF81, arg0);
+    sceSdRemote(1, 0x8010, 0x1081, arg0);
+}
+extern "C" u32 frd;
+extern "C" u8 isCountVblank;
+extern "C" s32 sceGsSyncV(...);
+extern "C" void startDisplay__Fi(s32 arg0) {
+    do {
+
+    } while (arg0 == sceGsSyncV(0));
+    frd = 0;
+    isCountVblank = 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", switchThread__Fv);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", videoDecSetState__FP8VideoDecUi);
 s32 videoDecGetState(VideoDec * arg0) {

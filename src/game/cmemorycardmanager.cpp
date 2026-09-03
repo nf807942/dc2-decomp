@@ -391,7 +391,32 @@ extern "C" void StartEffect__17CSWordAfterEffectFP8mgCFrameP8mgCFrameiii(CSWordA
     objet->unk84 = objet->unk78 - 1;
     printf(&_356_00377D08);
 }
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", AddPoint__17CSWordAfterEffectFPfPf);
+typedef struct CSWordAfterEffect_infere3 {
+    /* 0x00 */ char pad0[8];
+    /* 0x08 */ s32 unk8;                            /* inferred */
+    /* 0x0C */ s32 unkC;                            /* inferred */
+    /* 0x10 */ char pad10[0x68];                    /* maybe part of unkC[0x1B]void */
+    /* 0x78 */ s32 unk78;                           /* inferred */
+    /* 0x7C */ s32 unk7C;                           /* inferred */
+    /* 0x80 */ s32 unk80;                           /* inferred */
+    /* 0x84 */ s32 unk84;                           /* inferred */
+} CSWordAfterEffect_infere3;                                /* size >= 0x88 */
+extern "C" s32 sceVu0CopyVector(...);
+extern "C" void AddPoint__17CSWordAfterEffectFPfPf(CSWordAfterEffect_infere3 *objet, f32 *arg0, f32 *arg1) {
+    s32 temp_a0;
+
+    sceVu0CopyVector(objet->unk8 + (objet->unk80 * 0x10));
+    sceVu0CopyVector(objet->unkC + (objet->unk80 * 0x10), arg1);
+    objet->unk84 = objet->unk80;
+    temp_a0 = (s32) (objet->unk7C);
+    if (temp_a0 < objet->unk78) {
+        objet->unk7C = temp_a0 + 1;
+    }
+    objet->unk80 -= 1;
+    if (objet->unk80 < 0) {
+        objet->unk80 = objet->unk78 - 1;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Step__17CSWordAfterEffectFv);
 void CSWordAfterEffect::Clear(void) {
     this->field_0x88 = 0;
@@ -568,7 +593,24 @@ CGeyserEffectPoint::CGeyserEffectPoint(void) {
     this->field_0x28 = 0;
 }
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", __ct__13CGeyserEffectFv);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", StepGeyserEffect__FP6CScene);
+extern "C" u32 GeyserEffect;
+extern "C" u32 GeyserEffectFlag;
+#include "sphida.hpp"
+extern "C" s32 Step__13CGeyserEffectFv(...);
+extern "C" void StepGeyserEffect__FP6CScene(CScene *arg0) {
+    s32 var_s0;
+    s32 var_s1;
+
+    var_s0 = 0;
+    if (GeyserEffectFlag != 0) {
+        var_s1 = 0;
+        do {
+            Step__13CGeyserEffectFv(GeyserEffect + var_s1);
+            var_s0 += 1;
+            var_s1 += 0x80;
+        } while (var_s0 < 4);
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", DrawGeyserEffect__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Initialize__16CDngFloorManagerFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", _TREE_MAPINFO__FP9SPI_STACKi);

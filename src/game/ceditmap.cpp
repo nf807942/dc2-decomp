@@ -115,14 +115,41 @@ INCLUDE_ASM("nonmatchings/game/ceditmap", GetEditAngle__8CEditMapFi);
 INCLUDE_ASM("nonmatchings/game/ceditmap", ConvEditAngle__8CEditMapFf);
 INCLUDE_ASM("nonmatchings/game/ceditmap", AngleLimit__8CEditMapFi);
 INCLUDE_ASM("nonmatchings/game/ceditmap", GetEditPos__8CEditMapFPfPf);
-INCLUDE_ASM("nonmatchings/game/ceditmap", CmpEditAlt__8CEditMapFff);
+extern "C" s32 CmpEditAlt__8CEditMapFff(CEditMap *objet, f32 arg0, f32 arg1) {
+    f32 temp_f1;
+    s32 var_v0;
+
+    temp_f1 = arg0 - arg1;
+    if (!(temp_f1 <= 0.5f)) {
+        return -1;
+    }
+    var_v0 = 1;
+    if (!(temp_f1 < -0.5f)) {
+        var_v0 = 0;
+    }
+    return var_v0;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap", GetEditAlt__8CEditMapFf);
 INCLUDE_ASM("nonmatchings/game/ceditmap", GetGridPos__8CEditMapFPfPfPf);
 INCLUDE_ASM("nonmatchings/game/ceditmap", GetMatrix__8CEditMapFPA4_fPfi);
 INCLUDE_ASM("nonmatchings/game/ceditmap", GetInversMatrix__8CEditMapFPA4_fPA4_f);
 INCLUDE_ASM("nonmatchings/game/ceditmap", ConvertParts__8CEditMapFP10CEditParts);
 INCLUDE_ASM("nonmatchings/game/ceditmap", GetSameParts__8CEditMapFi);
-INCLUDE_ASM("nonmatchings/game/ceditmap", BuildEditParts__8CEditMapFi);
+extern "C" s32 GetePartsInfoAtID__8CEditMapFi(void *, s32);
+struct temp_v0_champs {
+    char pad0[0x3C];
+    /* 0x3C */ s32 unk3C;
+};
+extern "C" s32 BuildEditParts__8CEditMapFPc(...);
+extern "C" s32 BuildEditParts__8CEditMapFi(CEditMap *objet, s32 arg0) {
+    struct temp_v0_champs *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs *) (GetePartsInfoAtID__8CEditMapFi(objet, arg0));
+    if (temp_v0 != NULL) {
+        return BuildEditParts__8CEditMapFPc(objet, temp_v0->unk3C);
+    }
+    return -1;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap", GetTotalPolyn__8CEditMapFPiPi);
 INCLUDE_ASM("nonmatchings/game/ceditmap", BuildEditParts__8CEditMapFPc);
 INCLUDE_ASM("nonmatchings/game/ceditmap", DeleteEditParts__8CEditMapFi);
@@ -168,12 +195,45 @@ s32 emapINIT_EPARTS_END(SPI_STACK * arg0, s32 arg1) {
 INCLUDE_ASM("nonmatchings/game/ceditmap", LoadEditInfo__8CEditMapFPciP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/ceditmap", __ct__14CEditPartsInfoFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap", Initialize__14CEditPartsInfoFv);
-INCLUDE_ASM("nonmatchings/game/ceditmap", GetPartsType__14CEditPartsInfoFv);
+struct inferred;
+typedef struct CEditPartsInfo {
+    /* 0x00 */ char pad0[4];
+    /* 0x04 */ s32 unk4;                            /* inferred */
+    /* 0x08 */ char pad8[0x1C];                     /* maybe part of unk4[8]void */
+    /* 0x24 */ s32 unk24;                           /* inferred */
+} CEditPartsInfo;                                   /* size >= 0x28 */
+extern "C" s32 GetPartsType__14CEditPartsInfoFv(CEditPartsInfo *objet) {
+    s32 temp_v1;
+
+    temp_v1 = objet->unk4;
+    if (temp_v1 & 0x40) {
+        return 1;
+    }
+    if (temp_v1 & 0x80) {
+        return 0xB;
+    }
+    return objet->unk24;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap", CreateBox__14CEditPartsInfoFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap", GetPartsHeight__14CEditPartsInfoFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap", GetPartsMaxWidth__14CEditPartsInfoFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap", GetMaterial__14CEditPartsInfoFi);
-INCLUDE_ASM("nonmatchings/game/ceditmap", GetDefColor__14CEditPartsInfoFiPf);
+#include "gen/CMapParts.hpp"
+struct inferred;
+typedef struct CEditPartsInfo_infere {
+    /* 0x00 */ char pad0[0x44];
+    /* 0x44 */ CMapParts *unk44;                    /* inferred */
+} CEditPartsInfo_infere;                                   /* size >= 0x48 */
+extern "C" s32 GetDefColor__9CMapPartsFiPf(void *, s32, f32 *);
+extern "C" s32 GetDefColor__14CEditPartsInfoFiPf(CEditPartsInfo_infere *objet, s32 arg0, f32 *arg1) {
+    CMapParts *temp_a0;
+
+    temp_a0 = (CMapParts *) (objet->unk44);
+    if (temp_a0 == NULL) {
+        return 0;
+    }
+    return GetDefColor__9CMapPartsFiPf(temp_a0, arg0, arg1);
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap", LiveChara__10CEditHouseFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap", Initialize__10CEditPartsFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap", StandardPos__Ff);
@@ -182,7 +242,19 @@ INCLUDE_ASM("nonmatchings/game/ceditmap", SetPosition__10CEditPartsFfff);
 INCLUDE_ASM("nonmatchings/game/ceditmap", GetPosition__10CEditPartsFPf);
 INCLUDE_ASM("nonmatchings/game/ceditmap", GetLocalPos__10CEditPartsFPf);
 INCLUDE_ASM("nonmatchings/game/ceditmap", UpDatePosition__10CEditPartsFv);
-INCLUDE_ASM("nonmatchings/game/ceditmap", GetInfoID__10CEditPartsFv);
+typedef struct CEditParts {
+    /* 0x000 */ char pad0[0x324];
+    /* 0x324 */ s32 *unk324;                        /* inferred */
+} CEditParts;                                       /* size >= 0x328 */
+extern "C" s32 GetInfoID__10CEditPartsFv(CEditParts *objet) {
+    s32 *temp_v0;
+
+    temp_v0 = (s32 *) (objet->unk324);
+    if (temp_v0 != NULL) {
+        return *temp_v0;
+    }
+    return -1;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap", GetLiveNPC__10CEditPartsFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap", IsWallParts__10CEditPartsFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap", IsFence__10CEditPartsFv);

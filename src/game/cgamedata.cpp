@@ -42,8 +42,15 @@ s32 GetSaveData(void) {
 s32 GetSubGameSaveData(void) {
     return SubGameSaveData;
 }
-INCLUDE_ASM("nonmatchings/game/cgamedata", InitSaveData__Fv);
-INCLUDE_ASM("nonmatchings/game/cgamedata", GetVramTopAddress__Fv);
+extern "C" s32 GetSaveData__Fv(void);
+extern "C" s32 Initialize__9CSaveDataFv(...);
+extern "C" void InitSaveData__Fv(void) {
+    Initialize__9CSaveDataFv(GetSaveData__Fv());
+}
+extern "C" s32 mgGetTopVRAMAddress__Fv(void);
+extern "C" s32 GetVramTopAddress__Fv(void) {
+    return mgGetTopVRAMAddress__Fv() + 0x20;
+}
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetMainStack__Fv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", NextLoop__Fi13INIT_LOOP_ARG);
 s32 GetNowLoopNo(void) {
@@ -54,7 +61,15 @@ void cat_start(void) {
 }
 void cat_end(void) {
 }
-INCLUDE_ASM("nonmatchings/game/cgamedata", SetTextureTable__FiiP9mgCMemory);
+extern "C" u8 mgTexManager[540];
+#include "menu.hpp"
+extern "C" s32 Initialize__17mgCTextureManagerFii(void *, s32, s32);
+extern "C" s32 SetTableBuffer__17mgCTextureManagerFiiP9mgCMemory(void *, s32, s32, mgCMemory *);
+extern "C" s32 GetVramTopAddress__Fv(void);
+extern "C" void SetTextureTable__FiiP9mgCMemory(s32 arg0, s32 arg1, mgCMemory *arg2) {
+    SetTableBuffer__17mgCTextureManagerFiiP9mgCMemory(&mgTexManager, arg1, arg0, arg2);
+    Initialize__17mgCTextureManagerFii(&mgTexManager, GetVramTopAddress__Fv(), -1);
+}
 INCLUDE_ASM("nonmatchings/game/cgamedata", InitPadTable__Fi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", VSyncCallBack__Fi_00192150);
 void PlayTimeCount(s32 value) {
@@ -67,7 +82,13 @@ INCLUDE_ASM("nonmatchings/game/cgamedata", LanguageChange__FiP1);
 INCLUDE_ASM("nonmatchings/game/cgamedata", MainLoop__Fv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", MenuInit__F13INIT_LOOP_ARG);
 INCLUDE_ASM("nonmatchings/game/cgamedata", MenuLoop__Fv);
-INCLUDE_ASM("nonmatchings/game/cgamedata", MenuExit__Fv);
+extern "C" u8 GamePad_003FA5A0[1144];
+extern "C" s32 AutoRepeatOff__8CGamePadFv(void *);
+extern "C" s32 mgCloseFont__Fv(void);
+extern "C" void MenuExit__Fv(void) {
+    AutoRepeatOff__8CGamePadFv(&GamePad_003FA5A0);
+    mgCloseFont__Fv();
+}
 void InitEventSelect(void) {
     event_view = 0;
     future_sel = 0;
@@ -98,7 +119,16 @@ INCLUDE_ASM("nonmatchings/game/cgamedata", gcMAP_NO__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcPROGRESS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcBIT_FLAG_ON__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcBIT_FLAG_OFF__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cgamedata", gcSTART_EVENT__FP9SPI_STACKi);
+extern "C" u32 DefStartEventNo;
+struct SPI_STACK {
+    s32 field_0;
+    s32 field_4;
+};
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(SPI_STACK *);
+extern "C" s32 gcSTART_EVENT__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    DefStartEventNo = spiGetStackInt__FP9SPI_STACK(arg0);
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcGEO_COMPLETE__FP9SPI_STACKi);
 s32 gcGEO_DEBUG(SPI_STACK * arg0, s32 arg1) {
     DebugInfo.field_0x8 = 1;
@@ -170,7 +200,27 @@ INCLUDE_ASM("nonmatchings/game/cgamedata", GetAttachData__9CGameDataFi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetRoboData__9CGameDataFi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetFishData__9CGameDataFi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetGuardData__9CGameDataFi);
-INCLUDE_ASM("nonmatchings/game/cgamedata", GetDataType__9CGameDataFi);
+extern "C" s32 GetCommonData__9CGameDataFi(void *, s32);
+struct CGameData {
+    s32 field_0;
+    char pad_4[0x1C];
+    s16 field_20;
+    s16 field_22;
+    u16 field_24;
+    u16 field_26;
+    u16 field_28;
+    u16 field_2A;
+    u16 field_2C;
+};
+extern "C" u8 GetDataType__9CGameDataFi(CGameData *objet, s32 arg0) {
+    u8 *temp_v0;
+
+    temp_v0 = (u8 *) (GetCommonData__9CGameDataFi(objet, arg0));
+    if (temp_v0 != NULL) {
+        return *temp_v0;
+    }
+    return 0U;
+}
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetDataTypeStartListNo__9CGameDataFi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetCommonItemData__Fi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetItemInfoData__Fi);
@@ -180,7 +230,21 @@ INCLUDE_ASM("nonmatchings/game/cgamedata", GetBreedFishInfoData__Fi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetItemFileName__Fii);
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetItemFilePath__Fii);
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetItemDataType__Fi);
-INCLUDE_ASM("nonmatchings/game/cgamedata", GetItemDataAttribute__Fi);
+extern "C" u8 GameItemDataManage[48];
+extern "C" s32 GetCommonData__9CGameDataFi(void *, s32);
+struct temp_v0_champs {
+    char pad0[0x24];
+    /* 0x24 */ s32 unk24;
+};
+extern "C" s32 GetItemDataAttribute__Fi(s32 arg0) {
+    struct temp_v0_champs *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs *) (GetCommonData__9CGameDataFi(&GameItemDataManage, arg0));
+    if (temp_v0 != NULL) {
+        return temp_v0->unk24;
+    }
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cgamedata", ConvertUsedItemType__Fi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetItemMessageNo__Fii);
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetItemMessage__Fi);

@@ -83,9 +83,43 @@ INCLUDE_ASM("nonmatchings/game/cdngfloormanager", InitDataLoading__Fv);
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", switch_thread__Fv);
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", CreateLoadThread__FP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", StepLoadThread__Fv);
-INCLUDE_ASM("nonmatchings/game/cdngfloormanager", DeleteLoadThread__Fv);
+extern "C" u32 TheadID_0037E724;
+extern "C" u32 ThreadRunning;
+extern "C" s32 DeleteThread(...);
+extern "C" s32 TerminateThread(...);
+extern "C" s32 StepLoadThread__Fv(void);
+extern "C" void DeleteLoadThread__Fv(void) {
+    if (ThreadRunning != 0) {
+        do {
+
+        } while (StepLoadThread__Fv() != 0);
+        TerminateThread(TheadID_0037E724);
+        DeleteThread(TheadID_0037E724);
+        ThreadRunning = 0;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", StepDataLoading__FPv);
-INCLUDE_ASM("nonmatchings/game/cdngfloormanager", sgBreakFishing__Fv);
+extern "C" s32 GetNowSubGameInfo__Fv(void);
+struct SubGameInfo {
+    char pad_0[0x4];
+    s32 field_4;
+    s32 field_8;
+    s32 field_C;
+    s32 field_10;
+    s32 field_14;
+    s32 field_18;
+    s32 field_1C;
+    s32 field_20;
+    s32 field_24;
+    s32 field_28;
+    s32 field_2C;
+};
+extern "C" s32 sgExitFishing__FP11SubGameInfo(...);
+extern "C" s32 sgBreakFishing__Fv(void) {
+    DeleteLoadThread__Fv();
+    sgExitFishing__FP11SubGameInfo(GetNowSubGameInfo__Fv());
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", sgExitFishing__FP11SubGameInfo);
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", sgLoopFishing__FP11SubGameInfo);
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", sgLoopFishing2__FP11SubGameInfo);

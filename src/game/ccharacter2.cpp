@@ -316,7 +316,20 @@ extern "C" void Initialize__10CDAColPipeFv(CDAColPipe *objet) {
     mgZeroVector__FPf(&objet->unk20);
     objet->unk4 = 0x3F4CCCCD;
 }
-INCLUDE_ASM("nonmatchings/game/ccharacter2", Initialize__12CDACollisionFv);
+struct inferred;
+typedef struct CDACollision_infere {
+    /* 0x00 */ char pad0[4];
+    /* 0x04 */ s32 unk4;                            /* inferred */
+    /* 0x08 */ char pad8[8];                        /* maybe part of unk4[3]void */
+    /* 0x10 */ f32 unk10;                           /* inferred */
+    /* 0x14 */ char pad14[0xC];                     /* maybe part of unk10[4]void */
+    /* 0x20 */ f32 unk20;                           /* inferred */
+} CDACollision_infere;                                     /* size >= 0x24 */
+extern "C" void Initialize__12CDACollisionFv(CDACollision_infere *objet) {
+    mgZeroVector__FPf(&objet->unk10);
+    mgZeroVector__FPf(&objet->unk20);
+    objet->unk4 = 0x3F4CCCCD;
+}
 s32 dynCOLLISION_END(SPI_STACK *stack, int argc) {
     return 1;
 }

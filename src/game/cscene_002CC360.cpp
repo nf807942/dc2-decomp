@@ -61,14 +61,36 @@ INCLUDE_ASM("nonmatchings/game/cscene_002CC360", DeleteVillager__6CSceneFi);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", DeleteSubVillager__6CSceneFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", DeleteVillager__6CSceneFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", SearchCharaID__6CSceneFi);
-INCLUDE_ASM("nonmatchings/game/cscene_002CC360", GetNowVillagerTime__6CSceneFv);
+struct inferred;
+typedef struct CScene_infere {
+    /* 0x0000 */ char pad0[0x2F6C];
+    /* 0x2F6C */ f32 unk2F6C;                       /* inferred */
+} CScene_infere;                                           /* size >= 0x2F70 */
+extern "C" s32 CheckTime__Ffff(f32, f32, f32);
+extern "C" s32 GetNowVillagerTime__6CSceneFv(CScene_infere *objet) {
+    s32 var_v0;
+
+    var_v0 = 0;
+    if (CheckTime__Ffff(objet->unk2F6C, 21.0f, 6.0f) != 0) {
+        var_v0 = 1;
+    }
+    return var_v0;
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", GetLoadVillagerList__6CSceneFiPiPP18CVillagerPlaceInfo);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", SearchCopyModel__6CSceneFi);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", GetObjectNameList__FPcP11CCharacter2PP8mgCFramei);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", CharaObjectOnOff__6CSceneFiP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", LoadVillager__6CSceneFii);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", LoadSubVillager__6CSceneFii);
-INCLUDE_ASM("nonmatchings/game/cscene_002CC360", RegisterVillager__6CSceneFiii);
+extern "C" s32 GetVlgrPlaceInfo__Fi(s32);
+struct CVillagerPlaceInfo {
+    char pad_0[0x20];
+    s32 field_20;
+};
+extern "C" s32 RegisterVillager__6CSceneFiiP18CVillagerPlaceInfo(...);
+extern "C" void RegisterVillager__6CSceneFiii(CScene *objet, s32 arg0, s32 arg1, s32 arg2) {
+    RegisterVillager__6CSceneFiiP18CVillagerPlaceInfo(objet, arg0, arg1, GetVlgrPlaceInfo__Fi(arg2));
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", RegisterVillager__6CSceneFiiP18CVillagerPlaceInfo);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", RegisterVillager__6CSceneFiiP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", GetTalkEvent__6CSceneFPfP15CSceneEventData);
@@ -215,4 +237,29 @@ INCLUDE_ASM("nonmatchings/game/cscene_002CC360", SearchDataIDatCharaID__13CVilla
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", Register__13CVillagerMngrFiiP18CVillagerPlaceInfo);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", DeleteCharaID__13CVillagerMngrFi);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", NewData__13CVillagerMngrFv);
-INCLUDE_ASM("nonmatchings/game/cscene_002CC360", CheckStay__13CVillagerMngrFi);
+extern "C" s32 GetData__13CVillagerMngrFi(void *, s32);
+struct inferred;
+typedef struct CVillagerMngr {
+    /* 0x0 */ s32 unk0;                             /* inferred */
+} CVillagerMngr;                                    /* size >= 0x4 */
+struct temp_v0_champs {
+    char pad0[0x20];
+    /* 0x20 */ s32 unk20;
+    char pad24[0x8];
+    /* 0x2C */ s32 unk2C;
+};
+extern "C" s32 CheckStay__13CVillagerMngrFi(CVillagerMngr *objet, s32 arg0) {
+    struct temp_v0_champs *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs *) (GetData__13CVillagerMngrFi(objet, arg0));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    if (temp_v0->unk20 != 0) {
+        return 0;
+    }
+    if (objet->unk0 != 0) {
+        return 1;
+    }
+    return temp_v0->unk2C;
+}

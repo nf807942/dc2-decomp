@@ -52,11 +52,53 @@ INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetSeSrcFile__6CSceneFPci);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetSeEnvFile__6CSceneFPci);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetSeBaseFile__6CSceneFPci);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetSeBattleFile__6CSceneFPci);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", CheckLoadBGM__6CSceneFi);
+struct CScene;
+extern "C" s32 GetActiveBgmInfo__6CSceneFv(void *);
+struct temp_v0_champs {
+    char pad0[0x8];
+    /* 0x8 */ s32 unk8;
+};
+extern "C" s32 CheckLoadBGM__6CSceneFi(CScene *objet, s32 arg0) {
+    struct temp_v0_champs *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs *) (GetActiveBgmInfo__6CSceneFv(objet));
+    if (arg0 < 0) {
+        return 0;
+    }
+    return arg0 != temp_v0->unk8;
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", CheckLoadSeSrc__6CSceneFi);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", CheckLoadSeEnv__6CSceneFi);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", CheckLoadSeBattle__6CSceneFi);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", CheckLoadSeBase__6CSceneFi);
+struct inferred;
+typedef struct CScene_infere {
+    /* 0x0000 */ char pad0[0xA044];
+    /* 0xA044 */ s32 unkA044;                       /* inferred */
+} CScene_infere;                                           /* size >= 0xA048 */
+extern "C" s32 CheckLoadSeEnv__6CSceneFi(CScene_infere *objet, s32 arg0) {
+    if (arg0 < 0) {
+        return 0;
+    }
+    return objet->unkA044 != arg0;
+}
+typedef struct CScene_infere2 {
+    /* 0x0000 */ char pad0[0xC4D4];
+    /* 0xC4D4 */ s32 unkC4D4;                       /* inferred */
+} CScene_infere2;                                           /* size >= 0xC4D8 */
+extern "C" s32 CheckLoadSeBattle__6CSceneFi(CScene_infere2 *objet, s32 arg0) {
+    if (arg0 < 0) {
+        return 0;
+    }
+    return objet->unkC4D4 != arg0;
+}
+typedef struct CScene_infere3 {
+    /* 0x0000 */ char pad0[0xA49C];
+    /* 0xA49C */ s32 unkA49C;                       /* inferred */
+} CScene_infere3;                                           /* size >= 0xA4A0 */
+extern "C" s32 CheckLoadSeBase__6CSceneFi(CScene_infere3 *objet, s32 arg0) {
+    if (arg0 < 0) {
+        return 0;
+    }
+    return objet->unkA49C != arg0;
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", SearchSndDataID__6CSceneFi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetDefBgmNo__6CSceneFi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetDefEventSeFile__6CSceneFiPc);
@@ -213,7 +255,12 @@ extern "C" s32 GetMaxDrawMem__Fi(s32 arg0) {
         return var_v0;
     }
 }
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", __ct__14EditAnalyzeSrcFv);
+struct EditAnalyzeSrc;
+extern "C" s32 Init__14EditAnalyzeSrcFv(void *);
+extern "C" EditAnalyzeSrc *__ct__14EditAnalyzeSrcFv(EditAnalyzeSrc *objet) {
+    Init__14EditAnalyzeSrcFv(objet);
+    return objet;
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", MenuChapterInit__FP9mgCMemoryPiii);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", MenuChapterKey__Fv);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", MenuChapterDraw__Fv);

@@ -59,12 +59,30 @@ extern "C" s32 SearchBaseNo__16CEffectScriptManFPc(CEffectScriptMan *objet, s8 *
 extern "C" void GetBaseChara__16CEffectScriptManFPc(CEffectScriptMan *objet, s8 *arg0) {
     GetBaseChara__16CEffectScriptManFi(objet, SearchBaseNo__16CEffectScriptManFPc(objet, arg0));
 }
-INCLUDE_ASM("nonmatchings/game/ceffectscriptman", GetNotUsedTexb__16CEffectScriptManFv);
+struct inferred;
+typedef struct CEffectScriptMan_infere2 {
+    /* 0x00 */ char pad0[0x10];
+    /* 0x10 */ s32 unk10;                           /* inferred */
+    /* 0x14 */ s32 unk14;                           /* inferred */
+    /* 0x18 */ s32 unk18;                           /* inferred */
+} CEffectScriptMan_infere2;                                 /* size >= 0x1C */
+extern "C" s32 GetNotUsedTexb__16CEffectScriptManFv(CEffectScriptMan_infere2 *objet) {
+    s32 temp_v1;
+
+    temp_v1 = objet->unk18;
+    if (temp_v1 >= objet->unk14) {
+        return -1;
+    }
+    return objet->unk10 + temp_v1;
+}
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", AddTexb__16CEffectScriptManFv);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", BuildBase__16CEffectScriptManFiP1iP1iP9mgCMemoryi);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", BuildBase__16CEffectScriptManFPcP1iP1iP9mgCMemoryi);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", BuildPack__16CEffectScriptManFiPUiP9mgCMemoryi);
-INCLUDE_ASM("nonmatchings/game/ceffectscriptman", BuildPack__16CEffectScriptManFPcPUiP9mgCMemoryi);
+extern "C" s32 BuildPack__16CEffectScriptManFiPUiP9mgCMemoryi(void *, s32, u32 *, mgCMemory *, s32);
+extern "C" void BuildPack__16CEffectScriptManFPcPUiP9mgCMemoryi(CEffectScriptMan *objet, s8 *arg0, u32 *arg1, mgCMemory *arg2, s32 arg3) {
+    BuildPack__16CEffectScriptManFiPUiP9mgCMemoryi(objet, SearchBaseNo__16CEffectScriptManFPc(objet, arg0), arg1, arg2, arg3);
+}
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", GetNeedFilePath__16CEffectScriptManFiPcPc);
 extern "C" void GetNeedFilePath__16CEffectScriptManFiPcPc(CEffectScriptMan *objet, s32 arg0, s8 *arg1, s8 *arg2);
 extern "C" s32 SearchBaseNo__16CEffectScriptManFPc(CEffectScriptMan *objet, s8 *arg0);
@@ -72,7 +90,20 @@ extern "C" void GetNeedFilePath__16CEffectScriptManFPcPcPc(CEffectScriptMan *obj
     GetNeedFilePath__16CEffectScriptManFiPcPc(objet, SearchBaseNo__16CEffectScriptManFPc(objet, arg0), arg1, arg2);
 }
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", CreateEffSpt__16CEffectScriptManFiii);
-INCLUDE_ASM("nonmatchings/game/ceffectscriptman", CreateEffSpt__16CEffectScriptManFPcii);
+extern "C" s32 CreateEffSpt__16CEffectScriptManFiii(void *, s32, s32, s32);
+struct temp_v0_champs {
+    char pad0[0xAC];
+    /* 0xAC */ s32 unkAC;
+};
+extern "C" s32 CreateEffSpt__16CEffectScriptManFPcii(CEffectScriptMan *objet, s8 *arg0, s32 arg1, s32 arg2) {
+    struct temp_v0_champs *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs *) (CreateEffSpt__16CEffectScriptManFiii(objet, SearchBaseNo__16CEffectScriptManFPc(objet, arg0), arg1, arg2));
+    if (temp_v0 != NULL) {
+        return temp_v0->unkAC;
+    }
+    return -1;
+}
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", ClearEffectFromChrid__16CEffectScriptManFi);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", ClearEffectFromLevel__16CEffectScriptManFi);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", DeleteEffSpt__16CEffectScriptManFP11_EFF_SCRIPT);
@@ -85,7 +116,32 @@ INCLUDE_ASM("nonmatchings/game/ceffectscriptman", DeleteSprite__16CEffectScriptM
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", AssignCharacter__16CEffectScriptManFP11_EFF_SCRIPTi);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", SetScriptProgNo__16CEffectScriptManFiii);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", Pause__16CEffectScriptManFiii);
-INCLUDE_ASM("nonmatchings/game/ceffectscriptman", PauseFromLevel__16CEffectScriptManFii);
+struct inferred;
+typedef struct CEffectScriptMan_infere {
+    /* 0x0000 */ char pad0[0x1188];
+    /* 0x1188 */ void *unk1188;                     /* inferred */
+} CEffectScriptMan_infere;                                 /* size >= 0x118C */
+struct var_a0_champs {
+    char pad0[0x24];
+    /* 0x24 */ s32 unk24;
+    char pad28[0x114];
+    /* 0x13C */ s32 unk13C;
+    char pad140[0x4];
+    /* 0x144 */ s32 unk144;
+};
+extern "C" void PauseFromLevel__16CEffectScriptManFii(CEffectScriptMan_infere *objet, s32 arg0, s32 arg1) {
+    struct var_a0_champs *var_a0;
+
+    var_a0 = (struct var_a0_champs *) (objet->unk1188);
+    if (var_a0 != NULL) {
+        do {
+            if (var_a0->unk24 == arg0) {
+                var_a0->unk13C = arg1;
+            }
+            var_a0 = (struct var_a0_champs *) (var_a0->unk144);
+        } while (var_a0 != NULL);
+    }
+}
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", SetScriptVect1__16CEffectScriptManFPfii);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", GetScriptVect1__16CEffectScriptManFPfii);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", SetScriptVect2__16CEffectScriptManFPfii);

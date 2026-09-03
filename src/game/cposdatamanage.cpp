@@ -11,7 +11,27 @@
 #include "gen/CRepairEffect.hpp"
 #include "gen/CLevelUpEffect.hpp"
 
-INCLUDE_ASM("nonmatchings/game/cposdatamanage", Initialize__14CPosDataManageFv);
+struct inferred;
+typedef struct CPosDataManage_infere {
+    /* 0x00 */ s32 unk0;                            /* inferred */
+    /* 0x04 */ s16 unk4;                            /* inferred */
+    /* 0x06 */ char pad6[0xA];                      /* maybe part of unk4[6]void */
+    /* 0x10 */ s32 unk10;                           /* inferred */
+    /* 0x14 */ s16 unk14;                           /* inferred */
+    /* 0x16 */ char pad16[2];
+    /* 0x18 */ s32 unk18;                           /* inferred */
+    /* 0x1C */ s16 unk1C;                           /* inferred */
+    /* 0x1E */ s8 unk1E;                            /* inferred */
+} CPosDataManage_infere;                                   /* size >= 0x1F */
+extern "C" void Initialize__14CPosDataManageFv(CPosDataManage_infere *objet) {
+    objet->unk0 = 0;
+    objet->unk4 = 0;
+    objet->unk10 = 0;
+    objet->unk14 = 0;
+    objet->unk18 = 0;
+    objet->unk1C = 0;
+    objet->unk1E = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", GetTexGetInfo__14CPosDataManageFi);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", GetTexGetInfo__14CPosDataManageFPc);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", GetTexGetInfoTblNo__14CPosDataManageFPc);
@@ -30,16 +50,78 @@ INCLUDE_ASM("nonmatchings/game/cposdatamanage", GetFormInfo__14CPosDataManageFi)
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", FormInfoClear__14CPosDataManageFii);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", SetFormPos__14CPosDataManageFPcPi);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", InitDrawList__14CPosDataManageFv);
-INCLUDE_ASM("nonmatchings/game/cposdatamanage", GetDrawTopList__14CPosDataManageFv);
+struct CPosDataManage;
+extern "C" s32 GetFormInfo__14CPosDataManageFi(void *, s32);
+struct var_v0_champs {
+    char pad0[0x70];
+    /* 0x70 */ s32 unk70;
+};
+extern "C" void *GetDrawTopList__14CPosDataManageFv(CPosDataManage *objet) {
+    void *temp_v1;
+    struct var_v0_champs *var_v0;
+
+    var_v0 = (struct var_v0_champs *) (GetFormInfo__14CPosDataManageFi(objet, 0));
+    if (var_v0 != NULL) {
+loop_1:
+        temp_v1 = (void *) (var_v0->unk70);
+        if (temp_v1 == NULL) {
+            return var_v0;
+        }
+        var_v0 = (struct var_v0_champs *) (temp_v1);
+        if (temp_v1 == NULL) {
+            goto block_4;
+        }
+        goto loop_1;
+    }
+block_4:
+    return NULL;
+}
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", FormReLink__14CPosDataManageFPcPc);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", FormReLink2__14CPosDataManageFPcPcPcPc);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", FormStep__14CPosDataManageFv);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", MenuDrawParamStep__Fv);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", FormDraw__14CPosDataManageFv);
-INCLUDE_ASM("nonmatchings/game/cposdatamanage", ClearPos__14CPosDataManageFv);
+struct inferred;
+typedef struct CPosDataManage {
+    /* 0x00 */ char pad0[4];
+    /* 0x04 */ u16 unk4;                            /* inferred */
+    /* 0x06 */ char pad6[0xE];                      /* maybe part of unk4[8]void */
+    /* 0x14 */ u16 unk14;                           /* inferred */
+    /* 0x16 */ char pad16[6];                       /* maybe part of unk14[4]void */
+    /* 0x1C */ u16 unk1C;                           /* inferred */
+} CPosDataManage;                                   /* size >= 0x1E */
+extern "C" s32 EtcTblClear__14CPosDataManageFii(void *, s32, s32);
+extern "C" s32 FormInfoClear__14CPosDataManageFii(void *, s32, s32);
+extern "C" s32 TexGetInfoClear__14CPosDataManageFii(void *, s32, s32);
+extern "C" void ClearPos__14CPosDataManageFv(CPosDataManage *objet) {
+    EtcTblClear__14CPosDataManageFii(objet, 0, (s32) objet->unk4);
+    TexGetInfoClear__14CPosDataManageFii(objet, 0, (s32) objet->unk14);
+    FormInfoClear__14CPosDataManageFii(objet, 0, (s32) objet->unk1C);
+}
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", AttachCommonTexInfo__18CMenuPosDataManageFv);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", StepMainMenuIconMove__18CMenuPosDataManageFPiii);
-INCLUDE_ASM("nonmatchings/game/cposdatamanage", CheckItemUseVariable__FP13CGameDataUsedP14CItemUseTarget);
+#include "gamedataused.hpp"
+struct inferred;
+typedef struct CItemUseTarget {
+    /* 0x0 */ char pad0[4];
+    /* 0x4 */ CGameDataUsed *unk4;                  /* inferred */
+} CItemUseTarget;                                   /* size >= 0x8 */
+extern "C" s32 CheckBuildUp__FP13CGameDataUsedPiPiPi(CGameDataUsed *, s32 *, s32 *, s32 *);
+extern "C" s32 CheckNowStateUseThisItem__FP13CGameDataUsedP14CItemUseTarget(CGameDataUsed *, CItemUseTarget *);
+extern "C" s32 CheckItemUseVariable__FP13CGameDataUsedP14CItemUseTarget(CGameDataUsed *arg0, CItemUseTarget *arg1) {
+    s32 temp_s0;
+    s32 var_v0;
+
+    if ((arg0 == NULL) || (arg1 == NULL)) {
+        return 0;
+    }
+    temp_s0 = (s32) (CheckNowStateUseThisItem__FP13CGameDataUsedP14CItemUseTarget(arg0, arg1));
+    var_v0 = temp_s0;
+    if (CheckBuildUp__FP13CGameDataUsedPiPiPi(arg1->unk4, NULL, NULL, NULL) != 0) {
+        var_v0 = temp_s0 | 2;
+    }
+    return var_v0;
+}
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Func_MenuItemBrdPrepare__FP18MENUFORMPARTS_TYPEP13CGameDataUsedP13CGameDataUsedi);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Func_MenuItemBrdPrepare2__FP18MENUFORMPARTS_TYPEP13CGameDataUsedP13CGameDataUsed);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", NowUseNeedItemCheck__FP16CUserDataManager);
@@ -85,7 +167,138 @@ void CLevelUpEffect::Initialize(void) {
     this->field_0x24 = 0;
     this->field_0x20 = 0;
 }
-INCLUDE_ASM("nonmatchings/game/cposdatamanage", Generate__14CLevelUpEffectFP10mgCTextureiii);
+struct mgCTexture {
+    s16 field_0;
+    s16 field_2;
+    s16 field_4;
+    s16 field_6;
+    char pad_8[0x4];
+    s32 field_C;
+    s32 field_10;
+    s16 field_14;
+    char pad_16[0x2];
+    s32 field_18;
+    s32 field_1C;
+    char pad_20[0x8];
+    s32 field_28;
+    s32 field_2C;
+    s32 field_30;
+    char pad_34[0x4];
+    s64 field_38;
+    s64 field_40;
+    s64 field_48;
+    s32 field_50;
+    f32 field_54;
+    f32 field_58;
+    f32 field_5C;
+    s32 field_60;
+    s32 field_64;
+    s32 field_68;
+    char pad_6C[0xA4];
+    s32 field_110;
+    s32 field_114;
+    s32 field_118;
+    s16 field_11C;
+    s8 field_11E;
+    s8 field_11F;
+    s16 field_120;
+    s16 field_122;
+    s32 field_124;
+    s32 field_128;
+    s8 field_12C;
+    s8 field_12D;
+    char pad_12E[0x2];
+    s32 field_130;
+    s32 field_134;
+    s32 field_138;
+    s32 field_13C;
+    char pad_140[0x4];
+    s32 field_144;
+    s32 field_148;
+    s32 field_14C;
+    s32 field_150;
+    s32 field_154;
+    s32 field_158;
+    s32 field_15C;
+    s32 field_160;
+    s32 field_164;
+    s32 field_168;
+    s32 field_16C;
+    s32 field_170;
+    s32 field_174;
+    s32 field_178;
+    s32 field_17C;
+    s32 field_180;
+    s32 field_184;
+    s32 field_188;
+    s32 field_18C;
+    s32 field_190;
+    char pad_194[0x60];
+    s32 field_1F4;
+    s32 field_1F8;
+    s32 field_1FC;
+    s8 field_200;
+    s8 field_201;
+    s16 field_202;
+    s32 field_204;
+    s8 field_208;
+    s8 field_209;
+    char pad_20A[0x2];
+    s32 field_20C;
+    s32 field_210;
+    s32 field_214;
+    s32 field_218;
+    s32 field_21C;
+    char pad_220[0xC];
+    s32 field_22C;
+    s32 field_230;
+    s32 field_234;
+    s32 field_238;
+    s32 field_23C;
+    s32 field_240;
+    char pad_244[0x4];
+    s32 field_248;
+    s16 field_24C;
+    s16 field_24E;
+    char pad_250[0x6];
+    s16 field_256;
+    f32 field_258;
+    f32 field_25C;
+    char pad_260[0x4];
+    f32 field_264;
+    f32 field_268;
+    f32 field_26C;
+    char pad_270[0x4];
+    f32 field_274;
+    f32 field_278;
+    char pad_27C[0x68];
+    s32 field_2E4;
+    char pad_2E8[0x74];
+    s32 field_35C;
+    s32 field_360;
+    s32 field_364;
+};
+typedef struct CLevelUpEffect_infere {
+    /* 0x00 */ s8 unk0;                             /* inferred */
+    /* 0x01 */ char pad1[3];                        /* maybe part of unk0[4]void */
+    /* 0x04 */ s32 unk4;                            /* inferred */
+    /* 0x08 */ s32 unk8;                            /* inferred */
+    /* 0x0C */ char padC[4];
+    /* 0x10 */ f32 unk10;                           /* inferred */
+    /* 0x14 */ f32 unk14;                           /* inferred */
+    /* 0x18 */ char pad18[8];                       /* maybe part of unk14[3]void */
+    /* 0x20 */ mgCTexture *unk20;                   /* inferred */
+    /* 0x24 */ s32 unk24;                           /* inferred */
+} CLevelUpEffect_infere;                                   /* size >= 0x28 */
+extern "C" void Generate__14CLevelUpEffectFP10mgCTextureiii(CLevelUpEffect_infere *objet, mgCTexture *arg0, s32 arg1, s32 arg2, s32 arg3) {
+    objet->unk20 = arg0;
+    objet->unk8 = arg1;
+    objet->unk10 = (f32) (arg2 - 0x10);
+    objet->unk14 = (f32) arg3;
+    objet->unk4 = 0;
+    objet->unk24 = 0;
+    objet->unk0 = 1;
+}
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Generate__14CLevelUpEffectFP10mgCTextureiP11CCharacter2);
 u8 CLevelUpEffect::IsRun(void) {
     return this->field_0x0;
@@ -98,8 +311,33 @@ INCLUDE_ASM("nonmatchings/game/cposdatamanage", Generate__21CLevelUpEffectManage
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Generate__21CLevelUpEffectManagerFiP11CCharacter2);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Step__21CLevelUpEffectManagerFv);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Draw__21CLevelUpEffectManagerFv);
-INCLUDE_ASM("nonmatchings/game/cposdatamanage", Generate__9CStarDustFiiii);
-INCLUDE_ASM("nonmatchings/game/cposdatamanage", Step__9CStarDustFv);
+struct inferred;
+typedef struct CStarDust {
+    /* 0x0 */ f32 unk0;                             /* inferred */
+    /* 0x4 */ f32 unk4;                             /* inferred */
+    /* 0x8 */ s16 unk8;                             /* inferred */
+    /* 0xA */ s8 unkA;                              /* inferred */
+} CStarDust;                                        /* size >= 0xB */
+extern "C" s32 GetRandI__Fi(s32);
+extern "C" void Generate__9CStarDustFiiii(CStarDust *objet, s32 arg0, s32 arg1, s32 arg2, s32 arg3) {
+    objet->unk0 = (f32) arg0;
+    objet->unk4 = (f32) arg1;
+    objet->unk8 = arg2 + GetRandI__Fi(arg3);
+    objet->unkA = 1;
+}
+typedef struct CStarDust_infere {
+    /* 0x0 */ char pad0[8];
+    /* 0x8 */ s16 unk8;                             /* inferred */
+    /* 0xA */ u8 unkA;                              /* inferred */
+} CStarDust_infere;                                        /* size >= 0xB */
+extern "C" void Step__9CStarDustFv(CStarDust_infere *objet) {
+    if (objet->unkA != 0) {
+        objet->unk8 -= 1;
+        if (objet->unk8 < 0) {
+            objet->unkA = 0;
+        }
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Draw__9CStarDustFP10mgCTextureii);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", CheckNotRunStarDust__FP9CStarDusti);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", CheckRunStarDust__FP9CStarDusti);

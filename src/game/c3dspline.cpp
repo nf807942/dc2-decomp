@@ -23,10 +23,23 @@ INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_TEXDATA_CLEAR__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_FORM_CLEAR__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_TEXDATA_MALLOC__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_TEXNAME__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_TEXDATA_OFFSET__FP9SPI_STACKi);
+extern "C" u16 MenuTexPosNo;
+extern "C" u16 MenuTexPosNo_local;
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(...);
+extern "C" s32 _MENU_TEXDATA_OFFSET__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    MenuTexPosNo = spiGetStackInt__FP9SPI_STACK(arg0);
+    MenuTexPosNo_local = 0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_TEXDATA__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_FORM_MALLOC__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_FORM_OFFSET_NO__FP9SPI_STACKi);
+extern "C" u16 menu_analyze_formno;
+extern "C" u16 menu_analyze_formno_offset;
+extern "C" s32 _MENU_FORM_OFFSET_NO__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    menu_analyze_formno = spiGetStackInt__FP9SPI_STACK(arg0);
+    menu_analyze_formno_offset = 0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_FORM_SET__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_FORM_PARTNUM__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", menu_texdata_to_formpart_copy__FP18MENUFORMPARTS_TYPE);
@@ -149,7 +162,22 @@ void ResetNpcTalkMes(void) {
     EdEventInfo.field_0x126C = 0;
     EdEventInfo.field_0x1270 = 0;
 }
-INCLUDE_ASM("nonmatchings/game/c3dspline", GetSquareEvent__Fv);
+extern "C" s32 GetSaveData__Fv(void);
+#include "dngfloormanager.hpp"
+extern "C" s32 CheckNowTourEvent__9CSaveDataFv(void *);
+extern "C" s32 CheckNowTourType__9CSaveDataFv(void *);
+extern "C" s32 GetSquareEvent__Fv(void) {
+    CSaveData *temp_v0;
+
+    temp_v0 = (CSaveData *) (GetSaveData__Fv());
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    if (CheckNowTourEvent__9CSaveDataFv(temp_v0) == 0) {
+        return 0;
+    }
+    return CheckNowTourType__9CSaveDataFv(temp_v0);
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", InitEvent__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/c3dspline", SetEventScript__FPcPcP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/c3dspline", RunEvent__FiP6CScene);
@@ -159,9 +187,213 @@ INCLUDE_ASM("nonmatchings/game/c3dspline", SkipEventStart__Fv);
 INCLUDE_ASM("nonmatchings/game/c3dspline", SkipEvent__Fv);
 INCLUDE_ASM("nonmatchings/game/c3dspline", CheckEventSkip__Fv);
 INCLUDE_ASM("nonmatchings/game/c3dspline", EventLoop__Fv);
-INCLUDE_ASM("nonmatchings/game/c3dspline", GetEventMessage__Fi);
+struct CScene;
+extern "C" CScene *EventScene;
+struct CScene {
+    s32 field_0;
+    s32 field_4;
+    char pad_8[0x30];
+    s32 field_38;
+    s32 field_3C;
+    s32 field_40;
+    char pad_44[0x2000];
+    s32 field_2044;
+    char pad_2048[0x1C0];
+    s32 field_2208;
+    char pad_220C[0x5D4];
+    s32 field_27E0;
+    char pad_27E4[0xE0];
+    s32 field_28C4;
+    char pad_28C8[0xE0];
+    s32 field_29A8;
+    char pad_29AC[0x100];
+    s32 field_2AAC;
+    char pad_2AB0[0x1EC];
+    s32 field_2C9C;
+    s32 field_2CA0;
+    char pad_2CA4[0x1A0];
+    s32 field_2E44;
+    s32 field_2E48;
+    char pad_2E4C[0x4];
+    s32 field_2E50;
+    s32 field_2E54;
+    s32 field_2E58;
+    s32 field_2E5C;
+    s32 field_2E60;
+    s32 field_2E64;
+    s32 field_2E68;
+    s32 field_2E6C;
+    s32 field_2E70;
+    s32 field_2E74;
+    s32 field_2E78;
+    s32 field_2E7C;
+    s32 field_2E80;
+    s32 field_2E84;
+    s32 field_2E88;
+    s32 field_2E8C;
+    char pad_2E90[0x8];
+    s32 field_2E98;
+    char pad_2E9C[0x8];
+    s32 field_2EA4;
+    f32 field_2EA8;
+    f32 field_2EAC;
+    f32 field_2EB0;
+    f32 field_2EB4;
+    char pad_2EB8[0x8];
+    f32 field_2EC0;
+    f32 field_2EC4;
+    f32 field_2EC8;
+    f32 field_2ECC;
+    f32 field_2ED0;
+    f32 field_2ED4;
+    f32 field_2ED8;
+    f32 field_2EDC;
+    f32 field_2EE0;
+    f32 field_2EE4;
+    f32 field_2EE8;
+    f32 field_2EEC;
+    char pad_2EF0[0x38];
+    f32 field_2F28;
+    char pad_2F2C[0x8];
+    f32 field_2F34;
+    f32 field_2F38;
+    char pad_2F3C[0x14];
+    s32 field_2F50;
+    s32 field_2F54;
+    s32 field_2F58;
+    s32 field_2F5C;
+    s32 field_2F60;
+    s32 field_2F64;
+    s32 field_2F68;
+    f32 field_2F6C;
+    f32 field_2F70;
+    s32 field_2F74;
+    f32 field_2F78;
+    char pad_2F7C[0x4];
+    f32 field_2F80;
+    char pad_2F84[0x10];
+    s32 field_2F94;
+    s32 field_2F98;
+    s16 field_2F9C;
+    char pad_2F9E[0x2];
+    s32 field_2FA0;
+    char pad_2FA4[0x10];
+    s8 field_2FB4;
+    char pad_2FB5[0x1F];
+    s16 field_2FD4;
+    s16 field_2FD6;
+    s8 field_2FD8;
+    s8 field_2FD9;
+    char pad_2FDA[0x6];
+    f32 field_2FE0;
+    s32 field_2FE4;
+    s32 field_2FE8;
+    s32 field_2FEC;
+    char pad_2FF0[0x4];
+    s32 field_2FF4;
+    char pad_2FF8[0x4];
+    s32 field_2FFC;
+    char pad_3000[0x8];
+    s16 field_3008;
+    char pad_300A[0x2];
+    s32 field_300C;
+    s32 field_3010;
+    s32 field_3014;
+    s32 field_3018;
+    s8 field_301C;
+    char pad_301D[0x3];
+    s64 field_3020;
+    s32 field_3028;
+    s8 field_302C;
+    char pad_302D[0x1];
+    s16 field_302E;
+    s32 field_3030;
+    char pad_3034[0x4];
+    s32 field_3038;
+    s32 field_303C;
+    char pad_3040[0x14];
+    s32 field_3054;
+    char pad_3058[0xE08];
+    s32 field_3E60;
+    s32 field_3E64;
+    s32 field_3E68;
+    s32 field_3E6C;
+    char pad_3E70[0x1F0];
+    s32 field_4060;
+    char pad_4064[0x4800];
+    u32 field_8864;
+    char pad_8868[0x800];
+    s32 field_9068;
+    char pad_906C[0x4];
+    s32 field_9070;
+    s32 field_9074;
+    char pad_9078[0x8];
+    s32 field_9080;
+    char pad_9084[0x45C];
+    s32 field_94E0;
+    char pad_94E4[0x45C];
+    s32 field_9940;
+    char pad_9944[0x4BC];
+    s32 field_9E00;
+    s32 field_9E04;
+    char pad_9E08[0x80];
+    s32 field_9E88;
+    s32 field_9E8C;
+    char pad_9E90[0x80];
+    s32 field_9F10;
+    s32 field_9F14;
+    char pad_9F18[0x80];
+    s32 field_9F98;
+    s32 field_9F9C;
+    char pad_9FA0[0x80];
+    s32 field_A020;
+    s32 field_A024;
+    s32 field_A028;
+    s32 field_A02C;
+    s32 field_A030;
+    s32 field_A034;
+    s32 field_A038;
+    s32 field_A03C;
+    u32 field_A040;
+    s32 field_A044;
+    char pad_A048[0x424];
+    s32 field_A46C;
+    char pad_A470[0x4];
+    s32 field_A474;
+    char pad_A478[0x8];
+    s32 field_A480;
+    s32 field_A484;
+    f32 field_A488;
+    f32 field_A48C;
+    s32 field_A490;
+    s32 field_A494;
+    s32 field_A498;
+    s32 field_A49C;
+    char pad_A4A0[0x2030];
+    u32 field_C4D0;
+    s32 field_C4D4;
+};
+extern "C" s32 GetMessage__6CSceneFi(void *, s32);
+extern "C" s32 GetEventMessage__Fi(s32 arg0) {
+    s32 var_v0;
+
+    var_v0 = 0;
+    if (EventScene != NULL) {
+        var_v0 = GetMessage__6CSceneFi(EventScene, arg0);
+    }
+    return var_v0;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", GetActiveCamera__Fv);
-INCLUDE_ASM("nonmatchings/game/c3dspline", GetCharacter__Fi);
+extern "C" s32 GetCharacter__6CSceneFi(void *, s32);
+extern "C" s32 GetCharacter__Fi(s32 arg0) {
+    s32 var_v0;
+
+    var_v0 = 0;
+    if (EventScene != NULL) {
+        var_v0 = GetCharacter__6CSceneFi(EventScene, arg0);
+    }
+    return var_v0;
+}
 void InitSplineKey(SPLINE_KEY * arg0) {
     arg0->field_0x0 = 0;
     arg0->field_0x4 = 0;
@@ -178,7 +410,21 @@ void InitSplineKey(SPLINE_KEY * arg0) {
     arg0->field_0x28 = 0;
     arg0->field_0x34 = 0;
 }
-INCLUDE_ASM("nonmatchings/game/c3dspline", __ct__9C3DSplineFv);
+struct C3DSpline {
+    char pad_0[0x380];
+    s32 field_380;
+    s32 field_384;
+    f32 field_388;
+    f32 field_38C;
+    f32 field_390;
+    f32 field_394;
+    f32 field_398;
+};
+extern "C" s32 Initialize__9C3DSplineFv(void *);
+extern "C" C3DSpline *__ct__9C3DSplineFv(C3DSpline *objet) {
+    Initialize__9C3DSplineFv(objet);
+    return objet;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", Initialize__9C3DSplineFv);
 INCLUDE_ASM("nonmatchings/game/c3dspline", SetUpSpline__9C3DSplineFPA4_fPiif);
 INCLUDE_ASM("nonmatchings/game/c3dspline", StepS__9C3DSplineFv);
@@ -221,12 +467,66 @@ void CCharaPas::SetFrame(s32 arg0) {
 s32 CCharaPas::GetFrame(void) {
     return this->field_0x100;
 }
-INCLUDE_ASM("nonmatchings/game/c3dspline", scsPRDelay__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
+struct inferred;
+typedef struct CSceneCmrSeq_infere {
+    /* 0x00 */ char pad0[0x38];
+    /* 0x38 */ s32 unk38;                           /* inferred */
+} CSceneCmrSeq_infere;                                     /* size >= 0x3C */
+typedef struct _SEN_CMR_SEQ_infere {
+    /* 0x00 */ char pad0[0x30];
+    /* 0x30 */ s32 unk30;                           /* inferred */
+} _SEN_CMR_SEQ_infere;                                     /* size >= 0x34 */
+extern "C" s32 scsPRDelay__FP12_SEN_CMR_SEQP12CSceneCmrSeq(_SEN_CMR_SEQ_infere *arg0, CSceneCmrSeq_infere *arg1) {
+    s32 temp_v1;
+
+    temp_v1 = arg1->unk38;
+    if (temp_v1 >= arg0->unk30) {
+        arg1->unk38 = 0;
+        return 0;
+    }
+    arg1->unk38 = temp_v1 + 1;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", scsSetPos__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/c3dspline", scsSetRef__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
-INCLUDE_ASM("nonmatchings/game/c3dspline", scsAHDDelay__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
+struct inferred;
+typedef struct CSceneCmrSeq_infere2 {
+    /* 0x00 */ char pad0[0x3C];
+    /* 0x3C */ s32 unk3C;                           /* inferred */
+} CSceneCmrSeq_infere2;                                     /* size >= 0x40 */
+typedef struct _SEN_CMR_SEQ_infere2 {
+    /* 0x00 */ char pad0[0x30];
+    /* 0x30 */ s32 unk30;                           /* inferred */
+} _SEN_CMR_SEQ_infere2;                                     /* size >= 0x34 */
+extern "C" s32 scsAHDDelay__FP12_SEN_CMR_SEQP12CSceneCmrSeq(_SEN_CMR_SEQ_infere2 *arg0, CSceneCmrSeq_infere2 *arg1) {
+    s32 temp_v1;
+
+    temp_v1 = arg1->unk3C;
+    if (temp_v1 >= arg0->unk30) {
+        arg1->unk3C = 0;
+        return 0;
+    }
+    arg1->unk3C = temp_v1 + 1;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", scsSetAngle__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
-INCLUDE_ASM("nonmatchings/game/c3dspline", scsSetHeight__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
+typedef struct CSceneCmrSeq_infere3 {
+    /* 0x00 */ char pad0[0x54];
+    /* 0x54 */ f32 unk54;                           /* inferred */
+    /* 0x58 */ char pad58[0xC];                     /* maybe part of unk54[4]void */
+    /* 0x64 */ f32 unk64;                           /* inferred */
+    /* 0x68 */ char pad68[0xC];                     /* maybe part of unk64[4]void */
+    /* 0x74 */ f32 unk74;                           /* inferred */
+} CSceneCmrSeq_infere3;                                     /* size >= 0x78 */
+typedef struct _SEN_CMR_SEQ_infere3 {
+    /* 0x00 */ char pad0[0x30];
+    /* 0x30 */ f32 unk30;                           /* inferred */
+} _SEN_CMR_SEQ_infere3;                                     /* size >= 0x34 */
+extern "C" s32 scsSetHeight__FP12_SEN_CMR_SEQP12CSceneCmrSeq(_SEN_CMR_SEQ_infere3 *arg0, CSceneCmrSeq_infere3 *arg1) {
+    arg1->unk54 = arg0->unk30 + arg1->unk64;
+    arg1->unk74 = arg0->unk30;
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", scsSetDist__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 typedef struct CSceneCmrSeq {
     /* 0x00 */ char pad0[0x50];
