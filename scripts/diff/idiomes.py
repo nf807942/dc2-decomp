@@ -209,11 +209,39 @@ def compose_flottant(text: str, _rng: random.Random) -> list[str]:
     return out
 
 
+def cas_unique(text: str, _rng: random.Random) -> list[str]:
+    """`if (x == K) { … }` devient `switch (x) { case K: … break; }`.
+
+    Un aiguillage a un seul cas n'est pas un `if` : `switch` garde les sorties
+    distinctes et laisse le creneau de delai vide, la ou le `if` le comble. m2c
+    rend toujours un `if`, n'ayant vu qu'une comparaison et un branchement.
+
+    La transformation ne touche qu'une egalite a une constante entiere : c'est
+    la seule forme dont les deux ecritures sont assurement equivalentes.
+    """
+    out = []
+    for marque in re.finditer(
+            r'^(\s*)if \((\w+(?:->\w+)*) == (-?\d+|0x[0-9A-Fa-f]+)\) \{$',
+            text, re.MULTILINE):
+        marge, sujet, valeur = marque.groups()
+        ferme = brace_fermante(text, marque.end() - 1)
+        if ferme is None:
+            continue
+        corps = text[marque.end():ferme]
+        remplace = ('%sswitch (%s) {' % (marge, sujet)
+                    + '%s%scase %s:' % (chr(10), marge, valeur)
+                    + corps.rstrip()
+                    + '%s%s    break;%s%s}' % (chr(10), marge, chr(10), marge))
+        out.append(text[:marque.start()] + remplace + text[ferme + 1:])
+    return out
+
+
 IDIOMES = [
     compose_assignment,
     compose_flottant,
     constante_a_gauche,
     seuil_deplace,
+    cas_unique,
     early_return_from_guard,
     rotate_loop_body,
 ]
