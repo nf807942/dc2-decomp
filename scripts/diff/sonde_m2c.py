@@ -259,6 +259,19 @@ def _type_pointe(variable: str, corps: str) -> str | None:
     return trouve.group(1) if trouve else None
 
 
+def _type_valeur(variable: str, corps: str) -> str | None:
+    """Le type d'une locale que le corps déclare sans étoile.
+
+    m2c ne sait pas toujours qu'une locale tient une adresse : il la declare
+    `s32 temp_v1;` puis ecrit `temp_v1->unk6`. `_type_pointe` ne la voit pas —
+    elle ne porte pas d'etoile — et la fonction etait perdue sans qu'aucune
+    structure ne soit forgee pour elle.
+    """
+    trouve = re.search(r'^\s+([A-Za-z_]\w*)\s+' + re.escape(variable)
+                       + r'\s*;\s*$', corps, re.M)
+    return trouve.group(1) if trouve else None
+
+
 def _struct_par_offsets(nom: str, offsets: dict[int, str]) -> str:
     """Une structure bâtie sur les seuls décalages que le corps réclame.
 
@@ -272,14 +285,25 @@ def _struct_par_offsets(nom: str, offsets: dict[int, str]) -> str:
     fonction dans la mesure, où l'affinage peut la reprendre, là où l'absence
     la laissait au rebut sans le moindre chiffre.
     """
-    lignes, curseur = [], 0
-    for decalage in sorted(offsets):
+    rangs, lignes, curseur = sorted(offsets), [], 0
+    for indice, decalage in enumerate(rangs):
         if decalage < curseur:
             continue
         if decalage > curseur:
             lignes.append("    char pad%X[0x%X];" % (curseur, decalage - curseur))
-        lignes.append("    /* 0x%X */ s32 %s;" % (decalage, offsets[decalage]))
-        curseur = decalage + 4
+        # **L'alignement du decalage borne la largeur**, et l'ecart au champ
+        # suivant aussi : supposer quatre octets partout faisait disparaitre
+        # `unk6` derriere `unk4`, et MWCC repondait « undefined identifier
+        # 'unk6' » sur un champ que la structure aurait du porter.
+        suivant = rangs[indice + 1] if indice + 1 < len(rangs) else decalage + 4
+        place = max(suivant - decalage, 1)
+        largeur = 4
+        while largeur > 1 and (decalage % largeur or place < largeur):
+            largeur //= 2
+        lignes.append("    /* 0x%X */ %s %s;"
+                      % (decalage, {1: "s8", 2: "s16", 4: "s32"}[largeur],
+                         offsets[decalage]))
+        curseur = decalage + largeur
     return "struct %s {\n%s\n};" % (nom, "\n".join(lignes))
 
 
@@ -326,6 +350,17 @@ def complete_structures(structs: list[str], corps: str) -> tuple[list[str], str]
     for variable, offsets in demandes.items():
         type_ = _type_pointe(variable, corps)
         if type_ is None:
+            # La locale ne porte pas d'etoile : m2c l'a declaree `s32` puis
+            # dereferencee. On lui forge sa structure et on la rend pointeur.
+            valeur = _type_valeur(variable, corps)
+            if valeur is None:
+                continue
+            forge = "%s_champs" % variable
+            neuves.append(_struct_par_offsets(forge, offsets))
+            corps = re.sub(r"^(\s+)%s(\s+)%s(\s*;\s*)$"
+                           % (re.escape(valeur), re.escape(variable)),
+                           r"\1struct %s *%s\3" % (forge, variable),
+                           corps, count=1, flags=re.M)
             continue
         if type_ in par_nom:
             rang = par_nom[type_]

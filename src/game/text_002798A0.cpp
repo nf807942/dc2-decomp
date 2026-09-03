@@ -27,7 +27,25 @@ INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_SET_PIN_COL__FP12RS_STACK
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_GET_PIN_COL__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_SET_BALL_COL__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_GET_BALL_COL__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_SET_PAR_COUNT__FP12RS_STACKDATAi);
+extern "C" u32 DebugFlag;
+typedef struct Sphida_pointe {
+    char pad0[184];
+    s32 unkB8;
+} Sphida_pointe;
+extern "C" Sphida_pointe *Sphida;
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(...);
+extern "C" s32 _SPHIDA_SET_PAR_COUNT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    s32 temp_v0;
+
+    temp_v0 = (s32) (GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
+    if (Sphida == NULL) {
+        return 0;
+    }
+    if (DebugFlag == 0) {
+        Sphida->unkB8 = temp_v0;
+    }
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_GET_PAR_COUNT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_GET_MINI_LEVEL__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_GET_TEXB__FP12RS_STACKDATAi);
@@ -196,7 +214,24 @@ INCLUDE_ASM("nonmatchings/game/text_002798A0", _GET_RND_CIRCLE_TRAPID__FP12RS_ST
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SET_RND_CIRCLE_STATUS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SET_STATUSBAR_SHOW__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SET_PULL_ITEM__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002798A0", _MENU_CHARA_CHENGE__FP12RS_STACKDATAi);
+typedef struct EdEventInfo_champs {
+    char pad0[208];
+    s32 unkD0;
+    char padD4[4556];
+} EdEventInfo_champs;
+extern "C" EdEventInfo_champs EdEventInfo;
+typedef struct MenuArg_champs {
+    char pad0[40];
+    s32 unk28;
+    char pad2C[108];
+} MenuArg_champs;
+extern "C" MenuArg_champs MenuArg;
+extern "C" s32 _MENU_CHARA_CHENGE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    GetStackInt__FP12RS_STACKDATA_00262DA0(arg0);
+    MenuArg.unk28 = 0xE;
+    EdEventInfo.unkD0 = 3;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _GET_EVENT_INFO_SNDID__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _GET_PARTS_POS__FP12RS_STACKDATAi);
 extern "C" void CancelDramaScene__Fv();
