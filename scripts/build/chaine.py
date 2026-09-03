@@ -154,6 +154,16 @@ def main(argv: list[str]) -> int:
     # `sys.exit` lève `SystemExit`, qui les déroule : la sonde rend sa source.
     signal.signal(signal.SIGTERM, lambda *_: sys.exit(1))
 
+    # Une coupure laisse un objet tronque : `docker stop` interrompt Python,
+    # qui rend sa source et supprime l'objet, mais le `make` petit-fils ecrit
+    # encore et le recree, partiel. `make` le croit alors a jour et la
+    # construction diverge sans qu'aucune source ait change — 76 octets sur
+    # deux plages, dans une fonction restee greffee. Les retirer au demarrage
+    # coute une reconstruction, soit 1 min 10 s pour une moisson qui dure des
+    # heures.
+    for objet in (ROOT / "build" / "src").rglob("*.o"):
+        objet.unlink()
+
     etat = charge(options.reprendre)
     if options.profil:
         return profil(etat)
