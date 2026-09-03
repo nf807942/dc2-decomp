@@ -525,6 +525,7 @@ def eprouve(symbole: str, unite: str, taille: int,
     ajoutees: list[str] = []
     vus_types: set[str] = set()
     ellipses: set[str] = set()
+    typees = globales_m2c(texte)
     try:
         # Le compilateur dit ce qui manque, la table des symboles dit quoi
         # écrire, et l'on recommence. Cinq tours suffisent : chacun déclare
@@ -588,7 +589,11 @@ def eprouve(symbole: str, unite: str, taille: int,
                 continue
 
             manquants = {nom for nom in _INCONNU.findall(sortie)}
-            neuves = [d for d in (declaration(nom, declarations + corps)
+            # La forme que m2c a su typer passe devant celle que la table des
+            # symboles rend : elle porte le type pointé, et c'est lui que le
+            # corps déréférence.
+            neuves = [d for d in (typees.get(nom)
+                                  or declaration(nom, declarations + corps)
                                   for nom in sorted(manquants))
                       if d and d not in ajoutees]
             # Une déclaration ajoutée cite ses propres types — `extern "C" void
@@ -677,6 +682,38 @@ def objets() -> dict[str, int]:
         _TAILLES = {nom: int(taille, 16) for nom, taille in _OBJET.findall(table)
                     if "type:func" not in nom}
     return _TAILLES
+
+
+# `extern CScene *EventScene;` — la globale que m2c a su typer.
+_GLOBALE_M2C = re.compile(
+    r'^extern ([A-Za-z_]\w*) \*([A-Za-z_]\w*);$', re.M)
+
+
+def globales_m2c(texte: str) -> dict[str, str]:
+    """Les globales que m2c déclare comme pointeurs, quand la largeur concorde.
+
+    m2c écrit `extern CScene *EventScene;` : il a vu le déréférencement et en
+    connaît le type. Notre `declaration()`, elle, ne lit que la table des
+    symboles et rend `extern "C" u32 EventScene;` — un scalaire, dont MWCC
+    refuse le `->` : « pointer/array required ». C'était la première cause
+    d'échec de compilation d'une moisson, 77 cas.
+
+    La garde porte sur la largeur, non sur le type : **la taille déclarée d'une
+    globale décide de `%gp_rel` contre `%hi`/`%lo`**. Un pointeur fait quatre
+    octets ; on n'adopte la forme de m2c que si la table des symboles en dit
+    autant.
+
+    **Le gain n'est pas mesuré.** Elle ne se déclenche que sur un nom que MWCC
+    dit inconnu, et sur les trois témoins sondés la globale était déjà déclarée
+    par l'unité, en `u32`, forme sous laquelle des fonctions déjà appariées
+    écrivent `EventScene + 0x2F90`. Les deux formes ne peuvent pas coexister
+    pour une variable, et c'est l'unité qui a raison la première.
+    """
+    trouves: dict[str, str] = {}
+    for type_, nom in _GLOBALE_M2C.findall(texte):
+        if objets().get(nom) == 4:
+            trouves[nom] = 'extern "C" %s *%s;' % (type_, nom)
+    return trouves
 
 
 def declaration(nom: str, corps: str = "") -> str | None:

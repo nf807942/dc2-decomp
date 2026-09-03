@@ -203,7 +203,12 @@ def main(argv: list[str]) -> int:
                 # La cause, et non la seule issue : c'est elle qui dit quelle
                 # correction paierait le plus au tour suivant, et la relever
                 # après coup demanderait de tout réexécuter.
-                "cause": verdict.get("cause", ""), "unite": unite}
+                "cause": verdict.get("cause", ""),
+                # Et la ligne que MWCC désigne : le message seul ne dit pas
+                # quoi réparer — 256 « declaration syntax error » ne venaient
+                # que de trois unités amputées, ce que le chevron sous une
+                # accolade seule a nommé du premier coup.
+                "extrait": verdict.get("extrait", ""), "unite": unite}
 
             if part is not None and part >= 99.999:
                 gagnees += 1
