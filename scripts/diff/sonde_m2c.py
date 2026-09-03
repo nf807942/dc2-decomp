@@ -25,6 +25,7 @@ from __future__ import annotations
 import argparse
 import json
 import random
+import os
 import re
 import subprocess
 import sys
@@ -670,7 +671,7 @@ def eprouve(symbole: str, unite: str, taille: int,
             # et l ecarter laissait cinq fonctions sans leur appele.
             fragment = assemble(ajoutees, declarations, corps,
                                 avant.split(ligne)[0], avant)
-            source.write_text(avant.replace(ligne, fragment), encoding="utf-8")
+            ecris(source, avant.replace(ligne, fragment))
             if objet.exists():
                 objet.unlink()
             bati = run(["make", str(objet.relative_to(ROOT))],
@@ -781,7 +782,7 @@ def eprouve(symbole: str, unite: str, taille: int,
                 and (verdict.get("part") or 0) >= 99.999):
             pass
         else:
-            source.write_text(originel, encoding="utf-8")
+            ecris(source, originel)
 
         # L objet part avec la source. Un SIGTERM tombe le plus souvent
         # pendant `make`, qui laisse alors un `.o` tronque : `make` le
@@ -996,6 +997,23 @@ _CURSEUR = re.compile(r"^#\s+Error:( *)\^", re.M)
 def premiere_erreur(sortie: str) -> str:
     trouve = _ERREUR.findall(sortie)
     return trouve[0][:70] if trouve else "inconnue"
+
+
+def ecris(chemin: Path, texte: str) -> None:
+    """Écrit une source d'un seul coup, ou pas du tout.
+
+    `write_text` tronque le fichier puis le remplit : un processus tue entre
+    les deux — `docker stop` pendant une moisson — laisse une source coupee en
+    plein milieu. La pose suivante la relit comme etat de depart et propage la
+    coupure : une ligne de greffe tronquee, un bloc duplique, et l'unite ne
+    compile plus sans que rien ne le signale.
+
+    Le remplacement d'un fichier par un autre est atomique : ou l'ancien, ou le
+    neuf, jamais un melange.
+    """
+    provisoire = chemin.with_suffix(chemin.suffix + '.neuf')
+    provisoire.write_text(texte, encoding="utf-8")
+    os.replace(provisoire, chemin)
 
 
 def _equilibre(texte: str) -> int:

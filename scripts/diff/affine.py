@@ -28,6 +28,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from idiomes import IDIOMES  # noqa: E402
+from sonde_m2c import ecris  # noqa: E402
 from lib.project import ROOT  # noqa: E402
 
 # `extern "C" <type> <symbole>(…) {` … `}` — la définition que la chaîne a posée.
@@ -75,11 +76,10 @@ def affine(symbole: str, unite: str, depart: float,
             for variante in transformation(corps, rng):
                 if variante == corps:
                     continue
-                source.write_text(texte[:debut] + variante + texte[fin:],
-                                  encoding="utf-8")
+                ecris(source, texte[:debut] + variante + texte[fin:])
                 part = mesure(symbole, unite)
                 if part is None or part < meilleur:
-                    source.write_text(garde, encoding="utf-8")
+                    ecris(source, garde)
                     continue
                 # Égalité gardée : deux idiomes se composent souvent sans que le
                 # premier paie seul.
@@ -91,7 +91,7 @@ def affine(symbole: str, unite: str, depart: float,
             if progres:
                 break
         if not progres:
-            source.write_text(garde, encoding="utf-8")
+            ecris(source, garde)
             break
 
     return meilleur, meilleur >= 99.999

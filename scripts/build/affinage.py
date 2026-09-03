@@ -35,6 +35,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parent / ".." / "diff"))
 import affine  # noqa: E402
 import sonde_m2c  # noqa: E402
+from sonde_m2c import ecris  # noqa: E402
 from idiomes import IDIOMES  # noqa: E402
 from lib.project import ROOT, functions, run, unit_of  # noqa: E402
 
@@ -78,7 +79,7 @@ def pose(symbole: str, unite: str) -> tuple[Path, str] | None:
     if ligne not in avant:
         return None
     fragment = (CORPUS / (symbole + ".cpp")).read_text(encoding="utf-8")
-    source.write_text(avant.replace(ligne, fragment), encoding="utf-8")
+    ecris(source, avant.replace(ligne, fragment))
     return source, avant
 
 
@@ -113,15 +114,15 @@ def rendement(lot: list[tuple[int, str, str]]) -> int:
                     if variante == corps:
                         continue
                     essais[nom] += 1
-                    source.write_text(texte[:debut] + variante + texte[fin:],
+                    ecris(source, texte[:debut] + variante + texte[fin:],
                                       encoding="utf-8")
                     part = recompile_et_mesure(symbole, unite)
                     if part is not None and part >= 99.999:
                         compte[nom] += 1
                         break
-                source.write_text(texte, encoding="utf-8")
+                ecris(source, texte)
         finally:
-            source.write_text(avant, encoding="utf-8")
+            ecris(source, avant)
 
     print("\nrendement par idiome, sur %d fonctions :" % len(lot))
     for transformation in IDIOMES:
@@ -167,7 +168,7 @@ def main(argv: list[str]) -> int:
                       flush=True)
         finally:
             if not garde:
-                source.write_text(avant, encoding="utf-8")
+                ecris(source, avant)
     print("\n%d fonctions gagnées sur %d, %.1f s chacune"
           % (gagnees, len(lot), (time.time() - depart) / max(len(lot), 1)))
     print("`make ci` tranche.")

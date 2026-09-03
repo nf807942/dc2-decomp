@@ -19,7 +19,7 @@ from __future__ import annotations
 import argparse
 import re
 import sys
-from collections import defaultdict
+from collections import Counter, defaultdict
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
@@ -81,6 +81,28 @@ def greffes_en_double() -> list[str]:
             ou[nom].append(source)
     return [f"{nom} greffé par " + ", ".join(str(p.relative_to(ROOT)) for p in lieux)
             for nom, lieux in sorted(ou.items()) if len(lieux) > 1]
+
+
+def greffes_repetees() -> list[str]:
+    """Une même ligne de greffe écrite deux fois dans un fichier.
+
+    `greffes_en_double` compare les sources entre elles ; elle ne voit pas la
+    répétition à l'intérieur d'une seule. Or c'est la signature d'une écriture
+    coupée en deux : un processus tué pendant que la chaîne réécrivait une
+    source y a laissé un bloc dupliqué et une ligne tronquée, et l'unité ne
+    compilait plus sans qu'aucun contrôle ne le dise.
+    """
+    fautes = []
+    for chemin in sorted((ROOT / "src").rglob("*.cpp")):
+        lignes = [l for l in chemin.read_text(encoding="utf-8",
+                                              errors="replace").splitlines()
+                  if l.startswith("INCLUDE_ASM")]
+        for ligne, compte in Counter(lignes).items():
+            if compte > 1:
+                fautes.append("%s répète %d fois %s"
+                              % (chemin.relative_to(ROOT).as_posix(), compte,
+                                 ligne.strip()[:60]))
+    return fautes
 
 
 def greffes_hors_plage() -> list[str]:
@@ -186,6 +208,7 @@ CONTROLES = [
     ("en-têtes engendrés", entetes_manquants, False),
     ("greffes sans désassemblage", greffes_sans_desassemblage, True),
     ("greffes en double", greffes_en_double, False),
+    ("greffes répétées", greffes_repetees, False),
     ("greffes hors plage", greffes_hors_plage, False),
     ("plages qui se chevauchent", plages_qui_se_chevauchent, False),
     ("sources et unités", sources_absentes, False),
