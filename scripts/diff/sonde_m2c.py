@@ -737,7 +737,11 @@ def globales_m2c(texte: str) -> dict[str, str]:
     """
     trouves: dict[str, str] = {}
     for type_, nom in _GLOBALE_M2C.findall(texte):
-        if objets().get(nom) == 4:
+        # `extern void *g_tmp_effc;` : m2c declare aussi des `void *`, dont on
+        # ne tirerait qu'un `struct void;` — et un `void *` ne se dereference
+        # pas davantage que notre `u32`. Seul un vrai type nomme apprend
+        # quelque chose.
+        if type_ not in _BASE and objets().get(nom) == 4:
             # La declaration en avant precede, dans le meme bloc : le type
             # pointe n'existe pas encore, et MWCC repond « declaration syntax
             # error » avec le curseur sur son nom. La boucle de completion ne
