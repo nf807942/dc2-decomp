@@ -188,7 +188,7 @@ def _blocs(declarations: str) -> list[str]:
 
 
 def assemble(ajoutees: list[str], declarations: str, corps: str,
-             source: str) -> str:
+             source: str, unite: str = "") -> str:
     """Le fragment à poser, sans ce que la source déclare déjà.
 
     **La chaîne cumule les fonctions d'une même unité**, et chacune apporte ses
@@ -207,6 +207,25 @@ def assemble(ajoutees: list[str], declarations: str, corps: str,
         if cle:
             pris.add(cle)
 
+    # **Une déclaration située plus bas dans l'unité reste invisible ici et
+    # entre pourtant en collision.** `source` s'arrête au point de greffe, ce
+    # qu'exige la question « ce nom est-il disponible pour le code au-dessus ? ».
+    # Mais « ce nom est-il déjà pris ailleurs dans le fichier ? » est une autre
+    # question, et c'est elle qui décide de « redeclared ». On adopte donc la
+    # forme que l'unité porte en aval : une redéclaration identique est légale,
+    # deux formes divergentes ne le sont pas.
+    # Le relevé se fait ligne à ligne, non par blocs : une définition qui
+    # précède la déclaration se referme sur une accolade, et `_blocs` les
+    # agrège alors en un seul bloc dont la clé est celle de la définition.
+    en_aval: dict[tuple[str, str], str] = {}
+    for ligne in (unite[len(source):] if unite else "").splitlines():
+        nette = ligne.strip()
+        if "{" in nette or not nette.endswith(";"):
+            continue
+        cle = _cle(nette)
+        if cle and cle not in pris:
+            en_aval.setdefault(cle, nette)
+
     gardes = []
     for bloc in _blocs("\n".join([b for b in ajoutees + [declarations] if b])):
         cle = _cle(bloc)
@@ -214,6 +233,9 @@ def assemble(ajoutees: list[str], declarations: str, corps: str,
             if cle in pris:
                 continue
             pris.add(cle)
+            if cle in en_aval:
+                gardes.append(en_aval[cle])
+                continue
         gardes.append(bloc)
     return "\n".join(gardes + [corps])
 
