@@ -99,6 +99,24 @@ def recompile_et_mesure(symbole: str, unite: str) -> float | None:
     return sonde_m2c.score(symbole, unite)
 
 
+def image_identique() -> bool:
+    """L'image liee rend-elle les octets du disque ?
+
+    objdiff compare un objet a un objet : il ne voit ni le lien, ni le
+    remplissage qu'une unite porte en queue, ni le decalage qu'un changement
+    de taille inflige a tout ce qui suit. C'est la seule mesure qui porte sur
+    ce que le projet promet, et la chaine ne peut pas s'en passer.
+    """
+    bati = run(["make", "build"], capture_output=True, text=True)
+    if bati.returncode != 0:
+        return False
+    image = ROOT / "build" / "main.bin"
+    reference = ROOT / "rom" / "main.bin"
+    if not (image.exists() and reference.exists()):
+        return False
+    return image.read_bytes() == reference.read_bytes()
+
+
 def profil(etat: dict) -> int:
     """Ce que la moisson a rencontré, par cause puis par extrait.
 
@@ -194,6 +212,9 @@ def main(argv: list[str]) -> int:
     for unite, lot in groupes.items():
         print("\n%s — %d fonctions, %d octets"
               % (unite, len(lot), sum(t for t, _ in lot)), flush=True)
+        depart_unite = (ROOT / "src" / (unite + ".cpp")).read_text(
+            encoding="utf-8")
+        avant_unite, octets_avant_unite = gagnees, gagnes
         for taille, symbole in lot:
             verdict = sonde_m2c.eprouve(symbole, unite, taille, garde=True)
             faits += 1
