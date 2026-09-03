@@ -137,97 +137,65 @@ l'`INCLUDE_ASM` est encore là.
 ## Ce que la moisson automatique peut, et où elle s'arrête
 
 `make chaine` passe m2c sur chaque fonction greffée, normalise, compile, mesure,
-et **ne garde que ce qui rend exactement les octets du disque**. Elle tourne sans
-surveillance, reprend après coupure, et enregistre la *cause* de chaque échec —
-c'est cette dernière qui l'a fait sortir du plateau où elle semblait enfermée.
+et **ne garde que ce qui rend exactement les octets du disque** — la
+reconstruction complète du binaire est vérifiée après chaque unité productive,
+et l'unité revient à son état d'entrée si le sha1 diverge. Elle tourne sans
+surveillance, reprend après coupure, et enregistre la *cause* de chaque échec
+avec la ligne que MWCC désigne.
 
-**Le rendement se lit en entonnoir**, et c'est la seule façon utile de le lire :
+### Son rendement s'effondre avec la taille, et c'est mesuré
 
-| étape | part | ce qui la borne |
-|---|---|---|
-| m2c traduit | 94 % | ce qu'il avoue ne pas savoir rendre |
-| la sortie compile | 46 % | la normalisation — le vrai goulot |
-| les octets appariaient | 46 à 73 % des mesurées | la forme du C++ écrit |
+| tranche | jugées | compilent | gagnées | rendement | médiane d'appariement |
+|---|---|---|---|---|---|
+| 32–63 o | 815 | 464 | 220 | **27 %** | 99,6 % |
+| 64–127 o | 1 410 | 675 | 135 | **9,6 %** | 87,7 % |
+| 128–255 o | 1 343 | 484 | 39 | **2,9 %** | 84,1 % |
+| 256–511 o | 762 | 155 | 3 | **0,4 %** | 74,0 % |
+| 512 o et plus | 16 | 1 | 0 | **0 %** | — |
 
-**Le goulot est la compilation, pas l'appariement.** Une fonction qui compile
-rend les octets du disque une fois sur deux au moins ; une fonction qui ne
-compile pas ne rapporte rien. Chaque point de compilabilité gagné vaut donc
-environ un demi-point de fonction acquise, et c'est là que va l'effort.
+Appliqué aux octets qui restent, cela **plafonne la moisson vers 4 % du
+binaire**. Ce n'est pas une machine à décompiler le jeu : c'est une machine à
+mettre des fonctions *sous mesure*.
 
-Le taux d'appariement se dégrade à mesure que la compilabilité monte — 73 % sur
-les premières mesurées, 46 % quand la chaîne en atteint deux fois plus. Les
-fonctions que la normalisation débloque en dernier sont les plus difficiles ;
-extrapoler le premier chiffre surestime le gain.
+### Où sont réellement les octets qui restent
 
-### Ce que la moisson corrigée peut rapporter
-
-Le rendement, mesuré sur 556 fonctions après les sept correctifs, et comparé à
-ce que ce plan affirmait avant eux :
-
-| tranche | restent | avant | **après** |
+| ce qui reste | octets | part | technique qui s'applique |
 |---|---|---|---|
-| 32–64 o | 1 074 | 10,8 % | **60,5 %** |
-| 64–128 o | 1 709 | 3,2 % | **24,5 %** |
-| 128–256 o | 1 675 | 0,6 % | **9,8 %** |
-| 256–512 o | 1 009 | 0,6 % | 1,5 % |
-| 512–1024 o | 558 | 0 % | **0 %** |
-| 1024–2048 o | 266 | 0 % | **0 %** |
+| moins de 512 o | 849 260 | 39 % | la moisson, puis l'affinage |
+| **plus de 512 o (970 fn)** | **1 300 388** | **61 %** | **l'affinage seul** |
+| dont SDK, runtime, `mg*` | 327 584 | 15 % | oracle extérieur |
 
-**Le plafond de 512 octets tient**, lui, et il est net : au-delà, la moisson ne
-gagne rien, et l'y envoyer coûte trois quarts d'heure par millier de fonctions
-pour zéro. La fenêtre utile est donc `--mini 32 --maxi 512`.
+**Aucune fonction de plus de 512 octets ne sera gagnée par un traducteur.** m2c
+les amène à compiler et s'arrête là. C'est un fait de forme, non de volume :
+plus une fonction est longue, plus elle porte de décisions du compilateur, et
+il suffit qu'une seule diverge pour que les octets diffèrent.
 
-En dessous, tout a changé d'ordre de grandeur. Extrapolée sur ce qui reste :
+### Le chiffre qui décide du plan
 
-```
-+1 248 fonctions,  +103 900 octets
-1 847 / 7 840 fonctions = 23,6 %      des octets = 5,89 %
-```
+**657 fonctions compilent entre 85 et 100 %** — 87 236 octets de binaire, dont
+**5 708 octets seulement divergent réellement**. Cinq mille octets d'écart
+séparent le projet de quatre-vingt-sept mille octets acquis.
 
-contre les `+161 fonctions, +12 300 octets` que ce plan annonçait — **huit fois
-plus, sans que le binaire ait changé**. La différence est entièrement dans la
-normalisation.
+C'est là, et nulle part ailleurs, que se joue le gros du binaire. Le rendement
+de l'affinage **ne décroît pas avec la taille** : une décision de compilateur
+corrigée sur une fonction de 5 000 octets vaut 5 000 octets, et les mêmes
+décisions se répètent sur des milliers de sites. C'est la seule mécanique qui
+passe à l'échelle de deux mégaoctets.
 
-Cette projection est à prendre pour ce qu'elle est : les taux viennent d'une
-population qui mêle des fonctions fraîches et d'autres remises en file après un
-échec, donc plutôt plus difficiles que la moyenne. Elle sera revue quand la
-passe aura traversé le binaire entier.
+La moisson garde donc désormais le C++ de chaque quasi-succès sous
+`build/proches/`, et `make affinage` le reprend sans retraduire.
+`make affinage ARGS=--rendement` mesure ce que chaque idiome débloque, ce qui
+dit si en outiller un de plus vaut la peine.
 
-Restent hors fenêtre 756 fonctions de moins de 32 octets — le domaine du
-traducteur déterministe — et 146 de plus de 2 048, qui pèsent à elles seules
-532 516 octets.
+### La leçon de méthode
 
-### Le plateau était celui de l'outil, non de la méthode
-
-Une version de ce plan concluait : « c'est une passe finie ; les mêmes
-échoueront aux mêmes endroits ». C'était faux, et le diagnostic par cause l'a
-montré. Sur un témoin de soixante fonctions figé — même population, même
-échantillon, seule comparaison qui vaille —, la compilabilité est passée de
-**8 % à 33 %** en corrigeant sept défauts, dont aucun ne tenait à la difficulté
-du code :
-
-- trois octets de contrôle, un `` devenu retour arrière dans des expressions
-  régulières, qui annulaient le renommage anti-collision *en silence* ;
-- le nommage des registres, o32 dans le désassemblage contre EABI dans m2c ;
-- les conversions implicites que le C tolère et que le C++ refuse ;
-- les `?` que m2c laisse dans les déclarations ;
-- le retour `void` là où le mangling C++ n'encode aucun type de retour ;
-- les déclarations cumulées d'une même unité, qui se surchargeaient ;
-- les noms de structures inférées, qui doivent se chercher libres.
-
-**La leçon vaut au-delà de ces sept-là** : tant que la chaîne échoue sans dire
-pourquoi, on prend son outillage pour une propriété du binaire. `causes.py`
-répond à la question hors de `src/`, pendant qu'une moisson tourne.
-
-### Ce qu'elle laisse derrière elle
-
-Les fonctions qui compilent sans apparier sont le vivier de l'étape 2, et le
-moyen le moins cher d'enrichir le corpus d'idiomes. L'affinage automatique n'y
-a pour l'instant rien converti — trois idiomes contre une quinzaine de
-candidates —, ce qui confirme que le corpus, non le mécanisme, est ce qui
-manque.
-
----
+Tant que la chaîne échoue sans dire pourquoi, on prend son outillage pour une
+propriété du binaire. Trois des défauts les plus coûteux étaient des fautes de
+l'outil que rien ne signalait : un motif de substitution trop large qui amputait
+trois unités et faisait échouer 330 fonctions par ricochet ; une vérification
+annoncée mais jamais appelée, qui a laissé 546 gains faux ; une règle adoptant
+un type nommé incomplet, qui bloquait une meilleure règle. D'où les gardes :
+équilibre des accolades, image liée vérifiée, extrait de la ligne fautive.
 
 ## Étape 1 — Épuiser le traducteur déterministe
 
