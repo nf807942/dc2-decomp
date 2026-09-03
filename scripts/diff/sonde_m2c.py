@@ -99,7 +99,11 @@ def deja_declarees(unite: str) -> set[str]:
 
 # `int printf(const char *, ...);` — une fonction que l'unité voit déjà
 # déclarée, par elle-même ou par un en-tête qu'elle atteint.
-_DECLARE_FN = re.compile(r"^[^/#\n]*?\b(\w+)\s*\([^;()]*\)\s*;", re.M)
+# Un *appel* dans un corps de fonction d'en-tete — `f(x);` — ressemblait a une
+# declaration et faisait ecarter la notre : quatorze fonctions perdues sur
+# « undefined identifier ». Une declaration porte un type devant le nom, donc
+# au moins deux mots avant la parenthese.
+_DECLARE_FN = re.compile(r"^\s*[A-Za-z_]\w*(?:\s+[A-Za-z_]\w*)*\s+\**(\w+)\s*\([^;()]*\)\s*;", re.M)
 
 
 def deja_prototypees(unite: str) -> set[str]:
@@ -365,7 +369,14 @@ def _rend_pointeur(bloc: str, champ: str, cible: str) -> str | None:
     return motif.sub(r'\1struct %s *\2' % cible, bloc, count=1)
 
 
-def complete_structures(structs: list[str], corps: str) -> tuple[list[str], str]:
+def _marque(symbole: str) -> str:
+    """Un suffixe court et stable, propre a une fonction."""
+    import hashlib  # noqa: PLC0415
+    return "_" + hashlib.sha1(symbole.encode()).hexdigest()[:6]
+
+
+def complete_structures(structs: list[str], corps: str,
+                        marque: str = "") -> tuple[list[str], str]:
     """Donne un type aux pointeurs que le corps déréférence sans déclaration.
 
     C'est la moitié des échecs de compilation de la chaîne, mesurée par
@@ -398,7 +409,7 @@ def complete_structures(structs: list[str], corps: str) -> tuple[list[str], str]
                 # Ni locale ni parametre : le nom vit dans une structure
                 # inferee, que le corps dereference a son tour —
                 # `objet->unk0->unk10()`. On rend ce champ pointeur.
-                forge = "%s_champs" % variable
+                forge = "%s_champs%s" % (variable, marque)
                 for rang, bloc in enumerate(structs):
                     rendu = _rend_pointeur(bloc, variable, forge)
                     if rendu is not None:
@@ -406,7 +417,7 @@ def complete_structures(structs: list[str], corps: str) -> tuple[list[str], str]
                         neuves.append(_struct_par_offsets(forge, offsets, appeles))
                         break
                 continue
-            forge = "%s_champs" % variable
+            forge = "%s_champs%s" % (variable, marque)
             neuves.append(_struct_par_offsets(forge, offsets, appeles))
             corps = re.sub(r"^(\s+)%s(\s+)%s(\s*;\s*)$"
                            % (re.escape(valeur), re.escape(variable)),
@@ -420,7 +431,7 @@ def complete_structures(structs: list[str], corps: str) -> tuple[list[str], str]
         # Ni structure de m2c, ni type qui porte ces champs : on en bâtit une,
         # nommée d'après la variable pour que deux paramètres du même type de
         # base ne se disputent pas le nom.
-        forge = "%s_champs" % variable
+        forge = "%s_champs%s" % (variable, marque)
         neuves.append(_struct_par_offsets(forge, offsets, appeles))
         corps = re.sub(r"\b%s\s*\*\s*%s\b" % (re.escape(type_),
                                               re.escape(variable)),
@@ -565,7 +576,13 @@ def normalise(texte: str, symbole: str, vues: set[str],
         bloc = definition_atlas(nom)
         en_tete.append(bloc if bloc else "struct %s;" % nom)
 
-    structs, corps = complete_structures(structs, corps)
+    # **La forge porte la marque de sa fonction.** m2c reemploie `temp_v0`
+    # d'une fonction a l'autre, et la chaine cumule les fonctions d'une meme
+    # unite : deux `temp_v0_champs` de contenus differents ne peuvent pas
+    # coexister. Trente-cinq fonctions qui compilaient ont ete perdues sur
+    # « tag redefined » avant que la marque ne soit posee.
+    structs, corps = complete_structures(
+        structs, corps, marque=_marque(symbole))
     # MWCC, en C++, refuse la conversion implicite que le C tolere : c'est la
     # premiere cause d'echec de compilation de la chaine.
     corps = nettoie_locales(corps)
