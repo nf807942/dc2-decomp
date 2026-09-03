@@ -71,7 +71,7 @@ _DECLARE = re.compile(r"\b(?:class|struct)\s+(\w+)\s*(?::|\{)")
 _INCLUDE = re.compile(r'^#\s*include\s+"([^"]+)"', re.MULTILINE)
 
 
-def deja_vues(unite: str) -> set[str]:
+def deja_vues(unite: str, amont: str | None = None) -> set[str]:
     """Les types que cette unité voit déjà déclarés.
 
     La question porte sur ce que l'unité inclut, non sur le dépôt entier : un
@@ -79,10 +79,10 @@ def deja_vues(unite: str) -> set[str]:
     écarter la structure que m2c en donne la laisserait sans rien — c'est ce
     qui avait fait retomber à zéro la seule fonction qui appariait.
     """
-    return _parcourt(unite, _avec_champs)
+    return _parcourt(unite, _avec_champs, amont)
 
 
-def deja_declarees(unite: str) -> set[str]:
+def deja_declarees(unite: str, amont: str | None = None) -> set[str]:
     """Tout tag que cette unité voit, qu'il porte des champs ou non.
 
     `deja_vues` répond à « faut-il poser ce type ? » et écarte pour cela les
@@ -95,7 +95,7 @@ def deja_declarees(unite: str) -> set[str]:
     Mesuré sur les premières causes que la chaîne a enregistrées : 23 des 24
     échecs de compilation diagnostiqués portaient ce message.
     """
-    return _parcourt(unite, lambda texte: set(_DECLARE.findall(texte)))
+    return _parcourt(unite, lambda texte: set(_DECLARE.findall(texte)), amont)
 
 
 # `int printf(const char *, ...);` — une fonction que l'unité voit déjà
@@ -107,7 +107,7 @@ def deja_declarees(unite: str) -> set[str]:
 _DECLARE_FN = re.compile(r"^\s*[A-Za-z_]\w*(?:\s+[A-Za-z_]\w*)*\s+\**(\w+)\s*\([^;()]*\)\s*;", re.M)
 
 
-def deja_prototypees(unite: str) -> set[str]:
+def deja_prototypees(unite: str, amont: str | None = None) -> set[str]:
     """Les fonctions que cette unité voit déjà déclarées, en-têtes compris.
 
     `declarations_portees` ne lit que la source, et un appelé déclaré dans un
@@ -120,20 +120,30 @@ def deja_prototypees(unite: str) -> set[str]:
     dit « undefined identifier » et la boucle de complétion la rattrape au tour
     suivant.
     """
-    return _parcourt(unite, lambda texte: set(_DECLARE_FN.findall(texte)))
+    return _parcourt(unite, lambda texte: set(_DECLARE_FN.findall(texte)), amont)
 
 
-def _parcourt(unite: str, extrait) -> set[str]:
-    """Applique `extrait` à l'unité et aux en-têtes qu'elle atteint.
+def _parcourt(unite: str, extrait, amont: str | None = None) -> set[str]:
+    """Applique `extrait` au texte donné et aux en-têtes qu'il atteint.
 
     Le parcours est transitif : `cmap.cpp` n'inclut pas `gen/CMap.hpp`
     directement mais par un en-tête intermédiaire, et s'arrêter au premier rang
     laissait la collision passer.
+
+    **`amont` borne la question à ce qui précède le point de greffe.** La chaîne
+    pose ses `#include` au milieu du fichier, là où elle greffe : un en-tête
+    amené par un fragment situé plus bas ne rend pas son type visible ici. Lire
+    le fichier entier faisait tenir `mgCCamera` pour déclaré, et l'on renonçait
+    alors à combler le champ que MWCC ne sait pas lire — première cause d'échec
+    sur la tranche de 512 octets et plus.
     """
-    source = ROOT / "src" / (unite + ".cpp")
-    if not source.exists():
-        return set()
-    texte = source.read_text(encoding="utf-8", errors="replace")
+    if amont is not None:
+        texte = amont
+    else:
+        source = ROOT / "src" / (unite + ".cpp")
+        if not source.exists():
+            return set()
+        texte = source.read_text(encoding="utf-8", errors="replace")
     trouve, a_voir, vus = extrait(texte), list(_INCLUDE.findall(texte)), set()
     while a_voir:
         inclus = a_voir.pop()
@@ -686,10 +696,14 @@ def eprouve(symbole: str, unite: str, taille: int,
     avant = source.read_text(encoding="utf-8")
     originel = avant
 
-    rendu = normalise(texte, symbole, deja_vues(unite),
-                      deja_declarees(unite),
+    # Ce qui est visible au point de greffe, non dans le fichier entier :
+    # la chaine pose ses `#include` la ou elle greffe, et un en-tete amene
+    # par un fragment situe plus bas n'eclaire pas ce qui precede.
+    amont = avant.split(INCLUDE_ASM % (unite, symbole))[0]
+    rendu = normalise(texte, symbole, deja_vues(unite, amont),
+                      deja_declarees(unite, amont),
                       declarations_portees(avant),
-                      deja_prototypees(unite))
+                      deja_prototypees(unite, amont))
     if rendu is None:
         return {**verdict, "issue": "sortie illisible"}
     declarations, corps = rendu
