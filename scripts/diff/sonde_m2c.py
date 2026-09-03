@@ -524,6 +524,7 @@ def eprouve(symbole: str, unite: str, taille: int,
     objet = ROOT / "build" / "src" / (unite + ".o")
     ajoutees: list[str] = []
     vus_types: set[str] = set()
+    ellipses: set[str] = set()
     try:
         # Le compilateur dit ce qui manque, la table des symboles dit quoi
         # écrire, et l'on recommence. Cinq tours suffisent : chacun déclare
@@ -547,6 +548,33 @@ def eprouve(symbole: str, unite: str, taille: int,
             sortie = bati.stdout + bati.stderr
             if bati.returncode == 0:
                 break
+            # Deux fonctions d'une meme unite n'appellent pas toujours un
+            # appele de la meme facon : l'une lui passe ses arguments, l'autre
+            # les laisse dans les registres ou ils sont deja. Le nom
+            # `extern "C"` ne se surcharge pas, et la declaration adoptee ne
+            # peut donc convenir aux deux. `(...)` les accepte l'une et l'autre,
+            # et c'est mesure : les neuf declarations sans parametre de
+            # `text_002734D0` et le prototype typé de `SetStack__…` passes a
+            # `(...)`, l'unite rend toujours les octets du disque — un appel a
+            # deux arguments compris.
+            #
+            # La reserve tient a la promotion par defaut : sous `(...)`, un
+            # `float` deviendrait un `double` et la conversion se verrait. On
+            # n'y recourt donc qu'en reponse a un conflit constate, jamais par
+            # defaut : la forme typee que le mangling donne reste la premiere.
+            conflits = set(_ARITE.findall(sortie)) - ellipses
+            if conflits:
+                ellipses |= conflits
+                for appele in conflits:
+                    motif = re.compile(
+                        '^extern "C" ([^;(]*?)' + _MOT + re.escape(appele)
+                        + r'\s*\([^;]*\);$', re.M)
+                    remplacement = 'extern "C" ' + chr(92) + "1" + appele + "(...);"
+                    declarations = motif.sub(remplacement, declarations)
+                    ajoutees = [motif.sub(remplacement, d) for d in ajoutees]
+                    avant = motif.sub(remplacement, avant)
+                continue
+
             manquants = {nom for nom in _INCONNU.findall(sortie)}
             neuves = [d for d in (declaration(nom, declarations + corps)
                                   for nom in sorted(manquants))
@@ -612,7 +640,17 @@ def eprouve(symbole: str, unite: str, taille: int,
             objet.unlink()
 
 
+# La contre-oblique se pose par `chr(92)` : ecrite en clair, un correctif
+# mal echappe la transforme en l'octet 8, et le motif cherche alors un
+# retour arriere que rien ne porte — la substitution ne fait plus rien,
+# en silence. Le controle `outils corrompus` guette la meme faute.
+_MOT = chr(92) + 'b'
+
 _INCONNU = re.compile(r"undefined identifier '(\w+)'")
+
+# « function call 'f(int)' does not match 'f(void)' » — l'appele est le
+# meme, la facon de l'appeler differe d'une fonction de l'unite a l'autre.
+_ARITE = re.compile(r"function call '(\w+)\(")
 _OBJET = re.compile(r"^(\w+) = 0x[0-9A-Fa-f]+; // size:0x([0-9A-Fa-f]+)",
                     re.MULTILINE)
 _TAILLES: dict[str, int] | None = None

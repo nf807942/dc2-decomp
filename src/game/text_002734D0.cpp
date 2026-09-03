@@ -233,9 +233,25 @@ extern "C" s32 _SND_SE_ALL_STOP__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1)
     sndSeAllStop__Fi(GetStackInt__FP12RS_STACKDATA_00262DA0());
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _LOAD_BGM__FP12RS_STACKDATAi);
+extern "C" u32 EventScene;
+extern "C" u32 read_buffer;
+extern "C" s32 CheckLoadBGM__6CSceneFi(...);
+extern "C" s32 LoadBGM__6CSceneFiP1(...);
+extern "C" s32 _LOAD_BGM__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    s32 temp_v0;
+
+    temp_v0 = (s32) (GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
+    if (CheckLoadBGM__6CSceneFi(EventScene, temp_v0) == 0) {
+        return 0;
+    }
+    return LoadBGM__6CSceneFiP1(EventScene, temp_v0, read_buffer);
+}
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _PLAY_BGM__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _STOP_BGM__FP12RS_STACKDATAi);
+extern "C" s32 StopBGM__6CSceneFi(...);
+extern "C" s32 _STOP_BGM__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    StopBGM__6CSceneFi(EventScene, GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002734D0", CommandStreamOpenFromFPL__FiPcPc);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", CommandStreamOpen__FiPc);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", VpkFileNameFromVoiceNo__FPci);
@@ -253,13 +269,26 @@ extern "C" s32 _STREAM_STANDBY__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) 
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _STREAM_GET_STATUS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _GET_SYS_SND_ID__FP12RS_STACKDATAi);
 extern "C" u8 CSnd;
-extern "C" s32 SetStack__FP12RS_STACKDATAi_00262E70(RS_STACKDATA *, s32);
+extern "C" s32 SetStack__FP12RS_STACKDATAi_00262E70(...);
 extern "C" s32 StreamOpenState__6CSoundFv(void *);
 extern "C" s32 _STREAM_OPEN_CHECK__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     SetStack__FP12RS_STACKDATAi_00262E70(arg0, StreamOpenState__6CSoundFv(&CSnd));
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _LOAD_SE_ENV__FP12RS_STACKDATAi);
+extern "C" u32 EventScene;
+extern "C" u32 read_buffer;
+extern "C" s32 CheckLoadSeEnv__6CSceneFi(...);
+extern "C" s32 LoadSeEnv__6CSceneFiP1(...);
+extern "C" s32 _LOAD_SE_ENV__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    s32 temp_v0;
+
+    temp_v0 = (s32) (GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
+    if (CheckLoadSeEnv__6CSceneFi(EventScene, temp_v0) == 0) {
+        return 0;
+    }
+    LoadSeEnv__6CSceneFiP1(EventScene, temp_v0, read_buffer);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _PLAY_ENV_BGM__FP12RS_STACKDATAi);
 extern "C" u32 SystemSND_ID;
 extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(...);
@@ -274,10 +303,32 @@ extern "C" s32 _SYS_SE_PLAY__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     sndSePlay__FUiii(SystemSND_ID, temp_v0, 0);
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _INIT_SE_SRC__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _INIT_SE_ENV__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _INIT_SE_BAS__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _LOAD_SE_SRC__FP12RS_STACKDATAi);
+extern "C" s32 InitSeSrc__6CSceneFv(...);
+extern "C" s32 _INIT_SE_SRC__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    InitSeSrc__6CSceneFv(EventScene);
+    return 1;
+}
+extern "C" s32 InitSeEnv__6CSceneFv(...);
+extern "C" s32 _INIT_SE_ENV__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    InitSeEnv__6CSceneFv(EventScene);
+    return 1;
+}
+extern "C" s32 InitSeBas__6CSceneFv(...);
+extern "C" s32 _INIT_SE_BAS__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    InitSeBas__6CSceneFv(EventScene);
+    return 1;
+}
+extern "C" s32 CheckLoadSeSrc__6CSceneFi(...);
+extern "C" s32 LoadSeSrc__6CSceneFiP1(...);
+extern "C" s32 _LOAD_SE_SRC__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    s32 temp_v0;
+
+    temp_v0 = (s32) (GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
+    if (CheckLoadSeSrc__6CSceneFi(EventScene, temp_v0) == 0) {
+        return 0;
+    }
+    return LoadSeSrc__6CSceneFiP1(EventScene, temp_v0, read_buffer);
+}
 s32 _LOAD_SE_FOOT(RS_STACKDATA *stack, int argc) {
     return 0;
 }
@@ -287,7 +338,17 @@ s32 _LOAD_SE_DOOR(RS_STACKDATA *stack, int argc) {
 s32 _LOAD_SE_BOX(RS_STACKDATA *stack, int argc) {
     return 0;
 }
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _LOAD_SE_BATTLE__FP12RS_STACKDATAi);
+extern "C" s32 CheckLoadSeBattle__6CSceneFi(...);
+extern "C" s32 LoadSeBattle__6CSceneFiP1(...);
+extern "C" s32 _LOAD_SE_BATTLE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    s32 temp_v0;
+
+    temp_v0 = (s32) (GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
+    if (CheckLoadSeBattle__6CSceneFi(EventScene, temp_v0) == 0) {
+        return 0;
+    }
+    return LoadSeBattle__6CSceneFiP1(EventScene, temp_v0, read_buffer);
+}
 extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(...);
 extern "C" void sndDeletePort__Fi(s32 arg0);
 extern "C" s32 _SND_DELETE_PORT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
@@ -296,19 +357,37 @@ extern "C" s32 _SND_DELETE_PORT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1)
 }
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _FADE_IN_BGM__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _FADE_OUT_BGM__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _STOP_ENV_BGM__FP12RS_STACKDATAi);
+extern "C" s32 StopEnvBGM__6CSceneFv(...);
+extern "C" s32 _STOP_ENV_BGM__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    StopEnvBGM__6CSceneFv(EventScene);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _SET_BGM_VOL__FP12RS_STACKDATAi);
 s32 _SND_SET_REVERB(RS_STACKDATA *stack, int argc) {
     return 0;
 }
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _SND_SET_ENV_VOL__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _STREAM_SILENT_CHECK__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _AUTO_CHANGE_ENV__FP12RS_STACKDATAi);
+extern "C" s32 AutoChangeEnvBGM__6CSceneFi(...);
+extern "C" s32 _AUTO_CHANGE_ENV__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    AutoChangeEnvBGM__6CSceneFi(EventScene, GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _BGM_LOAD_CANCEL__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _SOUND_LOAD_CANCEL__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _BGM_LOAD_ENABLE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _SOUND_LOAD_ENABLE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _LOAD_SE_BASE__FP12RS_STACKDATAi);
+extern "C" s32 CheckLoadSeBase__6CSceneFi(...);
+extern "C" s32 LoadSeBase__6CSceneFiP1(...);
+extern "C" s32 _LOAD_SE_BASE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    s32 temp_v0;
+
+    temp_v0 = (s32) (GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
+    if (CheckLoadSeBase__6CSceneFi(EventScene, temp_v0) == 0) {
+        return 0;
+    }
+    return LoadSeBase__6CSceneFiP1(EventScene, temp_v0, read_buffer);
+}
 extern "C" u32 EventScene;
 extern "C" u32 read_buffer;
 extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(...);
@@ -331,15 +410,31 @@ extern "C" s32 _SND_IN_REVERB__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     SndInReverb__6CSoundFb(&CSnd, GetStackInt__FP12RS_STACKDATA_00262DA0() != 0);
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _SND_STOP_SRC__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _SND_PAUSE_BGM__FP12RS_STACKDATAi);
+extern "C" s32 StopSeSrc__6CSceneFv(...);
+extern "C" s32 _SND_STOP_SRC__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    StopSeSrc__6CSceneFv(EventScene);
+    return 1;
+}
+extern "C" s32 PauseBGM__6CSceneFv(...);
+extern "C" s32 _SND_PAUSE_BGM__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    PauseBGM__6CSceneFv(EventScene);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _STREAM_OPEN3__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _GET_ACTIVE_BGM_STATUS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _SET_ACTIVE_BGM_STATUS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _GET_BGM_STATUS_NOW_NO__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _GET_SE_STATUS__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _SE_ALL_STOP__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _SOUND_ALL_STOP__FP12RS_STACKDATAi);
+extern "C" s32 SeAllStop__6CSceneFv(...);
+extern "C" s32 _SE_ALL_STOP__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    SeAllStop__6CSceneFv(EventScene);
+    return 1;
+}
+extern "C" s32 SoundAllStop__6CSceneFv(...);
+extern "C" s32 _SOUND_ALL_STOP__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    SoundAllStop__6CSceneFv(EventScene);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _BGM_PLAY_CANCEL__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _BGM_PLAY_ENABLE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _GET_DEF_BGM_NO__FP12RS_STACKDATAi);
