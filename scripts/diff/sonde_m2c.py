@@ -376,6 +376,47 @@ def _marque(symbole: str) -> str:
     return "_" + hashlib.sha1(symbole.encode()).hexdigest()[:6]
 
 
+def remplace_champs_inconnus(bloc: str, connus: set[str]) -> str:
+    """Rend en remplissage un champ dont le type n'existe pas.
+
+    m2c infère parfois `/* 0x1C0 */ CCameraPas unk1C0;` — un champ **par
+    valeur** d'une classe que rien ne déclare. Une déclaration en avant ne
+    suffit pas : un champ par valeur réclame un type complet, et MWCC répond
+    « declaration syntax error » qui perd la structure entière, donc la
+    fonction.
+
+    L'offset du champ suivant donne sa taille, et du remplissage de la bonne
+    taille vaut mieux qu'un type absent : la disposition tient, et le corps
+    qui ne touchait pas ce champ compile. C'est la deuxième cause d'échec sur
+    la tranche de 512 octets et plus, là où vivent 61 % des octets restants.
+    """
+    champs = list(_CHAMP_M2C.finditer(bloc))
+    if not champs:
+        return bloc
+    rendu, dernier = [], 0
+    for rang, marque in enumerate(champs):
+        offset, type_, nom, tableau = marque.groups()
+        propre = type_.strip()
+        if ('*' in propre or propre.split()[-1] in connus
+                or propre.split()[-1] in _BASE):
+            continue
+        if rang + 1 < len(champs):
+            suivant = int(champs[rang + 1].group(1), 16)
+        else:
+            taille = re.search(r'size >= 0x([0-9A-Fa-f]+)', bloc)
+            if taille is None:
+                continue
+            suivant = int(taille.group(1), 16)
+        large = suivant - int(offset, 16)
+        if large <= 0:
+            continue
+        rendu.append((marque.start(), marque.end(),
+                      '/* 0x%s */ char %s[0x%X];' % (offset, nom, large)))
+    for debut, fin, texte in reversed(rendu):
+        bloc = bloc[:debut] + texte + bloc[fin:]
+    return bloc
+
+
 def complete_structures(structs: list[str], corps: str,
                         marque: str = "") -> tuple[list[str], str]:
     """Donne un type aux pointeurs que le corps déréférence sans déclaration.
@@ -471,6 +512,10 @@ def normalise(texte: str, symbole: str, vues: set[str],
                                                                   "char"),
                                             m.group(3)),
                       bloc)
+        # Un champ par valeur d'un type absent perd la structure entiere :
+        # son offset et celui du suivant en donnent la taille.
+        bloc = remplace_champs_inconnus(
+            bloc, vues | (declarees or set()))
         nom = _NOM_STRUCT.search(bloc).group(1)
         occupes = vues if declarees is None else declarees
         if nom in occupes:
@@ -658,9 +703,17 @@ def eprouve(symbole: str, unite: str, taille: int,
     ellipses: set[str] = set()
     try:
         # Le compilateur dit ce qui manque, la table des symboles dit quoi
-        # écrire, et l'on recommence. Cinq tours suffisent : chacun déclare
-        # tout ce que le tour précédent a signalé.
-        for _tour in range(5):
+        # écrire, et l'on recommence : chaque tour déclare ce que le
+        # précédent a signalé.
+        #
+        # **Cinq tours ne suffisent pas aux grosses fonctions.** MWCC ne nomme
+        # qu'un identifiant inconnu à la fois quand les suivants deviennent des
+        # erreurs de syntaxe anonymes ; une fonction qui touche trente types en
+        # réclame donc trente tours. Mesuré sur la tranche de 512 octets et
+        # plus : 9 échecs sur 60 s'arrêtaient sur « déclarations sans fin »,
+        # non sur un obstacle réel. Un tour ne coûte qu'une compilation d'unité,
+        # et la boucle s'arrête d'elle-même dès qu'un tour n'apprend rien.
+        for _tour in range(24):
             # Les déclarations trouvées en chemin passent devant : un type que
             # m2c emploie dans une structure inférée doit exister avant elle.
             # La source porte deja les declarations des fonctions que
