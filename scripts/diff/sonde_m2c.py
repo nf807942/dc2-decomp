@@ -277,7 +277,15 @@ def _type_valeur(variable: str, corps: str) -> str | None:
     return trouve.group(1) if trouve else None
 
 
-def _struct_par_offsets(nom: str, offsets: dict[int, str]) -> str:
+# `objet->unk0->unk10()` : le champ n'est pas une donnee mais une adresse de
+# fonction. MWCC repond « call of non-function » tant qu'on le declare `s32`,
+# et un pointeur de fonction fait quatre octets comme lui — la disposition
+# tient.
+_APPELE = re.compile(r"->\s*(unk[0-9A-Fa-f]+)\s*\(")
+
+
+def _struct_par_offsets(nom: str, offsets: dict[int, str],
+                        appeles: set[str] | None = None) -> str:
     """Une structure bâtie sur les seuls décalages que le corps réclame.
 
     m2c écrit `arg1->unk74` sans avoir inféré de structure pour `arg1` : le
@@ -305,9 +313,14 @@ def _struct_par_offsets(nom: str, offsets: dict[int, str]) -> str:
         largeur = 4
         while largeur > 1 and (decalage % largeur or place < largeur):
             largeur //= 2
-        lignes.append("    /* 0x%X */ %s %s;"
-                      % (decalage, {1: "s8", 2: "s16", 4: "s32"}[largeur],
-                         offsets[decalage]))
+        nom_champ = offsets[decalage]
+        if appeles and nom_champ in appeles:
+            lignes.append("    /* 0x%X */ s32 (*%s)();" % (decalage, nom_champ))
+            largeur = 4
+        else:
+            lignes.append("    /* 0x%X */ %s %s;"
+                          % (decalage, {1: "s8", 2: "s16", 4: "s32"}[largeur],
+                             nom_champ))
         curseur = decalage + largeur
     return "struct %s {\n%s\n};" % (nom, "\n".join(lignes))
 
@@ -360,6 +373,7 @@ def complete_structures(structs: list[str], corps: str) -> tuple[list[str], str]
     structure existe sans le champ, 24 % d'« expression syntax error » quand
     elle n'existe pas du tout. Le même défaut, vu des deux côtés.
     """
+    appeles = set(_APPELE.findall(corps))
     demandes: dict[str, dict[int, str]] = {}
     for variable, champ in (_FLECHE.findall(corps)
                             + _FLECHE_CHAINEE.findall(corps)):
@@ -389,11 +403,11 @@ def complete_structures(structs: list[str], corps: str) -> tuple[list[str], str]
                     rendu = _rend_pointeur(bloc, variable, forge)
                     if rendu is not None:
                         structs[rang] = rendu
-                        neuves.append(_struct_par_offsets(forge, offsets))
+                        neuves.append(_struct_par_offsets(forge, offsets, appeles))
                         break
                 continue
             forge = "%s_champs" % variable
-            neuves.append(_struct_par_offsets(forge, offsets))
+            neuves.append(_struct_par_offsets(forge, offsets, appeles))
             corps = re.sub(r"^(\s+)%s(\s+)%s(\s*;\s*)$"
                            % (re.escape(valeur), re.escape(variable)),
                            r"\1struct %s *%s\3" % (forge, variable),
@@ -407,7 +421,7 @@ def complete_structures(structs: list[str], corps: str) -> tuple[list[str], str]
         # nommée d'après la variable pour que deux paramètres du même type de
         # base ne se disputent pas le nom.
         forge = "%s_champs" % variable
-        neuves.append(_struct_par_offsets(forge, offsets))
+        neuves.append(_struct_par_offsets(forge, offsets, appeles))
         corps = re.sub(r"\b%s\s*\*\s*%s\b" % (re.escape(type_),
                                               re.escape(variable)),
                        "struct %s *%s" % (forge, variable), corps)
