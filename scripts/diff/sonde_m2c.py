@@ -535,6 +535,7 @@ def eprouve(symbole: str, unite: str, taille: int,
 
     source = ROOT / "src" / (unite + ".cpp")
     avant = source.read_text(encoding="utf-8")
+    originel = avant
 
     rendu = normalise(texte, symbole, deja_vues(unite),
                       deja_declarees(unite),
@@ -670,9 +671,16 @@ def eprouve(symbole: str, unite: str, taille: int,
         # précédentes. Mesurer isolément puis appliquer en bloc laissait les
         # déclarations se télescoper, et un fragment figé vieillissait dès que
         # le contexte changeait.
-        if not (garde and verdict.get("issue") == "mesurée"
+        # L'elargissement a `(...)` reecrit `avant` : il porte sur le reste
+        # de l'unite, non sur le seul fragment. Rendre cette version-la quand
+        # la fonction echoue laisserait l'unite modifiee sans contrepartie —
+        # et deux elargissements successifs y ont fait echouer la compilation
+        # entiere. Une source ne se garde modifiee que si elle a payé.
+        if (garde and verdict.get("issue") == "mesurée"
                 and (verdict.get("part") or 0) >= 99.999):
-            source.write_text(avant, encoding="utf-8")
+            pass
+        else:
+            source.write_text(originel, encoding="utf-8")
 
         # L objet part avec la source. Un SIGTERM tombe le plus souvent
         # pendant `make`, qui laisse alors un `.o` tronque : `make` le
