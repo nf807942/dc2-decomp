@@ -24,7 +24,12 @@ void InitLockCharaCtrl(void) {
     LockChara = 0;
 }
 INCLUDE_ASM("nonmatchings/game/cameractrlparam", LockCharaCtrl__Fv);
-INCLUDE_ASM("nonmatchings/game/cameractrlparam", UnLockCharaCtrl__Fv);
+extern "C" void UnLockCharaCtrl__Fv(void) {
+    LockChara -= 1;
+    if (LockChara < 0) {
+        LockChara = 0;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cameractrlparam", IsEditMode__Fv);
 void InitEditModeChg(void) {
     EditModeChgFlag = 0;
@@ -35,6 +40,55 @@ INCLUDE_ASM("nonmatchings/game/cameractrlparam", NowEditModeChg__Fv);
 INCLUDE_ASM("nonmatchings/game/cameractrlparam", EditModeChg__Fi);
 INCLUDE_ASM("nonmatchings/game/cameractrlparam", EditModeChgStep__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/cameractrlparam", SetDataPacket__Fi);
-INCLUDE_ASM("nonmatchings/game/cameractrlparam", PreExitLoop__FP6CScene);
+#include "sphida.hpp"
+extern "C" s32 BreakReadBG__Fv(void);
+extern "C" s32 BurnEditParts__Fv(void);
+extern "C" s32 EdEventTermination__Fv(void);
+extern "C" s32 EditDataSave__Fv(void);
+extern "C" s32 InitBGM__6CSceneFv(void *);
+extern "C" s32 ResetNpcTalkMes__Fv(void);
+extern "C" s32 SeAllStop__6CSceneFv(void *);
+extern "C" s32 StopBGM__6CSceneFi(void *, s32);
+extern "C" s32 sgBreakSubGame__Fv(void);
+extern "C" s32 sndStopVoice__Fi(s32);
+extern "C" void PreExitLoop__FP6CScene(CScene *arg0) {
+    BurnEditParts__Fv();
+    EditDataSave__Fv();
+    sgBreakSubGame__Fv();
+    StopBGM__6CSceneFi(arg0, 0);
+    InitBGM__6CSceneFv(arg0);
+    SeAllStop__6CSceneFv(arg0);
+    BreakReadBG__Fv();
+    sndStopVoice__Fi(1);
+    ResetNpcTalkMes__Fv();
+    EdEventTermination__Fv();
+}
 INCLUDE_ASM("nonmatchings/game/cameractrlparam", EditInit__F13INIT_LOOP_ARG);
-INCLUDE_ASM("nonmatchings/game/cameractrlparam", __as__15CameraCtrlParamFRC15CameraCtrlParam);
+struct inferred;
+typedef struct CameraCtrlParam {
+    /* 0x00 */ f32 unk0;                            /* inferred */
+    /* 0x04 */ f32 unk4;                            /* inferred */
+    /* 0x08 */ f32 unk8;                            /* inferred */
+    /* 0x0C */ f32 unkC;                            /* inferred */
+    /* 0x10 */ f32 unk10;                           /* inferred */
+    /* 0x14 */ f32 unk14;                           /* inferred */
+    /* 0x18 */ f32 unk18;                           /* inferred */
+    /* 0x1C */ f32 unk1C;                           /* inferred */
+    /* 0x20 */ f32 unk20;                           /* inferred */
+    /* 0x24 */ f32 unk24;                           /* inferred */
+    /* 0x28 */ s32 unk28;                           /* inferred */
+} CameraCtrlParam;                                  /* size >= 0x2C */
+extern "C" CameraCtrlParam *__as__15CameraCtrlParamFRC15CameraCtrlParam(CameraCtrlParam *objet, CameraCtrlParam *arg0) {
+    objet->unk0 = arg0->unk0;
+    objet->unk4 = arg0->unk4;
+    objet->unk8 = arg0->unk8;
+    objet->unkC = arg0->unkC;
+    objet->unk10 = arg0->unk10;
+    objet->unk14 = arg0->unk14;
+    objet->unk18 = arg0->unk18;
+    objet->unk1C = arg0->unk1C;
+    objet->unk20 = arg0->unk20;
+    objet->unk24 = arg0->unk24;
+    objet->unk28 = arg0->unk28;
+    return objet;
+}

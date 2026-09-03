@@ -107,7 +107,20 @@ extern "C" void Step__13CHealingPointFv(CHealingPoint_infere *objet) {
         }
     }
 }
-INCLUDE_ASM("nonmatchings/game/cminimapsymbol", _ROOM_FIXED__FP9SPI_STACKi);
+typedef struct nowPriset_pointe {
+    char pad0[12];
+    s32 unkC;
+} nowPriset_pointe;
+extern "C" nowPriset_pointe *nowPriset;
+struct SPI_STACK {
+    s32 field_0;
+    s32 field_4;
+};
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(SPI_STACK *);
+extern "C" s32 _ROOM_FIXED__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    nowPriset->unkC = spiGetStackInt__FP9SPI_STACK(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", _GRID_SIZE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", _ROOM_ID__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", _ROOM_SIZE__FP9SPI_STACKi);

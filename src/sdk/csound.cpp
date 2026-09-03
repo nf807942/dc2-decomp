@@ -101,7 +101,35 @@ INCLUDE_ASM("nonmatchings/sdk/csound", StreamGetState__6CSoundFi);
 INCLUDE_ASM("nonmatchings/sdk/csound", StreamGetLevel__6CSoundFi);
 INCLUDE_ASM("nonmatchings/sdk/csound", StreamStandBy__6CSoundFi);
 INCLUDE_ASM("nonmatchings/sdk/csound", TransBdState__6CSoundFi);
-INCLUDE_ASM("nonmatchings/sdk/csound", ezMidiInit__Fv);
+extern "C" u8 _33_00369320[23];
+typedef struct gCd_champs {
+    char pad0[36];
+    s32 unk24;
+} gCd_champs;
+extern "C" gCd_champs gCd;
+extern "C" s32 sceSifBindRpc(...);
+extern "C" s32 sceSifInitRpc(...);
+extern "C" s32 ezMidiInit__Fv(void) {
+    s32 temp_v0;
+    s32 var_v1;
+
+    sceSifInitRpc(0);
+loop_1:
+    if (sceSifBindRpc(&gCd, 0x12346, 0) < 0) {
+        printf(&_33_00369320);
+loop_3:
+        goto loop_3;
+    }
+    var_v1 = 0x2710;
+    do {
+        temp_v0 = var_v1;
+        var_v1 -= 1;
+    } while (temp_v0 != 0);
+    if (gCd.unk24 != 0) {
+        return 1;
+    }
+    goto loop_1;
+}
 INCLUDE_ASM("nonmatchings/sdk/csound", ezMidi__Fii);
 INCLUDE_ASM("nonmatchings/sdk/csound", ezTransToIOP2__FPvPvi);
 INCLUDE_ASM("nonmatchings/sdk/csound", BigToLittle__FPvPvi);

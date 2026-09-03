@@ -301,7 +301,29 @@ INCLUDE_ASM("nonmatchings/game/cpullitem", IsReversVec__11CColPrimManFP8CColPrim
 INCLUDE_ASM("nonmatchings/game/cpullitem", Step__11CColPrimManFv);
 INCLUDE_ASM("nonmatchings/game/cpullitem", Initialize__11CColPrimManFP6CScene);
 INCLUDE_ASM("nonmatchings/game/cpullitem", dngGetDebugInfo__Fv);
-INCLUDE_ASM("nonmatchings/game/cpullitem", dngDebugInit__Fv);
+extern "C" u8 dbFont[184];
+typedef struct dbinfo_champs {
+    s16 unk0;
+    s16 unk2;
+    char pad4[12];
+    s32 unk10;
+    s32 unk14;
+    s32 unk18;
+    s32 unk1C;
+} dbinfo_champs;
+extern "C" dbinfo_champs dbinfo;
+extern "C" s32 Init__5CFontFv(void *);
+extern "C" s32 SetClearance__5CFontFii(void *, s32, s32);
+extern "C" void dngDebugInit__Fv(void) {
+    dbinfo.unk0 = 0;
+    dbinfo.unk2 = 0;
+    dbinfo.unk10 = 1;
+    dbinfo.unk14 = 0;
+    dbinfo.unk18 = 0;
+    dbinfo.unk1C = 0;
+    Init__5CFontFv(&dbFont);
+    SetClearance__5CFontFii(&dbFont, 0x14, 0x14);
+}
 INCLUDE_ASM("nonmatchings/game/cpullitem", dngDebugStart__Fv);
 INCLUDE_ASM("nonmatchings/game/cpullitem", dngDebugDraw__Fv);
 INCLUDE_ASM("nonmatchings/game/cpullitem", dngDebugExit__Fv);
@@ -314,7 +336,22 @@ void CTreasureBox::Initialize(void) {
 INCLUDE_ASM("nonmatchings/game/cpullitem", DBGCMD_ReloadEnemy__Fii);
 INCLUDE_ASM("nonmatchings/game/cpullitem", DrawSystemParamInfo__Fv);
 INCLUDE_ASM("nonmatchings/game/cpullitem", DrawSystemParamInfo2__Fv);
-INCLUDE_ASM("nonmatchings/game/cpullitem", DrawDebugWindow__Fv);
+typedef struct command_int_champs {
+    char pad0[48];
+    s32 unk30;
+    char pad34[40];
+} command_int_champs;
+extern "C" command_int_champs command_int;
+extern "C" s32 DrawSystemParamInfo2__Fv(void);
+extern "C" s32 DrawSystemParamInfo__Fv(void);
+extern "C" void DrawDebugWindow__Fv(void) {
+    if (command_int.unk30 == 2) {
+        DrawSystemParamInfo__Fv();
+    }
+    if (command_int.unk30 == 3) {
+        DrawSystemParamInfo2__Fv();
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cpullitem", PrintV__FiiiP10mgCTexture9mgRect_i_iiiP7SP_RGBA);
 INCLUDE_ASM("nonmatchings/game/cpullitem", DrawDrumCounter__Fiii);
 INCLUDE_ASM("nonmatchings/game/cpullitem", DrawActiveItemCursor__Fiif);

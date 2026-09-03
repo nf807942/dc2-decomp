@@ -450,7 +450,18 @@ void CCameraPas::Run(void) {
 }
 INCLUDE_ASM("nonmatchings/game/c3dspline", Step__10CCameraPasFPfPf);
 INCLUDE_ASM("nonmatchings/game/c3dspline", CheckEnd__10CCameraPasFv);
-INCLUDE_ASM("nonmatchings/game/c3dspline", __ct__9CCharaPasFv);
+struct inferred;
+typedef struct CCharaPas_infere {
+    /* 0x000 */ char pad0[0x108];
+    /* 0x108 */ C3DSpline unk108;                   /* inferred */
+    /* 0x108 */ char pad108[1];
+} CCharaPas_infere;                                        /* size >= 0x109 */
+extern "C" s32 Initialize__9CCharaPasFv(void *);
+extern "C" CCharaPas_infere *__ct__9CCharaPasFv(CCharaPas_infere *objet) {
+    __ct__9C3DSplineFv(&objet->unk108);
+    Initialize__9CCharaPasFv(objet);
+    return objet;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", Initialize__9CCharaPasFv);
 INCLUDE_ASM("nonmatchings/game/c3dspline", AddCharaPas__9CCharaPasFPf);
 INCLUDE_ASM("nonmatchings/game/c3dspline", Setup__9CCharaPasFv);

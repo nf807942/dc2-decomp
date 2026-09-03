@@ -199,7 +199,102 @@ INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_FCAMERA_DIST__FP12RS_STACKDA
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_REF_ANGLE__FP12RS_STACKDATAi_0026C9B0);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _DNG_SET_STAGE_ID__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _DNG_GET_STAGE_ID__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_CAMERA_CTRL__FP12RS_STACKDATAi);
+typedef struct EventScene_pointe {
+    char pad0[11860];
+    s32 unk2E54;
+} EventScene_pointe;
+extern "C" EventScene_pointe *EventScene;
+extern "C" s32 GetCamera__6CSceneFi(void *, s32);
+struct CCameraControl {
+    f32 field_0;
+    char pad_4[0x70];
+    f32 field_74;
+    f32 field_78;
+    f32 field_7C;
+    char pad_80[0x4];
+    f32 field_84;
+    f32 field_88;
+    f32 field_8C;
+    char pad_90[0x24];
+    f32 field_B4;
+    f32 field_B8;
+    f32 field_BC;
+    char pad_C0[0x10];
+    s32 field_D0;
+    char pad_D4[0x10];
+    f32 field_E4;
+    f32 field_E8;
+    f32 field_EC;
+    char pad_F0[0xB8];
+    f32 field_1A8;
+    f32 field_1AC;
+    f32 field_1B0;
+    f32 field_1B4;
+    f32 field_1B8;
+    f32 field_1BC;
+    f32 field_1C0;
+    f32 field_1C4;
+    f32 field_1C8;
+    f32 field_1CC;
+    char pad_1D0[0x4];
+    f32 field_1D4;
+    f32 field_1D8;
+    f32 field_1DC;
+};
+struct inferred;
+struct mgCCameraFollow {
+    char pad_0[0x48];
+    f32 field_48;
+    char pad_4C[0x4];
+    f32 field_50;
+    char pad_54[0x8];
+    s32 field_5C;
+    char pad_60[0x10];
+    f32 field_70;
+    f32 field_74;
+    f32 field_78;
+    f32 field_7C;
+    f32 field_80;
+    f32 field_84;
+    f32 field_88;
+    f32 field_8C;
+    f32 field_90;
+    f32 field_94;
+    f32 field_98;
+    f32 field_9C;
+    s32 field_A0;
+    char pad_A4[0xC];
+    f32 field_B0;
+    f32 field_B4;
+    f32 field_B8;
+    f32 field_BC;
+    char pad_C0[0x4];
+    s32 field_C4;
+};
+typedef struct CScene {
+    /* 0x0000 */ char pad0[0x2E54];
+    /* 0x2E54 */ s32 unk2E54;                       /* inferred */
+} CScene;                                           /* size >= 0x2E58 */
+extern "C" s32 ControlOff__14CCameraControlFv(void *);
+extern "C" s32 ControlOn__14CCameraControlFv(void *);
+extern "C" s32 FollowOff__15mgCCameraFollowFv(void *);
+extern "C" s32 FollowOn__15mgCCameraFollowFv(void *);
+extern "C" s32 _SET_CAMERA_CTRL__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    mgCCameraFollow *temp_v0;
+
+    temp_v0 = (mgCCameraFollow *) (GetCamera__6CSceneFi(EventScene, EventScene->unk2E54));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    if (GetStackInt__FP12RS_STACKDATA_00262DA0(arg0) != 0) {
+        FollowOn__15mgCCameraFollowFv(temp_v0);
+        ControlOn__14CCameraControlFv((CCameraControl *) temp_v0);
+    } else {
+        FollowOff__15mgCCameraFollowFv(temp_v0);
+        ControlOff__14CCameraControlFv((CCameraControl *) temp_v0);
+    }
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_FCAMERA_ANGLE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_FCAMERA_HEIGHT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_FCAMERA_DIST__FP12RS_STACKDATAi);

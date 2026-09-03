@@ -17,10 +17,70 @@ extern s32 Select;
 
 
 INCLUDE_ASM("nonmatchings/game/text_001A7EA0", LadderControl__FP6CSceneP11CPadControl);
-INCLUDE_ASM("nonmatchings/game/text_001A7EA0", EditStepChara__FP6CScene);
-INCLUDE_ASM("nonmatchings/game/text_001A7EA0", EditDrawShadowChara__FP6CScene);
-INCLUDE_ASM("nonmatchings/game/text_001A7EA0", EditDrawChara__FP6CScene);
-INCLUDE_ASM("nonmatchings/game/text_001A7EA0", EditDrawEffectChara__FP6CScene);
+struct inferred;
+typedef struct CScene {
+    /* 0x0000 */ char pad0[0x2E50];
+    /* 0x2E50 */ s32 unk2E50;                       /* inferred */
+} CScene;                                           /* size >= 0x2E54 */
+extern "C" s32 StepChara__6CSceneFi(void *, s32);
+extern "C" void EditStepChara__FP6CScene(CScene *arg0) {
+    s32 var_s0;
+
+    StepChara__6CSceneFi(arg0, arg0->unk2E50);
+    var_s0 = 8;
+    do {
+        StepChara__6CSceneFi(arg0, var_s0);
+        var_s0 += 1;
+    } while (var_s0 < 0x40);
+    StepChara__6CSceneFi(arg0, 0x78);
+    StepChara__6CSceneFi(arg0, 0x79);
+    StepChara__6CSceneFi(arg0, 0x7A);
+    StepChara__6CSceneFi(arg0, 0x7B);
+}
+typedef struct CScene_infere2 {
+    /* 0x0000 */ char pad0[0x2E50];
+    /* 0x2E50 */ s32 unk2E50;                       /* inferred */
+} CScene_infere2;                                           /* size >= 0x2E54 */
+extern "C" s32 DrawCharaShadow__6CSceneFi(void *, s32);
+extern "C" void EditDrawShadowChara__FP6CScene(CScene_infere2 *arg0) {
+    s32 var_s0;
+
+    DrawCharaShadow__6CSceneFi(arg0, arg0->unk2E50);
+    var_s0 = 8;
+    do {
+        DrawCharaShadow__6CSceneFi(arg0, var_s0);
+        var_s0 += 1;
+    } while (var_s0 < 0x40);
+}
+typedef struct CScene_infere {
+    /* 0x0000 */ char pad0[0x2E50];
+    /* 0x2E50 */ s32 unk2E50;                       /* inferred */
+} CScene_infere;                                           /* size >= 0x2E54 */
+extern "C" s32 DrawChara__6CSceneFii(void *, s32, s32);
+extern "C" s32 GetType__6CSceneFii(void *, s32, s32);
+extern "C" void EditDrawChara__FP6CScene(CScene_infere *arg0) {
+    s32 var_s0;
+
+    DrawChara__6CSceneFii(arg0, arg0->unk2E50, 0);
+    var_s0 = 8;
+    do {
+        if (GetType__6CSceneFii(arg0, 1, var_s0) != 4) {
+            DrawChara__6CSceneFii(arg0, var_s0, 1);
+        }
+        var_s0 += 1;
+    } while (var_s0 < 0x40);
+}
+extern "C" void EditDrawEffectChara__FP6CScene(CScene *arg0) {
+    s32 var_s0;
+
+    var_s0 = 8;
+    do {
+        if (GetType__6CSceneFii(arg0, 1, var_s0) == 4) {
+            DrawChara__6CSceneFii(arg0, var_s0, 2);
+        }
+        var_s0 += 1;
+    } while (var_s0 < 0x40);
+}
 void EditDebugInit(void) {
     EditDebugFlag = 0;
     Select = 0;

@@ -47,7 +47,28 @@ extern "C" void QuestRequestClear__Fii(s32 arg0, s32 arg1) {
         QuestClear__10CQuestDataFi(temp_v0, arg0);
     }
 }
-INCLUDE_ASM("nonmatchings/game/crandom", GetQuestRequestStatus__Fi);
+extern "C" s32 GetPlayQuestData__10CQuestDataFi(void *, s32);
+struct temp_v0_champs {
+    /* 0x0 */ s8 unk0;
+    /* 0x1 */ s8 unk1;
+};
+extern "C" s32 GetQuestRequestStatus__Fi(s32 arg0) {
+    CQuestData *temp_v0_2;
+    struct temp_v0_champs *temp_v0;
+
+    temp_v0_2 = (CQuestData *) (GetQuestData__Fv());
+    if (temp_v0_2 == NULL) {
+        return -1;
+    }
+    temp_v0 = (struct temp_v0_champs *) (GetPlayQuestData__10CQuestDataFi(temp_v0_2, arg0));
+    if (temp_v0 == NULL) {
+        return -1;
+    }
+    if (temp_v0->unk1 != 0) {
+        return 2;
+    }
+    return temp_v0->unk0 != 0;
+}
 INCLUDE_ASM("nonmatchings/game/crandom", CountKill__12CMonsterBookFii);
 INCLUDE_ASM("nonmatchings/game/crandom", FutureMapSelect__Fv);
 extern "C" u32 AppInstall;

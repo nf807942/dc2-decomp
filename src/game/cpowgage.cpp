@@ -43,7 +43,20 @@ INCLUDE_ASM("nonmatchings/game/cpowgage", _INTERSECTION_POINT__FP12RS_STACKDATAi
 INCLUDE_ASM("nonmatchings/game/cpowgage", _MON_SE_PLAY__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _MON_SE_STOP__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _BTL_SE_PLAY__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/cpowgage", _BTL_SE_STOP__FP12RS_STACKDATAi);
+typedef struct now_scene_pointe {
+    char pad0[50384];
+    s32 unkC4D0;
+} now_scene_pointe;
+extern "C" now_scene_pointe *now_scene;
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_002E8280(RS_STACKDATA *);
+extern "C" s32 sndSeStop__FUiii(u32, s32, s32);
+extern "C" s32 _BTL_SE_STOP__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    u32 temp_s0;
+
+    temp_s0 = now_scene->unkC4D0;
+    sndSeStop__FUiii(temp_s0, GetStackInt__FP12RS_STACKDATA_002E8280(arg0), 0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cpowgage", _BSE_SE_PLAY__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _BSE_SE_STOP__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _MON_SE_PLAY2__FP12RS_STACKDATAi);
@@ -71,7 +84,29 @@ extern "C" s32 _DMG_SET_DAMAGE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) 
 }
 INCLUDE_ASM("nonmatchings/game/cpowgage", _COLPRIM_CREATE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _COLPRIM_SET_COORD__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/cpowgage", _COLPRIM_DELETE__FP12RS_STACKDATAi);
+typedef struct now_script_pointe {
+    char pad0[308];
+    s32 unk134;
+} now_script_pointe;
+extern "C" now_script_pointe *now_script;
+#include "gen/CColPrim.hpp"
+extern "C" s32 Delete__8CColPrimFi(void *, s32);
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_002E8280(RS_STACKDATA *);
+extern "C" s32 _COLPRIM_DELETE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    CColPrim *temp_a0;
+
+    if (now_script == NULL) {
+        return 0;
+    }
+    GetStackInt__FP12RS_STACKDATA_002E8280(arg0);
+    temp_a0 = (CColPrim *) (now_script->unk134);
+    if (temp_a0 == NULL) {
+        return 0;
+    }
+    Delete__8CColPrimFi(temp_a0, -1);
+    now_script->unk134 = NULL;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cpowgage", _COLPRIM_GET_HITCNT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _COLPRIM_GET_GIFT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _COLPRIM_GET_REVCNT__FP12RS_STACKDATAi);

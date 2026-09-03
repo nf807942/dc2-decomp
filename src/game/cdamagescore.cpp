@@ -28,7 +28,17 @@ INCLUDE_ASM("nonmatchings/game/cdamagescore", Step__13CDamageScore2Fv);
 INCLUDE_ASM("nonmatchings/game/cdamagescore", Draw__12CLockOnModelFv);
 INCLUDE_ASM("nonmatchings/game/cdamagescore", DrawMess__12CLockOnModelFi);
 INCLUDE_ASM("nonmatchings/game/cdamagescore", Step__12CLockOnModelFv);
-INCLUDE_ASM("nonmatchings/game/cdamagescore", Step__13CWarningGage2Fv);
+struct inferred;
+typedef struct CWarningGage2 {
+    /* 0x00 */ char pad0[0xC];
+    /* 0x0C */ s32 unkC;                            /* inferred */
+} CWarningGage2;                                    /* size >= 0x10 */
+extern "C" void Step__13CWarningGage2Fv(CWarningGage2 *objet) {
+    objet->unkC += 1;
+    if (objet->unkC >= 0x28) {
+        objet->unkC = 0;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cdamagescore", Draw__13CWarningGage2Fv);
 void CLockOnModel::Initialize(CScene * arg0) {
     this->field_0x80 = arg0;

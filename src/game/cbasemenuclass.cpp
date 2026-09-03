@@ -97,7 +97,17 @@ extern "C" MENU_ASKMODE_PARA *__ct__17MENU_ASKMODE_PARAFv(MENU_ASKMODE_PARA *obj
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", Set__18MENU_SWAPITEM_INFOFiiii);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", IsEnableChangeRoboParts__FP13CGameDataUsed);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", SetSpectolInfo__FP13CGameDataUsedP13CGameDataUsed);
-INCLUDE_ASM("nonmatchings/game/cbasemenuclass", InitSpectol__Fv);
+typedef struct SpectolInfo_champs {
+    char pad0[4];
+    s32 unk4;
+} SpectolInfo_champs;
+extern "C" SpectolInfo_champs SpectolInfo;
+extern "C" s32 Init__13CGameDataUsedFv(...);
+extern "C" void InitSpectol__Fv(void) {
+    if (SpectolInfo.unk4 != NULL) {
+        Init__13CGameDataUsedFv(SpectolInfo.unk4);
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", AfterSpectolFusion__FP13CGameDataUsedP13CGameDataUsed);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", FusionColor__FiiPf);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", SpectolFrameCalc__FP12CActionCharai);

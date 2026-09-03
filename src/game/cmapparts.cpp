@@ -261,7 +261,15 @@ extern "C" void GetNowTimeBand__4CMapFv(CMap *objet) {
 }
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetNowTimeLightBand__4CMapFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetLightingRatio__4CMapFPf);
-INCLUDE_ASM("nonmatchings/game/cmapparts", GetLightingFlareRatio__4CMapFPf);
+struct arg0_champs {
+    char pad0[0x8];
+    /* 0x8 */ s32 unk8;
+};
+extern "C" s32 GetLightingRatio__4CMapFPf(...);
+extern "C" void GetLightingFlareRatio__4CMapFPf(CMap *objet, struct arg0_champs *arg0) {
+    GetLightingRatio__4CMapFPf(objet, arg0);
+    arg0->unk8 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetLightingSunRatio__4CMapFPf);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetTimeLightingRatio__4CMapFPf);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetSunPoint__4CMapFPf);
@@ -325,7 +333,32 @@ void CList_9CMapPiece_::Initialize(void) {
 }
 INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__9CMapPieceFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__12CObjectFrameFv);
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE_NAME__FP9SPI_STACKi);
+extern "C" u32 mapNowMapPiece;
+extern "C" u32 mapStack;
+extern "C" s32 Alloc__9mgCMemoryFi(...);
+extern "C" s32 pGetData__17CList_9CMapPiece_Fv(...);
+extern "C" s32 spiGetStackString__FP9SPI_STACK(SPI_STACK *arg0);
+extern "C" void strcpy(void *, s32);
+extern "C" s32 strlen(...);
+extern "C" s32 SetName__9CMapPieceFPc(...);
+extern "C" s32 algn16_size__FUi(u32);
+extern "C" s32 mapPIECE_NAME__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    CMapPiece *temp_s0;
+    s32 temp_v0;
+    s8 *temp_v0_2;
+
+    if (mapNowMapPiece == NULL) {
+        return 0;
+    }
+    temp_s0 = (CMapPiece *) (pGetData__17CList_9CMapPiece_Fv(mapNowMapPiece));
+    temp_v0 = (s32) (spiGetStackString__FP9SPI_STACK(arg0));
+    if (temp_v0 != 0) {
+        temp_v0_2 = (s8 *) (Alloc__9mgCMemoryFi(mapStack, algn16_size__FUi(strlen(temp_v0) + 1)));
+        strcpy(temp_v0_2, temp_v0);
+        SetName__9CMapPieceFPc(temp_s0, temp_v0_2);
+    }
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE_POS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE_ROT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE_SCALE__FP9SPI_STACKi);
@@ -385,9 +418,22 @@ extern "C" s32 mapPARTS_GROUP__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     strcpy(&mapMapPartsGroupName, temp_v0);
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapPARTS_POS__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapPARTS_ROT__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapPARTS_SCALE__FP9SPI_STACKi);
+extern "C" u8 mapPos[16];
+extern "C" s32 spiGetStackVector__FPfP9SPI_STACK(...);
+extern "C" s32 mapPARTS_POS__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    spiGetStackVector__FPfP9SPI_STACK(&mapPos, arg0);
+    return 1;
+}
+extern "C" u8 mapRot[16];
+extern "C" s32 mapPARTS_ROT__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    spiGetStackVector__FPfP9SPI_STACK(&mapRot, arg0);
+    return 1;
+}
+extern "C" u8 mapScale[16];
+extern "C" s32 mapPARTS_SCALE__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    spiGetStackVector__FPfP9SPI_STACK(&mapScale, arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapMAP_PARTS_END__FP9SPI_STACKi);
 s32 map_MAP_INFO_TOP(SPI_STACK *stack, int argc) {
     return 1;
@@ -412,7 +458,23 @@ extern "C" s32 mapFIX_CAMERA__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     mapCameraRectIdx = 0;
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapFIX_CAMERA_POS__FP9SPI_STACKi);
+extern "C" u32 mapMap;
+extern "C" u32 mapCameraInfoIdx;
+extern "C" s32 GetCameraInfo__4CMapFi(...);
+extern "C" s32 spiGetStackVector__FPfP9SPI_STACK(...);
+extern "C" s32 mapFIX_CAMERA_POS__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    s32 temp_v0;
+
+    if (IsAddMode__Fv() != 0) {
+        return 1;
+    }
+    temp_v0 = GetCameraInfo__4CMapFi(mapMap, mapCameraInfoIdx);
+    if (temp_v0 == 0) {
+        return 0;
+    }
+    spiGetStackVector__FPfP9SPI_STACK(temp_v0 + 0x10, arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFIX_CAMERA_POS2__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFIX_CAMERA_OFF_GROUP__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFIX_CAMERA_RECT__FP9SPI_STACKi);
@@ -462,7 +524,26 @@ INCLUDE_ASM("nonmatchings/game/cmapparts", SetScale__10CFuncPointFPf);
 INCLUDE_ASM("nonmatchings/game/cmapparts", SetRotation__10CFuncPointFPf);
 INCLUDE_ASM("nonmatchings/game/cmapparts", SetPosition__10CFuncPointFPf);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFUNC_DATA_END__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapFUNC_POINT_END__FP9SPI_STACKi);
+extern "C" u32 mapNowMapParts;
+extern "C" u32 mapPtsFunc;
+#include "gen/CFuncPointMngr.hpp"
+extern "C" s32 UpdateStatus__14CFuncPointMngrFv(void *);
+extern "C" s32 pGetData__17CList_9CMapParts_Fv(...);
+extern "C" s32 mapFUNC_POINT_END__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    CFuncPointMngr *var_a0;
+
+    if (mapPtsFunc != 0) {
+        if (mapNowMapParts == NULL) {
+            return 0;
+        }
+        var_a0 = (CFuncPointMngr *) (pGetData__17CList_9CMapParts_Fv(mapNowMapParts) + 0x2B0);
+        goto block_5;
+    }
+    var_a0 = (CFuncPointMngr *) (mapMap + 0xCB0);
+block_5:
+    UpdateStatus__14CFuncPointMngrFv(var_a0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", LoadMapFile__4CMapFPciP9mgCMemoryi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", SetPieceLoadSkip__4CMapFi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", cfgDRAW_OFF_RECT__FP9SPI_STACKi);
@@ -523,7 +604,11 @@ s32 mapLIGHT_SET_END(SPI_STACK * arg0, s32 arg1) {
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFLOOR__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapCHARA_POS__FP9SPI_STACKi);
+extern "C" u32 MapInfo;
+extern "C" s32 mapCHARA_POS__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    spiGetStackVector__FPfP9SPI_STACK(MapInfo + 0xB0, arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapTIME_FLAG__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapTIME_LIGHT_NUM__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapDEF_FOOT__FP9SPI_STACKi);

@@ -132,7 +132,19 @@ extern "C" void MenuPolygonSetEnv__Fv(void) {
 }
 INCLUDE_ASM("nonmatchings/game/cmenueffect", MenuPolygonEnvReset__Fv);
 INCLUDE_ASM("nonmatchings/game/cmenueffect", GetMenuCfgFileName__Fii);
-INCLUDE_ASM("nonmatchings/game/cmenueffect", GetMenuMainMessageBuffer__Fv);
+typedef struct MenuArg_champs {
+    char pad0[32];
+    s32 unk20;
+    char pad24[116];
+} MenuArg_champs;
+extern "C" MenuArg_champs MenuArg;
+extern "C" u8 _1630_0036FCA8[12];
+extern "C" s32 GetPackFile__FPUiPcPi(...);
+extern "C" void GetMenuMainMessageBuffer__Fv(void) {
+    s32 sp1C;
+
+    GetPackFile__FPUiPcPi(MenuArg.unk20, &_1630_0036FCA8, &sp1C);
+}
 INCLUDE_ASM("nonmatchings/game/cmenueffect", GetMenuMainIMGPtr__Fv);
 INCLUDE_ASM("nonmatchings/game/cmenueffect", GetMenuMainPosCfgBuffer__FPi);
 INCLUDE_ASM("nonmatchings/game/cmenueffect", SetCommonMenuModeID__Fv);

@@ -66,7 +66,19 @@ INCLUDE_ASM("nonmatchings/game/ccharacter2", _OBJECT_NAME2__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _MOTION__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _SHADOW_MOTION__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _VERTEX_ANIME__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", _SHAPE_ANIME__FP9SPI_STACKi);
+typedef struct nowChr_pointe {
+    char pad0[308];
+    s32 unk134;
+} nowChr_pointe;
+extern "C" nowChr_pointe *nowChr;
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(SPI_STACK *);
+extern "C" s32 _SHAPE_ANIME__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    if (arg1 != 1) {
+        return 0;
+    }
+    nowChr->unk134 = spiGetStackInt__FP9SPI_STACK(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _KEY_START__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _KEY__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _KEY_END__FP9SPI_STACKi);

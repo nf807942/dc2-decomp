@@ -307,7 +307,16 @@ extern "C" s32 __IMG_NAME__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", __SIZE__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ceffectctrl", __DIR__FP9SPI_STACKi);
+typedef struct g_tmp_effc_pointe {
+    char pad0[32];
+    s32 unk20;
+} g_tmp_effc_pointe;
+extern "C" g_tmp_effc_pointe *g_tmp_effc;
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(SPI_STACK *);
+extern "C" s32 __DIR__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    g_tmp_effc->unk20 = spiGetStackInt__FP9SPI_STACK(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", __NUM__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", __NUM_RAND__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", __COUNT__FP9SPI_STACKi);

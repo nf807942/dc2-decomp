@@ -170,7 +170,16 @@ INCLUDE_ASM("nonmatchings/game/text_001E2410", _ESM_SET_VALUE__FP12RS_STACKDATAi
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _LOAD_EFFECT_SCRIPT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SW_EFFECT__FP12RS_STACKDATAi_001E8250);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _ESM_GET_NOTUESD_TEXB__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_001E2410", _ESM_ADD_TEXB__FP12RS_STACKDATAi);
+typedef struct ActiveMonster_pointe {
+    char pad0[65520];
+    s32 unkFFF0;
+} ActiveMonster_pointe;
+extern "C" ActiveMonster_pointe *ActiveMonster;
+extern "C" s32 AddTexb__16CEffectScriptManFv(...);
+extern "C" s32 _ESM_ADD_TEXB__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    AddTexb__16CEffectScriptManFv(ActiveMonster->unkFFF0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SHOT_ROCKET_LAUNCHER__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _RUN_EVENT_SCRIPT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_STATUS__FP12RS_STACKDATAi_001E8680);

@@ -63,7 +63,40 @@ loop_1:
 INCLUDE_ASM("nonmatchings/game/clsmes", GetTopAddress__FPcii);
 INCLUDE_ASM("nonmatchings/game/clsmes", MovieCCAnalyze__FPcii);
 INCLUDE_ASM("nonmatchings/game/clsmes", MovieCCDraw__Fv);
-INCLUDE_ASM("nonmatchings/game/clsmes", MovieCCInit__FPcii);
+extern "C" u32 LanguageCode;
+extern "C" u32 MovieCCCnt;
+typedef struct MovieCCFont_champs {
+    char pad0[156];
+    s32 unk9C;
+    s32 unkA0;
+    char padA4[20];
+} MovieCCFont_champs;
+extern "C" MovieCCFont_champs MovieCCFont;
+extern "C" u32 MovieCCH;
+extern "C" u32 MovieCCW;
+struct inferred;
+typedef struct CFont {
+    /* 0x00 */ char pad0[0x9C];
+    /* 0x9C */ char unk9C;                             /* inferred */
+    /* 0x9C */ char pad9C[4];
+    /* 0xA0 */ char unkA0;                             /* inferred */
+    /* 0xA0 */ char padA0[1];
+} CFont;                                            /* size >= 0xA1 */
+extern "C" s32 Init__5CFontFv(void *);
+extern "C" s32 SetClearance__5CFontFii(void *, s32, s32);
+extern "C" s32 SetFuchi__5CFontFi(void *, s32);
+extern "C" s32 MovieCCAnalyze__FPcii(...);
+extern "C" void MovieCCInit__FPcii(s8 *arg0, s32 arg1, s32 arg2) {
+    if (LanguageCode != 1) {
+        Init__5CFontFv(&MovieCCFont);
+        SetFuchi__5CFontFi(&MovieCCFont, 8);
+        SetClearance__5CFontFii(&MovieCCFont, MovieCCFont.unk9C + 2, MovieCCFont.unkA0 - 6);
+        MovieCCCnt = 0;
+        MovieCCW = 0;
+        MovieCCH = 0;
+        MovieCCAnalyze__FPcii(arg0, arg1, arg2);
+    }
+}
 INCLUDE_ASM("nonmatchings/game/clsmes", VSyncCallBack__Fi_0015D470);
 INCLUDE_ASM("nonmatchings/game/clsmes", ClearScreen__Fiii);
 INCLUDE_ASM("nonmatchings/game/clsmes", init__Fv);

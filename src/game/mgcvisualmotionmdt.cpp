@@ -79,7 +79,38 @@ INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Copy__18mgCVisualMotionMDTFP
 s32 mgCVisualMotionMDT::Iam(void) {
     return 3;
 }
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", ezBgmInit__Fv);
+extern "C" u8 _32[19];
+extern "C" u8 _33_00372D00[23];
+typedef struct gCd2_champs {
+    char pad0[36];
+    s32 unk24;
+} gCd2_champs;
+extern "C" gCd2_champs gCd2;
+extern "C" s32 printf(...);
+extern "C" s32 sceSifBindRpc(...);
+extern "C" s32 sceSifInitRpc(...);
+extern "C" s32 ezBgmInit__Fv(void) {
+    s32 temp_v0;
+    s32 var_v1;
+
+    printf(&_32);
+    sceSifInitRpc(0);
+loop_1:
+    if (sceSifBindRpc(&gCd2, 0x12345, 0) < 0) {
+        printf(&_33_00372D00);
+loop_3:
+        goto loop_3;
+    }
+    var_v1 = 0x2710;
+    do {
+        temp_v0 = var_v1;
+        var_v1 -= 1;
+    } while (temp_v0 != 0);
+    if (gCd2.unk24 != 0) {
+        return 1;
+    }
+    goto loop_1;
+}
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", ezBgm__Fii);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", StreamOpenState__6CSoundFv);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", DrawEpisode__20CStartupEpisodeTitleFii);
@@ -207,7 +238,21 @@ INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", XChgMapRotation__Fi);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", SearchMapEventParts__FiPP9CMapPartsPfi);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", SearchMapFlatPosition__FPfP11CAutoMapGen);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", GetDungeonEventPoint__FPfPfi);
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", _GROUP_START__FP9SPI_STACKi);
+typedef struct nowTbFloor_pointe {
+    char pad0[74244];
+    s32 unk12204;
+} nowTbFloor_pointe;
+extern "C" nowTbFloor_pointe *nowTbFloor;
+struct SPI_STACK {
+    s32 field_0;
+    s32 field_4;
+};
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(SPI_STACK *);
+extern "C" s32 _GROUP_START__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    spiGetStackInt__FP9SPI_STACK(arg0);
+    nowTbFloor->unk12204 = -1;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", _GROUP__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", _ITEM__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", _FLOOR_START__FP9SPI_STACKi);
@@ -227,7 +272,33 @@ s32 _FLE(SPI_STACK * arg0, s32 arg1) {
 }
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", CreatMonsterFloorInfo__FPci);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", AutoSetMonster__Fv);
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", AutoSetMonster__FiPfPfi);
+extern "C" u32 ActiveMonster;
+typedef struct DngMainScene_pointe {
+    char pad0[12268];
+    s32 unk2FEC;
+} DngMainScene_pointe;
+extern "C" DngMainScene_pointe *DngMainScene;
+extern "C" s32 SetActiveMonster__11CMonsterManFiPfPfi(...);
+struct temp_v0_2_champs {
+    char pad0[0x1350];
+    /* 0x1350 */ s32 unk1350;
+};
+extern "C" s32 SearchBaseIndex__11CMonsterManFi(...);
+extern "C" void AutoSetMonster__FiPfPfi(s32 arg0, f32 *arg1, f32 *arg2, s32 arg3) {
+    s32 temp_v0;
+    struct temp_v0_2_champs *temp_v0_2;
+
+    if (ActiveMonster != NULL) {
+        DngMainScene->unk2FEC = 0;
+        temp_v0 = SearchBaseIndex__11CMonsterManFi(ActiveMonster, arg0);
+        if (temp_v0 != -1) {
+            temp_v0_2 = (struct temp_v0_2_champs *) (SetActiveMonster__11CMonsterManFiPfPfi(ActiveMonster, temp_v0, arg1, arg2, -1));
+            if (temp_v0_2 != NULL) {
+                temp_v0_2->unk1350 = arg3;
+            }
+        }
+    }
+}
 void DungeonFloorInit(void) {
 }
 void DungeonFloorFinish(void) {

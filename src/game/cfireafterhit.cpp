@@ -21,7 +21,26 @@ float trans_effect_rate(int rate) {
     return f;
 }
 INCLUDE_ASM("nonmatchings/game/cfireafterhit", trans_float_to_sceVector__FPfPfi);
-INCLUDE_ASM("nonmatchings/game/cfireafterhit", Initialize__14CChillAfterHitFv);
+struct inferred;
+typedef struct CChillAfterHit {
+    /* 0x00 */ s32 unk0;                            /* inferred */
+    /* 0x04 */ s32 unk4;                            /* inferred */
+    /* 0x08 */ s32 unk8;                            /* inferred */
+    /* 0x0C */ char padC[4];
+    /* 0x10 */ f32 unk10;                           /* inferred */
+    /* 0x14 */ char pad14[0xC];                     /* maybe part of unk10[4]void */
+    /* 0x20 */ char unk20;                             /* inferred */
+    /* 0x20 */ char pad20[1];
+} CChillAfterHit;                                   /* size >= 0x21 */
+extern "C" s32 memset(...);
+extern "C" s32 mgZeroVector__FPf(f32 *);
+extern "C" void Initialize__14CChillAfterHitFv(CChillAfterHit *objet) {
+    objet->unk0 = 0;
+    objet->unk4 = 0;
+    objet->unk8 = 0;
+    memset(&objet->unk20, 0, 0x780);
+    mgZeroVector__FPf(&objet->unk10);
+}
 INCLUDE_ASM("nonmatchings/game/cfireafterhit", SetPos__14CChillAfterHitFPffi);
 INCLUDE_ASM("nonmatchings/game/cfireafterhit", Step__14CChillAfterHitFv);
 INCLUDE_ASM("nonmatchings/game/cfireafterhit", LocalTransWorldPrimPos__FPA4_iPffff);

@@ -10,4 +10,14 @@
 
 INCLUDE_ASM("nonmatchings/game/cmenuinvent", IsCreateObject__11CMenuInventFii);
 INCLUDE_ASM("nonmatchings/game/cmenuinvent", CalcMakeBrd__11CMenuInventFi);
-INCLUDE_ASM("nonmatchings/game/cmenuinvent", EnableSelectMaxCardList__11CMenuInventFv);
+#include "menuinvent.hpp"
+extern "C" s32 GetHatsumeiNum__15CInventUserDataFv(void *);
+extern "C" s32 EnableSelectMaxCardList__11CMenuInventFv(CMenuInvent *objet) {
+    s32 var_v0;
+
+    var_v0 = GetHatsumeiNum__15CInventUserDataFv(InventUserDataPtr) + 1;
+    if (var_v0 < 5) {
+        var_v0 = 5;
+    }
+    return var_v0;
+}

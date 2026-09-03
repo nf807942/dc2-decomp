@@ -143,13 +143,54 @@ INCLUDE_ASM("nonmatchings/game/caquames", AddMenuCursor__8CAquaMesFii);
 INCLUDE_ASM("nonmatchings/game/caquames", SetQuestionId__8CAquaMesFiii);
 INCLUDE_ASM("nonmatchings/game/caquames", AddQuestionCursor__8CAquaMesFv);
 INCLUDE_ASM("nonmatchings/game/caquames", SetCtrlHelpId__8CAquaMesFi);
-INCLUDE_ASM("nonmatchings/game/caquames", SetInfoMsgID__8CAquaMesFi);
+typedef struct CAquaMes_infere2 {
+    /* 0x00 */ char pad0[0x4C];
+    /* 0x4C */ struct unk4C_champs *unk4C;                       /* inferred */
+} CAquaMes_infere2;                                         /* size >= 0x50 */
+typedef struct ClsMes_infere {
+    /* 0x0000 */ char pad0[0x1E3C];
+    /* 0x1E3C */ s32 unk1E3C;                       /* inferred */
+} ClsMes_infere;                                           /* size >= 0x1E40 */
+struct unk4C_champs {
+    char pad0[0x1E3C];
+    /* 0x1E3C */ s32 unk1E3C;
+};
+extern "C" s32 Step__6ClsMesFv(void *);
+extern "C" void SetInfoMsgID__8CAquaMesFi(CAquaMes_infere2 *objet, s32 arg0) {
+    objet->unk4C->unk1E3C = -1;
+    MakeMesWin__6ClsMesFi(objet->unk4C, arg0);
+    Step__6ClsMesFv(objet->unk4C);
+}
 INCLUDE_ASM("nonmatchings/game/caquames", EatMessage__8CAquaMesFiP9CAquaFish);
 INCLUDE_ASM("nonmatchings/game/caquames", ChangeManMessage__8CAquaMesFP9CAquaFish);
 INCLUDE_ASM("nonmatchings/game/caquames", DeadMessage__8CAquaMesFP9CAquaFish);
 INCLUDE_ASM("nonmatchings/game/caquames", Step__8CAquaMesFv);
 INCLUDE_ASM("nonmatchings/game/caquames", Draw__8CAquaMesFv);
-INCLUDE_ASM("nonmatchings/game/caquames", DrawTitleMes__8CAquaMesFv);
+extern "C" u8 mgTexManager[540];
+typedef struct MenuArg_champs {
+    char pad0[52];
+    s32 unk34;
+    char pad38[96];
+} MenuArg_champs;
+extern "C" MenuArg_champs MenuArg;
+struct sceVif1Packet;
+typedef struct CAquaMes_infere {
+    /* 0x0 */ char pad0[4];
+    /* 0x4 */ ClsMes *unk4;                         /* inferred */
+    /* 0x8 */ char pad8[4];
+    /* 0xC */ u8 unkC;                              /* inferred */
+} CAquaMes_infere;                                         /* size >= 0xD */
+extern "C" s32 DrawMesWin__6ClsMesFv(void *);
+extern "C" s32 ReloadTexture__17mgCTextureManagerFiP13sceVif1Packet(void *, s32, sceVif1Packet *);
+extern "C" void DrawTitleMes__8CAquaMesFv(CAquaMes_infere *objet) {
+    ClsMes *temp_a0;
+
+    ReloadTexture__17mgCTextureManagerFiP13sceVif1Packet(&mgTexManager, MenuArg.unk34, NULL);
+    temp_a0 = (ClsMes *) (objet->unk4);
+    if ((temp_a0 != NULL) && (objet->unkC != 0)) {
+        DrawMesWin__6ClsMesFv(temp_a0);
+    }
+}
 extern "C" u8 _2377_0036F1E0[18];
 extern "C" s32 GetItemFileName__Fii(s32, s32);
 extern "C" s32 sprintf(...);

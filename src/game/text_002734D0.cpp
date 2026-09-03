@@ -258,7 +258,30 @@ INCLUDE_ASM("nonmatchings/game/text_002734D0", VpkFileNameFromVoiceNo__FPci);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _STREAM_OPEN__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", CommandStreamPlay__Fii);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _STREAM_PLAY__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _STREAM_STOP__FP12RS_STACKDATAi);
+extern "C" u8 CSnd;
+typedef struct EdEventInfo_champs {
+    char pad0[308];
+    s32 unk134;
+    s32 unk138;
+    char pad13C[196];
+    s32 unk200;
+    char pad204[4252];
+} EdEventInfo_champs;
+extern "C" EdEventInfo_champs EdEventInfo;
+extern "C" s32 StreamClose__6CSoundFi(void *, s32);
+extern "C" s32 StreamEND__6CSoundFi(void *, s32);
+extern "C" s32 StreamSetVol__6CSoundFiii(void *, s32, s32, s32);
+extern "C" s32 _STREAM_STOP__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    EdEventInfo.unk134 = 0;
+    GetStackInt__FP12RS_STACKDATA_00262DA0(arg0);
+    if (EdEventInfo.unk138 == 1) {
+        StreamEND__6CSoundFi(&CSnd, 1);
+    } else {
+        StreamSetVol__6CSoundFiii(&CSnd, 1, EdEventInfo.unk200, EdEventInfo.unk200);
+        StreamClose__6CSoundFi(&CSnd, 1);
+    }
+    return 1;
+}
 extern "C" u8 CSnd;
 extern "C" s32 StreamStandBy__6CSoundFi(void *, s32);
 extern "C" s32 _STREAM_STANDBY__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
@@ -487,4 +510,18 @@ extern "C" s32 _SPHIDA_INIT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _SPHIDA_SET_UP__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _SPHIDA_SET_PLAY_FLAG__FP12RS_STACKDATAi);
+typedef struct Sphida_pointe {
+    char pad0[40];
+    s32 unk28;
+} Sphida_pointe;
+extern "C" Sphida_pointe *Sphida;
+extern "C" s32 _SPHIDA_SET_PLAY_FLAG__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    s32 temp_v0;
+
+    temp_v0 = (s32) (GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
+    if (Sphida == NULL) {
+        return 0;
+    }
+    Sphida->unk28 = temp_v0;
+    return 1;
+}

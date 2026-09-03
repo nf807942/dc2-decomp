@@ -60,7 +60,24 @@ extern "C" void SetMenuReturnMsgCtrl__Fi(s32 arg0) {
         MenuReturnMsgDrawFlag = 0;
     }
 }
-INCLUDE_ASM("nonmatchings/game/cmosbookmenu", DrawMenuReturnMsg__Fv);
+extern "C" u8 mgTexManager[540];
+typedef struct MenuArg_champs {
+    char pad0[52];
+    s32 unk34;
+    char pad38[96];
+} MenuArg_champs;
+extern "C" MenuArg_champs MenuArg;
+struct sceVif1Packet;
+extern "C" s32 DrawMsg__7CDC2MesFv(...);
+extern "C" s32 ReloadTexture__17mgCTextureManagerFiP13sceVif1Packet(void *, s32, sceVif1Packet *);
+extern "C" s32 StepMsg__7CDC2MesFv(...);
+extern "C" void DrawMenuReturnMsg__Fv(void) {
+    if ((MenuReturnMsgDrawFlag != 0) && (MenuReturnMsg != NULL)) {
+        ReloadTexture__17mgCTextureManagerFiP13sceVif1Packet(&mgTexManager, MenuArg.unk34, NULL);
+        StepMsg__7CDC2MesFv(MenuReturnMsg);
+        DrawMsg__7CDC2MesFv(MenuReturnMsg);
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", CheckOmakeVtuto__Fi);
 void InitMnOnePictTex(void) {
     MnOnePictTex.field_0x0 = 0;

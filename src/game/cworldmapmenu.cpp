@@ -36,6 +36,27 @@ INCLUDE_ASM("nonmatchings/game/cworldmapmenu", CheckBattleLoop__Fv);
 INCLUDE_ASM("nonmatchings/game/cworldmapmenu", SetMenuLoadItemNo__Fi);
 INCLUDE_ASM("nonmatchings/game/cworldmapmenu", MenuMemoryDivide__FP9mgCMemoryPP9mgCMemoryi);
 INCLUDE_ASM("nonmatchings/game/cworldmapmenu", MenuMemoryAdjust__FP9mgCMemoryP9mgCMemoryP9mgCMemoryi);
-INCLUDE_ASM("nonmatchings/game/cworldmapmenu", DeleteMonsterEffect__Fv);
+typedef struct FxScriptMan_pointe {
+    char pad0[12];
+    s32 unkC;
+} FxScriptMan_pointe;
+extern "C" FxScriptMan_pointe *FxScriptMan;
+extern "C" u8 mgTexManager[540];
+struct inferred;
+typedef struct CEffectScriptMan {
+    /* 0x00 */ char pad0[0xC];
+    /* 0x0C */ s32 unkC;                            /* inferred */
+} CEffectScriptMan;                                 /* size >= 0x10 */
+extern "C" s32 ClearBaseFromLevel__16CEffectScriptManFiPii(void *, s32, s32 *, s32);
+extern "C" s32 ClearEffectFromChrid__16CEffectScriptManFi(void *, s32);
+extern "C" s32 DeleteBlock__17mgCTextureManagerFi(void *, s32);
+extern "C" void DeleteMonsterEffect__Fv(void) {
+    if (FxScriptMan != NULL) {
+        ClearEffectFromChrid__16CEffectScriptManFi(FxScriptMan, 0);
+        FxScriptMan->unkC = 2;
+        ClearBaseFromLevel__16CEffectScriptManFiPii(FxScriptMan, 2, NULL, -1);
+    }
+    DeleteBlock__17mgCTextureManagerFi(&mgTexManager, 0xAA);
+}
 INCLUDE_ASM("nonmatchings/game/cworldmapmenu", SetMessagePositionNPCForm__FP16CMenuPosDataFormP7CDC2Mes);
 INCLUDE_ASM("nonmatchings/game/cworldmapmenu", AdjustNPCTalk__FP7CDC2MesP11CCharacter2);

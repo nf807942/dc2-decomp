@@ -78,7 +78,61 @@ void PlayTimeCount(s32 value) {
 s32 GetPlayTimeCountFlag(void) {
     return PlayTimeCountFlag;
 }
-INCLUDE_ASM("nonmatchings/game/cgamedata", LanguageChange__FiP1);
+extern "C" u8 GameItemDataManage[48];
+typedef struct InfoStack_champs {
+    char pad0[28];
+    s32 unk1C;
+    char pad20[4];
+    s32 unk24;
+    char pad28[8];
+} InfoStack_champs;
+extern "C" InfoStack_champs InfoStack;
+extern "C" u32 LanguageCode;
+extern "C" u32 read_buffer;
+struct inferred;
+typedef struct mgCMemory_infere {
+    /* 0x00 */ char pad0[0x1C];
+    /* 0x1C */ s32 unk1C;                           /* inferred */
+    /* 0x20 */ char pad20[4];
+    /* 0x24 */ s32 unk24;                           /* inferred */
+} mgCMemory_infere;                                        /* size >= 0x28 */
+extern "C" s32 InitPauseData__Fv(void);
+extern "C" s32 LanguageEquipChange__Fv(void);
+extern "C" s32 LoadEditAnalyzeData__FiP1(...);
+extern "C" s32 LoadFilePictureName__Fv(void);
+extern "C" s32 LoadFontTblBin__Fv(void);
+extern "C" s32 LoadFontTex2Img__Fv(void);
+extern "C" s32 LoadGaijiImg__Fv(void);
+extern "C" s32 LoadGameInfo__FP9mgCMemory(...);
+extern "C" s32 LoadHelpMes__FP1(...);
+extern "C" s32 LoadMapName__FiP1(...);
+extern "C" s32 LoadMonsterLanguage__Fi(s32);
+extern "C" s32 LoadNPCCfg__Fv(void);
+extern "C" s32 LoadSystemMes__Fv(void);
+extern "C" s32 InitPadTable__Fi(s32);
+extern "C" s32 LoadFontTexture__Fv(void);
+extern "C" s32 LoadItemSystemMes__9CGameDataFi(void *, s32);
+extern "C" void LanguageChange__FiP1(s32 arg0) {
+    LanguageCode = arg0;
+    LoadItemSystemMes__9CGameDataFi(&GameItemDataManage, arg0);
+    LoadHelpMes__FP1(read_buffer);
+    LoadMapName__FiP1(LanguageCode, read_buffer);
+    LanguageEquipChange__Fv();
+    LoadNPCCfg__Fv();
+    LoadSystemMes__Fv();
+    LoadFontTex2Img__Fv();
+    LoadGaijiImg__Fv();
+    LoadFontTexture__Fv();
+    LoadFontTblBin__Fv();
+    LoadEditAnalyzeData__FiP1(LanguageCode, read_buffer);
+    LoadFilePictureName__Fv();
+    LoadMonsterLanguage__Fi(LanguageCode);
+    InfoStack.unk24 = 0;
+    InfoStack.unk1C = 0;
+    LoadGameInfo__FP9mgCMemory(&InfoStack);
+    InitPauseData__Fv();
+    InitPadTable__Fi(LanguageCode);
+}
 INCLUDE_ASM("nonmatchings/game/cgamedata", MainLoop__Fv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", MenuInit__F13INIT_LOOP_ARG);
 INCLUDE_ASM("nonmatchings/game/cgamedata", MenuLoop__Fv);

@@ -20,7 +20,35 @@ INCLUDE_ASM("nonmatchings/game/cmenuitemuse", CheckRoboShieldKit__FP16CUserDataM
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", MenuUseItemCheckFunc__FP13CGameDataUsedP14CItemUseTargeti);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", CheckItemUseEnable__12CMenuItemUseFP13CGameDataUsediPv);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", UseItem__12CMenuItemUseFP13CGameDataUsediPv);
-INCLUDE_ASM("nonmatchings/game/cmenuitemuse", UseItem__12CMenuItemUseFP13CGameDataUsedP14CItemUseTarget);
+typedef struct MenuUsedTarget_champs {
+    s32 unk0;
+    s32 unk4;
+} MenuUsedTarget_champs;
+extern "C" MenuUsedTarget_champs MenuUsedTarget;
+struct inferred;
+typedef struct CGameDataUsed {
+    /* 0x0 */ char pad0[2];
+    /* 0x2 */ s16 unk2;                             /* inferred */
+} CGameDataUsed;                                    /* size >= 0x4 */
+typedef struct CItemUseTarget {
+    /* 0x0 */ s32 unk0;                             /* inferred */
+    /* 0x4 */ s32 unk4;                             /* inferred */
+} CItemUseTarget;                                   /* size >= 0x8 */
+typedef struct CMenuItemUse {
+    /* 0x0 */ s32 unk0;                             /* inferred */
+    /* 0x4 */ s32 unk4;                             /* inferred */
+} CMenuItemUse;                                     /* size >= 0x8 */
+extern "C" s32 MenuUseItemCheckFunc__FP13CGameDataUsedP14CItemUseTargeti(CGameDataUsed *, CItemUseTarget *, s32);
+extern "C" s32 UseItem__12CMenuItemUseFP13CGameDataUsedP14CItemUseTarget(CMenuItemUse *objet, CGameDataUsed *arg0, CItemUseTarget *arg1) {
+    if (arg0 == NULL) {
+        return 0;
+    }
+    objet->unk0 = (s32) arg0->unk2;
+    objet->unk4 = arg1->unk0;
+    MenuUsedTarget.unk0 = (s32) arg1->unk0;
+    MenuUsedTarget.unk4 = (s32) arg1->unk4;
+    return MenuUseItemCheckFunc__FP13CGameDataUsedP14CItemUseTargeti(arg0, arg1, 1);
+}
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", Initialize__12CMenuItemUseFv);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", CheckNowStateUseThisItem__FP13CGameDataUsedP14CItemUseTarget);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", AttachMessageForm__Fv);

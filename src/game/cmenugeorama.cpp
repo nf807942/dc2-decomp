@@ -27,7 +27,189 @@ INCLUDE_ASM("nonmatchings/game/cmenugeorama", MenuMapPartsDraw__FRi);
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", MenuGeoramaMessageMake__Fi);
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", CheckGekkaViewMode__Fi);
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", InitEnd__12CMenuGeoramaFv);
-INCLUDE_ASM("nonmatchings/game/cmenugeorama", ExitEnd__12CMenuGeoramaFv);
+extern "C" u32 GeoRequestFlag;
+typedef struct MenuGeoramaSystemData_pointe {
+    char pad0[80];
+    s16 unk50;
+    s16 unk52;
+    s16 unk54;
+    s16 unk56;
+    s16 unk58;
+    s16 unk5A;
+    s16 unk5C;
+    s16 unk5E;
+    s16 unk60;
+    s16 unk62;
+    s16 unk64;
+    s16 unk66;
+    s16 unk68;
+    s16 unk6A;
+} MenuGeoramaSystemData_pointe;
+extern "C" MenuGeoramaSystemData_pointe *MenuGeoramaSystemData;
+struct mgCMemory;
+struct inferred;
+struct mgCTexture {
+    s16 field_0;
+    s16 field_2;
+    s16 field_4;
+    s16 field_6;
+    char pad_8[0x4];
+    s32 field_C;
+    s32 field_10;
+    s16 field_14;
+    char pad_16[0x2];
+    s32 field_18;
+    s32 field_1C;
+    char pad_20[0x8];
+    s32 field_28;
+    s32 field_2C;
+    s32 field_30;
+    char pad_34[0x4];
+    s64 field_38;
+    s64 field_40;
+    s64 field_48;
+    s32 field_50;
+    f32 field_54;
+    f32 field_58;
+    f32 field_5C;
+    s32 field_60;
+    s32 field_64;
+    s32 field_68;
+    char pad_6C[0xA4];
+    s32 field_110;
+    s32 field_114;
+    s32 field_118;
+    s16 field_11C;
+    s8 field_11E;
+    s8 field_11F;
+    s16 field_120;
+    s16 field_122;
+    s32 field_124;
+    s32 field_128;
+    s8 field_12C;
+    s8 field_12D;
+    char pad_12E[0x2];
+    s32 field_130;
+    s32 field_134;
+    s32 field_138;
+    s32 field_13C;
+    char pad_140[0x4];
+    s32 field_144;
+    s32 field_148;
+    s32 field_14C;
+    s32 field_150;
+    s32 field_154;
+    s32 field_158;
+    s32 field_15C;
+    s32 field_160;
+    s32 field_164;
+    s32 field_168;
+    s32 field_16C;
+    s32 field_170;
+    s32 field_174;
+    s32 field_178;
+    s32 field_17C;
+    s32 field_180;
+    s32 field_184;
+    s32 field_188;
+    s32 field_18C;
+    s32 field_190;
+    char pad_194[0x60];
+    s32 field_1F4;
+    s32 field_1F8;
+    s32 field_1FC;
+    s8 field_200;
+    s8 field_201;
+    s16 field_202;
+    s32 field_204;
+    s8 field_208;
+    s8 field_209;
+    char pad_20A[0x2];
+    s32 field_20C;
+    s32 field_210;
+    s32 field_214;
+    s32 field_218;
+    s32 field_21C;
+    char pad_220[0xC];
+    s32 field_22C;
+    s32 field_230;
+    s32 field_234;
+    s32 field_238;
+    s32 field_23C;
+    s32 field_240;
+    char pad_244[0x4];
+    s32 field_248;
+    s16 field_24C;
+    s16 field_24E;
+    char pad_250[0x6];
+    s16 field_256;
+    f32 field_258;
+    f32 field_25C;
+    char pad_260[0x4];
+    f32 field_264;
+    f32 field_268;
+    f32 field_26C;
+    char pad_270[0x4];
+    f32 field_274;
+    f32 field_278;
+    char pad_27C[0x68];
+    s32 field_2E4;
+    char pad_2E8[0x74];
+    s32 field_35C;
+    s32 field_360;
+    s32 field_364;
+};
+typedef struct CMenuGeorama_infere {
+    /* 0x00000 */ char pad0[0x1B7F4];
+    /* 0x1B7F4 */ s16 unk1B7F4;                     /* inferred */
+    /* 0x1B7F6 */ char pad1B7F6[2];
+    /* 0x1B7F8 */ s16 unk1B7F8;                     /* inferred */
+    /* 0x1B7FA */ char pad1B7FA[2];
+    /* 0x1B7FC */ s16 unk1B7FC;                     /* inferred */
+    /* 0x1B7FE */ char pad1B7FE[2];
+    /* 0x1B800 */ s16 unk1B800;                     /* inferred */
+    /* 0x1B802 */ char pad1B802[2];
+    /* 0x1B804 */ s16 unk1B804;                     /* inferred */
+    /* 0x1B806 */ char pad1B806[2];
+    /* 0x1B808 */ s16 unk1B808;                     /* inferred */
+    /* 0x1B80A */ char pad1B80A[2];
+    /* 0x1B80C */ s16 unk1B80C;                     /* inferred */
+    /* 0x1B80E */ char pad1B80E[2];
+    /* 0x1B810 */ s16 unk1B810;                     /* inferred */
+    /* 0x1B812 */ char pad1B812[2];
+    /* 0x1B814 */ s16 unk1B814;                     /* inferred */
+    /* 0x1B816 */ char pad1B816[2];
+    /* 0x1B818 */ s16 unk1B818;                     /* inferred */
+    /* 0x1B81A */ char pad1B81A[2];
+    /* 0x1B81C */ s16 unk1B81C;                     /* inferred */
+    /* 0x1B81E */ char pad1B81E[2];
+    /* 0x1B820 */ s16 unk1B820;                     /* inferred */
+    /* 0x1B822 */ char pad1B822[2];
+    /* 0x1B824 */ s16 unk1B824;                     /* inferred */
+    /* 0x1B826 */ char pad1B826[2];
+    /* 0x1B828 */ s16 unk1B828;                     /* inferred */
+} CMenuGeorama_infere;                                     /* size >= 0x1B82A */
+extern "C" s32 InitDownLoadAnaunce__FP9mgCMemory(mgCMemory *);
+extern "C" s32 InitMenuDl__FP10mgCTexturei(mgCTexture *, s32);
+extern "C" void ExitEnd__12CMenuGeoramaFv(CMenuGeorama_infere *objet) {
+    MenuGeoramaSystemData->unk50 = (s16) objet->unk1B7F4;
+    MenuGeoramaSystemData->unk52 = (s16) objet->unk1B7F8;
+    MenuGeoramaSystemData->unk54 = (s16) objet->unk1B7FC;
+    MenuGeoramaSystemData->unk56 = (s16) objet->unk1B800;
+    MenuGeoramaSystemData->unk58 = (s16) objet->unk1B804;
+    MenuGeoramaSystemData->unk5A = (s16) objet->unk1B808;
+    MenuGeoramaSystemData->unk5C = (s16) objet->unk1B80C;
+    MenuGeoramaSystemData->unk5E = (s16) objet->unk1B810;
+    MenuGeoramaSystemData->unk60 = (s16) objet->unk1B814;
+    MenuGeoramaSystemData->unk62 = (s16) objet->unk1B818;
+    MenuGeoramaSystemData->unk64 = (s16) objet->unk1B81C;
+    MenuGeoramaSystemData->unk66 = (s16) objet->unk1B820;
+    MenuGeoramaSystemData->unk68 = (s16) objet->unk1B824;
+    MenuGeoramaSystemData->unk6A = (s16) objet->unk1B828;
+    InitMenuDl__FP10mgCTexturei(NULL, 0);
+    InitDownLoadAnaunce__FP9mgCMemory(NULL);
+    GeoRequestFlag = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", GetPartsIDListNum__12CMenuGeoramaFi);
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", GetNowMakePartsNum__12CMenuGeoramaFi);
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", GetPenkiItemNo__Fi);

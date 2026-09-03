@@ -33,9 +33,33 @@ INCLUDE_ASM("nonmatchings/game/cvillagermngr", _SE_LOOP_PLAY__FP12RS_STACKDATAi)
 INCLUDE_ASM("nonmatchings/game/cvillagermngr", _GET_SHOT_TYPE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cvillagermngr", _GET_MONS_ID__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cvillagermngr", _GET_FRONT_VEC__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/cvillagermngr", _GET_PADON__FP12RS_STACKDATAi_002D2F20);
-INCLUDE_ASM("nonmatchings/game/cvillagermngr", _GET_PADDOWN__FP12RS_STACKDATAi_002D2F70);
-INCLUDE_ASM("nonmatchings/game/cvillagermngr", _GET_PADUP__FP12RS_STACKDATAi_002D2FC0);
+extern "C" u8 GamePad_003FA5A0[1144];
+#include "runscript.hpp"
+extern "C" s32 GetPadOn__8CGamePadFv(void *);
+extern "C" s32 SetStack__FP12RS_STACKDATAi_002D2820(...);
+extern "C" s32 _GET_PADON__FP12RS_STACKDATAi_002D2F20(s32 arg0, s32 arg1) {
+    if (arg1 <= 0) {
+        return 0;
+    }
+    SetStack__FP12RS_STACKDATAi_002D2820(arg0, GetPadOn__8CGamePadFv(&GamePad_003FA5A0));
+    return 1;
+}
+extern "C" s32 GetPadDown__8CGamePadFv(void *);
+extern "C" s32 _GET_PADDOWN__FP12RS_STACKDATAi_002D2F70(s32 arg0, s32 arg1) {
+    if (arg1 <= 0) {
+        return 0;
+    }
+    SetStack__FP12RS_STACKDATAi_002D2820(arg0, GetPadDown__8CGamePadFv(&GamePad_003FA5A0));
+    return 1;
+}
+extern "C" s32 GetPadUp__8CGamePadFv(void *);
+extern "C" s32 _GET_PADUP__FP12RS_STACKDATAi_002D2FC0(s32 arg0, s32 arg1) {
+    if (arg1 <= 0) {
+        return 0;
+    }
+    SetStack__FP12RS_STACKDATAi_002D2820(arg0, GetPadUp__8CGamePadFv(&GamePad_003FA5A0));
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cvillagermngr", _GET_BTN__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cvillagermngr", _GET_PAD_HISTORY__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cvillagermngr", _RESET_PAD_HISTORY__FP12RS_STACKDATAi);

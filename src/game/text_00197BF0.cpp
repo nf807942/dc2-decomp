@@ -11,8 +11,22 @@
 INCLUDE_ASM("nonmatchings/game/text_00197BF0", LoadSystemMes__Fv);
 INCLUDE_ASM("nonmatchings/game/text_00197BF0", GetSystemMesBuffer__Fv);
 INCLUDE_ASM("nonmatchings/game/text_00197BF0", GetSysMesBuffer__Fv);
-INCLUDE_ASM("nonmatchings/game/text_00197BF0", CreateSystemMes__Fv);
+extern "C" s32 CreateSystemMes__Fii(s32, s32);
+extern "C" void CreateSystemMes__Fv(void) {
+    CreateSystemMes__Fii(0, 0);
+    CreateSystemMes__Fii(1, 0);
+    CreateSystemMes__Fii(2, 0);
+}
 INCLUDE_ASM("nonmatchings/game/text_00197BF0", CreateSystemMes__Fii);
 INCLUDE_ASM("nonmatchings/game/text_00197BF0", GetUserDataMan__Fv);
 INCLUDE_ASM("nonmatchings/game/text_00197BF0", GetFishTournament__Fv);
-INCLUDE_ASM("nonmatchings/game/text_00197BF0", GetAquariumData__Fv);
+extern "C" s32 GetUserDataMan__Fv(void);
+extern "C" s32 GetAquariumData__Fv(void) {
+    s32 temp_v0;
+
+    temp_v0 = GetUserDataMan__Fv();
+    if (temp_v0 != 0) {
+        return temp_v0 + 0x4958;
+    }
+    return 0;
+}
