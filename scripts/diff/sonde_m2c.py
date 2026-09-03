@@ -552,7 +552,6 @@ def eprouve(symbole: str, unite: str, taille: int,
     ajoutees: list[str] = []
     vus_types: set[str] = set()
     ellipses: set[str] = set()
-    typees = globales_m2c(texte)
     try:
         # Le compilateur dit ce qui manque, la table des symboles dit quoi
         # écrire, et l'on recommence. Cinq tours suffisent : chacun déclare
@@ -619,8 +618,7 @@ def eprouve(symbole: str, unite: str, taille: int,
             # La forme que m2c a su typer passe devant celle que la table des
             # symboles rend : elle porte le type pointé, et c'est lui que le
             # corps déréférence.
-            neuves = [d for d in (typees.get(nom)
-                                  or declaration(nom, declarations + corps)
+            neuves = [d for d in (declaration(nom, declarations + corps)
                                   for nom in sorted(manquants))
                       if d and d not in ajoutees]
             # Une déclaration ajoutée cite ses propres types — `extern "C" void
@@ -718,45 +716,46 @@ def objets() -> dict[str, int]:
     return _TAILLES
 
 
-# `extern CScene *EventScene;` — la globale que m2c a su typer.
-_GLOBALE_M2C = re.compile(
-    r'^extern ([A-Za-z_]\w*) \*([A-Za-z_]\w*);$', re.M)
+def structure_pointee(nom: str, corps: str) -> str | None:
+    """La structure qu'une globale de quatre octets désigne.
 
+    `g_tmp_effc->unk258` : la globale tient un pointeur, et notre `u32` ne se
+    dereference pas — MWCC repond « expression syntax error » ou
+    « pointer/array required » selon la forme. m2c n'a souvent qu'un
+    `extern void *`, qui ne vaut pas mieux.
 
-def globales_m2c(texte: str) -> dict[str, str]:
-    """Les globales que m2c déclare comme pointeurs, quand la largeur concorde.
+    Les offsets lus derriere la fleche donnent les champs. La taille de la
+    structure pointee, elle, ne se connait pas — et **elle n'a pas a l'etre** :
+    c'est la globale qui s'adresse, et elle fait quatre octets dans les deux
+    cas.
 
-    m2c écrit `extern CScene *EventScene;` : il a vu le déréférencement et en
-    connaît le type. Notre `declaration()`, elle, ne lit que la table des
-    symboles et rend `extern "C" u32 EventScene;` — un scalaire, dont MWCC
-    refuse le `->` : « pointer/array required ». C'était la première cause
-    d'échec de compilation d'une moisson, 77 cas.
-
-    La garde porte sur la largeur, non sur le type : **la taille déclarée d'une
-    globale décide de `%gp_rel` contre `%hi`/`%lo`**. Un pointeur fait quatre
-    octets ; on n'adopte la forme de m2c que si la table des symboles en dit
-    autant.
-
-    **Le gain n'est pas mesuré.** Elle ne se déclenche que sur un nom que MWCC
-    dit inconnu, et sur les trois témoins sondés la globale était déjà déclarée
-    par l'unité, en `u32`, forme sous laquelle des fonctions déjà appariées
-    écrivent `EventScene + 0x2F90`. Les deux formes ne peuvent pas coexister
-    pour une variable, et c'est l'unité qui a raison la première.
+    Sauf si le corps fait de l'arithmetique sur la globale : `(nom + k)->unkN`
+    se met alors a l'echelle de la structure, la ou m2c comptait en octets. On
+    s'abstient, plutot que de changer une adresse en silence.
     """
-    trouves: dict[str, str] = {}
-    for type_, nom in _GLOBALE_M2C.findall(texte):
-        # `extern void *g_tmp_effc;` : m2c declare aussi des `void *`, dont on
-        # ne tirerait qu'un `struct void;` — et un `void *` ne se dereference
-        # pas davantage que notre `u32`. Seul un vrai type nomme apprend
-        # quelque chose.
-        if type_ not in _BASE and objets().get(nom) == 4:
-            # La declaration en avant precede, dans le meme bloc : le type
-            # pointe n'existe pas encore, et MWCC repond « declaration syntax
-            # error » avec le curseur sur son nom. La boucle de completion ne
-            # rattrape pas cette faute-la — elle ne sait chasser qu'un
-            # identifiant declare inconnu, non une erreur de syntaxe.
-            trouves[nom] = 'struct %s;\nextern "C" %s *%s;' % (type_, type_, nom)
-    return trouves
+    if re.search(r'\b' + re.escape(nom) + r'\s*(?:\+|-(?!>))', corps):
+        return None
+    motif = re.compile(r'\b' + re.escape(nom) + r'->unk([0-9A-Fa-f]+)\b')
+    offsets = sorted({int(o, 16) for o in motif.findall(corps)})
+    if not offsets:
+        return None
+    champs, rang = [], 0
+    for indice, offset in enumerate(offsets):
+        if offset > rang:
+            champs.append('    char pad%X[%d];' % (rang, offset - rang))
+        elif offset < rang:
+            return None
+        suivant = offsets[indice + 1] if indice + 1 < len(offsets) else offset + 4
+        place = max(suivant - offset, 1)
+        largeur = 4
+        while largeur > 1 and (offset % largeur or place < largeur):
+            largeur //= 2
+        champs.append('    %s unk%X;' % ({1: 's8', 2: 's16', 4: 's32'}[largeur],
+                                         offset))
+        rang = offset + largeur
+    return ('typedef struct %s_pointe {' % nom + chr(10) + chr(10).join(champs)
+            + chr(10) + '} %s_pointe;' % nom
+            + chr(10) + 'extern "C" %s_pointe *%s;' % (nom, nom))
 
 
 def structure_de_globale(nom: str, corps: str, taille: int) -> str | None:
@@ -867,6 +866,11 @@ def declaration(nom: str, corps: str = "") -> str | None:
     # La largeur d'un champ, elle, se devine : `s32` par defaut, faute de
     # mieux. Une largeur fausse n'apparie pas, et la fonction retourne a sa
     # greffe — ce qu'elle faisait de toute facon sans cette declaration.
+    # Quatre octets et une fleche : la globale tient un pointeur.
+    if taille == 4 and corps:
+        pointee = structure_pointee(nom, corps)
+        if pointee:
+            return pointee
     champs = structure_de_globale(nom, corps, taille)
     if champs:
         return champs
