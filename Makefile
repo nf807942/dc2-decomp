@@ -135,7 +135,7 @@ O_FILES   := $(addprefix $(BUILD_DIR)/, $(S_FILES:.s=.o) $(BIN_FILES:.bin=.o) \
              $(addsuffix .o, $(basename $(SRC_FILES))))
 
 .PHONY: all setup tools patch split build objects check diff decompile measure \
-        atlas carve clean distclean contexte injecte provenance chaine controle ci etat progress report
+        atlas carve clean distclean contexte injecte provenance chaine affinage controle ci etat progress report
 
 all: build
 
@@ -304,6 +304,12 @@ provenance:
 # du disque. `ARGS=--reprendre` repart de ce que `progress/chaine.json` sait.
 chaine:
 	@$(PYTHON) scripts/build/chaine.py $(ARGS)
+
+# La seconde passe : reprend ce qui compile entre 85 et 100 %, la ou le gros
+# des octets se trouve. `ARGS=--rendement` mesure ce que chaque idiome
+# debloque au lieu de garder.
+affinage:
+	@$(PYTHON) scripts/build/affinage.py $(ARGS)
 
 # Verse les champs de l'atlas dans les classes que le dépôt déclare vides. Une
 # disposition ne change les octets que si le code l'emploie — sauf pour une

@@ -134,8 +134,86 @@ def rotate_loop_body(text: str, _rng: random.Random) -> list[str]:
 # Les transformations d'idiome passent avant les aveugles : une correction dont
 # on connaît la raison a plus de chances qu'un tirage au sort, et son succès
 # apprend quelque chose.
+def constante_a_gauche(text: str, _rng: random.Random) -> list[str]:
+    """`if (x > 255.0f)` devient `if (255.0f < x)`, et l'inverse.
+
+    Une comparaison flottante porte la constante a gauche dans le code du
+    commerce : `if (255.0f < x)` rend `c.lt.s`, `if (x > 255.0f)` rend
+    `c.le.s` suivi de `bc1t`. m2c ecrit toujours la variable a gauche, n'ayant
+    aucune raison de faire autrement.
+    """
+    out = []
+    oppose = {'<': '>', '>': '<', '<=': '>=', '>=': '<='}
+    motif = re.compile(r'(\w+(?:->\w+|\.\w+)*) (<=|>=|<|>) (-?\d+\.\d+f?)')
+    for marque in motif.finditer(text):
+        gauche, signe, constante = marque.groups()
+        out.append(text[:marque.start()]
+                   + '%s %s %s' % (constante, oppose[signe], gauche)
+                   + text[marque.end():])
+    motif_inverse = re.compile(r'(-?\d+\.\d+f?) (<=|>=|<|>) (\w+(?:->\w+|\.\w+)*)')
+    for marque in motif_inverse.finditer(text):
+        constante, signe, droite = marque.groups()
+        out.append(text[:marque.start()]
+                   + '%s %s %s' % (droite, oppose[signe], constante)
+                   + text[marque.end():])
+    return out
+
+
+def seuil_deplace(text: str, _rng: random.Random) -> list[str]:
+    """`x > 99` devient `x >= 100`, et l'inverse.
+
+    Les deux comparent la meme chose sur des entiers, et MWCC ne les rend pas
+    pareil : `x > 99` ecrit le `slti` dans `$at`, `x >= 100` dans le registre
+    compare. m2c choisit selon l'instruction qu'il a lue, non selon ce que la
+    source portait.
+    """
+    out = []
+    for marque in re.finditer(r'(\w+(?:->\w+)*) > (-?\d+)\b', text):
+        nom, valeur = marque.groups()
+        out.append(text[:marque.start()]
+                   + '%s >= %d' % (nom, int(valeur) + 1)
+                   + text[marque.end():])
+    for marque in re.finditer(r'(\w+(?:->\w+)*) >= (-?\d+)\b', text):
+        nom, valeur = marque.groups()
+        out.append(text[:marque.start()]
+                   + '%s > %d' % (nom, int(valeur) - 1)
+                   + text[marque.end():])
+    return out
+
+
+def compose_flottant(text: str, _rng: random.Random) -> list[str]:
+    """`x = x + c` devient `x += c`, et l'inverse.
+
+    `x += c` rend `add.s f0, f1, f0` ; `x = x + c` rend `add.s f0, f0, f1`. La
+    forme composee decale aussi la lecture *apres* un appel de la partie
+    droite, ce qui epargne un registre sauvegarde et seize octets de pile.
+
+    Contrairement a `compose_assignment`, aucune garde n'est necessaire : les
+    deux formes sont la meme operation sur la meme variable.
+    """
+    out = []
+    for marque in re.finditer(
+            r'^(\s*)(\w+(?:->\w+)*) = \2 ([-+*/]) ([^;]+);$',
+            text, re.MULTILINE):
+        marge, cible, operateur, reste = marque.groups()
+        out.append(text[:marque.start()]
+                   + '%s%s %s= %s;' % (marge, cible, operateur, reste)
+                   + text[marque.end():])
+    for marque in re.finditer(
+            r'^(\s*)(\w+(?:->\w+)*) ([-+*/])= ([^;]+);$',
+            text, re.MULTILINE):
+        marge, cible, operateur, reste = marque.groups()
+        out.append(text[:marque.start()]
+                   + '%s%s = %s %s %s;' % (marge, cible, cible, operateur, reste)
+                   + text[marque.end():])
+    return out
+
+
 IDIOMES = [
     compose_assignment,
+    compose_flottant,
+    constante_a_gauche,
+    seuil_deplace,
     early_return_from_guard,
     rotate_loop_body,
 ]
