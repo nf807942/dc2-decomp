@@ -419,10 +419,21 @@ def remplace_champs_inconnus(bloc: str, connus: set[str]) -> str:
             suivant = int(taille.group(1), 16)
         large = suivant - int(offset, 16)
         if large <= 0:
+            # m2c pose parfois son propre remplissage au *meme* offset, juste
+            # apres le champ typé : `/* 0x110 */ mgCCamera unk110;` suivi de
+            # `/* 0x110 */ char pad110[0x60];`. La place est deja couverte, le
+            # champ n'a plus qu'a disparaitre.
+            rendu.append((marque.start(), marque.end(), ""))
             continue
         rendu.append((marque.start(), marque.end(),
                       '/* 0x%s */ char %s[0x%X];' % (offset, nom, large)))
     for debut, fin, texte in reversed(rendu):
+        if not texte:
+            # La ligne entiere part, marge et retour compris.
+            while debut > 0 and bloc[debut - 1] in " 	":
+                debut -= 1
+            fin = bloc.find(chr(10), fin)
+            fin = len(bloc) if fin < 0 else fin + 1
         bloc = bloc[:debut] + texte + bloc[fin:]
     return bloc
 
