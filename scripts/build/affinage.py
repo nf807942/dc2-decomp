@@ -114,8 +114,7 @@ def rendement(lot: list[tuple[int, str, str]]) -> int:
                     if variante == corps:
                         continue
                     essais[nom] += 1
-                    ecris(source, texte[:debut] + variante + texte[fin:],
-                                      encoding="utf-8")
+                    ecris(source, texte[:debut] + variante + texte[fin:])
                     part = recompile_et_mesure(symbole, unite)
                     if part is not None and part >= 99.999:
                         compte[nom] += 1
@@ -136,11 +135,17 @@ def main(argv: list[str]) -> int:
     parseur = argparse.ArgumentParser(description=__doc__)
     parseur.add_argument("--combien", type=int, default=0,
                          help="ne traite que les N plus lourdes")
+    # Les plus lourdes sont aussi les plus dures : mesurer le rendement sur
+    # elles seules le sous-estime. Le tirage porte sur toute la file.
+    parseur.add_argument("--tirage", type=int, default=0,
+                         help="tire N fonctions au hasard dans la file")
     parseur.add_argument("--rendement", action="store_true",
                          help="mesure ce que chaque idiome débloque, sans garder")
     options = parseur.parse_args(argv)
 
     lot = candidats(options.combien)
+    if options.tirage:
+        lot = random.Random(1).sample(lot, min(options.tirage, len(lot)))
     if not lot:
         print("corpus vide : `make chaine` le remplit en mesurant.")
         return 0
