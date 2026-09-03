@@ -759,6 +759,50 @@ def globales_m2c(texte: str) -> dict[str, str]:
     return trouves
 
 
+def structure_de_globale(nom: str, corps: str, taille: int) -> str | None:
+    """La globale employée comme structure, telle que le corps la révèle.
+
+    m2c ecrit `extern ? EventScriptArg;` : il sait que c'est une donnee, non
+    ce qu'elle porte. Le corps, lui, la lit champ par champ — `.unk4`, `.unk8`
+    — et chaque nom porte son offset. La table des symboles donne la taille.
+    De quoi poser une structure exacte en taille, approximative en largeurs.
+
+    Rien n'est rendu si le corps ne la lit pas ainsi : une globale scalaire
+    garde sa declaration de largeur, qui est juste.
+    """
+    motif = re.compile(r'\b' + re.escape(nom) + r'\.unk([0-9A-Fa-f]+)\b')
+    offsets = sorted({int(o, 16) for o in motif.findall(corps)})
+    if not offsets or offsets[-1] >= taille:
+        return None
+    lignes, rang = [], 0
+    for indice, offset in enumerate(offsets):
+        if offset > rang:
+            lignes.append('    char pad%X[%d];' % (rang, offset - rang))
+        elif offset < rang:
+            # Deux champs se recouvrent : la largeur devinee est fausse, et
+            # une structure incoherente vaut moins que pas de structure.
+            return None
+        # **L'alignement de l'offset borne la largeur** : `unk2` ne peut pas
+        # etre un mot de quatre octets, et le supposer faisait rejeter la
+        # structure entiere. L'ecart au champ suivant la borne aussi — deux
+        # champs consecutifs a un octet d'intervalle sont des octets.
+        suivant = offsets[indice + 1] if indice + 1 < len(offsets) else taille
+        place = suivant - offset
+        largeur = 4
+        while largeur > 1 and (offset % largeur or place < largeur):
+            largeur //= 2
+        lignes.append('    %s unk%X;' % ({1: 's8', 2: 's16', 4: 's32'}[largeur],
+                                         offset))
+        rang = offset + largeur
+    if rang > taille:
+        return None
+    if rang < taille:
+        lignes.append('    char pad%X[%d];' % (rang, taille - rang))
+    return ('typedef struct %s_champs {' % nom + chr(10) + chr(10).join(lignes)
+            + chr(10) + '} %s_champs;' % nom
+            + chr(10) + 'extern "C" %s_champs %s;' % (nom, nom))
+
+
 def declaration(nom: str, corps: str = "") -> str | None:
     """Ce qu'il faut écrire pour que ce symbole existe, d'après le binaire.
 
@@ -810,6 +854,22 @@ def declaration(nom: str, corps: str = "") -> str | None:
         if porteur:
             return '#include "%s"' % porteur
         return definition_atlas(nom)
+    # Le corps dit `EventScriptArg.unk4` : la globale est une structure, et
+    # `u8 nom[16]` n'en porte pas les champs — MWCC repond « expression syntax
+    # error », curseur sur le nom du champ. Premiere cause d'echec de
+    # compilation de la moisson, et m2c n'aide pas : il ecrit `extern ?`.
+    #
+    # Les offsets, eux, sont dans le corps, et la table des symboles donne la
+    # taille exacte. La structure se synthetise donc, remplie jusqu'a cette
+    # taille — **c'est elle qui decide de `%gp_rel` contre `%hi`/`%lo`**, et
+    # la garder exacte est la seule chose qui ne se devine pas.
+    #
+    # La largeur d'un champ, elle, se devine : `s32` par defaut, faute de
+    # mieux. Une largeur fausse n'apparie pas, et la fonction retourne a sa
+    # greffe — ce qu'elle faisait de toute facon sans cette declaration.
+    champs = structure_de_globale(nom, corps, taille)
+    if champs:
+        return champs
     largeur = {1: "u8", 2: "u16", 4: "u32", 8: "u64"}.get(taille)
     if largeur is None:
         return 'extern "C" u8 %s[%d];' % (nom, taille)

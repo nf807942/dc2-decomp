@@ -153,13 +153,18 @@ def declare_les_piles(corps: str) -> str:
 _TYPEDEF = re.compile(r"^typedef struct (\w+)")
 _AVANT = re.compile(r"^struct (\w+);")
 _FONCTION = re.compile(r'^extern "C" .*?\b(\w+)\s*\(')
+# `extern "C" EventScriptArg_champs EventScriptArg;` — une donnee, non une
+# fonction : sans cette cle, deux fonctions d'une meme unite la reemettent et
+# MWCC repond « redefined ».
+_VARIABLE = re.compile(r'^extern "C" [\w ]+ \*?(\w+)(?:\[[^\]]*\])?;')
 
 
 def _cle(bloc: str) -> tuple[str, str] | None:
     """Ce que ce bloc déclare, sous une forme comparable."""
     tete = bloc.lstrip().split("\n", 1)[0]
     for motif, genre in ((_TYPEDEF, "type"), (_AVANT, "type"),
-                         (_FONCTION, "fonction")):
+                         (_FONCTION, "fonction"),
+                         (_VARIABLE, "variable")):
         marque = motif.match(tete)
         if marque:
             return genre, marque.group(1)
