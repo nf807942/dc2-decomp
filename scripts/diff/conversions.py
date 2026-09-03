@@ -307,3 +307,37 @@ def cast_les_affectations(corps: str) -> str:
         return "%s%s = (%s) (%s);" % (marge, cible, vise, expression)
 
     return _AFFECTE.sub(pose, corps)
+
+
+def declarations_portees(source: str) -> dict[str, str]:
+    """Les déclarations de fonction que cette unité porte déjà, par nom.
+
+    La chaîne cumule les fonctions d'une même unité, et chacune forge ses
+    déclarations pour son propre compte. Le même appelé s'y écrit alors de deux
+    façons — `GetStackInt__FP12RS_STACKDATA_00262DA0()` là où la valeur était
+    déjà dans le registre, `(RS_STACKDATA *, s32)` là où le mangling l'a dictée.
+    Un nom `extern "C"` ne se surcharge pas : MWCC répond « illegal function
+    overloading », et la fonction est perdue. Mesuré sur les causes que la
+    chaîne enregistre : 45 cas sur 161 échecs de compilation, plus 20 « function
+    call does not match » qui sont la même divergence vue du site d'appel.
+
+    Écarter la nôtre quand la source en porte une ne suffisait pas : `assemble`
+    ne comparait qu'à ce qui *précède* le point de greffe, une déclaration en
+    aval restant invisible — et c'est bien elle qui entre en collision. On
+    adopte donc la forme de la source où qu'elle soit dans le fichier : une
+    redéclaration identique est légale, deux formes divergentes ne le sont pas.
+    """
+    portees: dict[str, str] = {}
+    for bloc in _blocs(source):
+        # `_blocs` referme un bloc sur un `;` : une *definition*, qui finit sur
+        # une accolade, s'agrege alors a ce qui la suit. On ne retient donc que
+        # ce qui est une declaration et rien d'autre — une seule ligne, aucune
+        # accolade —, sans quoi l'adoption recopierait un corps de fonction.
+        ligne = bloc.strip()
+        cle = _cle(ligne)
+        if not (cle and cle[0] == "fonction"):
+            continue
+        if "{" in ligne or chr(10) in ligne or not ligne.endswith(";"):
+            continue
+        portees.setdefault(cle[1], ligne)
+    return portees

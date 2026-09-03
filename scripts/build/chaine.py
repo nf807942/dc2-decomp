@@ -110,6 +110,12 @@ def main(argv: list[str]) -> int:
     parseur.add_argument("--unites", type=int, default=0,
                          help="s'arrête après N unités")
     parseur.add_argument("--reprendre", action="store_true")
+    # Une comparaison avant/apres ne vaut que sur la meme population :
+    # la moisson reecrit `chaine.json` en mesurant, et deux tirages du
+    # meme rang y puisent alors des fonctions differentes. La liste fige
+    # les temoins.
+    parseur.add_argument("--liste", type=Path, default=None,
+                         help="ne traite que les symboles de ce fichier")
     options = parseur.parse_args(argv)
 
     # `docker stop` envoie SIGTERM, que Python termine sans dérouler les `finally`
@@ -124,6 +130,14 @@ def main(argv: list[str]) -> int:
         groupes = {unite: [e for e in lot if e[1] not in etat["eprouvees"]]
                    for unite, lot in groupes.items()}
         groupes = {u: l for u, l in groupes.items() if l}
+    if options.liste:
+        voulus = {ligne.strip() for ligne
+                  in options.liste.read_text(encoding="utf-8").splitlines()
+                  if ligne.strip()}
+        groupes = {u: [e for e in lot if e[1] in voulus]
+                   for u, lot in groupes.items()}
+        groupes = {u: l for u, l in groupes.items() if l}
+
     if options.unites:
         groupes = dict(list(groupes.items())[:options.unites])
 

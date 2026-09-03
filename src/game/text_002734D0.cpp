@@ -17,7 +17,12 @@ extern "C" s32 _CMRS_INIT_PAS__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     InitPas__12CSceneCmrSeqFv(&CameraSeq);
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _CMRS_SET_PAS_FRM__FP12RS_STACKDATAi);
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(...);
+extern "C" s32 SetPasFrm__12CSceneCmrSeqFi(void *, s32);
+extern "C" s32 _CMRS_SET_PAS_FRM__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    SetPasFrm__12CSceneCmrSeqFi(&CameraSeq, GetStackInt__FP12RS_STACKDATA_00262DA0());
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _CMRS_ADD_PAS__FP12RS_STACKDATAi);
 extern "C" s32 StartPas__12CSceneCmrSeqFv(void *);
 extern "C" s32 _CMRS_START_PAS__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
@@ -54,7 +59,12 @@ extern "C" s32 _CMRS_AHD_RETURN__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1)
     AHDReturn__12CSceneCmrSeqFv(&CameraSeq);
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _CMRS_FADE_DELAY__FP12RS_STACKDATAi);
+extern "C" s32 FadeDelay__12CSceneCmrSeqFi(void *, s32);
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(...);
+extern "C" s32 _CMRS_FADE_DELAY__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    FadeDelay__12CSceneCmrSeqFi(&CameraSeq, GetStackInt__FP12RS_STACKDATA_00262DA0());
+    return 1;
+}
 extern "C" s32 FadeInit__12CSceneCmrSeqFv(void *);
 extern "C" s32 _CMRS_FADE_INIT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     FadeInit__12CSceneCmrSeqFv(&CameraSeq);
@@ -62,20 +72,51 @@ extern "C" s32 _CMRS_FADE_INIT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) 
 }
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _CMRS_FADE_IN__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _CMRS_FADE_OUT__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _CMRS_QUAKE_DELAY__FP12RS_STACKDATAi);
+extern "C" s32 QuakeDelay__12CSceneCmrSeqFi(void *, s32);
+extern "C" s32 _CMRS_QUAKE_DELAY__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    QuakeDelay__12CSceneCmrSeqFi(&CameraSeq, GetStackInt__FP12RS_STACKDATA_00262DA0());
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _CMRS_QUAKE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _CMRS_QUAKE2__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _CMRS_CHARA_DELAY__FP12RS_STACKDATAi);
+extern "C" s32 CharaDelay__12CSceneCmrSeqFi(void *, s32);
+extern "C" s32 _CMRS_CHARA_DELAY__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    CharaDelay__12CSceneCmrSeqFi(&CameraSeq, GetStackInt__FP12RS_STACKDATA_00262DA0());
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _CMRS_CHARA_ATTACH__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _CMRS_MOVE_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_CHECK__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_INIT__FP12RS_STACKDATAi);
+extern "C" s32 GetObjSeq__Fi(s32);
+#include "gen/CSceneObjSeq.hpp"
+extern "C" s32 Clear__12CSceneObjSeqFv(void *);
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(...);
+extern "C" s32 _OBJS_INIT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    CSceneObjSeq *temp_v0;
+
+    temp_v0 = (CSceneObjSeq *) (GetObjSeq__Fi(GetStackInt__FP12RS_STACKDATA_00262DA0()));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    Clear__12CSceneObjSeqFv(temp_v0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_SYNC_OBJ__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_POS_DELAY__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_SET_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_MOVE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_MOVE2__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_INIT_PAS__FP12RS_STACKDATAi);
+extern "C" s32 InitPas__12CSceneObjSeqFv(void *);
+extern "C" s32 _OBJS_INIT_PAS__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    CSceneObjSeq *temp_v0;
+
+    temp_v0 = (CSceneObjSeq *) (GetObjSeq__Fi(GetStackInt__FP12RS_STACKDATA_00262DA0()));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    InitPas__12CSceneObjSeqFv(temp_v0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_SET_PAS_FRM__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_ADD_PAS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_START_PAS__FP12RS_STACKDATAi);
@@ -91,12 +132,52 @@ INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_REFERENCE__FP12RS_STACKDATA
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_MOTION_DELAY__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_SET_MOTION__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_NEXT_MOTION__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_MOTION_WAIT__FP12RS_STACKDATAi);
+extern "C" s32 MotionWait__12CSceneObjSeqFv(void *);
+extern "C" s32 _OBJS_MOTION_WAIT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    CSceneObjSeq *temp_v0;
+
+    temp_v0 = (CSceneObjSeq *) (GetObjSeq__Fi(GetStackInt__FP12RS_STACKDATA_00262DA0()));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    MotionWait__12CSceneObjSeqFv(temp_v0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_SET_STEP__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_CHENGE_STEP__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_SEQ_MOT_TRG__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_SEQ_MOT_TRG_WAIT__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_RESET_MOTION__FP12RS_STACKDATAi);
+extern "C" s32 SetMotionTrg__12CSceneObjSeqFv(void *);
+extern "C" s32 _OBJS_SEQ_MOT_TRG__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    CSceneObjSeq *temp_v0;
+
+    temp_v0 = (CSceneObjSeq *) (GetObjSeq__Fi(GetStackInt__FP12RS_STACKDATA_00262DA0()));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    SetMotionTrg__12CSceneObjSeqFv(temp_v0);
+    return 1;
+}
+extern "C" s32 MotionTrgWait__12CSceneObjSeqFv(void *);
+extern "C" s32 _OBJS_SEQ_MOT_TRG_WAIT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    CSceneObjSeq *temp_v0;
+
+    temp_v0 = (CSceneObjSeq *) (GetObjSeq__Fi(GetStackInt__FP12RS_STACKDATA_00262DA0()));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    MotionTrgWait__12CSceneObjSeqFv(temp_v0);
+    return 1;
+}
+extern "C" s32 ResetMotion__12CSceneObjSeqFv(void *);
+extern "C" s32 _OBJS_RESET_MOTION__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    CSceneObjSeq *temp_v0;
+
+    temp_v0 = (CSceneObjSeq *) (GetObjSeq__Fi(GetStackInt__FP12RS_STACKDATA_00262DA0()));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    ResetMotion__12CSceneObjSeqFv(temp_v0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_SET_MOTION_NOW_TIME__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_SET_MOTION_WAIT_TIME__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_TEXA_DELAY__FP12RS_STACKDATAi);
@@ -107,12 +188,32 @@ INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_SCALE_DELAY__FP12RS_STACKDA
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_SET_SCALE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_SE_DELAY__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_SE_PLAY__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_RESET_DA_POSITION__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _OBJS_NORMAL_DRIVE__FP12RS_STACKDATAi);
+extern "C" s32 ResetDAPosition__12CSceneObjSeqFv(void *);
+extern "C" s32 _OBJS_RESET_DA_POSITION__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    CSceneObjSeq *temp_v0;
+
+    temp_v0 = (CSceneObjSeq *) (GetObjSeq__Fi(GetStackInt__FP12RS_STACKDATA_00262DA0()));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    ResetDAPosition__12CSceneObjSeqFv(temp_v0);
+    return 1;
+}
+extern "C" s32 NormalDrive__12CSceneObjSeqFv(void *);
+extern "C" s32 _OBJS_NORMAL_DRIVE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    CSceneObjSeq *temp_v0;
+
+    temp_v0 = (CSceneObjSeq *) (GetObjSeq__Fi(GetStackInt__FP12RS_STACKDATA_00262DA0()));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    NormalDrive__12CSceneObjSeqFv(temp_v0);
+    return 1;
+}
 s32 _ASQ_CHECK(RS_STACKDATA *stack, int argc) {
     return 1;
 }
-extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0();
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(...);
 extern "C" void sndInitPort__Fi(s32 arg0);
 extern "C" s32 _SND_INIT_PORT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     sndInitPort__Fi(GetStackInt__FP12RS_STACKDATA_00262DA0());
@@ -126,7 +227,7 @@ INCLUDE_ASM("nonmatchings/game/text_002734D0", _SND_SE_STOP__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _SND_SET_SE_VOL__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _SND_SET_SE_PAN__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _SND_SET_SE_PITCH__FP12RS_STACKDATAi);
-extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0();
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(...);
 extern "C" void sndSeAllStop__Fi(s32 arg0);
 extern "C" s32 _SND_SE_ALL_STOP__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     sndSeAllStop__Fi(GetStackInt__FP12RS_STACKDATA_00262DA0());
@@ -161,7 +262,7 @@ extern "C" s32 _STREAM_OPEN_CHECK__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _LOAD_SE_ENV__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _PLAY_ENV_BGM__FP12RS_STACKDATAi);
 extern "C" u32 SystemSND_ID;
-extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0();
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(...);
 extern "C" void sndSePlay__FUiii(u32 arg0, s32 arg1, s32 arg2);
 extern "C" s32 _SYS_SE_PLAY__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     s32 temp_v0;
@@ -187,7 +288,7 @@ s32 _LOAD_SE_BOX(RS_STACKDATA *stack, int argc) {
     return 0;
 }
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _LOAD_SE_BATTLE__FP12RS_STACKDATAi);
-extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0();
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(...);
 extern "C" void sndDeletePort__Fi(s32 arg0);
 extern "C" s32 _SND_DELETE_PORT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     sndDeletePort__Fi(GetStackInt__FP12RS_STACKDATA_00262DA0());
@@ -210,7 +311,7 @@ INCLUDE_ASM("nonmatchings/game/text_002734D0", _SOUND_LOAD_ENABLE__FP12RS_STACKD
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _LOAD_SE_BASE__FP12RS_STACKDATAi);
 extern "C" u32 EventScene;
 extern "C" u32 read_buffer;
-extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0();
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(...);
 extern "C" void LoadSound__6CSceneFiP1(s32, s32, s32);
 extern "C" s32 _LOAD_SOUND__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     LoadSound__6CSceneFiP1(EventScene, GetStackInt__FP12RS_STACKDATA_00262DA0(), read_buffer);
@@ -285,7 +386,7 @@ INCLUDE_ASM("nonmatchings/game/text_002734D0", _EOH_SET_FRAME_ALPHA__FP12RS_STAC
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _EOH_SYNC_FUNCP__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _EOH_SET_FOOT_SE_ID__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _EOH_SYNC_DOOR_PARTS__FP12RS_STACKDATAi);
-extern "C" void InitSphida__Fv();
+extern "C" void InitSphida__Fv(...);
 extern "C" s32 _SPHIDA_INIT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     InitSphida__Fv();
     return 1;

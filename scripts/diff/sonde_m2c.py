@@ -36,7 +36,7 @@ from lib.project import (ROOT, functions, grafted_by_source,  # noqa: E402
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from conversions import (cast_les_affectations,  # noqa: E402
                          assemble, declare_les_piles, nettoie_declarations,
-                         remplit_les_appels, renomme,
+                         declarations_portees, remplit_les_appels, renomme,
                          nettoie_locales)
 
 # `typedef struct X {` … `} X;` — la structure que m2c infère d'un pointeur.
@@ -322,7 +322,8 @@ def complete_structures(structs: list[str], corps: str) -> tuple[list[str], str]
 
 
 def normalise(texte: str, symbole: str, vues: set[str],
-              declarees: set[str] | None = None) -> tuple[str, str] | None:
+              declarees: set[str] | None = None,
+              portees: dict[str, str] | None = None) -> tuple[str, str] | None:
     """Rend (déclarations, définition) prêtes à compiler, ou rien.
 
     Trois retouches, et pas une de plus : les structures inférées se gardent
@@ -390,6 +391,13 @@ def normalise(texte: str, symbole: str, vues: set[str],
         # fonctions de l unite. Deux formes divergentes du meme nom
         # `extern "C"` font repondre « illegal function overloading », et
         # la chaine cumule les fonctions d une meme unite.
+        # L'unite a peut-etre deja declare cet appele, et sa forme fait loi :
+        # un nom `extern "C"` ne se surcharge pas. La reprendre mot pour mot
+        # rend la redeclaration legale et donne a `remplit_les_appels` l'arite
+        # que le reste du fichier suppose.
+        if portees and nom in portees:
+            externes.append(portees[nom])
+            continue
         depuis_mangling = declaration(nom) if nom in functions() else None
         if depuis_mangling:
             # Le renommage vaut aussi pour elle : le corps parle de la
@@ -500,14 +508,15 @@ def eprouve(symbole: str, unite: str, taille: int,
             return {**verdict, "issue": "m2c ne sait pas traduire",
                     "cause": aveu}
 
+    source = ROOT / "src" / (unite + ".cpp")
+    avant = source.read_text(encoding="utf-8")
+
     rendu = normalise(texte, symbole, deja_vues(unite),
-                      deja_declarees(unite))
+                      deja_declarees(unite),
+                      declarations_portees(avant))
     if rendu is None:
         return {**verdict, "issue": "sortie illisible"}
     declarations, corps = rendu
-
-    source = ROOT / "src" / (unite + ".cpp")
-    avant = source.read_text(encoding="utf-8")
     ligne = INCLUDE_ASM % (unite, symbole)
     if ligne not in avant:
         return {**verdict, "issue": "non greffée"}

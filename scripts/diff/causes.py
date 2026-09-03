@@ -32,6 +32,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import conversions  # noqa: E402
 import sonde_m2c  # noqa: E402
 from lib.project import ROOT, functions, run, unit_of  # noqa: E402
 
@@ -82,17 +83,18 @@ def cause(symbole: str, unite: str, jeton: str) -> tuple[str, str]:
     texte = sonde_m2c.decompile(symbole)
     if texte is None:
         return "m2c refuse", ""
+    source = (ROOT / "src" / (unite + ".cpp")).read_text(encoding="utf-8")
     rendu = sonde_m2c.normalise(texte, symbole,
                                 sonde_m2c.deja_vues(unite),
-                                sonde_m2c.deja_declarees(unite))
+                                sonde_m2c.deja_declarees(unite),
+                                conversions.declarations_portees(source))
     if rendu is None:
         return "sortie illisible", ""
     declarations, corps = rendu
 
     # Les mêmes en-têtes que l'unité : sans eux, tout type du projet manquerait
     # et le diagnostic ne parlerait que de cela.
-    entetes = "\n".join(_INCLUDE.findall(
-        (ROOT / "src" / (unite + ".cpp")).read_text(encoding="utf-8")))
+    entetes = chr(10).join(_INCLUDE.findall(source))
 
     ajoutees: list[str] = []
     for _tour in range(5):
