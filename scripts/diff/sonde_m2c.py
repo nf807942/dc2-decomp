@@ -568,11 +568,23 @@ def eprouve(symbole: str, unite: str, taille: int,
                 for appele in conflits:
                     motif = re.compile(
                         '^extern "C" ([^;(]*?)' + _MOT + re.escape(appele)
-                        + r'\s*\([^;]*\);$', re.M)
+                        # La classe niee traverse les retours a la ligne :
+                        # `[^;]*` a mordu sur le corps d'une definition et
+                        # laisse trois unites desequilibrees. On borne aux
+                        # caracteres qu'une liste de parametres porte.
+                        + r'\s*\([^;{}\n]*\);$', re.M)
                     remplacement = 'extern "C" ' + chr(92) + "1" + appele + "(...);"
                     declarations = motif.sub(remplacement, declarations)
                     ajoutees = [motif.sub(remplacement, d) for d in ajoutees]
-                    avant = motif.sub(remplacement, avant)
+                    # Une reecriture de l'unite ne doit toucher qu'une
+                    # declaration. Si l'equilibre des accolades bouge, elle a
+                    # mordu sur un corps de fonction : on la refuse plutot que
+                    # de laisser l'unite cassee derriere soi. Faute d'un tel
+                    # garde-fou, un motif trop large a desequilibre trois
+                    # unites et fait echouer 330 fonctions par ricochet.
+                    reecrit = motif.sub(remplacement, avant)
+                    if _equilibre(reecrit) == _equilibre(avant):
+                        avant = reecrit
                 continue
 
             manquants = {nom for nom in _INCONNU.findall(sortie)}
@@ -737,6 +749,11 @@ _CURSEUR = re.compile(r"^#\s+Error:( *)\^", re.M)
 def premiere_erreur(sortie: str) -> str:
     trouve = _ERREUR.findall(sortie)
     return trouve[0][:70] if trouve else "inconnue"
+
+
+def _equilibre(texte: str) -> int:
+    """Autant d'accolades ouvertes que fermees, ou l'ecart."""
+    return texte.count("{") - texte.count("}")
 
 
 def erreur_detaillee(sortie: str) -> tuple[str, str]:

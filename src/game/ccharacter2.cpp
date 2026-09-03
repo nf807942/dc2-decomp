@@ -74,7 +74,7 @@ INCLUDE_ASM("nonmatchings/game/ccharacter2", _SEQ_START__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _SEQ__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _SEQ_END__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _CLOTH_START__FP9SPI_STACKi);
-extern "C" s32 Initialize__13CDynamicAnimeFv(CDynamicAnime *objet);
+extern "C" s32 Initialize__13CDynamicAnimeFv(...);
 extern "C" CDynamicAnime *__ct__13CDynamicAnimeFv(CDynamicAnime *objet) {
     Initialize__13CDynamicAnimeFv(objet);
     return objet;
@@ -240,12 +240,25 @@ INCLUDE_ASM("nonmatchings/game/ccharacter2", pGetBoundingBox__13CDynamicAnimeFi)
 INCLUDE_ASM("nonmatchings/game/ccharacter2", SetCollision__13CDynamicAnimeFiP12CDACollision);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", DrawSub__13CDynamicAnimeFi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", Copy__13CDynamicAnimeFR13CDynamicAnimeP8mgCFrameP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", dynFRAME_START__FP9SPI_STACKi);
+extern "C" u32 dynNowDA;
+extern "C" u32 dynStack;
+#include "menu.hpp"
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(SPI_STACK *);
+extern "C" s32 NewFrameTable__13CDynamicAnimeFiP9mgCMemory(...);
+extern "C" s32 dynFRAME_START__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    NewFrameTable__13CDynamicAnimeFiP9mgCMemory(dynNowDA, spiGetStackInt__FP9SPI_STACK(arg0), dynStack);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynFRAME__FP9SPI_STACKi);
 s32 dynFRAME_END(SPI_STACK *stack, int argc) {
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/ccharacter2", dynVERTEX_START__FP9SPI_STACKi);
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(SPI_STACK *);
+extern "C" s32 NewVertexTable__13CDynamicAnimeFiP9mgCMemory(...);
+extern "C" s32 dynVERTEX_START__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    NewVertexTable__13CDynamicAnimeFiP9mgCMemory(dynNowDA, spiGetStackInt__FP9SPI_STACK(arg0), dynStack);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynVERTEX__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynVERTEX_L__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynVERTEX_END__FP9SPI_STACKi);
@@ -261,17 +274,30 @@ INCLUDE_ASM("nonmatchings/game/ccharacter2", FRAME_POSE_Sub__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynFRAME_POSE_L__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynFRAME_POSE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynDRAW_FRAME__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", dynBIND_VERTEX_START__FP9SPI_STACKi);
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(SPI_STACK *);
+extern "C" s32 NewBindVertexTable__13CDynamicAnimeFiP9mgCMemory(...);
+extern "C" s32 dynBIND_VERTEX_START__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    NewBindVertexTable__13CDynamicAnimeFiP9mgCMemory(dynNowDA, spiGetStackInt__FP9SPI_STACK(arg0), dynStack);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynBIND_VERTEX__FP9SPI_STACKi);
 s32 dynBIND_VERTEX_END(SPI_STACK *stack, int argc) {
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/ccharacter2", dynBOUNDING_BOX_START__FP9SPI_STACKi);
+extern "C" s32 NewBoundingBoxTable__13CDynamicAnimeFiP9mgCMemory(...);
+extern "C" s32 dynBOUNDING_BOX_START__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    NewBoundingBoxTable__13CDynamicAnimeFiP9mgCMemory(dynNowDA, spiGetStackInt__FP9SPI_STACK(arg0), dynStack);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynBOUNDING_BOX__FP9SPI_STACKi);
 s32 dynBOUNDING_BOX_END(SPI_STACK *stack, int argc) {
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/ccharacter2", dynCOLLISION_START__FP9SPI_STACKi);
+extern "C" s32 NewCollisionTable__13CDynamicAnimeFiP9mgCMemory(...);
+extern "C" s32 dynCOLLISION_START__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    NewCollisionTable__13CDynamicAnimeFiP9mgCMemory(dynNowDA, spiGetStackInt__FP9SPI_STACK(arg0), dynStack);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynCOLLISION__FP9SPI_STACKi);
 typedef struct CDAColPipe {
     /* 0x00 */ char pad0[4];
@@ -283,7 +309,7 @@ typedef struct CDAColPipe {
     /* 0x24 */ char pad24[0xAC];                    /* maybe part of unk20[0x2C]? */
     /* 0xD0 */ s32 unkD0;                           /* inferred */
 } CDAColPipe;                                       /* size >= 0xD4 */
-extern "C" void mgZeroVector__FPf(f32 *arg0);
+extern "C" void mgZeroVector__FPf(...);
 extern "C" void Initialize__10CDAColPipeFv(CDAColPipe *objet) {
     objet->unkD0 = 0;
     mgZeroVector__FPf(&objet->unk10);

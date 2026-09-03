@@ -158,6 +158,30 @@ def outils_corrompus() -> list[str]:
     return fautes
 
 
+def sources_desequilibrees() -> list[str]:
+    """Les unités où les accolades ne se referment pas.
+
+    La chaîne réécrit ses sources, et une substitution trop large peut mordre
+    sur un corps de fonction : elle laisse alors l'unité amputée, qui ne
+    compile plus. Toute fonction posée ensuite dans cette unité échoue sans
+    rapport avec elle-même — 330 des 586 échecs d'une moisson venaient de
+    trois unités déséquilibrées, et rien ne le disait.
+
+    Le compte ne prouve pas que le code est bien formé — une accolade dans une
+    chaîne de caractères le fausse —, mais il attrape l'amputation, qui est la
+    faute que la chaîne sait commettre.
+    """
+    fautes = []
+    for chemin in sorted((ROOT / "src").rglob("*.cpp")):
+        texte = chemin.read_text(encoding="utf-8", errors="replace")
+        ecart = texte.count("{") - texte.count("}")
+        if ecart:
+            fautes.append("%s : %+d accolade%s"
+                          % (chemin.relative_to(ROOT).as_posix(), ecart,
+                             "s" if abs(ecart) > 1 else ""))
+    return fautes
+
+
 CONTROLES = [
     ("en-têtes engendrés", entetes_manquants, False),
     ("greffes sans désassemblage", greffes_sans_desassemblage, True),
@@ -166,6 +190,7 @@ CONTROLES = [
     ("plages qui se chevauchent", plages_qui_se_chevauchent, False),
     ("sources et unités", sources_absentes, False),
     ("outils corrompus", outils_corrompus, False),
+    ("accolades des sources", sources_desequilibrees, False),
 ]
 
 

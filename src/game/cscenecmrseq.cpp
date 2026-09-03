@@ -41,16 +41,72 @@ s32 scsPRKeep(_SEN_CMR_SEQ * arg0, CSceneCmrSeq * arg1) {
 s32 scsPRReturn(_SEN_CMR_SEQ *sequence, CSceneCmrSeq *owner) {
     return 2;
 }
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsFadeDelay__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
+struct inferred;
+typedef struct CSceneCmrSeq_infere3 {
+    /* 0x00 */ char pad0[0x40];
+    /* 0x40 */ s32 unk40;                           /* inferred */
+} CSceneCmrSeq_infere3;                                     /* size >= 0x44 */
+typedef struct _SEN_CMR_SEQ_infere {
+    /* 0x00 */ char pad0[0x30];
+    /* 0x30 */ s32 unk30;                           /* inferred */
+} _SEN_CMR_SEQ_infere;                                     /* size >= 0x34 */
+extern "C" s32 scsFadeDelay__FP12_SEN_CMR_SEQP12CSceneCmrSeq(_SEN_CMR_SEQ_infere *arg0, CSceneCmrSeq_infere3 *arg1) {
+    s32 temp_v1;
+
+    temp_v1 = arg1->unk40;
+    if (temp_v1 >= arg0->unk30) {
+        arg1->unk40 = 0;
+        return 0;
+    }
+    arg1->unk40 = temp_v1 + 1;
+    return 1;
+}
 s32 scsFadeInit(_SEN_CMR_SEQ *sequence, CSceneCmrSeq *owner) {
     return 0;
 }
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsFadeIn__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsFadeOut__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsQuakeDelay__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
+struct inferred;
+typedef struct CSceneCmrSeq_infere4 {
+    /* 0x00 */ char pad0[0x44];
+    /* 0x44 */ s32 unk44;                           /* inferred */
+} CSceneCmrSeq_infere4;                                     /* size >= 0x48 */
+typedef struct _SEN_CMR_SEQ_infere2 {
+    /* 0x00 */ char pad0[0x30];
+    /* 0x30 */ s32 unk30;                           /* inferred */
+} _SEN_CMR_SEQ_infere2;                                     /* size >= 0x34 */
+extern "C" s32 scsQuakeDelay__FP12_SEN_CMR_SEQP12CSceneCmrSeq(_SEN_CMR_SEQ_infere2 *arg0, CSceneCmrSeq_infere4 *arg1) {
+    s32 temp_v1;
+
+    temp_v1 = arg1->unk44;
+    if (temp_v1 >= arg0->unk30) {
+        arg1->unk44 = 0;
+        return 0;
+    }
+    arg1->unk44 = temp_v1 + 1;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsQuake__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsQuake2__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsCharaDelay__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
+typedef struct CSceneCmrSeq_infere5 {
+    /* 0x00 */ char pad0[0x48];
+    /* 0x48 */ s32 unk48;                           /* inferred */
+} CSceneCmrSeq_infere5;                                     /* size >= 0x4C */
+typedef struct _SEN_CMR_SEQ_infere3 {
+    /* 0x00 */ char pad0[0x30];
+    /* 0x30 */ s32 unk30;                           /* inferred */
+} _SEN_CMR_SEQ_infere3;                                     /* size >= 0x34 */
+extern "C" s32 scsCharaDelay__FP12_SEN_CMR_SEQP12CSceneCmrSeq(_SEN_CMR_SEQ_infere3 *arg0, CSceneCmrSeq_infere5 *arg1) {
+    s32 temp_v1;
+
+    temp_v1 = arg1->unk48;
+    if (temp_v1 >= arg0->unk30) {
+        arg1->unk48 = 0;
+        return 0;
+    }
+    arg1->unk48 = temp_v1 + 1;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsCharaAttach__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 s32 scsDummy(_SEN_CMR_SEQ *sequence, CSceneCmrSeq *owner) {
     return 1;
@@ -58,7 +114,19 @@ s32 scsDummy(_SEN_CMR_SEQ *sequence, CSceneCmrSeq *owner) {
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", InitSceneCmrSeq__FP12_SEN_CMR_SEQ);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", __ct__12CSceneCmrSeqFv);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", ZeroInitialize__12CSceneCmrSeqFv);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Initialize__12CSceneCmrSeqFP12_SEN_CMR_SEQi);
+struct inferred;
+typedef struct CSceneCmrSeq_infere2 {
+    /* 0x0 */ _SEN_CMR_SEQ *unk0;                   /* inferred */
+    /* 0x4 */ s32 unk4;                             /* inferred */
+} CSceneCmrSeq_infere2;                                     /* size >= 0x8 */
+extern "C" s32 Clear__12CSceneCmrSeqFv(void *);
+extern "C" s32 ZeroInitialize__12CSceneCmrSeqFv(void *);
+extern "C" void Initialize__12CSceneCmrSeqFP12_SEN_CMR_SEQi(CSceneCmrSeq_infere2 *objet, _SEN_CMR_SEQ *arg0, s32 arg1) {
+    ZeroInitialize__12CSceneCmrSeqFv(objet);
+    objet->unk0 = arg0;
+    objet->unk4 = arg1;
+    Clear__12CSceneCmrSeqFv(objet);
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Clear__12CSceneCmrSeqFv);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", CheckEnd__12CSceneCmrSeqFv);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Play__12CSceneCmrSeqFv);
@@ -78,7 +146,7 @@ typedef struct _SEN_CMR_SEQ {
     /* 0x00 */ char pad0[0x5C];
     /* 0x5C */ s32 unk5C;                           /* inferred */
 } _SEN_CMR_SEQ;                                     /* size >= 0x60 */
-extern "C" s32 InitSceneCmrSeq__FP12_SEN_CMR_SEQ(_SEN_CMR_SEQ *arg0);
+extern "C" s32 InitSceneCmrSeq__FP12_SEN_CMR_SEQ(...);
 extern "C" s32 GetNextSeq__12CSceneCmrSeqFP12_SEN_CMR_SEQi(CSceneCmrSeq_infere *objet, _SEN_CMR_SEQ *arg0, s32 arg1) {
     s32 temp_s0;
 
@@ -110,13 +178,42 @@ INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Move__12CSceneCmrSeqFPfPfi);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Move2__12CSceneCmrSeqFPfPfiif);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", MoveRef__12CSceneCmrSeqFPfi);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", MovePos__12CSceneCmrSeqFPfi);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", InitPas__12CSceneCmrSeqFv);
+extern "C" s32 SearchNextPrSeq__12CSceneCmrSeqFv(void *);
+extern "C" void InitPas__12CSceneCmrSeqFv(CSceneCmrSeq *objet) {
+    s32 *temp_v0;
+
+    temp_v0 = (s32 *) (SearchNextPrSeq__12CSceneCmrSeqFv(objet));
+    if (temp_v0 != NULL) {
+        *temp_v0 = 8;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SetPasFrm__12CSceneCmrSeqFi);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", AddPas__12CSceneCmrSeqFPfPf);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", StartPas__12CSceneCmrSeqFv);
+extern "C" void StartPas__12CSceneCmrSeqFv(CSceneCmrSeq *objet) {
+    s32 *temp_v0;
+
+    temp_v0 = (s32 *) (SearchNextPrSeq__12CSceneCmrSeqFv(objet));
+    if (temp_v0 != NULL) {
+        *temp_v0 = 0xB;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", PRSlowing__12CSceneCmrSeqFfi);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", PRKeep__12CSceneCmrSeqFv);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", PRReturn__12CSceneCmrSeqFv);
+extern "C" void PRKeep__12CSceneCmrSeqFv(CSceneCmrSeq *objet) {
+    s32 *temp_v0;
+
+    temp_v0 = (s32 *) (SearchNextPrSeq__12CSceneCmrSeqFv(objet));
+    if (temp_v0 != NULL) {
+        *temp_v0 = 0xD;
+    }
+}
+extern "C" void PRReturn__12CSceneCmrSeqFv(CSceneCmrSeq *objet) {
+    s32 *temp_v0;
+
+    temp_v0 = (s32 *) (SearchNextPrSeq__12CSceneCmrSeqFv(objet));
+    if (temp_v0 != NULL) {
+        *temp_v0 = 0xE;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", AHDDelay__12CSceneCmrSeqFi);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SetAngle__12CSceneCmrSeqFf);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SetHeight__12CSceneCmrSeqFf);
@@ -125,12 +222,42 @@ INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SetAHD__12CSceneCmrSeqFfff);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", MoveAHD__12CSceneCmrSeqFfffi);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", MoveAHD2__12CSceneCmrSeqFfffiif);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SetSyncObj__12CSceneCmrSeqFiPffffiPc);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", ReleaseSyncObj__12CSceneCmrSeqFv);
+extern "C" s32 SearchNextAhdSeq__12CSceneCmrSeqFv(void *);
+extern "C" void ReleaseSyncObj__12CSceneCmrSeqFv(CSceneCmrSeq *objet) {
+    s32 *temp_v0;
+
+    temp_v0 = (s32 *) (SearchNextAhdSeq__12CSceneCmrSeqFv(objet));
+    if (temp_v0 != NULL) {
+        *temp_v0 = 0x17;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", AHDSlowing__12CSceneCmrSeqFfi);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", AHDKeep__12CSceneCmrSeqFv);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", AHDReturn__12CSceneCmrSeqFv);
+extern "C" void AHDKeep__12CSceneCmrSeqFv(CSceneCmrSeq *objet) {
+    s32 *temp_v0;
+
+    temp_v0 = (s32 *) (SearchNextAhdSeq__12CSceneCmrSeqFv(objet));
+    if (temp_v0 != NULL) {
+        *temp_v0 = 0x19;
+    }
+}
+extern "C" void AHDReturn__12CSceneCmrSeqFv(CSceneCmrSeq *objet) {
+    s32 *temp_v0;
+
+    temp_v0 = (s32 *) (SearchNextAhdSeq__12CSceneCmrSeqFv(objet));
+    if (temp_v0 != NULL) {
+        *temp_v0 = 0x1A;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", FadeDelay__12CSceneCmrSeqFi);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", FadeInit__12CSceneCmrSeqFv);
+extern "C" s32 SearchNextFadeSeq__12CSceneCmrSeqFv(void *);
+extern "C" void FadeInit__12CSceneCmrSeqFv(CSceneCmrSeq *objet) {
+    s32 *temp_v0;
+
+    temp_v0 = (s32 *) (SearchNextFadeSeq__12CSceneCmrSeqFv(objet));
+    if (temp_v0 != NULL) {
+        *temp_v0 = 0x1C;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", FadeIn__12CSceneCmrSeqFifff);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", FadeOut__12CSceneCmrSeqFifff);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", QuakeDelay__12CSceneCmrSeqFi);
@@ -138,43 +265,328 @@ INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Quake__12CSceneCmrSeqFPfi);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Quake2__12CSceneCmrSeqFPfi);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", CharaDelay__12CSceneCmrSeqFi);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", CharaAttach__12CSceneCmrSeqFifi);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsPosDelay__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsSetPos__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
+typedef struct CSceneObjSeq_infere4 {
+    /* 0x00 */ char pad0[0x40];
+    /* 0x40 */ s32 unk40;                           /* inferred */
+} CSceneObjSeq_infere4;                                     /* size >= 0x44 */
+typedef struct _SEN_OBJ_SEQ_infere3 {
+    /* 0x00 */ char pad0[0x20];
+    /* 0x20 */ s32 unk20;                           /* inferred */
+} _SEN_OBJ_SEQ_infere3;                                     /* size >= 0x24 */
+extern "C" s32 scsPosDelay__FP12_SEN_OBJ_SEQP12CSceneObjSeq(_SEN_OBJ_SEQ_infere3 *arg0, CSceneObjSeq_infere4 *arg1) {
+    s32 temp_v1;
+
+    temp_v1 = arg1->unk40;
+    if (temp_v1 >= arg0->unk20) {
+        arg1->unk40 = 0;
+        return 0;
+    }
+    arg1->unk40 = temp_v1 + 1;
+    return 1;
+}
+typedef struct CSceneObjSeq_infere15 {
+    /* 0x00 */ char pad0[0x70];
+    /* 0x70 */ char unk70;                             /* inferred */
+    /* 0x70 */ char pad70[1];
+} CSceneObjSeq_infere15;                                     /* size >= 0x71 */
+typedef struct _SEN_OBJ_SEQ_infere14 {
+    /* 0x00 */ char pad0[0x10];
+    /* 0x10 */ char unk10;                             /* inferred */
+    /* 0x10 */ char pad10[1];
+} _SEN_OBJ_SEQ_infere14;                                     /* size >= 0x11 */
+extern "C" s32 sceVu0CopyVector(...);
+extern "C" s32 scsSetPos__FP12_SEN_OBJ_SEQP12CSceneObjSeq(_SEN_OBJ_SEQ_infere14 *arg0, CSceneObjSeq_infere15 *arg1) {
+    sceVu0CopyVector(&arg1->unk70, &arg0->unk10);
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsMove__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsMove2__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsInitPas__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsSetPasFrm__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsAddPas__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsStartPas__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsJump__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
+struct inferred;
+typedef struct CSceneObjSeq_infere2 {
+    /* 0x000 */ char pad0[0x40];
+    /* 0x040 */ s32 unk40;                          /* inferred */
+    /* 0x044 */ char pad44[0x2C];                   /* maybe part of unk40[0xC]void */
+    /* 0x070 */ f32 unk70;                          /* inferred */
+    /* 0x074 */ char pad74[0x8C];                   /* maybe part of unk70[0x24]void */
+    /* 0x100 */ f32 unk100;                         /* inferred */
+    /* 0x104 */ char pad104[0xC];                   /* maybe part of unk100[4]void */
+    /* 0x110 */ f32 unk110;                         /* inferred */
+} CSceneObjSeq_infere2;                                     /* size >= 0x114 */
+typedef struct _SEN_OBJ_SEQ_infere2 {
+    /* 0x00 */ char pad0[0x10];
+    /* 0x10 */ f32 unk10;                           /* inferred */
+    /* 0x14 */ char pad14[0xC];                     /* maybe part of unk10[4]void */
+    /* 0x20 */ f32 unk20;                           /* inferred */
+    /* 0x24 */ s32 unk24;                           /* inferred */
+} _SEN_OBJ_SEQ_infere2;                                     /* size >= 0x28 */
+extern "C" s32 CalcPosParabolicJump__FPfPfPffff(f32 *, f32 *, f32 *, f32, f32, f32);
+extern "C" s32 sceVu0CopyVector(...);
+extern "C" s32 scsJump__FP12_SEN_OBJ_SEQP12CSceneObjSeq(_SEN_OBJ_SEQ_infere2 *arg0, CSceneObjSeq_infere2 *arg1) {
+    s32 temp_v1;
+
+    if (arg1->unk40 <= 0) {
+        sceVu0CopyVector(&arg1->unk100, &arg1->unk70);
+        sceVu0CopyVector(&arg1->unk110, &arg0->unk10);
+    }
+    temp_v1 = arg1->unk40;
+    if (temp_v1 >= arg0->unk24) {
+        sceVu0CopyVector(&arg1->unk70, &arg1->unk110);
+        arg1->unk40 = 0;
+        return 0;
+    }
+    arg1->unk40 = temp_v1 + 1;
+    CalcPosParabolicJump__FPfPfPffff(&arg1->unk70, &arg1->unk100, &arg1->unk110, arg0->unk20, (f32) arg0->unk24, (f32) arg1->unk40);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsSetEohFramePos__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsAddPos__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsAttachCamera__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsResetDAPosition__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsRotDelay__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsSetRot__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
+extern "C" u8 EventObjHandleMother[512];
+typedef struct CSceneObjSeq_infere3 {
+    /* 0x00 */ char pad0[0x64];
+    /* 0x64 */ s32 unk64;                           /* inferred */
+    /* 0x68 */ char pad68[8];                       /* maybe part of unk64[3]void */
+    /* 0x70 */ f32 unk70;                           /* inferred */
+    /* 0x74 */ f32 unk74;                           /* inferred */
+    /* 0x78 */ f32 unk78;                           /* inferred */
+    /* 0x7C */ char pad7C[4];
+    /* 0x80 */ f32 unk80;                           /* inferred */
+    /* 0x84 */ f32 unk84;                           /* inferred */
+    /* 0x88 */ f32 unk88;                           /* inferred */
+} CSceneObjSeq_infere3;                                     /* size >= 0x8C */
+extern "C" s32 ResetDAPosition__10CEohMotherFi(void *, s32);
+extern "C" s32 SetPos__10CEohMotherFifff(void *, s32, f32, f32, f32);
+extern "C" s32 SetRot__10CEohMotherFifff(void *, s32, f32, f32, f32);
+extern "C" s32 UpdatePosition__10CEohMotherFi(void *, s32);
+extern "C" s32 scsResetDAPosition__FP12_SEN_OBJ_SEQP12CSceneObjSeq(_SEN_OBJ_SEQ *arg0, CSceneObjSeq_infere3 *arg1) {
+    SetPos__10CEohMotherFifff(&EventObjHandleMother, arg1->unk64, arg1->unk70, arg1->unk74, arg1->unk78);
+    SetRot__10CEohMotherFifff(&EventObjHandleMother, arg1->unk64, arg1->unk80, arg1->unk84, arg1->unk88);
+    UpdatePosition__10CEohMotherFi(&EventObjHandleMother, arg1->unk64);
+    ResetDAPosition__10CEohMotherFi(&EventObjHandleMother, arg1->unk64);
+    return 0;
+}
+typedef struct CSceneObjSeq_infere5 {
+    /* 0x00 */ char pad0[0x44];
+    /* 0x44 */ s32 unk44;                           /* inferred */
+} CSceneObjSeq_infere5;                                     /* size >= 0x48 */
+typedef struct _SEN_OBJ_SEQ_infere4 {
+    /* 0x00 */ char pad0[0x20];
+    /* 0x20 */ s32 unk20;                           /* inferred */
+} _SEN_OBJ_SEQ_infere4;                                     /* size >= 0x24 */
+extern "C" s32 scsRotDelay__FP12_SEN_OBJ_SEQP12CSceneObjSeq(_SEN_OBJ_SEQ_infere4 *arg0, CSceneObjSeq_infere5 *arg1) {
+    s32 temp_v1;
+
+    temp_v1 = arg1->unk44;
+    if (temp_v1 >= arg0->unk20) {
+        arg1->unk44 = 0;
+        return 0;
+    }
+    arg1->unk44 = temp_v1 + 1;
+    return 1;
+}
+typedef struct CSceneObjSeq_infere16 {
+    /* 0x00 */ char pad0[0x80];
+    /* 0x80 */ char unk80;                             /* inferred */
+    /* 0x80 */ char pad80[1];
+} CSceneObjSeq_infere16;                                     /* size >= 0x81 */
+typedef struct _SEN_OBJ_SEQ_infere15 {
+    /* 0x00 */ char pad0[0x10];
+    /* 0x10 */ char unk10;                             /* inferred */
+    /* 0x10 */ char pad10[1];
+} _SEN_OBJ_SEQ_infere15;                                     /* size >= 0x11 */
+extern "C" s32 sceVu0CopyVector(...);
+extern "C" s32 scsSetRot__FP12_SEN_OBJ_SEQP12CSceneObjSeq(_SEN_OBJ_SEQ_infere15 *arg0, CSceneObjSeq_infere16 *arg1) {
+    sceVu0CopyVector(&arg1->unk80, &arg0->unk10);
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsRotation__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsRotation2__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsReference__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsMotionDelay__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
+typedef struct CSceneObjSeq_infere6 {
+    /* 0x00 */ char pad0[0x48];
+    /* 0x48 */ s32 unk48;                           /* inferred */
+} CSceneObjSeq_infere6;                                     /* size >= 0x4C */
+typedef struct _SEN_OBJ_SEQ_infere5 {
+    /* 0x00 */ char pad0[0x20];
+    /* 0x20 */ s32 unk20;                           /* inferred */
+} _SEN_OBJ_SEQ_infere5;                                     /* size >= 0x24 */
+extern "C" s32 scsMotionDelay__FP12_SEN_OBJ_SEQP12CSceneObjSeq(_SEN_OBJ_SEQ_infere5 *arg0, CSceneObjSeq_infere6 *arg1) {
+    s32 temp_v1;
+
+    temp_v1 = arg1->unk48;
+    if (temp_v1 >= arg0->unk20) {
+        arg1->unk48 = 0;
+        return 0;
+    }
+    arg1->unk48 = temp_v1 + 1;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsSetMotion__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsNextMotion__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsMotionWait__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsMotionTrg__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsSetMotStep__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsSetMotChangeStep__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsResetMotion__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsSetMotionNowTime__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsSetMotionWaitTime__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsNormalDrive__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
+typedef struct CSceneObjSeq_infere17 {
+    /* 0x00 */ char pad0[0x64];
+    /* 0x64 */ s32 unk64;                           /* inferred */
+} CSceneObjSeq_infere17;                                     /* size >= 0x68 */
+extern "C" s32 SetMotionTrg__10CEohMotherFi(void *, s32);
+extern "C" s32 scsMotionTrg__FP12_SEN_OBJ_SEQP12CSceneObjSeq(_SEN_OBJ_SEQ *arg0, CSceneObjSeq_infere17 *arg1) {
+    SetMotionTrg__10CEohMotherFi(&EventObjHandleMother, arg1->unk64);
+    return 0;
+}
+typedef struct CSceneObjSeq_infere11 {
+    /* 0x00 */ char pad0[0x64];
+    /* 0x64 */ s32 unk64;                           /* inferred */
+} CSceneObjSeq_infere11;                                     /* size >= 0x68 */
+typedef struct _SEN_OBJ_SEQ_infere10 {
+    /* 0x00 */ char pad0[0x20];
+    /* 0x20 */ f32 unk20;                           /* inferred */
+} _SEN_OBJ_SEQ_infere10;                                     /* size >= 0x24 */
+extern "C" s32 SetStep__10CEohMotherFif(void *, s32, f32);
+extern "C" s32 scsSetMotStep__FP12_SEN_OBJ_SEQP12CSceneObjSeq(_SEN_OBJ_SEQ_infere10 *arg0, CSceneObjSeq_infere11 *arg1) {
+    SetStep__10CEohMotherFif(&EventObjHandleMother, arg1->unk64, arg0->unk20);
+    return 0;
+}
+typedef struct CSceneObjSeq_infere12 {
+    /* 0x00 */ char pad0[0x64];
+    /* 0x64 */ s32 unk64;                           /* inferred */
+} CSceneObjSeq_infere12;                                     /* size >= 0x68 */
+typedef struct _SEN_OBJ_SEQ_infere11 {
+    /* 0x00 */ char pad0[0x20];
+    /* 0x20 */ f32 unk20;                           /* inferred */
+} _SEN_OBJ_SEQ_infere11;                                     /* size >= 0x24 */
+extern "C" s32 SetChangeStep__10CEohMotherFif(void *, s32, f32);
+extern "C" s32 scsSetMotChangeStep__FP12_SEN_OBJ_SEQP12CSceneObjSeq(_SEN_OBJ_SEQ_infere11 *arg0, CSceneObjSeq_infere12 *arg1) {
+    SetChangeStep__10CEohMotherFif(&EventObjHandleMother, arg1->unk64, arg0->unk20);
+    return 0;
+}
+typedef struct CSceneObjSeq_infere18 {
+    /* 0x00 */ char pad0[0x64];
+    /* 0x64 */ s32 unk64;                           /* inferred */
+} CSceneObjSeq_infere18;                                     /* size >= 0x68 */
+extern "C" s32 ResetMotion__10CEohMotherFi(void *, s32);
+extern "C" s32 scsResetMotion__FP12_SEN_OBJ_SEQP12CSceneObjSeq(_SEN_OBJ_SEQ *arg0, CSceneObjSeq_infere18 *arg1) {
+    ResetMotion__10CEohMotherFi(&EventObjHandleMother, arg1->unk64);
+    return 0;
+}
+typedef struct CSceneObjSeq_infere13 {
+    /* 0x00 */ char pad0[0x64];
+    /* 0x64 */ s32 unk64;                           /* inferred */
+} CSceneObjSeq_infere13;                                     /* size >= 0x68 */
+typedef struct _SEN_OBJ_SEQ_infere12 {
+    /* 0x00 */ char pad0[0x20];
+    /* 0x20 */ f32 unk20;                           /* inferred */
+} _SEN_OBJ_SEQ_infere12;                                     /* size >= 0x24 */
+extern "C" s32 SetMotionNowTime__10CEohMotherFif(void *, s32, f32);
+extern "C" s32 scsSetMotionNowTime__FP12_SEN_OBJ_SEQP12CSceneObjSeq(_SEN_OBJ_SEQ_infere12 *arg0, CSceneObjSeq_infere13 *arg1) {
+    SetMotionNowTime__10CEohMotherFif(&EventObjHandleMother, arg1->unk64, arg0->unk20);
+    return 0;
+}
+typedef struct CSceneObjSeq_infere14 {
+    /* 0x00 */ char pad0[0x64];
+    /* 0x64 */ s32 unk64;                           /* inferred */
+} CSceneObjSeq_infere14;                                     /* size >= 0x68 */
+typedef struct _SEN_OBJ_SEQ_infere13 {
+    /* 0x00 */ char pad0[0x20];
+    /* 0x20 */ f32 unk20;                           /* inferred */
+} _SEN_OBJ_SEQ_infere13;                                     /* size >= 0x24 */
+extern "C" s32 SetMotionWaitTime__10CEohMotherFif(void *, s32, f32);
+extern "C" s32 scsSetMotionWaitTime__FP12_SEN_OBJ_SEQP12CSceneObjSeq(_SEN_OBJ_SEQ_infere13 *arg0, CSceneObjSeq_infere14 *arg1) {
+    SetMotionWaitTime__10CEohMotherFif(&EventObjHandleMother, arg1->unk64, arg0->unk20);
+    return 0;
+}
+typedef struct CSceneObjSeq_infere19 {
+    /* 0x00 */ char pad0[0x64];
+    /* 0x64 */ s32 unk64;                           /* inferred */
+} CSceneObjSeq_infere19;                                     /* size >= 0x68 */
+extern "C" s32 NormalDrive__10CEohMotherFi(void *, s32);
+extern "C" s32 scsNormalDrive__FP12_SEN_OBJ_SEQP12CSceneObjSeq(_SEN_OBJ_SEQ *arg0, CSceneObjSeq_infere19 *arg1) {
+    NormalDrive__10CEohMotherFi(&EventObjHandleMother, arg1->unk64);
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsMotionTrgWait__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsTexAnimeDelay__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
+typedef struct CSceneObjSeq_infere7 {
+    /* 0x00 */ char pad0[0x4C];
+    /* 0x4C */ s32 unk4C;                           /* inferred */
+} CSceneObjSeq_infere7;                                     /* size >= 0x50 */
+typedef struct _SEN_OBJ_SEQ_infere6 {
+    /* 0x00 */ char pad0[0x20];
+    /* 0x20 */ s32 unk20;                           /* inferred */
+} _SEN_OBJ_SEQ_infere6;                                     /* size >= 0x24 */
+extern "C" s32 scsTexAnimeDelay__FP12_SEN_OBJ_SEQP12CSceneObjSeq(_SEN_OBJ_SEQ_infere6 *arg0, CSceneObjSeq_infere7 *arg1) {
+    s32 temp_v1;
+
+    temp_v1 = arg1->unk4C;
+    if (temp_v1 >= arg0->unk20) {
+        arg1->unk4C = 0;
+        return 0;
+    }
+    arg1->unk4C = temp_v1 + 1;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsTexAnime__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsColorDelay__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
+typedef struct CSceneObjSeq_infere8 {
+    /* 0x00 */ char pad0[0x50];
+    /* 0x50 */ s32 unk50;                           /* inferred */
+} CSceneObjSeq_infere8;                                     /* size >= 0x54 */
+typedef struct _SEN_OBJ_SEQ_infere7 {
+    /* 0x00 */ char pad0[0x20];
+    /* 0x20 */ s32 unk20;                           /* inferred */
+} _SEN_OBJ_SEQ_infere7;                                     /* size >= 0x24 */
+extern "C" s32 scsColorDelay__FP12_SEN_OBJ_SEQP12CSceneObjSeq(_SEN_OBJ_SEQ_infere7 *arg0, CSceneObjSeq_infere8 *arg1) {
+    s32 temp_v1;
+
+    temp_v1 = arg1->unk50;
+    if (temp_v1 >= arg0->unk20) {
+        arg1->unk50 = 0;
+        return 0;
+    }
+    arg1->unk50 = temp_v1 + 1;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsSetColor__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsScaleDelay__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
+typedef struct CSceneObjSeq_infere9 {
+    /* 0x00 */ char pad0[0x54];
+    /* 0x54 */ s32 unk54;                           /* inferred */
+} CSceneObjSeq_infere9;                                     /* size >= 0x58 */
+typedef struct _SEN_OBJ_SEQ_infere8 {
+    /* 0x00 */ char pad0[0x20];
+    /* 0x20 */ s32 unk20;                           /* inferred */
+} _SEN_OBJ_SEQ_infere8;                                     /* size >= 0x24 */
+extern "C" s32 scsScaleDelay__FP12_SEN_OBJ_SEQP12CSceneObjSeq(_SEN_OBJ_SEQ_infere8 *arg0, CSceneObjSeq_infere9 *arg1) {
+    s32 temp_v1;
+
+    temp_v1 = arg1->unk54;
+    if (temp_v1 >= arg0->unk20) {
+        arg1->unk54 = 0;
+        return 0;
+    }
+    arg1->unk54 = temp_v1 + 1;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsSetScale__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsSeDelay__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
+typedef struct CSceneObjSeq_infere10 {
+    /* 0x00 */ char pad0[0x58];
+    /* 0x58 */ s32 unk58;                           /* inferred */
+} CSceneObjSeq_infere10;                                     /* size >= 0x5C */
+typedef struct _SEN_OBJ_SEQ_infere9 {
+    /* 0x00 */ char pad0[0x20];
+    /* 0x20 */ s32 unk20;                           /* inferred */
+} _SEN_OBJ_SEQ_infere9;                                     /* size >= 0x24 */
+extern "C" s32 scsSeDelay__FP12_SEN_OBJ_SEQP12CSceneObjSeq(_SEN_OBJ_SEQ_infere9 *arg0, CSceneObjSeq_infere10 *arg1) {
+    s32 temp_v1;
+
+    temp_v1 = arg1->unk58;
+    if (temp_v1 >= arg0->unk20) {
+        arg1->unk58 = 0;
+        return 0;
+    }
+    arg1->unk58 = temp_v1 + 1;
+    return 1;
+}
 typedef struct _SEN_OBJ_SEQ_infere {
     /* 0x00 */ char pad0[0x20];
     /* 0x20 */ u32 unk20;                           /* inferred */
@@ -301,7 +713,15 @@ INCLUDE_ASM("nonmatchings/game/cscenecmrseq", PosDelay__12CSceneObjSeqFi);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SetPos__12CSceneObjSeqFPf);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Move__12CSceneObjSeqFPfii);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Move2__12CSceneObjSeqFPfiif);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", InitPas__12CSceneObjSeqFv);
+extern "C" s32 SearchNextPosSeq__12CSceneObjSeqFv(void *);
+extern "C" void InitPas__12CSceneObjSeqFv(CSceneObjSeq *objet) {
+    s32 *temp_v0;
+
+    temp_v0 = (s32 *) (SearchNextPosSeq__12CSceneObjSeqFv(objet));
+    if (temp_v0 != NULL) {
+        *temp_v0 = 5;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SetPasFrm__12CSceneObjSeqFi);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", AddPas__12CSceneObjSeqFPf);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", StartPas__12CSceneObjSeqFi);
@@ -317,15 +737,51 @@ INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Reference__12CSceneObjSeqFPfi);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", MotionDelay__12CSceneObjSeqFi);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SetMotion__12CSceneObjSeqFPcif);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", NextMotion__12CSceneObjSeqFPcif);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", MotionWait__12CSceneObjSeqFv);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SetMotionTrg__12CSceneObjSeqFv);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", MotionTrgWait__12CSceneObjSeqFv);
+extern "C" s32 SearchNextMotSeq__12CSceneObjSeqFv(void *);
+extern "C" void MotionWait__12CSceneObjSeqFv(CSceneObjSeq *objet) {
+    s32 *temp_v0;
+
+    temp_v0 = (s32 *) (SearchNextMotSeq__12CSceneObjSeqFv(objet));
+    if (temp_v0 != NULL) {
+        *temp_v0 = 0x15;
+    }
+}
+extern "C" void SetMotionTrg__12CSceneObjSeqFv(CSceneObjSeq *objet) {
+    s32 *temp_v0;
+
+    temp_v0 = (s32 *) (SearchNextMotSeq__12CSceneObjSeqFv(objet));
+    if (temp_v0 != NULL) {
+        *temp_v0 = 0x16;
+    }
+}
+extern "C" void MotionTrgWait__12CSceneObjSeqFv(CSceneObjSeq *objet) {
+    s32 *temp_v0;
+
+    temp_v0 = (s32 *) (SearchNextMotSeq__12CSceneObjSeqFv(objet));
+    if (temp_v0 != NULL) {
+        *temp_v0 = 0x17;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SetStep__12CSceneObjSeqFf);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SetChengeStep__12CSceneObjSeqFf);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", ResetMotion__12CSceneObjSeqFv);
+extern "C" void ResetMotion__12CSceneObjSeqFv(CSceneObjSeq *objet) {
+    s32 *temp_v0;
+
+    temp_v0 = (s32 *) (SearchNextMotSeq__12CSceneObjSeqFv(objet));
+    if (temp_v0 != NULL) {
+        *temp_v0 = 0x1A;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SetMotionNowTime__12CSceneObjSeqFf);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SetMotionWaitTime__12CSceneObjSeqFf);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", NormalDrive__12CSceneObjSeqFv);
+extern "C" void NormalDrive__12CSceneObjSeqFv(CSceneObjSeq *objet) {
+    s32 *temp_v0;
+
+    temp_v0 = (s32 *) (SearchNextMotSeq__12CSceneObjSeqFv(objet));
+    if (temp_v0 != NULL) {
+        *temp_v0 = 0x1D;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", TexAnimeDelay__12CSceneObjSeqFi);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", TexAnime__12CSceneObjSeqFPci);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", ColorDelay__12CSceneObjSeqFi);
@@ -333,8 +789,38 @@ INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SetColor__12CSceneObjSeqFPfi);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", ScaleDelay__12CSceneObjSeqFi);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SetScale__12CSceneObjSeqFPfi);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SeDelay__12CSceneObjSeqFi);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SePlay__12CSceneObjSeqFii);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", ResetDAPosition__12CSceneObjSeqFv);
+extern "C" s32 SearchNextSeSeq__12CSceneObjSeqFv(void *);
+struct temp_v0_champs {
+    /* 0x0 */ s32 unk0;
+    char pad4[0x1C];
+    /* 0x20 */ s32 unk20;
+    /* 0x24 */ s32 unk24;
+};
+extern "C" void SePlay__12CSceneObjSeqFii(CSceneObjSeq *objet, s32 arg0, s32 arg1) {
+    struct temp_v0_champs *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs *) (SearchNextSeSeq__12CSceneObjSeqFv(objet));
+    if (temp_v0 != NULL) {
+        temp_v0->unk0 = 0x25;
+        temp_v0->unk20 = arg0;
+        temp_v0->unk24 = arg1;
+    }
+}
+extern "C" s32 SearchNextMotSeq__12CSceneObjSeqFv(void *);
+extern "C" s32 SearchNextSeSeq__12CSceneObjSeqFv(void *);
+extern "C" void ResetDAPosition__12CSceneObjSeqFv(CSceneObjSeq *objet) {
+    s32 *temp_v0;
+    s32 *temp_v0_2;
+
+    temp_v0 = (s32 *) (SearchNextSeSeq__12CSceneObjSeqFv(objet));
+    if (temp_v0 != NULL) {
+        *temp_v0 = 0x26;
+    }
+    temp_v0_2 = (s32 *) (SearchNextMotSeq__12CSceneObjSeqFv(objet));
+    if (temp_v0_2 != NULL) {
+        *temp_v0_2 = 0x26;
+    }
+}
 CEoh::CEoh(void) {
     this->field_0x0 = -1;
     this->field_0x4 = -1;

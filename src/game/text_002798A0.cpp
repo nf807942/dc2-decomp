@@ -54,7 +54,7 @@ extern "C" s32 GetSubGameSaveData__Fv(void);
 #include "gen/CSphidaData.hpp"
 #include "gen/CSubGameData.hpp"
 extern "C" s32 GetNowHorl__11CSphidaDataFv(void *);
-extern "C" s32 SetStack__FP12RS_STACKDATAi_00262E70(RS_STACKDATA *, s32);
+extern "C" s32 SetStack__FP12RS_STACKDATAi_00262E70(...);
 extern "C" s32 _SPHIDA_GET_NOW_HOLE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     CSphidaData *temp_v0_2;
     CSubGameData *temp_v0;
@@ -109,7 +109,16 @@ INCLUDE_ASM("nonmatchings/game/text_002798A0", _CTRLC_STEP__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _CTRLC_SET_ROTATE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _CTRLC_ROT_BACK__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _CTRLC_MOVE_CAMERA__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002798A0", _CTRLC_SET_ROT_CANCEL__FP12RS_STACKDATAi);
+extern "C" s32 GetCamera__Fv(void);
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(...);
+extern "C" s32 SetRotCameraCancel__14CCameraControlFi(...);
+extern "C" s32 _CTRLC_SET_ROT_CANCEL__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    s32 temp_s0;
+
+    temp_s0 = (s32) (GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
+    SetRotCameraCancel__14CCameraControlFi(GetCamera__Fv(), temp_s0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _CTRLC_MOVE_RANGE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _GET_NEAR_TBOX_POS__FP12RS_STACKDATAi);
 s32 _CONV_CHRNO_S2L(RS_STACKDATA *stack, int argc) {
@@ -168,7 +177,7 @@ s32 _GEOSTONE_ANIME_OFF(RS_STACKDATA * arg0, s32 arg1) {
     GeoStone.field_0x668 = 0;
     return 1;
 }
-extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(RS_STACKDATA *);
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(...);
 extern "C" s32 SetFlag__9CGeoStoneFi(void *, s32);
 extern "C" s32 _GEOSTONE_SET_FLAG__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     SetFlag__9CGeoStoneFi(&GeoStone, GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
@@ -222,7 +231,11 @@ extern "C" s32 _DNG_COLLISION_ALL_CLR__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32
 }
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SET_MAP_DRAW__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _CHECK_MC_LOAD__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002798A0", _SET_NOW_MAP_NO__FP12RS_STACKDATAi);
+extern "C" s32 SetNowMapNo__6CSceneFi(...);
+extern "C" s32 _SET_NOW_MAP_NO__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    SetNowMapNo__6CSceneFi(EventScene, GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _GET_TBOX_PARAM__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _CANCEL_LOAD_VILLAGER__FP12RS_STACKDATAi);
 extern "C" void CancelNowLoading__Fv();
@@ -293,7 +306,7 @@ INCLUDE_ASM("nonmatchings/game/text_002798A0", _FUNC_POINT_POS__FP12RS_STACKDATA
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _PARTS_NAME_STRCMP__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _GET_TRIAL_VERSION__FP12RS_STACKDATAi);
 extern "C" u8 StartupEpisodeTitle[24];
-extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(RS_STACKDATA *);
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(...);
 extern "C" s32 Switch__20CStartupEpisodeTitleFi(void *, s32);
 extern "C" s32 _SET_FLOOR_EPISODE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     Switch__20CStartupEpisodeTitleFi(&StartupEpisodeTitle, GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));

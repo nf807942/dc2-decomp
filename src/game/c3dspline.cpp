@@ -75,8 +75,8 @@ INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_PARTS_EFFECT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", MenuDataAnalyze__FPciP9mgCMemory);
 extern "C" u8 MenuCommandAnalyzeInfo[104];
 extern "C" u8 SpiMenuExeCommandFlag;
-extern "C" s32 spiGetStackString__FP9SPI_STACK(SPI_STACK *arg0);
-extern "C" s32 strcmp(void *, s32);
+extern "C" s32 spiGetStackString__FP9SPI_STACK(...);
+extern "C" s32 strcmp(...);
 extern "C" s32 _MENU_EXE_COMMAND_NAME__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     s32 temp_a1;
 
@@ -115,8 +115,8 @@ struct SPI_STACK {
     s32 field_0;
     s32 field_4;
 };
-extern "C" void SetWakuType__12CMenuKeyFuncFi(CMenuKeyFunc *objet, s32 arg0);
-extern "C" s32 spiGetStackInt__FP9SPI_STACK(SPI_STACK *arg0);
+extern "C" void SetWakuType__12CMenuKeyFuncFi(...);
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(...);
 extern "C" s32 _MENU_WAKUTYPE__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     if (SpiMenuExeCommandFlag == 0) {
         return 1;
@@ -126,7 +126,7 @@ extern "C" s32 _MENU_WAKUTYPE__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
 }
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_SCENE_FADE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_SE_PLAY__FP9SPI_STACKi);
-extern "C" void InitDrawList__14CPosDataManageFv(CPosDataManage *objet);
+extern "C" void InitDrawList__14CPosDataManageFv(...);
 extern "C" s32 _MENU_EXE_INIT_DRAWLIST__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     if (SpiMenuExeCommandFlag == 0) {
         return 1;
@@ -134,7 +134,7 @@ extern "C" s32 _MENU_EXE_INIT_DRAWLIST__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1)
     InitDrawList__14CPosDataManageFv(MenuPosData);
     return 1;
 }
-extern "C" void ResetTextureInfoAll__14CPosDataManageFv(CPosDataManage *objet);
+extern "C" void ResetTextureInfoAll__14CPosDataManageFv(...);
 extern "C" s32 _MENU_EXE_RESET_TEXINFO__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     if (SpiMenuExeCommandFlag == 0) {
         return 1;

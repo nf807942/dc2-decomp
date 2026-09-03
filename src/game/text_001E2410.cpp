@@ -39,7 +39,21 @@ INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_ESCAPE_RATE__FP12RS_STACKDAT
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_GUARD_RATE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_EXT_PARAM_RATE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_BOSS_FLAG__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_001E2410", _RESET_TIMER__FP12RS_STACKDATAi);
+extern "C" u32 nowScene_0037D4E4;
+struct temp_v0_champs {
+    char pad0[0x10];
+    /* 0x10 */ s32 unk10;
+};
+extern "C" s32 _RESET_TIMER__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    struct temp_v0_champs *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs *) (nowScene_0037D4E4 + 0x2F90);
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    temp_v0->unk10 = 0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_TIMER__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_FRAME_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _MY_SE_PLAY__FP12RS_STACKDATAi);
