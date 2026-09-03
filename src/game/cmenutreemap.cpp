@@ -338,7 +338,36 @@ INCLUDE_ASM("nonmatchings/game/cmenutreemap", InitEnd__12CMenuTreeMapFv);
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", MsgInit__12CMenuTreeMapFv);
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", Step__12CMenuTreeMapFv);
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", Draw__12CMenuTreeMapFv);
-INCLUDE_ASM("nonmatchings/game/cmenutreemap", FadeInOutMenu__12CMenuTreeMapFv);
+struct inferred;
+struct irregular;
+typedef struct CMenuTreeMap {
+    /* 0x000 */ s16 unk0;                           /* inferred */
+    /* 0x002 */ char pad2[0x118];                   /* maybe part of unk0[0x8D]void */
+    /* 0x11A */ s16 unk11A;                         /* inferred */
+} CMenuTreeMap;                                     /* size >= 0x11C */
+extern "C" s32 FadeCheckMenu__14CBaseMenuClassFv(void *);
+extern "C" s32 FadeOutMenu__14CBaseMenuClassFif(void *, s32, f32);
+extern "C" s32 FadeInOutMenu__12CMenuTreeMapFv(CMenuTreeMap *objet) {
+    s16 temp_v1;
+    s32 var_s0;
+
+    temp_v1 = objet->unk0;
+    var_s0 = 0;
+    switch (temp_v1) {                              /* irregular */
+    case 1:
+        var_s0 = FadeCheckMenu__14CBaseMenuClassFv((CBaseMenuClass *) objet);
+        if (var_s0 != 0) {
+            FadeOutMenu__14CBaseMenuClassFif((CBaseMenuClass *) objet, 0x28, 0.0f);
+        }
+        break;
+    case 2:
+        if (objet->unk11A == 0) {
+            var_s0 = FadeCheckMenu__14CBaseMenuClassFv((CBaseMenuClass *) objet);
+        }
+        break;
+    }
+    return var_s0;
+}
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", DngTreeMapInit__FP9mgCMemoryPiii);
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", Init__6ClsMesFv);
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", DngTreeMapKey__Fv);
@@ -365,7 +394,46 @@ void mgRect_f_::Set(f32 arg0, f32 arg1, f32 arg2, f32 arg3) {
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", GetPenkiColor__FiPf);
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", ConvGeoramaDataNo__Fi);
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", CheckMenuLine__FPiPiii);
-INCLUDE_ASM("nonmatchings/game/cmenutreemap", SetEditMenuEnv__Fv);
+struct CPosDataManage;
+extern "C" CPosDataManage *MenuPosData;
+struct CPosDataManage {
+    char pad_0[0x4];
+    u16 field_4;
+    char pad_6[0x6];
+    u16 field_C;
+    char pad_E[0x2];
+    s32 field_10;
+    u16 field_14;
+    char pad_16[0x2];
+    s32 field_18;
+    u16 field_1C;
+    u8 field_1E;
+    char pad_1F[0x39];
+    s32 field_58;
+};
+extern "C" u8 _990_0036DC80[14];
+extern "C" s32 GetFormInfo__14CPosDataManageFPc(...);
+typedef struct CMenuPosDataForm {
+    /* 0x00 */ char pad0[1];
+    /* 0x01 */ s8 unk1;                             /* inferred */
+    /* 0x02 */ char pad2[0xA];                      /* maybe part of unk1[0xB]void */
+    /* 0x0C */ s32 unkC;                            /* inferred */
+    /* 0x10 */ s32 unk10;                           /* inferred */
+} CMenuPosDataForm;                                 /* size >= 0x14 */
+extern "C" s32 SetRGBACalcParam__16CMenuPosDataFormFiii(void *, s32, s32, s32);
+extern "C" void SetEditMenuEnv__Fv(void) {
+    CMenuPosDataForm *temp_v0;
+
+    temp_v0 = (CMenuPosDataForm *) (GetFormInfo__14CPosDataManageFPc(MenuPosData, &_990_0036DC80));
+    if (temp_v0 != NULL) {
+        temp_v0->unk1 = 1;
+        SetRGBACalcParam__16CMenuPosDataFormFiii(temp_v0, 0, -3, 0x40);
+        SetRGBACalcParam__16CMenuPosDataFormFiii(temp_v0, 1, -3, 0x40);
+        SetRGBACalcParam__16CMenuPosDataFormFiii(temp_v0, 2, -3, 0x40);
+        temp_v0->unkC = 0;
+        temp_v0->unk10 = 0;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", MenuGeoramaInit__FP9mgCMemoryi);
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", MenuGeoDebugKey__Fv);
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", MenuGeoramaKey__Fv);

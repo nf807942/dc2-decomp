@@ -23,21 +23,90 @@ INCLUDE_ASM("nonmatchings/game/cminimapsymbol", ResetEyeView__FP12CActionChara);
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", EyeCamera__FP9mgCCameraP11CCharacter2i_001D53B0);
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", DebugMainDraw__Fv);
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", DBGCMD_RunScript__Fi);
-INCLUDE_ASM("nonmatchings/game/cminimapsymbol", __ct__13CFireAfterHitFv);
-INCLUDE_ASM("nonmatchings/game/cminimapsymbol", __ct__14CChillAfterHitFv);
+struct CFireAfterHit {
+    s32 field_0;
+    s32 field_4;
+    s32 field_8;
+    f32 field_C;
+    f32 field_10;
+    char pad_14[0x29C];
+    f32 field_2B0;
+};
+extern "C" s32 Initialize__13CFireAfterHitFv(void *);
+extern "C" CFireAfterHit *__ct__13CFireAfterHitFv(CFireAfterHit *objet) {
+    Initialize__13CFireAfterHitFv(objet);
+    return objet;
+}
+struct CChillAfterHit {
+    s32 field_0;
+    s32 field_4;
+    f32 field_8;
+    char pad_C[0x4];
+    f32 field_10;
+    char pad_14[0xC];
+    f32 field_20;
+};
+extern "C" s32 Initialize__14CChillAfterHitFv(void *);
+extern "C" CChillAfterHit *__ct__14CChillAfterHitFv(CChillAfterHit *objet) {
+    Initialize__14CChillAfterHitFv(objet);
+    return objet;
+}
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", __ct__8CThunderFv);
 CAfterWire::CAfterWire(void) {
     this->field_0x0 = 0;
 }
-INCLUDE_ASM("nonmatchings/game/cminimapsymbol", __ct__12CDamageScoreFv);
+struct inferred;
+typedef struct CDamageScore {
+    /* 0x00 */ char pad0[0x48];
+    /* 0x48 */ char unk48;                             /* inferred */
+    /* 0x48 */ char pad48[1];
+} CDamageScore;                                     /* size >= 0x49 */
+extern "C" s32 memset(...);
+extern "C" CDamageScore *__ct__12CDamageScoreFv(CDamageScore *objet) {
+    memset(&objet->unk48, 0x80, 6);
+    return objet;
+}
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", SetMapInfo__14CMiniMapSymbolFP4CMapP13CAutoMapPartsiiff);
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", DrawSymbolOpen__14CMiniMapSymbolFv);
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", DrawSymbolClose__14CMiniMapSymbolFv);
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", DrawSymbol__14CMiniMapSymbolFPfi);
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", DrawSymbol_Chara__14CMiniMapSymbolFP11CCharacter2);
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", Draw__14CMiniMapSymbolFPf);
-INCLUDE_ASM("nonmatchings/game/cminimapsymbol", CheckHealingTime__13CHealingPointFv);
-INCLUDE_ASM("nonmatchings/game/cminimapsymbol", Step__13CHealingPointFv);
+extern "C" u8 HealingEffectMan[816];
+struct inferred;
+typedef struct CHealingPoint {
+    /* 0x0 */ s32 unk0;                             /* inferred */
+    /* 0x4 */ s32 unk4;                             /* inferred */
+} CHealingPoint;                                    /* size >= 0x8 */
+extern "C" s32 SetMode__17CHealingEffectManFi(void *, s32);
+extern "C" s32 CheckHealingTime__13CHealingPointFv(CHealingPoint *objet) {
+    if (objet->unk0 == 0) {
+        return 0;
+    }
+    if (objet->unk4 > 0) {
+        return 0;
+    }
+    SetMode__17CHealingEffectManFi(&HealingEffectMan, 1);
+    objet->unk4 = 0x708;
+    return 1;
+}
+typedef struct CHealingPoint_infere {
+    /* 0x0 */ s32 unk0;                             /* inferred */
+    /* 0x4 */ s32 unk4;                             /* inferred */
+} CHealingPoint_infere;                                    /* size >= 0x8 */
+extern "C" void Step__13CHealingPointFv(CHealingPoint_infere *objet) {
+    s32 temp_v1;
+
+    if (objet->unk0 != 0) {
+        temp_v1 = objet->unk4;
+        if (temp_v1 > 0) {
+            objet->unk4 = temp_v1 - 1;
+        }
+        if (objet->unk4 <= 0) {
+            SetMode__17CHealingEffectManFi(&HealingEffectMan, 2);
+        }
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", _ROOM_FIXED__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", _GRID_SIZE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", _ROOM_ID__FP9SPI_STACKi);

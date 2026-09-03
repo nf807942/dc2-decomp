@@ -22,7 +22,33 @@ INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", DrawFireEffect__8CEditMapFi);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", DrawFireRaster__8CEditMapFv);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", DrawEffect__8CEditMapFv);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", AnimeStep__8CEditMapFP12CObjAnimeEnv);
-INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", CheckTime__Ffff);
+struct match;
+extern "C" s32 CheckTime__Ffff(f32 arg0, f32 arg1, f32 arg2) {
+    s32 var_v0;
+
+    if (!(arg2 <= arg1)) {
+        if (arg0 < arg1) {
+            return 0;
+        }
+        var_v0 = 1;
+        if (arg0 < arg2) {
+            var_v0 = 0;
+        }
+        return var_v0 ^ 1;
+    }
+    if (!(arg1 <= arg2)) {
+        if (!(arg0 < arg1)) {
+            /* Duplicate return node #12. Try simplifying control flow for better match */
+            return 1;
+        }
+        if (!(arg0 < arg2)) {
+            return 0;
+        }
+        /* Duplicate return node #12. Try simplifying control flow for better match */
+        return 1;
+    }
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", LimitTime__Ff);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", SubTime__Fff);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", Initialize__10CFuncPointFv);
@@ -43,7 +69,31 @@ INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", __ct__19CList_10CFuncPoint_Fv);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", GetReserve__14CFuncPointMngrFv);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", AddFromReserve__14CFuncPointMngrFi);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", GetNum__14CFuncPointMngrFi);
-INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", GetEventNum__14CFuncPointMngrFi);
+extern "C" s32 Get__14CFuncPointMngrFv(void *);
+struct var_v0_champs {
+    char pad0[0x20];
+    /* 0x20 */ s32 unk20;
+};
+extern "C" s32 GetEnd__14CFuncPointMngrFv(void *);
+extern "C" s32 GetStart__14CFuncPointMngrFi(void *, s32);
+extern "C" s32 GetEventNum__14CFuncPointMngrFi(CFuncPointMngr *objet, s32 arg0) {
+    s32 var_s0;
+    struct var_v0_champs *var_v0;
+
+    var_s0 = 0;
+    GetStart__14CFuncPointMngrFi(objet, 6);
+    var_v0 = (struct var_v0_champs *) (Get__14CFuncPointMngrFv(objet));
+    if (var_v0 != NULL) {
+        do {
+            if (var_v0->unk20 & arg0) {
+                var_s0 += 1;
+            }
+            var_v0 = (struct var_v0_champs *) (Get__14CFuncPointMngrFv(objet));
+        } while (var_v0 != NULL);
+    }
+    GetEnd__14CFuncPointMngrFv(objet);
+    return var_s0;
+}
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", EnableFuncNum__14CFuncPointMngrFi);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", GetStart__14CFuncPointMngrFi);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", Get__14CFuncPointMngrFv);
@@ -53,4 +103,41 @@ void CFuncPointMngr::GetEnd(void) {
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", Search__14CFuncPointMngrFPc);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", GetLight__14CFuncPointMngrFPfP10CFuncPointiP15CFuncPointChecki);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", Step__14CFuncPointMngrFiP15CFuncPointCheck);
-INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", UpdateFlag__14CFuncPointMngrFiP15CFuncPointCheck);
+extern "C" s32 Get__14CFuncPointMngrFv(void *);
+struct CFuncPointCheck {
+    f32 field_0;
+    s32 field_4;
+};
+struct inferred;
+typedef struct CFuncPoint {
+    /* 0x000 */ char pad0[0x1B0];
+    /* 0x1B0 */ s32 unk1B0;                         /* inferred */
+} CFuncPoint;                                       /* size >= 0x1B4 */
+extern "C" s32 Check__10CFuncPointFP15CFuncPointCheck(void *, CFuncPointCheck *);
+extern "C" s32 GetEnd__14CFuncPointMngrFv(void *);
+extern "C" s32 GetStart__14CFuncPointMngrFi(void *, s32);
+extern "C" s32 UpdateFlag__14CFuncPointMngrFiP15CFuncPointCheck(CFuncPointMngr *objet, s32 arg0, CFuncPointCheck *arg1) {
+    CFuncPoint *temp_v0;
+    CFuncPoint *temp_v0_2;
+    CFuncPoint *var_s0;
+    s32 temp_v0_3;
+    s32 var_s1;
+
+    GetStart__14CFuncPointMngrFi(objet, arg0);
+    var_s1 = 0;
+    temp_v0 = (CFuncPoint *) (Get__14CFuncPointMngrFv(objet));
+    var_s0 = (CFuncPoint *) (temp_v0);
+    if (temp_v0 != NULL) {
+        do {
+            temp_v0_3 = (s32) (Check__10CFuncPointFP15CFuncPointCheck(var_s0, arg1));
+            var_s0->unk1B0 = temp_v0_3;
+            if (temp_v0_3 != 0) {
+                var_s1 += 1;
+            }
+            temp_v0_2 = (CFuncPoint *) (Get__14CFuncPointMngrFv(objet));
+            var_s0 = (CFuncPoint *) (temp_v0_2);
+        } while (temp_v0_2 != NULL);
+    }
+    GetEnd__14CFuncPointMngrFv(objet);
+    return var_s1;
+}

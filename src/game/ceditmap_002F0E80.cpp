@@ -462,11 +462,45 @@ s32 CEditEvent::Draw(CScene *scene) {
     return 0;
 }
 INCLUDE_ASM("nonmatchings/game/ceditmap_002F0E80", GeoramaFunc__FP12GeoFuncParamP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/ceditmap_002F0E80", CheckPlaceBurnParts__FP12GeoFuncParamP12RS_STACKDATAi);
+extern "C" s32 GetMap__6CSceneFi(void *, s32);
+#include "runscript.hpp"
+struct inferred;
+typedef struct CScene {
+    /* 0x0000 */ char pad0[0x2E5C];
+    /* 0x2E5C */ s32 unk2E5C;                       /* inferred */
+} CScene;                                           /* size >= 0x2E60 */
+typedef struct GeoFuncParam {
+    /* 0x0 */ CScene *unk0;                         /* inferred */
+} GeoFuncParam;                                     /* size >= 0x4 */
+extern "C" s32 PlaceBurnParts__8CEditMapFv(void *);
+extern "C" s32 rsSetStack__FP12RS_STACKDATAi(RS_STACKDATA *, s32);
+extern "C" s32 CheckPlaceBurnParts__FP12GeoFuncParamP12RS_STACKDATAi(GeoFuncParam *arg0, RS_STACKDATA *arg1, s32 arg2) {
+    CEditMap *temp_v0;
+    CScene *temp_a0;
+
+    if (arg2 != 1) {
+        return 0;
+    }
+    rsSetStack__FP12RS_STACKDATAi(arg1, 0);
+    temp_a0 = (CScene *) (arg0->unk0);
+    if (temp_a0 == NULL) {
+        return 0;
+    }
+    temp_v0 = (CEditMap *) (GetMap__6CSceneFi(temp_a0, temp_a0->unk2E5C));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    rsSetStack__FP12RS_STACKDATAi(arg1, PlaceBurnParts__8CEditMapFv(temp_v0));
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap_002F0E80", LoadIntNPC__FP12GeoFuncParamP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/ceditmap_002F0E80", LoadGeoNPC__FP12GeoFuncParami);
 INCLUDE_ASM("nonmatchings/game/ceditmap_002F0E80", GeoUpdateNpcPos__FP6CScene);
-INCLUDE_ASM("nonmatchings/game/ceditmap_002F0E80", __ct__15CMenuSystemDataFv);
+extern "C" s32 MenuSystemDataInit__15CMenuSystemDataFv(void *);
+extern "C" CMenuSystemData *__ct__15CMenuSystemDataFv(CMenuSystemData *objet) {
+    MenuSystemDataInit__15CMenuSystemDataFv(objet);
+    return objet;
+}
 void CMenuSystemData::MenuSystemDataInit(void) {
     memset(this, 0, 4);
 }

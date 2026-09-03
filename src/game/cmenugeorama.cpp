@@ -39,7 +39,28 @@ INCLUDE_ASM("nonmatchings/game/cmenugeorama", LoadGeoramaPart__12CMenuGeoramaFii
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", UpdateGeoramaPartColor__12CMenuGeoramaFi);
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", AttachFormInfo__12CMenuGeoramaFv);
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", SetGeoListInfo__12CMenuGeoramaFiii);
-INCLUDE_ASM("nonmatchings/game/cmenugeorama", ReturnSelectMode__12CMenuGeoramaFi);
+extern "C" u8 _3181[15];
+extern "C" u8 _3182[16];
+#include "menu.hpp"
+struct inferred;
+typedef struct CMenuGeorama {
+    /* 0x000 */ char pad0[0x14];
+    /* 0x014 */ s16 unk14;                          /* inferred */
+    /* 0x016 */ char pad16[0x132];                  /* maybe part of unk14[0x9A]void */
+    /* 0x148 */ s32 unk148;                         /* inferred */
+} CMenuGeorama;                                     /* size >= 0x14C */
+extern "C" s32 ExeScript__14CBaseMenuClassFPc(...);
+extern "C" s32 ReturnSelectMode__12CMenuGeoramaFi(CMenuGeorama *objet, s32 arg0) {
+    objet->unk148 = objet->unk14 - 1;
+    objet->unk14 = 0;
+    if (arg0 == 0) {
+        ExeScript__14CBaseMenuClassFPc((CBaseMenuClass *) objet, &_3181);
+    }
+    if (arg0 == 1) {
+        ExeScript__14CBaseMenuClassFPc((CBaseMenuClass *) objet, &_3182);
+    }
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", GetNowViewModeMax__12CMenuGeoramaFi);
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", LRCheck__12CMenuGeoramaFv);
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", MakeMsgPartsItemInfo__FP7CDC2MesP14CEditPartsInfoP21MENUFORM_MAKEBRD_INFO);

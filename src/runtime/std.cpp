@@ -8,11 +8,24 @@
 
 #include "common.h"
 
-INCLUDE_ASM("nonmatchings/runtime/std", _dpfne);
-INCLUDE_ASM("nonmatchings/runtime/std", _dpflt);
-INCLUDE_ASM("nonmatchings/runtime/std", _dpfle);
-INCLUDE_ASM("nonmatchings/runtime/std", _dpfgt);
-INCLUDE_ASM("nonmatchings/runtime/std", _dpfge);
+extern "C" s32 dpcmp(...);
+extern "C" s32 _dpfne(void) {
+    return dpcmp() != 0;
+}
+extern "C" s32 dpcmp(...);
+extern "C" s32 _dpflt(void) {
+    return dpcmp() < 0;
+}
+extern "C" s32 dpcmp(...);
+extern "C" s32 _dpfle(void) {
+    return dpcmp() <= 0;
+}
+extern "C" s32 _dpfgt(void) {
+    return dpcmp() > 0;
+}
+extern "C" s32 _dpfge(void) {
+    return dpcmp() >= 0;
+}
 INCLUDE_ASM("nonmatchings/runtime/std", mwInit);
 INCLUDE_ASM("nonmatchings/runtime/std", __construct_array);
 INCLUDE_ASM("nonmatchings/runtime/std", __construct_new_array);
@@ -44,7 +57,18 @@ INCLUDE_ASM("nonmatchings/runtime/std", FindExceptionRecord__FPcP13ExceptionInfo
 INCLUDE_ASM("nonmatchings/runtime/std", what__Q23std13bad_exceptionCFv);
 INCLUDE_ASM("nonmatchings/runtime/std", __TransferControl__FP12ThrowContextP13ExceptionInfoPc);
 INCLUDE_ASM("nonmatchings/runtime/std", __throw);
-INCLUDE_ASM("nonmatchings/runtime/std", __SkipUnwindInfo__FPc);
+extern "C" s32 __DecodeUnsignedNumber__FPcPUi(...);
+extern "C" void __SkipUnwindInfo__FPc(s8 *arg0) {
+    u32 sp2C;
+    s32 temp_s0;
+    s8 *temp_a0;
+
+    temp_s0 = *arg0 & 0x40;
+    temp_a0 = (s8 *) (__DecodeUnsignedNumber__FPcPUi(__DecodeUnsignedNumber__FPcPUi(arg0 + 1, &sp2C), &sp2C));
+    if (temp_s0 != 0) {
+        __DecodeUnsignedNumber__FPcPUi(temp_a0, &sp2C);
+    }
+}
 INCLUDE_ASM("nonmatchings/runtime/std", __FindExceptionTable__FP13ExceptionInfoPc);
 INCLUDE_ASM("nonmatchings/runtime/std", __SetupFrameInfo__FP12ThrowContextP13ExceptionInfo);
 INCLUDE_ASM("nonmatchings/runtime/std", __PopStackFrame__FP12ThrowContextP13ExceptionInfo);

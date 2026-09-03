@@ -27,7 +27,19 @@ INCLUDE_ASM("nonmatchings/game/cfishobj", IsEnablePhotoMenu__Fv);
 void HidePhoto(void) {
     ShowTakePhotoCnt = 0;
 }
-INCLUDE_ASM("nonmatchings/game/cfishobj", GhostPhotoTiming__Fv);
+extern "C" u32 TakePhotoMode;
+struct fallthrough;
+struct irregular;
+extern "C" s32 GhostPhotoTiming__Fv(void) {
+    switch (TakePhotoMode) {                        /* irregular */
+    case 3:
+        /* fallthrough */
+    case 5:
+        return 1;
+    default:
+        return 0;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cfishobj", LoopTakePhoto__FP11CPadControlP15CInventUserData);
 INCLUDE_ASM("nonmatchings/game/cfishobj", DrawTakePhoto__FP17USER_PICTURE_INFOPf);
 INCLUDE_ASM("nonmatchings/game/cfishobj", SetTookPhotoData__FP17USER_PICTURE_INFO);
@@ -70,7 +82,10 @@ INCLUDE_ASM("nonmatchings/game/cfishobj", CatchLine__FPff);
 INCLUDE_ASM("nonmatchings/game/cfishobj", SlowLineVelo__Ff);
 INCLUDE_ASM("nonmatchings/game/cfishobj", ResetLineVelo__Fv);
 INCLUDE_ASM("nonmatchings/game/cfishobj", ResetLine__FPf);
-INCLUDE_ASM("nonmatchings/game/cfishobj", GetNextChanceCnt__Fv);
+extern "C" s32 rand(...);
+extern "C" s32 GetNextChanceCnt__Fv(void) {
+    return (rand() % 80) + 0x3C;
+}
 INCLUDE_ASM("nonmatchings/game/cfishobj", InitFishBattle__Fv);
 s32 EndFishBattle(void) {
     BattleFlag = 0;
@@ -78,7 +93,24 @@ s32 EndFishBattle(void) {
     ActionChanceCnt = 0;
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/cfishobj", CheckRodActionChance__FiPi);
+extern "C" u32 ActionChanceDir;
+extern "C" s32 CheckRodActionChance__FiPi(s32 arg0, s32 *arg1) {
+    s32 temp_v0;
+
+    *arg1 = 0;
+    if ((BattleFlag == 0) || (ActionChanceCnt <= 0)) {
+        return 0;
+    }
+    temp_v0 = arg0 * ActionChanceDir;
+    if (temp_v0 > 0) {
+        return 1;
+    }
+    if (temp_v0 < 0) {
+        return -1;
+    }
+    *arg1 = ActionChanceCnt == 0x1C;
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cfishobj", FishBattle__FP6CSceneP6CCPolyi);
 INCLUDE_ASM("nonmatchings/game/cfishobj", GetFishPosVelo__FPfPf);
 INCLUDE_ASM("nonmatchings/game/cfishobj", BindFishObj__Fv);
@@ -96,6 +128,36 @@ INCLUDE_ASM("nonmatchings/game/cfishobj", ParaBlend__FPffPA4_fi);
 INCLUDE_ASM("nonmatchings/game/cfishobj", sgInitBuggy__FP11SubGameInfo);
 INCLUDE_ASM("nonmatchings/game/cfishobj", sgExitBuggy__FP11SubGameInfo);
 INCLUDE_ASM("nonmatchings/game/cfishobj", sgLoopBuggy__FP11SubGameInfo);
-INCLUDE_ASM("nonmatchings/game/cfishobj", sgDrawBuggy__FP11SubGameInfo);
+#include "sphida.hpp"
+struct inferred;
+typedef struct SubGameInfo {
+    /* 0x0 */ CScene *unk0;                         /* inferred */
+} SubGameInfo;                                      /* size >= 0x4 */
+extern "C" s32 DrawChara__6CSceneFii(void *, s32, s32);
+extern "C" s32 sgDrawBuggy__FP11SubGameInfo(SubGameInfo *arg0) {
+    CScene *temp_s0;
+
+    temp_s0 = (CScene *) (arg0->unk0);
+    DrawChara__6CSceneFii(temp_s0, 0x40, 1);
+    DrawChara__6CSceneFii(temp_s0, 0x41, 1);
+    DrawChara__6CSceneFii(temp_s0, 0x42, 1);
+    DrawChara__6CSceneFii(temp_s0, 0x44, 1);
+    DrawChara__6CSceneFii(temp_s0, 0x43, 1);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cfishobj", sgEffectDrawBuggy__FP11SubGameInfo);
-INCLUDE_ASM("nonmatchings/game/cfishobj", sgDrawShadowBuggy__FP11SubGameInfo);
+struct inferred;
+typedef struct SubGameInfo_infere {
+    /* 0x0 */ CScene *unk0;                         /* inferred */
+} SubGameInfo_infere;                                      /* size >= 0x4 */
+extern "C" s32 DrawCharaShadow__6CSceneFi(void *, s32);
+extern "C" s32 sgDrawShadowBuggy__FP11SubGameInfo(SubGameInfo_infere *arg0) {
+    CScene *temp_s0;
+
+    temp_s0 = (CScene *) (arg0->unk0);
+    DrawCharaShadow__6CSceneFi(temp_s0, 0x40);
+    DrawCharaShadow__6CSceneFi(temp_s0, 0x44);
+    DrawCharaShadow__6CSceneFi(temp_s0, 0x41);
+    DrawCharaShadow__6CSceneFi(temp_s0, 0x42);
+    return 1;
+}

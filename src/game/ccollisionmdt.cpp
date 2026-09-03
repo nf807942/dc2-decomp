@@ -47,7 +47,17 @@ public:
     s32 PickUpNearPoly(CCPoly *poly, const mgVu0FBOX &box, s32 flag);
 };
 
-INCLUDE_ASM("nonmatchings/game/ccollisionmdt", InsidePoint__10CCollisionFPf);
+struct inferred;
+typedef struct CCollision_infere {
+    /* 0x00 */ char pad0[0x10];
+    /* 0x10 */ f32 unk10;                           /* inferred */
+    /* 0x14 */ char pad14[0xC];                     /* maybe part of unk10[4]void */
+    /* 0x20 */ f32 unk20;                           /* inferred */
+} CCollision_infere;                                       /* size >= 0x24 */
+extern "C" s32 mgClipBoxVertex__FPfPfPf(f32 *, f32 *, f32 *);
+extern "C" s32 InsidePoint__10CCollisionFPf(CCollision_infere *objet, f32 *arg0) {
+    return mgClipBoxVertex__FPfPfPf(arg0, &objet->unk10, &objet->unk20) != 0;
+}
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", Copy__13CCollisionMDTFR13CCollisionMDTP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", CreateBBox__13CCollisionMDTFv);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", GetMaxY__13CCollisionMDTFPf);
@@ -80,7 +90,18 @@ s32 CCollision::GetMaxY(f32 *y) {
     return 0;
 }
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", Initialize__10CCollisionFv);
-INCLUDE_ASM("nonmatchings/game/ccollisionmdt", size_to_sector__Fi);
+extern "C" s32 size_to_sector__Fi(s32 arg0) {
+    s32 var_v0;
+
+    var_v0 = arg0 >> 0xB;
+    if (arg0 < 0) {
+        var_v0 = (s32) (arg0 + 0x7FF) >> 0xB;
+    }
+    if ((arg0 % 2048) != 0) {
+        var_v0 += 1;
+    }
+    return var_v0;
+}
 s32 GetMainFileDev(void) {
     return DefaultFileDev;
 }
@@ -89,9 +110,39 @@ INCLUDE_ASM("nonmatchings/game/ccollisionmdt", ChangeDefaultFile__Fv);
 void SetIoErrCallBack(s32 (*callback)(s32)) {
     error_cb = callback;
 }
-INCLUDE_ASM("nonmatchings/game/ccollisionmdt", SetCurrentDir__FPc);
+extern "C" u8 CurrentDir[256];
+extern "C" u8 TopDir[256];
+extern "C" s32 strcpy(...);
+extern "C" void SetCurrentDir__FPc(s8 *arg0) {
+    s8 *var_a1;
+
+    var_a1 = (s8 *) (arg0);
+    if (var_a1 != NULL) {
+        if (*var_a1 == 0x2F) {
+            var_a1 += 1;
+        }
+        strcpy(&CurrentDir, var_a1);
+        return;
+    }
+    strcpy(&CurrentDir, &TopDir);
+}
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", GetCurrentDir__FPc);
-INCLUDE_ASM("nonmatchings/game/ccollisionmdt", ChangeDir__FPc);
+extern "C" u8 CurrentDir[256];
+extern "C" u8 TopDir[256];
+extern "C" s32 strcat(...);
+extern "C" s32 strcpy(...);
+extern "C" void ChangeDir__FPc(s8 *arg0) {
+    s8 *var_s0;
+
+    var_s0 = (s8 *) (arg0);
+    strcpy(&CurrentDir, &TopDir);
+    if (var_s0 != NULL) {
+        if (*var_s0 == 0x2F) {
+            var_s0 += 1;
+        }
+        strcat(&CurrentDir, var_s0);
+    }
+}
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", SearchFile__FPc);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", InitReadBG__Fv);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", LoadFileBG__FPcP1Pi);
@@ -105,7 +156,17 @@ INCLUDE_ASM("nonmatchings/game/ccollisionmdt", InitCDFile__Fv);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", GetDevType__FPcPc);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", ConvStr__FPc);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", GetFullPath__FPcPc);
-INCLUDE_ASM("nonmatchings/game/ccollisionmdt", LoadFile__FPcPvPi);
+extern "C" u8 _571_00367010[26];
+extern "C" s32 Exit(...);
+extern "C" s32 printf(...);
+extern "C" s32 LoadFile2__FPcPvPii(...);
+extern "C" s32 LoadFile__FPcPvPi(s8 *arg0, void *arg1, s32 *arg2) {
+    if (LoadFile2__FPcPvPii(arg0, arg1, arg2, 0) == 0) {
+        printf(&_571_00367010, arg0);
+        Exit(0);
+    }
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", LoadFile2__FPcPvPii);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", CDRead__FPcPUiPi);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", align_size__FUiUi);
@@ -115,7 +176,26 @@ INCLUDE_ASM("nonmatchings/game/ccollisionmdt", DeleteFileCache__Fv);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", EntryFileCache__FPcP1i);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", LoadFileCacheBG__FPc);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", SearchFileCache__FPc);
-INCLUDE_ASM("nonmatchings/game/ccollisionmdt", SearchFileCache__FPcPi);
+extern "C" s32 SearchFileCache__FPc(...);
+struct temp_v0_champs {
+    /* 0x0 */ s32 unk0;
+    /* 0x4 */ s32 unk4;
+};
+extern "C" s32 SearchFileCache__FPcPi(s8 *arg0, s32 *arg1) {
+    struct temp_v0_champs *temp_v0;
+
+    if (arg1 != NULL) {
+        *arg1 = 0;
+    }
+    temp_v0 = (struct temp_v0_champs *) (SearchFileCache__FPc(arg0));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    if (arg1 != NULL) {
+        *arg1 = temp_v0->unk4;
+    }
+    return temp_v0->unk0;
+}
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", WriteFile__FPcPvi);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", GetPackFile__FPUiPcPi);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", GetPackFile__FPUiiPPcPi);

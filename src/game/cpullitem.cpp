@@ -21,7 +21,84 @@ INCLUDE_ASM("nonmatchings/game/cpullitem", Initialize__18CRocketLauncherManFP8mg
 INCLUDE_ASM("nonmatchings/game/cpullitem", Set__11CMachineGunFPfPf);
 INCLUDE_ASM("nonmatchings/game/cpullitem", Step__11CMachineGunFv);
 INCLUDE_ASM("nonmatchings/game/cpullitem", SetPos__9CLaserGunFPfPfPf);
-INCLUDE_ASM("nonmatchings/game/cpullitem", SetVisualCode__9CLaserGunFi);
+struct inferred;
+typedef struct CLaserGun_infere {
+    /* 0x000 */ char pad0[0xDC];
+    /* 0x0DC */ s32 unkDC;                          /* inferred */
+    /* 0x0E0 */ s32 unkE0;                          /* inferred */
+    /* 0x0E4 */ s32 unkE4;                          /* inferred */
+    /* 0x0E8 */ char padE8[8];                      /* maybe part of unkE4[3]void */
+    /* 0x0F0 */ s32 unkF0;                          /* inferred */
+    /* 0x0F4 */ s32 unkF4;                          /* inferred */
+    /* 0x0F8 */ s32 unkF8;                          /* inferred */
+    /* 0x0FC */ s32 unkFC;                          /* inferred */
+    /* 0x100 */ s32 unk100;                         /* inferred */
+    /* 0x104 */ s32 unk104;                         /* inferred */
+    /* 0x108 */ s16 unk108;                         /* inferred */
+    /* 0x10A */ char pad10A[6];                     /* maybe part of unk108[4]void */
+    /* 0x110 */ s32 unk110;                         /* inferred */
+    /* 0x114 */ s32 unk114;                         /* inferred */
+    /* 0x118 */ s32 unk118;                         /* inferred */
+} CLaserGun_infere;                                        /* size >= 0x11C */
+extern "C" void SetVisualCode__9CLaserGunFi(CLaserGun_infere *objet, s32 arg0) {
+    objet->unk108 = (s16) arg0;
+    if (arg0 == 0) {
+        objet->unkFC = 0x3DCCCCCD;
+        objet->unk100 = 0x3DCCCCCD;
+        objet->unk104 = 0x3F000000;
+        objet->unk110 = 0x42800000;
+        objet->unk114 = 0x43000000;
+        objet->unk118 = 0x42800000;
+    }
+    if (arg0 == 1) {
+        objet->unkFC = 0x3E4CCCCD;
+        objet->unk100 = 0x3ECCCCCD;
+        objet->unk104 = 0x3F4CCCCD;
+        objet->unkDC = 0x41F00000;
+        objet->unk110 = 0x42800000;
+        objet->unk114 = 0x42800000;
+        objet->unk118 = 0x43000000;
+    }
+    if (arg0 == 2) {
+        objet->unkFC = 0x3E4CCCCD;
+        objet->unk100 = 0x3ECCCCCD;
+        objet->unk104 = 0x3FB33333;
+        objet->unkDC = 0x41700000;
+        objet->unkE0 = 0x40A00000;
+        objet->unkE4 = 0x42200000;
+        objet->unk110 = 0x43000000;
+        objet->unk114 = 0x42000000;
+        objet->unk118 = 0x43000000;
+    }
+    if (arg0 == 3) {
+        objet->unkFC = 0x3E4CCCCD;
+        objet->unk100 = 0x3E4CCCCD;
+        objet->unk104 = 0x3F19999A;
+        objet->unkDC = 0;
+        objet->unkE0 = 0x40000000;
+        objet->unkE4 = 0x420C0000;
+        objet->unkF0 = 0;
+        objet->unkF4 = 0x1869F;
+        objet->unkF8 = 0x4B;
+        objet->unk110 = 0;
+        objet->unk114 = 0x43000000;
+        objet->unk118 = 0x43000000;
+    }
+    if (arg0 == 4) {
+        objet->unkFC = 0x3ECCCCCD;
+        objet->unk100 = 0x3ECCCCCD;
+        objet->unk104 = 0x3FE66666;
+        objet->unkDC = 0x41200000;
+        objet->unkE0 = 0x40A00000;
+        objet->unkE4 = 0x41F00000;
+        objet->unkF0 = 0;
+        objet->unkF4 = 5;
+        objet->unkF8 = 0x4B;
+        objet->unk110 = 0x43000000;
+        objet->unk114 = 0x42800000;
+        objet->unk118 = 0;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cpullitem", Step__9CLaserGunFv);
 INCLUDE_ASM("nonmatchings/game/cpullitem", Draw__9CLaserGunFv);
 void CLaserGun::Initialize(void) {
@@ -62,14 +139,137 @@ void CRoboVoiceSystem::SetStatus(s32 arg0, s32 arg1) {
     this->field_0xC = arg0;
     this->field_0x10 = arg1;
 }
-INCLUDE_ASM("nonmatchings/game/cpullitem", StartVoiceSystem__16CRoboVoiceSystemFv);
-INCLUDE_ASM("nonmatchings/game/cpullitem", StopVoice__16CRoboVoiceSystemFi);
+typedef struct CRoboVoiceSystem_infere2 {
+    /* 0x00 */ s16 unk0;                            /* inferred */
+    /* 0x02 */ char pad2[2];
+    /* 0x04 */ s32 unk4;                            /* inferred */
+    /* 0x08 */ char pad8[4];
+    /* 0x0C */ s32 unkC;                            /* inferred */
+    /* 0x10 */ char pad10[2];
+    /* 0x12 */ s16 unk12;                           /* inferred */
+} CRoboVoiceSystem_infere2;                                 /* size >= 0x14 */
+extern "C" s32 iRand__Fi(s32);
+extern "C" void StartVoiceSystem__16CRoboVoiceSystemFv(CRoboVoiceSystem_infere2 *objet) {
+    objet->unk0 = 5;
+    objet->unkC = -1;
+    objet->unk12 = iRand__Fi(0xF0) + 0x3C;
+    objet->unk4 = 0;
+}
+extern "C" u8 CSnd;
+typedef struct CRoboVoiceSystem_infere {
+    /* 0x00 */ s16 unk0;                            /* inferred */
+    /* 0x02 */ char pad2[2];
+    /* 0x04 */ s32 unk4;                            /* inferred */
+    /* 0x08 */ char pad8[0xE];                      /* maybe part of unk4[4]void */
+    /* 0x16 */ s16 unk16;                           /* inferred */
+} CRoboVoiceSystem_infere;                                 /* size >= 0x18 */
+extern "C" s32 StreamClose__6CSoundFi(void *, s32);
+extern "C" s32 StreamOpenState__6CSoundFv(void *);
+extern "C" void StopVoice__16CRoboVoiceSystemFi(CRoboVoiceSystem_infere *objet, s32 arg0) {
+    if (objet->unk4 != 0) {
+        do {
+
+        } while (StreamOpenState__6CSoundFv(&CSnd) != 0);
+        StreamClose__6CSoundFi(&CSnd, 1);
+    }
+    objet->unk4 = 0;
+    objet->unk0 = 0;
+    objet->unk16 = (s16) arg0;
+}
 INCLUDE_ASM("nonmatchings/game/cpullitem", Step__16CRoboVoiceSystemFv);
 INCLUDE_ASM("nonmatchings/game/cpullitem", SetDamage__8CColPrimFPci);
 INCLUDE_ASM("nonmatchings/game/cpullitem", SetCoord__8CColPrimFPff);
-INCLUDE_ASM("nonmatchings/game/cpullitem", SetCoord__8CColPrimFPfPff);
-INCLUDE_ASM("nonmatchings/game/cpullitem", SetCoord__8CColPrimFP8mgCFramef);
-INCLUDE_ASM("nonmatchings/game/cpullitem", SetCoord__8CColPrimFP8mgCFrameP8mgCFramef);
+typedef struct CColPrim_infere {
+    /* 0x00 */ char pad0[0x20];
+    /* 0x20 */ s32 unk20;                           /* inferred */
+    /* 0x24 */ char pad24[0xC];                     /* maybe part of unk20[4]void */
+    /* 0x30 */ s32 unk30;                           /* inferred */
+    /* 0x34 */ char pad34[0xC];                     /* maybe part of unk30[4]void */
+    /* 0x40 */ f32 unk40;                           /* inferred */
+    /* 0x44 */ char pad44[0xC];                     /* maybe part of unk40[4]void */
+    /* 0x50 */ f32 unk50;                           /* inferred */
+    /* 0x54 */ char pad54[0xC];                     /* maybe part of unk50[4]void */
+    /* 0x60 */ f32 unk60;                           /* inferred */
+    /* 0x64 */ char pad64[0xC];                     /* maybe part of unk60[4]void */
+    /* 0x70 */ f32 unk70;                           /* inferred */
+    /* 0x74 */ char pad74[0x10];                    /* maybe part of unk70[5]void */
+    /* 0x84 */ f32 unk84;                           /* inferred */
+    /* 0x88 */ char pad88[0x28];                    /* maybe part of unk84[0xB]void */
+    /* 0xB0 */ f32 unkB0;                           /* inferred */
+} CColPrim_infere;                                         /* size >= 0xB4 */
+struct arg0_champs {
+    char pad0[0xC];
+    /* 0xC */ s32 unkC;
+};
+struct arg1_champs {
+    char pad0[0xC];
+    /* 0xC */ s32 unkC;
+};
+extern "C" s32 sceVu0CopyVector(...);
+extern "C" void SetCoord__8CColPrimFPfPff(CColPrim_infere *objet, struct arg0_champs *arg0, struct arg1_champs *arg1, f32 arg2) {
+    arg0->unkC = 0x3F800000;
+    arg1->unkC = 0x3F800000;
+    if (objet->unk20 == 0) {
+        sceVu0CopyVector(&objet->unk40);
+        sceVu0CopyVector(&objet->unk50, arg1);
+        sceVu0CopyVector(&objet->unk60, arg0);
+        sceVu0CopyVector(&objet->unk70, arg1);
+        sceVu0CopyVector(&objet->unkB0, arg0);
+    } else {
+        sceVu0CopyVector(&objet->unk60, &objet->unk40);
+        sceVu0CopyVector(&objet->unk70, &objet->unk50);
+        sceVu0CopyVector(&objet->unk40, arg0);
+        sceVu0CopyVector(&objet->unk50, arg1);
+    }
+    objet->unk84 = arg2;
+    objet->unk30 = 1;
+}
+#include "gen/mgCFrame.hpp"
+typedef struct CColPrim_infere2 {
+    /* 0x00 */ char pad0[0x20];
+    /* 0x20 */ s32 unk20;                           /* inferred */
+    /* 0x24 */ char pad24[0xC];                     /* maybe part of unk20[4]void */
+    /* 0x30 */ s32 unk30;                           /* inferred */
+    /* 0x34 */ char pad34[4];
+    /* 0x38 */ mgCFrame *unk38;                     /* inferred */
+    /* 0x3C */ s32 unk3C;                           /* inferred */
+    /* 0x40 */ char pad40[0x44];                    /* maybe part of unk3C[0x12]void */
+    /* 0x84 */ f32 unk84;                           /* inferred */
+    /* 0x88 */ char pad88[0x28];                    /* maybe part of unk84[0xB]void */
+    /* 0xB0 */ f32 unkB0;                           /* inferred */
+} CColPrim_infere2;                                         /* size >= 0xB4 */
+extern "C" s32 GetWorldPosition0__8mgCFrameFPf(void *, f32 *);
+extern "C" void SetCoord__8CColPrimFP8mgCFramef(CColPrim_infere2 *objet, mgCFrame *arg0, f32 arg1) {
+    objet->unk38 = arg0;
+    objet->unk3C = 0;
+    objet->unk84 = arg1;
+    objet->unk30 = 2;
+    if ((objet->unk20 == 0) && (arg0 != NULL)) {
+        GetWorldPosition0__8mgCFrameFPf(arg0, &objet->unkB0);
+    }
+}
+typedef struct CColPrim_infere3 {
+    /* 0x00 */ char pad0[0x20];
+    /* 0x20 */ s32 unk20;                           /* inferred */
+    /* 0x24 */ char pad24[0xC];                     /* maybe part of unk20[4]void */
+    /* 0x30 */ s32 unk30;                           /* inferred */
+    /* 0x34 */ char pad34[4];
+    /* 0x38 */ mgCFrame *unk38;                     /* inferred */
+    /* 0x3C */ mgCFrame *unk3C;                     /* inferred */
+    /* 0x40 */ char pad40[0x44];                    /* maybe part of unk3C[0x12]void */
+    /* 0x84 */ f32 unk84;                           /* inferred */
+    /* 0x88 */ char pad88[0x28];                    /* maybe part of unk84[0xB]void */
+    /* 0xB0 */ f32 unkB0;                           /* inferred */
+} CColPrim_infere3;                                         /* size >= 0xB4 */
+extern "C" void SetCoord__8CColPrimFP8mgCFrameP8mgCFramef(CColPrim_infere3 *objet, mgCFrame *arg0, mgCFrame *arg1, f32 arg2) {
+    objet->unk38 = arg0;
+    objet->unk3C = arg1;
+    objet->unk84 = arg2;
+    objet->unk30 = 2;
+    if ((objet->unk20 == 0) && (arg0 != NULL)) {
+        GetWorldPosition0__8mgCFrameFPf(arg0, &objet->unkB0);
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cpullitem", IsHit__8CColPrimFP6CScenei);
 INCLUDE_ASM("nonmatchings/game/cpullitem", IsReversVec__8CColPrimFP8CColPrim);
 INCLUDE_ASM("nonmatchings/game/cpullitem", GetReversVec__8CColPrimFPf);

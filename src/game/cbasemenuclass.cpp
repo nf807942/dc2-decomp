@@ -59,7 +59,14 @@ INCLUDE_ASM("nonmatchings/game/cbasemenuclass", ExeScript__14CBaseMenuClassFPc);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", ExtendCommand__14CBaseMenuClassFii);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", SelectMakeObject__14CBaseMenuClassFi);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", IsAskEnd__14CBaseMenuClassFiP16CMenuPosDataForm);
-INCLUDE_ASM("nonmatchings/game/cbasemenuclass", FadeInMenu__14CBaseMenuClassFif);
+extern "C" u32 MenuMainScene;
+#include "menu.hpp"
+extern "C" s32 FadeIn__10CFadeInOutFi(...);
+extern "C" s32 FadeStep__10CFadeInOutFv(...);
+extern "C" void FadeInMenu__14CBaseMenuClassFif(CBaseMenuClass *objet, s32 arg0, f32 arg1) {
+    FadeIn__10CFadeInOutFi(MenuMainScene + 0x2C70, arg0);
+    FadeStep__10CFadeInOutFv(MenuMainScene + 0x2C70);
+}
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", FadeOutMenu__14CBaseMenuClassFif);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", FadeCheckMenu__14CBaseMenuClassFv);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", SetPreCmdTrush__FP14CBaseMenuClassiP13CGameDataUsedP16CMenuPosDataForm);
@@ -76,7 +83,17 @@ void CMENU_USERPARAM::Initialize(void) {
 }
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", AttachInfo__15CMENU_USERPARAMFv);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", Initialize__17MENU_ASKMODE_PARAFv);
-INCLUDE_ASM("nonmatchings/game/cbasemenuclass", __ct__17MENU_ASKMODE_PARAFv);
+struct inferred;
+typedef struct MENU_ASKMODE_PARA {
+    /* 0x00 */ char pad0[0x8C];
+    /* 0x8C */ s32 unk8C;                           /* inferred */
+} MENU_ASKMODE_PARA;                                /* size >= 0x90 */
+extern "C" s32 Initialize__17MENU_ASKMODE_PARAFv(void *);
+extern "C" MENU_ASKMODE_PARA *__ct__17MENU_ASKMODE_PARAFv(MENU_ASKMODE_PARA *objet) {
+    objet->unk8C = -1;
+    Initialize__17MENU_ASKMODE_PARAFv(objet);
+    return objet;
+}
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", Set__18MENU_SWAPITEM_INFOFiiii);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", IsEnableChangeRoboParts__FP13CGameDataUsed);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", SetSpectolInfo__FP13CGameDataUsedP13CGameDataUsed);

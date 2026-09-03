@@ -48,7 +48,18 @@ INCLUDE_ASM("nonmatchings/game/cmosbookmenu", MonsterBookKey__Fv);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", MonsterBookDraw__Fv);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", Set__9mgRect_s_Fssss);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", InitMenuReturnMsg__FP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/cmosbookmenu", SetMenuReturnMsgCtrl__Fi);
+extern "C" u32 LanguageCode;
+extern "C" u32 MenuReturnMsg;
+extern "C" u8 MenuReturnMsgDrawFlag;
+extern "C" void SetMenuReturnMsgCtrl__Fi(s32 arg0) {
+    MenuReturnMsgDrawFlag = arg0 != 0;
+    if (LanguageCode == 0) {
+        MenuReturnMsgDrawFlag = 0;
+    }
+    if (MenuReturnMsg == 0) {
+        MenuReturnMsgDrawFlag = 0;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", DrawMenuReturnMsg__Fv);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", CheckOmakeVtuto__Fi);
 void InitMnOnePictTex(void) {

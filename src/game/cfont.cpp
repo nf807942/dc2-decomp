@@ -63,8 +63,130 @@ INCLUDE_ASM("nonmatchings/game/cfont", set2DSpriteEasyFont__FP11mgCDrawPrim9mgRe
 INCLUDE_ASM("nonmatchings/game/cfont", set2DSprite_Fuchi__FP11mgCDrawPrim4RECT4RECTii);
 INCLUDE_ASM("nonmatchings/game/cfont", DrawChar__5CFontFP11mgCDrawPrimiiii10RGBAQ_TYPEUc);
 INCLUDE_ASM("nonmatchings/game/cfont", DrawChar__5CFontFP11mgCDrawPrimPcii);
-INCLUDE_ASM("nonmatchings/game/cfont", MySetTex__FPcP11mgCDrawPrim);
-INCLUDE_ASM("nonmatchings/game/cfont", MySetTex__FiP11mgCDrawPrim);
+extern "C" u8 mgTexManager[540];
+extern "C" s32 GetTexture__17mgCTextureManagerFPci(...);
+#include "gen/mgCDrawPrim.hpp"
+struct mgCTexture {
+    s16 field_0;
+    s16 field_2;
+    s16 field_4;
+    s16 field_6;
+    char pad_8[0x4];
+    s32 field_C;
+    s32 field_10;
+    s16 field_14;
+    char pad_16[0x2];
+    s32 field_18;
+    s32 field_1C;
+    char pad_20[0x8];
+    s32 field_28;
+    s32 field_2C;
+    s32 field_30;
+    char pad_34[0x4];
+    s64 field_38;
+    s64 field_40;
+    s64 field_48;
+    s32 field_50;
+    f32 field_54;
+    f32 field_58;
+    f32 field_5C;
+    s32 field_60;
+    s32 field_64;
+    s32 field_68;
+    char pad_6C[0xA4];
+    s32 field_110;
+    s32 field_114;
+    s32 field_118;
+    s16 field_11C;
+    s8 field_11E;
+    s8 field_11F;
+    s16 field_120;
+    s16 field_122;
+    s32 field_124;
+    s32 field_128;
+    s8 field_12C;
+    s8 field_12D;
+    char pad_12E[0x2];
+    s32 field_130;
+    s32 field_134;
+    s32 field_138;
+    s32 field_13C;
+    char pad_140[0x4];
+    s32 field_144;
+    s32 field_148;
+    s32 field_14C;
+    s32 field_150;
+    s32 field_154;
+    s32 field_158;
+    s32 field_15C;
+    s32 field_160;
+    s32 field_164;
+    s32 field_168;
+    s32 field_16C;
+    s32 field_170;
+    s32 field_174;
+    s32 field_178;
+    s32 field_17C;
+    s32 field_180;
+    s32 field_184;
+    s32 field_188;
+    s32 field_18C;
+    s32 field_190;
+    char pad_194[0x60];
+    s32 field_1F4;
+    s32 field_1F8;
+    s32 field_1FC;
+    s8 field_200;
+    s8 field_201;
+    s16 field_202;
+    s32 field_204;
+    s8 field_208;
+    s8 field_209;
+    char pad_20A[0x2];
+    s32 field_20C;
+    s32 field_210;
+    s32 field_214;
+    s32 field_218;
+    s32 field_21C;
+    char pad_220[0xC];
+    s32 field_22C;
+    s32 field_230;
+    s32 field_234;
+    s32 field_238;
+    s32 field_23C;
+    s32 field_240;
+    char pad_244[0x4];
+    s32 field_248;
+    s16 field_24C;
+    s16 field_24E;
+    char pad_250[0x6];
+    s16 field_256;
+    f32 field_258;
+    f32 field_25C;
+    char pad_260[0x4];
+    f32 field_264;
+    f32 field_268;
+    f32 field_26C;
+    char pad_270[0x4];
+    f32 field_274;
+    f32 field_278;
+    char pad_27C[0x68];
+    s32 field_2E4;
+    char pad_2E8[0x74];
+    s32 field_35C;
+    s32 field_360;
+    s32 field_364;
+};
+extern "C" s32 Texture__11mgCDrawPrimFP10mgCTexture(...);
+extern "C" void MySetTex__FPcP11mgCDrawPrim(s8 *arg0, mgCDrawPrim *arg1) {
+    Texture__11mgCDrawPrimFP10mgCTexture(arg1, GetTexture__17mgCTextureManagerFPci(&mgTexManager, arg0, -1));
+}
+extern "C" s32 GetFontTexture__Fi(s32);
+extern "C" void MySetTex__FiP11mgCDrawPrim(s32 arg0, mgCDrawPrim *arg1) {
+    if ((arg0 == 0) || (arg0 == 1)) {
+        Texture__11mgCDrawPrimFP10mgCTexture(arg1, GetFontTexture__Fi(arg0));
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cfont", DrawGaiji_sub__FP11mgCDrawPrimiii10RGBAQ_TYPEi);
 INCLUDE_ASM("nonmatchings/game/cfont", DrawGaiji__5CFontFP11mgCDrawPrimiii);
 extern "C" void UpDateWH__FPiPiii(s32 *arg0, s32 *arg1, s32 arg2, s32 arg3) {
@@ -103,7 +225,21 @@ INCLUDE_ASM("nonmatchings/game/cfont", DrawVersatileWin_4__FP11mgCDrawPrim4RECTP
 INCLUDE_ASM("nonmatchings/game/cfont", DrawDQFukidashi__FP11mgCDrawPrim4RECTiiP10RGBAQ_TYPEii);
 INCLUDE_ASM("nonmatchings/game/cfont", LoadGaijiImg__Fv);
 INCLUDE_ASM("nonmatchings/game/cfont", GetGaijiImgPtr__Fv);
-INCLUDE_ASM("nonmatchings/game/cfont", LoadFontTex2Img__Fv);
+extern "C" u32 LanguageCode;
+extern "C" u8 _278_003765B0[17];
+extern "C" s32 LoadFile__FPcPvPi(...);
+extern "C" s32 LoadFontTex2Img__Fv(void) {
+    s32 sp1C;
+
+    if (FontTex_2_Buff == NULL) {
+        return 0;
+    }
+    if (LanguageCode != 0) {
+        return 0;
+    }
+    LoadFile__FPcPvPi(&_278_003765B0, FontTex_2_Buff, &sp1C);
+    return sp1C;
+}
 s32 GetFontTex2ImgPtr(void) {
     return FontTex_2_Buff;
 }

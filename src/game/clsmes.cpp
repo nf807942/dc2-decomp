@@ -49,7 +49,17 @@ INCLUDE_ASM("nonmatchings/game/clsmes", CheckPosInOutForArea__FPfPfPf);
 INCLUDE_ASM("nonmatchings/game/clsmes", CalcMoveNextPos__FPfPffPf);
 INCLUDE_ASM("nonmatchings/game/clsmes", InitMovieCC__Fv);
 INCLUDE_ASM("nonmatchings/game/clsmes", MyStrCpyLineFeed__FPcPc);
-INCLUDE_ASM("nonmatchings/game/clsmes", GetNextLineTop__FPPc);
+extern "C" void GetNextLineTop__FPPc(s8 **arg0) {
+    s8 *var_a2;
+
+    var_a2 = (s8 *) (*arg0);
+loop_1:
+    if (*var_a2 != 0xA) {
+        var_a2 += 1;
+        goto loop_1;
+    }
+    *arg0 = var_a2 + 1;
+}
 INCLUDE_ASM("nonmatchings/game/clsmes", GetTopAddress__FPcii);
 INCLUDE_ASM("nonmatchings/game/clsmes", MovieCCAnalyze__FPcii);
 INCLUDE_ASM("nonmatchings/game/clsmes", MovieCCDraw__Fv);
@@ -57,6 +67,31 @@ INCLUDE_ASM("nonmatchings/game/clsmes", MovieCCInit__FPcii);
 INCLUDE_ASM("nonmatchings/game/clsmes", VSyncCallBack__Fi_0015D470);
 INCLUDE_ASM("nonmatchings/game/clsmes", ClearScreen__Fiii);
 INCLUDE_ASM("nonmatchings/game/clsmes", init__Fv);
-INCLUDE_ASM("nonmatchings/game/clsmes", main);
+extern "C" u32 MainThreadPriority;
+extern "C" u8 _847_00367490[26];
+extern "C" u32 vcount_0037CF84;
+extern "C" s32 ChangeThreadPriority(...);
+extern "C" s32 GetThreadId(...);
+extern "C" s32 MainLoop__Fv(void);
+extern "C" s32 printf(...);
+extern "C" s32 sceCdInit(...);
+extern "C" s32 sceGsSyncPath(...);
+extern "C" s32 sceGsSyncV(...);
+extern "C" s32 sceGsSyncVCallback(...);
+extern "C" s32 sceSifExitCmd(...);
+extern "C" s32 init__Fv(void);
+extern "C" s32 main(void) {
+    MainThreadPriority = 0xA;
+    ChangeThreadPriority(GetThreadId(), MainThreadPriority);
+    init__Fv();
+    printf(&_847_00367490, vcount_0037CF84);
+    MainLoop__Fv();
+    sceGsSyncPath(0, 0);
+    sceGsSyncVCallback(0);
+    sceGsSyncV(0);
+    sceCdInit(5);
+    sceSifExitCmd();
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/clsmes", SetFlag__12CMapFlagDataFii);
 INCLUDE_ASM("nonmatchings/game/clsmes", GetFlag__12CMapFlagDataFi);

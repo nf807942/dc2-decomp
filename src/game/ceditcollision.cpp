@@ -24,16 +24,47 @@ INCLUDE_ASM("nonmatchings/game/ceditcollision", SearchEquipType__Fii);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", IsItemtypeWhoisEquip__FiPi);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", IsCheckParty__Fi);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", GetAquariumFish0__Fi);
-INCLUDE_ASM("nonmatchings/game/ceditcollision", GetUserItemHaveNum__Fi);
+extern "C" s32 GetUserDataMan__Fv(void);
+#include "dngfloormanager.hpp"
+extern "C" s32 GetNumSameItem__16CUserDataManagerFi(void *, s32);
+extern "C" s32 GetUserItemHaveNum__Fi(s32 arg0) {
+    CUserDataManager *temp_v0;
+
+    temp_v0 = (CUserDataManager *) (GetUserDataMan__Fv());
+    if (temp_v0 != NULL) {
+        return GetNumSameItem__16CUserDataManagerFi(temp_v0, arg0);
+    }
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/ceditcollision", CheckItemOver__Fv);
-INCLUDE_ASM("nonmatchings/game/ceditcollision", CheckItemLimmitOver__Fv);
+extern "C" s32 CheckItemLimmitOver__16CUserDataManagerFv(void *);
+extern "C" s32 CheckItemLimmitOver__Fv(void) {
+    CUserDataManager *temp_v0;
+
+    temp_v0 = (CUserDataManager *) (GetUserDataMan__Fv());
+    if (temp_v0 != NULL) {
+        return CheckItemLimmitOver__16CUserDataManagerFv(temp_v0);
+    }
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/ceditcollision", CheckGetItemLimmitOver__Fii);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", CheckGetItemRemainNum__Fi);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", CheckItemDngKey__Fv);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", PlayerPartyCure__Fv);
-INCLUDE_ASM("nonmatchings/game/ceditcollision", UserDataRefresh__Fv);
+extern "C" s32 RefreshParam__16CUserDataManagerFv(void *);
+extern "C" void UserDataRefresh__Fv(void) {
+    CUserDataManager *temp_v0;
+
+    temp_v0 = (CUserDataManager *) (GetUserDataMan__Fv());
+    if (temp_v0 != NULL) {
+        RefreshParam__16CUserDataManagerFv(temp_v0);
+    }
+}
 INCLUDE_ASM("nonmatchings/game/ceditcollision", DeleteErekiFish__Fv);
-INCLUDE_ASM("nonmatchings/game/ceditcollision", GetNowBagMax__Fi);
+extern "C" s32 GetItemBoardMaxNum__16CUserDataManagerFi(...);
+extern "C" void GetNowBagMax__Fi(s32 arg0) {
+    GetItemBoardMaxNum__16CUserDataManagerFi(GetUserDataMan__Fv(), arg0);
+}
 INCLUDE_ASM("nonmatchings/game/ceditcollision", LeaveMonicaItemCheck__Fv);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", AquaFishFatigueClear__Fv);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", DebugGetItem__FP16CUserDataManageri);
@@ -75,7 +106,35 @@ INCLUDE_ASM("nonmatchings/game/ceditcollision", EditOnGround__Fv);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", IsWalkMode__Fv);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", EditControlInit__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", EditControlStatusInit__FP6CScene);
-INCLUDE_ASM("nonmatchings/game/ceditcollision", EditControl__FP6CSceneP11CPadControl);
+struct CPadControl {
+    f32 field_0;
+    f32 field_4;
+    f32 field_8;
+    f32 field_C;
+};
+struct inferred;
+typedef struct CScene {
+    /* 0x0000 */ char pad0[0x2E88];
+    /* 0x2E88 */ s32 unk2E88;                       /* inferred */
+} CScene;                                           /* size >= 0x2E8C */
+extern "C" s32 LadderControl__FP6CSceneP11CPadControl(CScene *, CPadControl *);
+extern "C" s32 CameraControl__FP6CSceneP11CPadControl(CScene *, CPadControl *);
+extern "C" s32 CharaControl__FP6CSceneP11CPadControl_001A6B90(...);
+extern "C" s32 EditControl__FP6CSceneP11CPadControl(CScene *arg0, CPadControl *arg1) {
+    CPadControl *var_s0;
+
+    var_s0 = (CPadControl *) (arg1);
+    if (LadderMode != 0) {
+        LadderControl__FP6CSceneP11CPadControl(arg0, arg1);
+    } else {
+        CharaControl__FP6CSceneP11CPadControl_001A6B90();
+        if (arg0->unk2E88 != 0) {
+            var_s0 = (CPadControl *) (NULL);
+        }
+        CameraControl__FP6CSceneP11CPadControl(arg0, var_s0);
+    }
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/ceditcollision", GetFootEffName__Fi);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", EditMoveChara__FP6CScenePfP17EditMoveCharaInfo);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", EditCameraControl__FP6CSceneP11CPadControlPA4_f);

@@ -101,7 +101,11 @@ void CList_14PartsGroupData_::Initialize(void) {
     this->field_0x4 = 0;
     this->field_0x0 = 0;
 }
-INCLUDE_ASM("nonmatchings/game/cmap", SearchPartsGroup__4CMapFPc);
+extern "C" s32 GetPartsGroup__4CMapFi(void *, s32);
+extern "C" s32 SearchPartsGroupNo__4CMapFPc(...);
+extern "C" void SearchPartsGroup__4CMapFPc(CMap *objet, s8 *arg0) {
+    GetPartsGroup__4CMapFi(objet, SearchPartsGroupNo__4CMapFPc(objet, arg0));
+}
 INCLUDE_ASM("nonmatchings/game/cmap", SearchPartsGroupNo__4CMapFPc);
 INCLUDE_ASM("nonmatchings/game/cmap", SerachEmptyPartsGroupNo__4CMapFv);
 INCLUDE_ASM("nonmatchings/game/cmap", Initialize__4CMapFv);
@@ -131,7 +135,20 @@ INCLUDE_ASM("nonmatchings/game/cmap", ConvertParts__4CMapFP9CMapParts);
 INCLUDE_ASM("nonmatchings/game/cmap", GetPlaceParts__4CMapFP9mgVu0FBOXPP9CMapPartsi);
 INCLUDE_ASM("nonmatchings/game/cmap", GetPlaceColParts__4CMapFP9mgVu0FBOXPP9CMapPartsi);
 INCLUDE_ASM("nonmatchings/game/cmap", CreateFuncCheck__4CMapFP15CFuncPointCheck);
-INCLUDE_ASM("nonmatchings/game/cmap", GetBBox__4CMapFP9mgVu0FBOX);
+struct inferred;
+#include "sphida.hpp"
+typedef struct CMap_infere {
+    /* 0x000 */ char pad0[0x334];
+    /* 0x334 */ s32 unk334;                         /* inferred */
+    /* 0x338 */ char pad338[8];                     /* maybe part of unk334[3]void */
+    /* 0x340 */ mgVu0FBOX unk340;                   /* inferred */
+    /* 0x340 */ char pad340[1];
+} CMap_infere;                                             /* size >= 0x341 */
+extern "C" s32 __as__9mgVu0FBOXFR9mgVu0FBOX(...);
+extern "C" s32 GetBBox__4CMapFP9mgVu0FBOX(CMap_infere *objet, mgVu0FBOX *arg0) {
+    __as__9mgVu0FBOXFR9mgVu0FBOX(arg0, &objet->unk340);
+    return objet->unk334;
+}
 INCLUDE_ASM("nonmatchings/game/cmap", PreDraw__4CMapFPf);
 INCLUDE_ASM("nonmatchings/game/cmap", GetCharaLight__4CMapFP9mgCObjectP10CFuncPointii);
 INCLUDE_ASM("nonmatchings/game/cmap", SetFuncPLight__4CMapFPfP15CFuncPointCheck);
@@ -159,7 +176,28 @@ INCLUDE_ASM("nonmatchings/game/cmap", EffectStep__4CMapFv);
 INCLUDE_ASM("nonmatchings/game/cmap", AnimeStep__4CMapFP12CObjAnimeEnv);
 INCLUDE_ASM("nonmatchings/game/cmap", Step__4CMapFv);
 INCLUDE_ASM("nonmatchings/game/cmap", GetSeSrcVolPan__4CMapFPiPfPfi);
-INCLUDE_ASM("nonmatchings/game/cmap", CreateMap__4CMapFP11CMdsListSetP9mgCMemory);
+extern "C" s32 GetAddMapFile__8CMapInfoFPi(void *, s32 *);
+extern "C" s32 GetMapFile__8CMapInfoFPi(void *, s32 *);
+#include "gen/CMapInfo.hpp"
+struct CMdsListSet {
+    s32 field_0;
+    char pad_4[0x8C];
+    s32 field_90;
+};
+#include "menu.hpp"
+extern "C" s32 LoadMapFile__4CMapFPciP9mgCMemoryi(...);
+extern "C" void CreateMap__4CMapFP11CMdsListSetP9mgCMemory(CMap *objet, CMdsListSet *arg0, mgCMemory *arg1) {
+    s32 sp3C;
+    s8 *temp_v0;
+
+    temp_v0 = (s8 *) (GetAddMapFile__8CMapInfoFPi((CMapInfo *) objet, &sp3C));
+    if (temp_v0 != NULL) {
+        if (sp3C > 0) {
+            LoadMapFile__4CMapFPciP9mgCMemoryi(objet, temp_v0, sp3C, arg1, 1);
+        }
+    }
+    LoadMapFile__4CMapFPciP9mgCMemoryi(objet, GetMapFile__8CMapInfoFPi((CMapInfo *) objet, &sp3C), sp3C, arg1, 0);
+}
 INCLUDE_ASM("nonmatchings/game/cmap", AssignFuncPoint__4CMapFP9mgCMemory);
 CObjAnime::CObjAnime(void) {
     this->field_0x4 = 0;

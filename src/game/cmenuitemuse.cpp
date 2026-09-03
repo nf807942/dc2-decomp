@@ -59,8 +59,35 @@ INCLUDE_ASM("nonmatchings/game/cmenuitemuse", PrimFillRect4__FP11mgCDrawPrim9mgR
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", MenuReloadTexture__FRii);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", MenuReloadCLUT__Fi);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", DrawMenuFillBox__Fiiii);
-INCLUDE_ASM("nonmatchings/game/cmenuitemuse", DrawMenuFillBox__Fffffiiii);
-INCLUDE_ASM("nonmatchings/game/cmenuitemuse", DrawMenuFillBox__FP11mgCDrawPrimffffiiii);
+extern "C" s32 GetMenuPrim__Fv(void);
+#include "gen/mgCDrawPrim.hpp"
+extern "C" s32 Begin__11mgCDrawPrimFi(void *, s32);
+extern "C" s32 Color__11mgCDrawPrimFiiii(void *, s32, s32, s32, s32);
+extern "C" s32 DepthTestEnable__11mgCDrawPrimFi(void *, s32);
+extern "C" s32 End__11mgCDrawPrimFv(void *);
+extern "C" s32 Vertex__11mgCDrawPrimFfff(void *, f32, f32, f32);
+extern "C" s32 SetSpriteEnv__FP11mgCDrawPrimi(mgCDrawPrim *, s32);
+extern "C" void DrawMenuFillBox__Fffffiiii(f32 arg0, f32 arg1, f32 arg2, f32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7) {
+    mgCDrawPrim *temp_v0;
+
+    temp_v0 = (mgCDrawPrim *) (GetMenuPrim__Fv());
+    SetSpriteEnv__FP11mgCDrawPrimi(temp_v0, 1);
+    DepthTestEnable__11mgCDrawPrimFi(temp_v0, 0);
+    Begin__11mgCDrawPrimFi(temp_v0, 6);
+    Color__11mgCDrawPrimFiiii(temp_v0, arg5, arg6, arg7, arg4);
+    Vertex__11mgCDrawPrimFfff(temp_v0, arg0, arg1, 0.0f);
+    Vertex__11mgCDrawPrimFfff(temp_v0, arg0 + arg2, arg1 + arg3, 0.0f);
+    End__11mgCDrawPrimFv(temp_v0);
+}
+extern "C" void DrawMenuFillBox__FP11mgCDrawPrimffffiiii(mgCDrawPrim *arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, s32 arg5, s32 arg6, s32 arg7, s32 arg8) {
+    SetSpriteEnv__FP11mgCDrawPrimi(arg0, 1);
+    DepthTestEnable__11mgCDrawPrimFi(arg0, 0);
+    Begin__11mgCDrawPrimFi(arg0, 6);
+    Color__11mgCDrawPrimFiiii(arg0, arg6, arg7, arg8, arg5);
+    Vertex__11mgCDrawPrimFfff(arg0, arg1, arg2, 0.0f);
+    Vertex__11mgCDrawPrimFfff(arg0, arg1 + arg3, arg2 + arg4, 0.0f);
+    End__11mgCDrawPrimFv(arg0);
+}
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", GenarateRandamLine__FPiiiPiii);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", DrawRandamLine__FP11mgCDrawPrimPiiiPUc);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", GetMenuDlTexture__Fv);

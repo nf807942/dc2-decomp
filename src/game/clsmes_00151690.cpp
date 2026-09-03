@@ -46,7 +46,17 @@ extern "C" s32 CheckPosInOutFor2P__Fffffff(f32 arg0, f32 arg1, f32 arg2, f32 arg
     return var_v0 ^ 1;
 }
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", CalcIntersectionPointLineAndLine__FffffffffPfPf);
-INCLUDE_ASM("nonmatchings/game/clsmes_00151690", CalcIntersectionPoint2PAnd2P__FffffffffPfPf);
+extern "C" s32 CalcIntersectionPointLineAndLine__FffffffffPfPf(f32, f32, f32, f32, f32, f32, f32, f32, f32 *, f32 *);
+extern "C" s32 CheckPosInOutFor2P__Fffffff(f32, f32, f32, f32, f32, f32);
+extern "C" s32 CalcIntersectionPoint2PAnd2P__FffffffffPfPf(f32 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6, f32 arg7, f32 *arg8, f32 *arg9) {
+    if (CalcIntersectionPointLineAndLine__FffffffffPfPf(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8, arg9) == 0) {
+        return 0;
+    }
+    if (CheckPosInOutFor2P__Fffffff(arg0, arg1, arg2, arg3, *arg8, *arg9) == 0) {
+        return 0;
+    }
+    return CheckPosInOutFor2P__Fffffff(arg4, arg5, arg6, arg7, *arg8, *arg9) != 0;
+}
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", MySetPrim__FP11mgCDrawPrimii);
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", set2DSpriteEasy__FP11mgCDrawPrim9mgRect_i_9mgRect_i_P10RGBAQ_TYPE);
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", _set2DSprite__FPcP11mgCDrawPrim9mgRect_i_9mgRect_i_P10RGBAQ_TYPE);
@@ -69,7 +79,18 @@ INCLUDE_ASM("nonmatchings/game/clsmes_00151690", CalcMesWinXYFromFukidashiXY__6C
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", CalcFukidashiXY__6ClsMesFPi);
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", AutoSet__6ClsMesFPi);
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", GetBuffMesIdPtr__FPcii);
-INCLUDE_ASM("nonmatchings/game/clsmes_00151690", SetHalfFontWPercent__6ClsMesFf);
+struct inferred;
+typedef struct ClsMes_infere {
+    /* 0x00 */ char pad0[0xD0];
+    /* 0xD0 */ f32 unkD0;                           /* inferred */
+} ClsMes_infere;                                           /* size >= 0xD4 */
+extern "C" void SetHalfFontWPercent__6ClsMesFf(ClsMes_infere *objet, f32 arg0) {
+    if (arg0 < 0.0f) {
+        objet->unkD0 = 0.55f;
+        return;
+    }
+    objet->unkD0 = arg0;
+}
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", __ct__6ClsMesFv);
 void ClsMes::SetBuff(s16 * arg0) {
     this->field_0x294C = arg0;
