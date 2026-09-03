@@ -249,6 +249,23 @@ def main(argv: list[str]) -> int:
             elif part is not None:
                 print("  %5d o  %-46s  %5.1f %%"
                       % (taille, symbole[:46], part), flush=True)
+        # **objdiff ne voit qu'un objet, jamais le binaire lie.** Une fonction
+        # peut y apparier a 100 % et changer pourtant l'image : degreffer la
+        # derniere fonction d'une unite en retire le remplissage de queue, et
+        # tout ce qui suit se decale. Mesure au prix fort : 546 fonctions
+        # annoncees gagnees, 53 % des octets divergents, et une bissection
+        # pour trouver l'unite en cause.
+        if gagnees > avant_unite and not image_identique():
+            print("  l'image diverge : %s revient a son etat d'entree"
+                  % unite, flush=True)
+            (ROOT / "src" / (unite + ".cpp")).write_text(
+                depart_unite, encoding="utf-8")
+            for _, symbole in lot:
+                fiche = etat["eprouvees"].get(symbole)
+                if fiche and (fiche.get("part") or 0) >= 99.999:
+                    fiche["issue"] = "image divergente"
+                    fiche["part"] = None
+            gagnees, gagnes = avant_unite, octets_avant_unite
         enregistre(etat)
 
     ecoule = time.time() - depart
