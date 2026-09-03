@@ -248,6 +248,11 @@ def decompile(symbole: str) -> str | None:
 
 
 _FLECHE = re.compile(r"\b([A-Za-z_]\w*)\s*->\s*(unk[0-9A-Fa-f]+)\b")
+# Un motif ne revient pas sur ce qu'il a consomme : dans
+# `objet->unk0->unk10`, `_FLECHE` prend `(objet, unk0)` puis reprend apres
+# `unk0`, et le second maillon n'est jamais vu. Il se cherche a part.
+_FLECHE_CHAINEE = re.compile(
+    r"(unk[0-9A-Fa-f]+)\s*->\s*(unk[0-9A-Fa-f]+)\b")
 _CHAMP_M2C = re.compile(
     r"/\*\s*0x([0-9A-Fa-f]+)\s*\*/\s*(.+?)\s*(\w+)\s*(\[[^\]]*\])?\s*;")
 
@@ -326,6 +331,27 @@ def _elargit(bloc: str, manquants: dict[int, str]) -> str:
     return bloc[:fin] + queue + "\n" + bloc[fin:]
 
 
+def _rend_pointeur(bloc: str, champ: str, cible: str) -> str | None:
+    """Rend pointeur un champ que le corps déréférence à son tour.
+
+    `objet->unk0->unk10()` : m2c a infere `unk0` comme un entier, puis l'a
+    dereference. MWCC repond « expression syntax error » sur `unk10`, et le
+    champ fautif n'est ni une locale ni un parametre — il vit dans la
+    structure de l'objet, hors du corps.
+
+    La largeur ne change pas : un pointeur fait quatre octets comme le `s32`
+    qu'il remplace, et la disposition tient.
+    """
+    # m2c ecrit parfois `void *unk0` : l'etoile est deja la, et le type reste
+    # inutilisable. Le motif l'accepte donc, sans quoi la regle ne voyait que
+    # les champs scalaires.
+    motif = re.compile(
+        r'(/\*\s*0x[0-9A-Fa-f]+\s*\*/\s*)[A-Za-z_]\w*\s*\**\s*(' + re.escape(champ) + r'\s*;)')
+    if not motif.search(bloc):
+        return None
+    return motif.sub(r'\1struct %s *\2' % cible, bloc, count=1)
+
+
 def complete_structures(structs: list[str], corps: str) -> tuple[list[str], str]:
     """Donne un type aux pointeurs que le corps déréférence sans déclaration.
 
@@ -335,7 +361,8 @@ def complete_structures(structs: list[str], corps: str) -> tuple[list[str], str]
     elle n'existe pas du tout. Le même défaut, vu des deux côtés.
     """
     demandes: dict[str, dict[int, str]] = {}
-    for variable, champ in _FLECHE.findall(corps):
+    for variable, champ in (_FLECHE.findall(corps)
+                            + _FLECHE_CHAINEE.findall(corps)):
         demandes.setdefault(variable, {})[int(champ[3:], 16)] = champ
     if not demandes:
         return structs, corps
@@ -354,6 +381,16 @@ def complete_structures(structs: list[str], corps: str) -> tuple[list[str], str]
             # dereferencee. On lui forge sa structure et on la rend pointeur.
             valeur = _type_valeur(variable, corps)
             if valeur is None:
+                # Ni locale ni parametre : le nom vit dans une structure
+                # inferee, que le corps dereference a son tour —
+                # `objet->unk0->unk10()`. On rend ce champ pointeur.
+                forge = "%s_champs" % variable
+                for rang, bloc in enumerate(structs):
+                    rendu = _rend_pointeur(bloc, variable, forge)
+                    if rendu is not None:
+                        structs[rang] = rendu
+                        neuves.append(_struct_par_offsets(forge, offsets))
+                        break
                 continue
             forge = "%s_champs" % variable
             neuves.append(_struct_par_offsets(forge, offsets))
