@@ -34,8 +34,21 @@ du temps de compilation sans rien rendre.
 
 `echange_deux_rangements` a été ajouté depuis et n'est pas encore mesuré.
 
-Extrapolé aux 657 quasi-succès de l'époque : environ 49 fonctions, 6 500
-octets. C'est le chiffre à battre en outillant les idiomes qui suivent.
+**Ce chiffre était mesuré avec objdiff seul, et il était double du vrai.**
+objdiff compare un objet à un objet : il ne voit ni le lien, ni le remplissage
+qu'une unité porte en queue, ni le décalage qu'un changement de taille inflige
+à tout ce qui suit. Une passe d'affinage a ainsi annoncé neuf gains dont la
+reconstruction complète du binaire écartait la plupart — 68 % des octets
+divergents, et l'image plus courte de 112 octets.
+
+**Sous vérification de l'image liée : 3 fonctions gagnées sur 80, soit 3,75 %.**
+C'est le rendement réel de l'affinage, et il vaut la moitié de ce que la mesure
+par objet annonçait. Extrapolé aux 556 quasi-succès du corpus : environ
+21 fonctions.
+
+La leçon vaut pour toute mesure de ce dépôt : **`match_percent` d'objdiff
+départage deux formes d'une même fonction, il ne prouve pas un gain.** Seule la
+reconstruction complète le fait.
 
 ---
 
