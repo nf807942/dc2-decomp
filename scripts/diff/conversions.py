@@ -30,8 +30,11 @@ import re
 # `    s32 temp_t4;` ou `    struct X *temp_t4;` — une locale que m2c déclare en
 # tête de fonction. L'étoile se capture à part : elle colle au nom, non au type,
 # et c'est pourtant elle qui décide si la conversion se pose.
+# Le tableau compte pour une declaration : `u8 sp210[0x10];` n'etait pas vu,
+# et `declare_les_piles` reposait alors un emplacement deja declare —
+# « object 'sp210' redefined ».
 _LOCALE = re.compile(
-    r"^    ((?:struct |union |const )?[A-Za-z_]\w*)\s*(\**)\s*(\w+)\s*;\s*$", re.M)
+    r"^    ((?:struct |union |const )?[A-Za-z_]\w*)\s*(\**)\s*(\w+)\s*(?:\[[^\]]*\])?\s*;\s*$", re.M)
 # `CSphidaData *objet, s32 arg0)` — les paramètres, lus sur la ligne d'en-tête.
 _PARAM = re.compile(r"([A-Za-z_][\w ]*?[\w*])\s*\*?\s*(\w+)\s*(?:,|\))")
 # `    temp_t4 = objet + var_t3;` — une affectation simple, seule sur sa ligne.
@@ -112,6 +115,45 @@ def nettoie_locales(corps: str) -> str:
 _PILE = re.compile(r"\bsp([0-9A-Fa-f]+)\b")
 
 
+# `CMenuFont sp210;` — un emplacement de pile que m2c type par une classe dont
+# le projet n'a pas la définition.
+_BASE_C = {'void', 'char', 'bool', 's8', 'u8', 's16', 'u16', 's32',
+           'u32', 's64', 'u64', 'f32', 'f64', 'int', 'unsigned',
+           'signed', 'long', 'short', 'float', 'double', 'struct'}
+
+_PILE_TYPEE = re.compile(r"^(\s*)([A-Za-z_]\w*)\s+(sp[0-9A-Fa-f]+)\s*;\s*$", re.M)
+
+
+def taille_les_piles_typees(corps: str, connus: set[str]) -> str:
+    """Rend en octets un emplacement de pile d'un type incomplet.
+
+    m2c ecrit `CMenuFont sp210;` : il a lu la signature d'un appel et en a tire
+    le type. Mais une locale *par valeur* reclame une definition complete, et
+    MWCC repond « illegal use of incomplete struct/union/class » — la fonction
+    est perdue pour un objet dont elle ne lit aucun champ.
+
+    Le decalage est dans le nom, et celui de l'emplacement suivant le borne :
+    la meme regle que pour les emplacements que m2c ne declare pas du tout. Un
+    tableau d'octets de la bonne taille tient la place, et l'adresse passee a
+    l'appel est la meme.
+    """
+    decalages = sorted({int(o, 16) for o in _PILE.findall(corps)})
+    def borne(marque: re.Match) -> str:
+        marge, type_, nom = marque.groups()
+        if type_ in connus or type_ in _BASE_C:
+            return marque.group(0)
+        # Un emplacement dont le corps lit un champ a besoin de son type : le
+        # rendre en octets ferait echouer l'acces. Ceux qu'on remplace ne sont
+        # touches que par leur adresse — `&spF0` passe a un constructeur.
+        if (nom + ".") in corps or (nom + "->") in corps:
+            return marque.group(0)
+        decalage = int(nom[2:], 16)
+        suivants = [d for d in decalages if d > decalage]
+        large = (suivants[0] - decalage) if suivants else 16
+        return '%su8 %s[0x%X];' % (marge, nom, max(large, 1))
+    return _PILE_TYPEE.sub(borne, corps)
+
+
 def declare_les_piles(corps: str) -> str:
     """Introduit les emplacements de pile que m2c emploie sans les déclarer.
 
@@ -162,7 +204,13 @@ _VARIABLE = re.compile(r'^extern "C" [\w ]+ \*?(\w+)(?:\[[^\]]*\])?;')
 def _cle(bloc: str) -> tuple[str, str] | None:
     """Ce que ce bloc déclare, sous une forme comparable."""
     tete = bloc.lstrip().split("\n", 1)[0]
-    for motif, genre in ((_TYPEDEF, "type"), (_AVANT, "type"),
+    # **Une déclaration en avant n'est pas une définition.** Les ranger sous
+    # la même clé faisait écarter notre `typedef struct CMenuFont { … }` parce
+    # que l'unité portait un `struct CMenuFont;` : le type restait nommé et
+    # incomplet, et MWCC répondait « illegal use of incomplete struct » sur la
+    # première locale qui en lit un champ. C'est la même distinction que
+    # `deja_vues` contre `deja_declarees`, vue du côté du rejet.
+    for motif, genre in ((_TYPEDEF, "type"), (_AVANT, "avant"),
                          (_FONCTION, "fonction"),
                          (_VARIABLE, "variable")):
         marque = motif.match(tete)

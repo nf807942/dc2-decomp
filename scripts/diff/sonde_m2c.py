@@ -38,7 +38,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from conversions import (cast_les_affectations,  # noqa: E402
                          assemble, declare_les_piles, nettoie_declarations,
                          declarations_portees, remplit_les_appels, renomme,
-                         nettoie_locales)
+                         nettoie_locales, taille_les_piles_typees)
 
 # `typedef struct X {` … `} X;` — la structure que m2c infère d'un pointeur.
 # m2c fait suivre l'accolade fermante d'un commentaire de taille — `} X;
@@ -614,6 +614,16 @@ def normalise(texte: str, symbole: str, vues: set[str],
     # identifiant inconnu, les suivants devenant des « declaration syntax
     # error » anonymes, et cinq tours n'en déclaraient donc que cinq.
     definis = {_NOM_STRUCT.search(bloc).group(1) for bloc in structs}
+    # Une locale *par valeur* d'un type incomplet perd la fonction pour un
+    # objet dont elle ne lit aucun champ : son decalage de pile et le suivant
+    # en donnent la taille.
+    # `vues` et non `declarees` : la question est « ce type est-il *complet* ? »,
+    # non « ce nom est-il pris ? ». Une coquille declaree sans champs laisse
+    # MWCC repondre « incomplete », et la garde large faisait passer son tour.
+    # `vues` seul : une structure que m2c definit peut etre retiree par
+    # `assemble` quand l'unite declare deja le tag, et il ne reste qu'une
+    # declaration en avant — le type est nomme, non complet.
+    corps = taille_les_piles_typees(corps, vues)
     employes = set(re.findall(r"\b([A-Za-z_]\w*)\s*\*", "\n".join(externes + structs) + corps))
     # `arg0 * 5` est une multiplication, non une déclaration : le motif ci-dessus
     # ne les distingue pas, et faisait émettre un `struct arg0;` que rien
@@ -661,7 +671,18 @@ def normalise(texte: str, symbole: str, vues: set[str],
     corps = declare_les_piles(corps)
     corps = cast_les_affectations(corps)
 
-    declarations = "\n".join(en_tete + structs + externes)
+    # **m2c définit ses structures après celles qui les emploient.**
+    # `/* 0x2C8 */ mgCTexture *unk2C8;` precede de cinq lignes le
+    # `typedef struct mgCTexture`, et MWCC repond « declaration syntax error »
+    # sur un type qu'il rencontrera plus loin. Une declaration en avant de
+    # chacune, posee en tete, leve tout l'ordre — et en C++ elle introduit
+    # aussi le nom comme type, ce dont le champ a besoin.
+    avances = []
+    for bloc in structs:
+        trouve = _NOM_STRUCT.search(bloc)
+        if trouve:
+            avances.append("struct %s;" % trouve.group(1))
+    declarations = chr(10).join(en_tete + avances + structs + externes)
     return nettoie_declarations(declarations), corps
 
 
