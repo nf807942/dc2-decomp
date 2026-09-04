@@ -18,7 +18,38 @@ void CQuestManager::Initialize(void) {
     this->field_0x4 = 0;
 }
 INCLUDE_ASM("nonmatchings/game/crandom", GetQuestInfo__13CQuestManagerFi);
-INCLUDE_ASM("nonmatchings/game/crandom", quest_NUM__FP9SPI_STACKi);
+extern "C" u32 spi_quest_info;
+typedef struct spi_questman_pointe {
+    s32 unk0;
+    s32 unk4;
+} spi_questman_pointe;
+extern "C" spi_questman_pointe *spi_questman;
+struct spi_questman_pointe;
+extern "C" u32 spi_queststack;
+struct SPI_STACK {
+    s32 field_0;
+    s32 field_4;
+};
+extern "C" s32 Alloc__9mgCMemoryFi(...);
+extern "C" s32 __nwa__FUiP1(...);
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(SPI_STACK *);
+extern "C" s32 quest_NUM__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    s32 temp_v0;
+    u32 temp_s0;
+    u32 var_v0;
+
+    temp_v0 = (s32) (spiGetStackInt__FP9SPI_STACK(arg0));
+    spi_questman->unk0 = temp_v0;
+    temp_s0 = temp_v0 * 0x3D0;
+    if (temp_s0 & 0xF) {
+        var_v0 = (temp_s0 >> 4) + 1;
+    } else {
+        var_v0 = temp_s0 >> 4;
+    }
+    spi_questman->unk4 = __nwa__FUiP1(temp_s0, Alloc__9mgCMemoryFi(spi_queststack, var_v0 + 2));
+    spi_quest_info = spi_questman->unk4;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/crandom", quest_NEW__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/crandom", quest_COMMENT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/crandom", quest_END__FP9SPI_STACKi);

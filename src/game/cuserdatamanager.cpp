@@ -235,7 +235,28 @@ extern "C" s32 AddFp__16CUserDataManagerFi(CUserDataManager *objet, s32 arg0) {
     return AddFusionPoint__13CGameDataUsedFi(&objet->unk40B8, arg0);
 }
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SetChrEquip__16CUserDataManagerFiP13CGameDataUsed);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SetChrEquip__16CUserDataManagerFii);
+extern "C" s32 SearchItemOnItemBrd__16CUserDataManagerFii(void *, s32, s32);
+extern "C" s32 SearchEquip__16CUserDataManagerFii(void *, s32, s32);
+extern "C" s32 SetChrEquip__16CUserDataManagerFiP13CGameDataUsed(void *, s32, CGameDataUsed *);
+extern "C" s32 SetChrEquip__16CUserDataManagerFii(CUserDataManager *objet, s32 arg0, s32 arg1) {
+    CGameDataUsed *temp_v0;
+
+    if (arg1 <= 0) {
+        return 0;
+    }
+    if ((arg0 < 0) || (arg0 > 2)) {
+        return 0;
+    }
+    if (SearchEquip__16CUserDataManagerFii(objet, arg0, arg1) != 0) {
+        return 0;
+    }
+    temp_v0 = (CGameDataUsed *) (SearchItemOnItemBrd__16CUserDataManagerFii(objet, arg1, 1));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    SetChrEquip__16CUserDataManagerFiP13CGameDataUsed(objet, arg0, temp_v0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SetChrEquipDirect__16CUserDataManagerFii);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SearchEquip__16CUserDataManagerFii);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetCharaEquipDataPath__16CUserDataManagerFii);
@@ -248,7 +269,39 @@ INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SearchActiveItemTableSpace__16
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SearchItemOnItemBrd__16CUserDataManagerFii);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetNumStackOverBoard__16CUserDataManagerFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SearchAllHaveItem__16CUserDataManagerFi);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", FishInAquarium__16CUserDataManagerFP13CGameDataUsedi);
+struct CFishAquarium {
+    s16 field_0;
+    s16 field_2;
+    char pad_4[0x514];
+    s64 field_518;
+    s64 field_520;
+    s32 field_528;
+    f32 field_52C;
+};
+typedef struct CUserDataManager_infere7 {
+    /* 0x0000 */ char pad0[0x4958];
+    /* 0x4958 */ CFishAquarium unk4958;             /* inferred */
+    /* 0x4958 */ char pad4958[1];
+} CUserDataManager_infere7;                                 /* size >= 0x4959 */
+extern "C" s32 Init__13CGameDataUsedFv(void *);
+extern "C" s32 FishIntoAquarium__13CFishAquariumFiiP13CGameDataUsed(void *, s32, s32, CGameDataUsed *);
+extern "C" s32 SearchAqua1NotUsed__13CFishAquariumFi(void *, s32);
+extern "C" s32 FishInAquarium__16CUserDataManagerFP13CGameDataUsedi(CUserDataManager_infere7 *objet, CGameDataUsed *arg0, s32 arg1) {
+    CFishAquarium *temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = (CFishAquarium *) (&objet->unk4958);
+    if ((arg1 < 0) || (arg1 > 2)) {
+        return 0;
+    }
+    temp_v0 = (s32) (SearchAqua1NotUsed__13CFishAquariumFi(temp_s0, 0));
+    if ((temp_v0 < 0) || (arg0 == NULL)) {
+        return 0;
+    }
+    FishIntoAquarium__13CFishAquariumFiiP13CGameDataUsed(temp_s0, arg1, temp_v0, arg0);
+    Init__13CGameDataUsedFv(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", CheckElectricFish__16CUserDataManagerFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetNumSameItem__16CUserDataManagerFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AddYarikomiMedal__16CUserDataManagerFi);

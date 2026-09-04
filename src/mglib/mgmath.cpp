@@ -109,5 +109,29 @@ INCLUDE_ASM("nonmatchings/mglib/mgmath", mgVectorMinMaxN__FPfPfPA4_fi);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgApplyMatrix__FPfPfPA4_fPfPf);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgVectorInterpolate__FPfPfPffi);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgAngleInterpolate__Ffffi);
-INCLUDE_ASM("nonmatchings/mglib/mgmath", mgAngleCmp__Ffff);
+extern "C" s32 mgAngleCmp__Ffff(f32 arg0, f32 arg1, f32 arg2) {
+    f32 var_f1;
+    s32 var_v0;
+
+    var_f1 = arg0 - arg1;
+    if (var_f1 == 0.0f) {
+        return 0;
+    }
+    if (!(var_f1 <= 3.1415927f)) {
+        var_f1 -= 6.2831855f;
+    }
+    if (var_f1 < -3.1415927f) {
+        var_f1 += 6.2831855f;
+    }
+    if (!(var_f1 <= arg2)) {
+        return 1;
+    }
+    var_v0 = 0;
+    if (!(var_f1 < -arg2)) {
+        return var_v0;
+    }
+    var_v0 = -1;
+
+    return var_v0;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgAngleLimit__Ff);

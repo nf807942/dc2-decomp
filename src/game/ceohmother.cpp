@@ -100,7 +100,51 @@ void CRaster::Initialize(void) {
 }
 INCLUDE_ASM("nonmatchings/game/ceohmother", SetParam__7CRasterFfff);
 INCLUDE_ASM("nonmatchings/game/ceohmother", StartRaster__7CRasterFfffi);
-INCLUDE_ASM("nonmatchings/game/ceohmother", StopRaster__7CRasterFfffi);
+typedef struct CRaster_infere {
+    /* 0x00 */ s32 unk0;                            /* inferred */
+    /* 0x04 */ f32 unk4;                            /* inferred */
+    /* 0x08 */ f32 unk8;                            /* inferred */
+    /* 0x0C */ f32 unkC;                            /* inferred */
+    /* 0x10 */ f32 unk10;                           /* inferred */
+    /* 0x14 */ f32 unk14;                           /* inferred */
+    /* 0x18 */ f32 unk18;                           /* inferred */
+    /* 0x1C */ char pad1C[8];                       /* maybe part of unk18[3]void */
+    /* 0x24 */ s32 unk24;                           /* inferred */
+    /* 0x28 */ s32 unk28;                           /* inferred */
+} CRaster_infere;                                          /* size >= 0x2C */
+extern "C" void StopRaster__7CRasterFfffi(CRaster_infere *objet, f32 arg0, f32 arg1, f32 arg2, s32 arg3) {
+    objet->unk24 = arg3;
+    objet->unk28 = 0;
+    if (objet->unk24 > 1) {
+        objet->unk0 = 3;
+        if (arg0 != -1.0f) {
+            objet->unk8 = (arg0 - objet->unk4) / (f32) objet->unk24;
+        } else {
+            objet->unk8 = 0.0f;
+        }
+        if (arg1 != -1.0f) {
+            objet->unk10 = (arg1 - objet->unkC) / (f32) objet->unk24;
+        } else {
+            objet->unk10 = 0.0f;
+        }
+        if (arg2 != -1.0f) {
+            objet->unk18 = (arg2 - objet->unk14) / (f32) objet->unk24;
+            return;
+        }
+        objet->unk18 = 0.0f;
+        return;
+    }
+    if (arg0 != -1.0f) {
+        objet->unk4 = arg0;
+    }
+    if (arg1 != -1.0f) {
+        objet->unkC = arg1;
+    }
+    if (arg2 != -1.0f) {
+        objet->unk14 = arg2;
+    }
+    objet->unk0 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/ceohmother", StepRaster__7CRasterFv);
 INCLUDE_ASM("nonmatchings/game/ceohmother", DrawRaster__7CRasterFv);
 struct inferred;
