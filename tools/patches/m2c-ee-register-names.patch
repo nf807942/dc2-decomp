@@ -40,6 +40,24 @@ sept instructions couvertes sont `adda.s`, `suba.s`, `mula.s`, `madda.s`,
 Vérifié sur quatre fonctions tirées des plus lourdes de la famille : les quatre
 passent de « intraduisible » à zéro `M2C_ERROR`.
 
+## Un nom que le désassembleur a désambiguïsé
+
+Le désassembleur ajoute son adresse à un symbole qu'il ne peut pas distinguer :
+`GetStackString__FP12RS_STACKDATA_001E1BD0`. Le démangleur CodeWarrior de m2c
+s'y perd et **échoue sur une assertion**, non sur une `ValueError`.
+
+La différence décide de tout. Les appelants attrapent déjà `ValueError` et se
+passent alors du démanglage ; une `AssertionError` remonte au contraire jusqu'au
+traducteur, qui rend le bloc entier en `M2C_ERROR()` — sans message, ce qui rend
+la panne muette. **Une fonction est donc perdue entière parce qu'elle appelle un
+symbole désambiguïsé.**
+
+Une assertion qui saute dans un analyseur syntaxique est un échec d'analyse, pas
+une panne : `parse` la convertit désormais en `ValueError`.
+
+Mesuré sur ce dépôt : **246 fonctions, 67 092 octets**. Sur quatorze tirées au
+hasard, douze se traduisent après le correctif.
+
 diff --git a/m2c/arch_mips.py b/m2c/arch_mips.py
 index fdd13ef..b813b34 100644
 --- a/m2c/arch_mips.py
@@ -149,3 +167,31 @@ index fdd13ef..b813b34 100644
  
      def default_function_abi_candidate_slots(self) -> List[AbiArgSlot]:
          return [
+diff --git a/m2c/demangle_codewarrior.py b/m2c/demangle_codewarrior.py
+index 0883953..2426ac2 100755
+--- a/m2c/demangle_codewarrior.py
++++ b/m2c/demangle_codewarrior.py
+@@ -511,7 +511,22 @@ def parse(mangled: str) -> CxxSymbol:
+     for old, new in DOLDISASM_SUBSTITUTIONS:
+         mangled = mangled.replace(new, old)
+     with as_stringio(mangled) as buf:
+-        return CxxSymbol.parse(buf)
++        try:
++            return CxxSymbol.parse(buf)
++        except AssertionError as faute:
++            # **Une assertion qui saute dans un analyseur est un echec
++            # d'analyse**, non une panne. Les appelants attrapent deja
++            # `ValueError` et se passent alors du demanglage ; une
++            # `AssertionError` remonte au contraire jusqu'au traducteur, qui
++            # rend le bloc entier en `M2C_ERROR()`.
++            #
++            # Le cas se rencontre des qu'un desassembleur desambiguise un
++            # symbole en lui ajoutant son adresse —
++            # `GetStackString__FP12RS_STACKDATA_001E1BD0`. Mesure sur Dark
++            # Chronicle : 246 fonctions, 67 092 octets, perdues sur ce seul
++            # motif.
++            raise ValueError(
++                "nom mangle illisible : %s" % mangled) from faute
+ 
+ 
+ def demangle(mangled: str) -> str:
