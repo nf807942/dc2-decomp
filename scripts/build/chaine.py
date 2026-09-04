@@ -54,11 +54,34 @@ def charge(reprendre: bool) -> dict:
     return {"eprouvees": {}}
 
 
+# Les verdicts que *cette* execution a rendus. Le reste de l'etat appartient au
+# disque, qu'une purge peut avoir allege entre-temps.
+_juges: dict = {}
+
+
 def enregistre(etat: dict) -> None:
+    """Écrit l'état en laissant au disque le dernier mot sur les suppressions.
+
+    La chaîne garde l'état en mémoire et le réécrit après chaque unité. Une
+    purge lancée pendant qu'elle tourne était donc annulée à l'unité suivante :
+    43 verdicts rendus caducs par un correctif sont ainsi revenus, et la
+    moisson les a crus.
+
+    L'écriture repart donc de ce que le disque porte, et n'y applique que les
+    verdicts de cette exécution. Une purge faite pendant la passe tient ; le
+    travail de la passe aussi.
+    """
     ETAT.parent.mkdir(exist_ok=True)
+    fond = {}
+    if ETAT.exists():
+        try:
+            fond = json.loads(ETAT.read_text(encoding="utf-8")).get("eprouvees", {})
+        except json.JSONDecodeError:
+            fond = {}
+    fond.update(_juges)
+    etat["eprouvees"] = fond
     ETAT.write_text(json.dumps(etat, ensure_ascii=False, indent=1),
                     encoding="utf-8")
-
 
 def par_unite(mini: int, maxi: int) -> dict[str, list[tuple[int, str]]]:
     """Les candidates de la fenêtre, groupées par unité et triées par poids.
@@ -229,7 +252,9 @@ def main(argv: list[str]) -> int:
                 if gagnee_par_idiome:
                     verdict["part"] = part
                     verdict["idiome"] = True
-            etat["eprouvees"][symbole] = {
+            # Le verdict va dans les deux : la memoire sert au tri de la
+            # passe, `_juges` a l'ecriture, qui repart du disque.
+            _juges[symbole] = etat["eprouvees"][symbole] = {
                 "issue": verdict["issue"], "part": part, "taille": taille,
                 # La cause, et non la seule issue : c'est elle qui dit quelle
                 # correction paierait le plus au tour suivant, et la relever
