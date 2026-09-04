@@ -38,7 +38,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from conversions import (cast_les_affectations,  # noqa: E402
                          assemble, declare_les_piles, nettoie_declarations,
                          declarations_portees, remplit_les_appels, renomme,
-                         nettoie_locales, taille_les_piles_typees)
+                         nettoie_locales, taille_les_piles_typees,
+                         rend_les_reinterpretations)
 
 # `typedef struct X {` … `} X;` — la structure que m2c infère d'un pointeur.
 # m2c fait suivre l'accolade fermante d'un commentaire de taille — `} X;
@@ -719,6 +720,12 @@ def eprouve(symbole: str, unite: str, taille: int,
     # registre sauvegardé laissé nu. Aucune de ces fonctions n'appariera par
     # cette voie, et les compter parmi les échecs de plomberie fausse le
     # diagnostic : elles relèvent du permuteur ou de la main.
+    # La reinterpretation de bits se rend en C++ avant le tri : elle n'est pas
+    # un aveu d'echec, seulement une notation propre a m2c. Ce qui reste
+    # `bitwise` apres cette passe porte sur une expression sans adresse, et
+    # celui-la est un vrai refus.
+    texte = rend_les_reinterpretations(texte)
+
     for aveu in ("M2C_ERROR", "M2C_UNK", "bitwise", "saved_reg_"):
         if aveu in texte:
             return {**verdict, "issue": "m2c ne sait pas traduire",

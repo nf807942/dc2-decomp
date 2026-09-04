@@ -135,7 +135,7 @@ O_FILES   := $(addprefix $(BUILD_DIR)/, $(S_FILES:.s=.o) $(BIN_FILES:.bin=.o) \
              $(addsuffix .o, $(basename $(SRC_FILES))))
 
 .PHONY: all setup tools patch split build objects check diff decompile measure \
-        atlas carve clean distclean contexte injecte provenance chaine affinage controle ci etat progress report
+        atlas carve clean distclean contexte injecte provenance chaine affinage instructions controle ci etat progress report
 
 all: build
 
@@ -310,6 +310,12 @@ chaine:
 # debloque au lieu de garder.
 affinage:
 	@$(PYTHON) scripts/build/affinage.py $(ARGS)
+
+# Ce que m2c ne sait pas lire, compte en fonctions perdues et en octets. Une
+# seule instruction inconnue perd la fonction entiere : c'est ce releve qui a
+# designe l'accumulateur flottant du R5900 comme le plus gros verrou.
+instructions:
+	@$(PYTHON) scripts/diff/instructions.py $(ARGS)
 
 # Verse les champs de l'atlas dans les classes que le dépôt déclare vides. Une
 # disposition ne change les octets que si le code l'emploie — sauf pour une

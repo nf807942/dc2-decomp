@@ -154,6 +154,29 @@ def taille_les_piles_typees(corps: str, connus: set[str]) -> str:
     return _PILE_TYPEE.sub(borne, corps)
 
 
+# `(bitwise f32) sp180` — m2c reinterprete les bits d'une valeur d'un type dans
+# un autre. Ce n'est pas un aveu d'echec : c'est ce que `mtc1` fait, et le C++
+# l'ecrit `*(f32 *)&sp180`.
+_BITWISE = re.compile(r"\(bitwise ([A-Za-z_]\w*)\s*(\**)\)\s*([A-Za-z_]\w*)\b")
+
+
+def rend_les_reinterpretations(texte: str) -> str:
+    """Rend en C++ les réinterprétations de bits que m2c note à sa façon.
+
+    Sur le R5900, passer un registre entier dans un registre flottant est une
+    seule instruction, `mtc1`, et elle ne convertit rien : elle recopie les
+    bits. m2c le note `(bitwise f32) x`, ce qui n'est pas du C — et la chaîne
+    rejetait la fonction entière pour cela, 65 fois.
+
+    **Seul un nom se réécrit**, jamais une expression : `&` réclame une valeur
+    qui a une adresse. Une réinterprétation portant sur un calcul reste donc
+    telle quelle, et la fonction reste écartée — ce qu'elle était déjà.
+    """
+    return _BITWISE.sub(
+        lambda m: '(*(%s %s*) &%s)' % (m.group(1), m.group(2), m.group(3)),
+        texte)
+
+
 def declare_les_piles(corps: str) -> str:
     """Introduit les emplacements de pile que m2c emploie sans les déclarer.
 
