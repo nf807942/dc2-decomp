@@ -39,7 +39,7 @@ from conversions import (cast_les_affectations,  # noqa: E402
                          assemble, declare_les_piles, nettoie_declarations,
                          declarations_portees, remplit_les_appels, renomme,
                          nettoie_locales, taille_les_piles_typees,
-                         rend_les_reinterpretations)
+                         rend_les_reinterpretations, types_locaux)
 
 # `typedef struct X {` … `} X;` — la structure que m2c infère d'un pointeur.
 # m2c fait suivre l'accolade fermante d'un commentaire de taille — `} X;
@@ -467,6 +467,7 @@ def complete_structures(structs: list[str], corps: str,
     # La variable d'un appel virtuel se retient a part : ce n'est pas un
     # pointeur vers la structure mais un pointeur *vers ce pointeur*.
     etoilees = {nom for nom, _ in _FLECHE_ETOILE.findall(corps)}
+    locales = set(types_locaux(corps))
     for variable, champ in (_FLECHE.findall(corps)
                             + _FLECHE_CHAINEE.findall(corps)
                             + _FLECHE_ETOILE.findall(corps)):
@@ -482,6 +483,22 @@ def complete_structures(structs: list[str], corps: str,
 
     neuves = []
     for variable, offsets in demandes.items():
+        # Une globale n'est ni locale ni parametre : le corps ne la declare
+        # pas. L'unite, elle, la porte souvent en `u32`, forme sous laquelle
+        # des fonctions deja appariees ecrivent `now_script + 0x40` — et deux
+        # declarations d'une meme variable ne peuvent pas coexister.
+        #
+        # La conversion se pose donc **au site d'emploi**, jamais sur la
+        # declaration : `((struct X *) now_script)->unk40`. Rien d'autre dans
+        # l'unite n'en est change. Premiere cause d'echec de compilation :
+        # 430 fonctions, 133 808 octets.
+        if variable not in locales and variable not in etoilees:
+            forge = "%s_champs%s" % (variable, marque)
+            neuves.append(_struct_par_offsets(forge, offsets, appeles))
+            corps = re.sub(r"\b%s\s*->" % re.escape(variable),
+                           "((struct %s *) %s)->" % (forge, variable),
+                           corps)
+            continue
         if variable in etoilees:
             # `void **temp_v0` puis `(*temp_v0)->unkD0(...)` : c'est la table
             # virtuelle qu'on atteint, et la variable pointe vers le pointeur
