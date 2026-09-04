@@ -112,7 +112,10 @@ def nettoie_locales(corps: str) -> str:
 
 # `&sp40[0]` — un emplacement de pile que m2c localise sans le typer, et qu'il
 # n'introduit donc jamais. MWCC répond « undefined identifier 'sp40' ».
-_PILE = re.compile(r"\bsp([0-9A-Fa-f]+)\b")
+# Le decalage peut etre vide : m2c ecrit `&sp` tout court pour l'emplacement
+# a zero, et `&sp10` pour celui a 0x10. Exiger un chiffre laissait 155
+# fonctions sur « undefined identifier 'sp' », dont 83 du jeu, 49 780 octets.
+_PILE = re.compile(r"\bsp([0-9A-Fa-f]*)\b")
 
 
 # `CMenuFont sp210;` — un emplacement de pile que m2c type par une classe dont
@@ -137,7 +140,7 @@ def taille_les_piles_typees(corps: str, connus: set[str]) -> str:
     tableau d'octets de la bonne taille tient la place, et l'adresse passee a
     l'appel est la meme.
     """
-    decalages = sorted({int(o, 16) for o in _PILE.findall(corps)})
+    decalages = sorted({int(o or "0", 16) for o in _PILE.findall(corps)})
     def borne(marque: re.Match) -> str:
         marge, type_, nom = marque.groups()
         if type_ in connus or type_ in _BASE_C:
@@ -191,11 +194,16 @@ def declare_les_piles(corps: str) -> str:
     corrige, là où l'absence la laissait au rebut sans le moindre chiffre.
     """
     corps_seul = corps.split("{", 1)[-1]
-    offsets = sorted({int(t, 16) for t in _PILE.findall(corps_seul)})
+    offsets = sorted({int(t or "0", 16) for t in _PILE.findall(corps_seul)})
     if not offsets:
         return corps
     deja = set(types_locaux(corps))
-    manquants = [o for o in offsets if ("sp%X" % o) not in deja
+    # L'emplacement a zero s'appelle `sp`, non `sp0` : c'est le nom que m2c
+    # emploie, et celui que la declaration doit porter.
+    def nomme(decalage: int) -> str:
+        return "sp" if decalage == 0 else "sp%X" % decalage
+
+    manquants = [o for o in offsets if nomme(o) not in deja
                  and ("sp%x" % o) not in deja]
     if not manquants:
         return corps
@@ -204,7 +212,7 @@ def declare_les_piles(corps: str) -> str:
     for rang, decalage in enumerate(manquants):
         suivant = (manquants[rang + 1] if rang + 1 < len(manquants)
                    else decalage + 16)
-        nom = "sp%X" % decalage if ("sp%X" % decalage) in corps else "sp%x" % decalage
+        nom = nomme(decalage) if nomme(decalage) in corps else "sp%x" % decalage
         lignes.append("    u8 %s[0x%X];" % (nom, max(suivant - decalage, 1)))
 
     # Les déclarations se posent en tête de corps, où m2c met les siennes.
