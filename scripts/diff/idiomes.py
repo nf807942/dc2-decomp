@@ -236,12 +236,46 @@ def cas_unique(text: str, _rng: random.Random) -> list[str]:
     return out
 
 
+def echange_deux_rangements(text: str, _rng: random.Random) -> list[str]:
+    """Échange deux rangements voisins, qui ne se lisent pas l'un l'autre.
+
+    **L'ordre d'émission d'une suite de stockages est celui de la source.** Une
+    suite divergente se lit donc comme un ordre de source, non comme un
+    ordonnancement du compilateur — et m2c rend l'ordre des instructions, non
+    celui que la source portait.
+
+    L'échange ne se fait qu'entre deux affectations dont ni la cible ni la
+    partie droite ne cite l'autre : sans quoi les deux formes cesseraient de
+    calculer la même chose.
+    """
+    out = []
+    lignes = text.split(chr(10))
+    motif = re.compile(r'^(\s*)([\w>().\[\]*-]+) = ([^;]+);$')
+    for rang in range(len(lignes) - 1):
+        un, deux = motif.match(lignes[rang]), motif.match(lignes[rang + 1])
+        if not (un and deux):
+            continue
+        cible1, droite1 = un.group(2), un.group(3)
+        cible2, droite2 = deux.group(2), deux.group(3)
+        noms1 = set(re.findall(r'\w+', cible1))
+        noms2 = set(re.findall(r'\w+', cible2))
+        if (noms1 & set(re.findall(r'\w+', droite2))
+                or noms2 & set(re.findall(r'\w+', droite1))
+                or noms1 & noms2):
+            continue
+        echange = list(lignes)
+        echange[rang], echange[rang + 1] = echange[rang + 1], echange[rang]
+        out.append(chr(10).join(echange))
+    return out
+
+
 IDIOMES = [
     compose_assignment,
     compose_flottant,
     constante_a_gauche,
     seuil_deplace,
     cas_unique,
+    echange_deux_rangements,
     early_return_from_guard,
     rotate_loop_body,
 ]
