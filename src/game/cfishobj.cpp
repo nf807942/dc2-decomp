@@ -56,8 +56,21 @@ void SetWaterLevel(f32 value) {
 f32 GetWaterLevel(void) {
     return WaterLevel;
 }
-INCLUDE_ASM("nonmatchings/game/cfishobj", GetActiveHariObj__Fv);
-INCLUDE_ASM("nonmatchings/game/cfishobj", GetActiveUkiObj__Fv);
+extern "C" u8 HariObj[976];
+extern "C" u8 LureObj[976];
+extern "C" void *GetActiveHariObj__Fv(void) {
+    if (NowMode == 2) {
+        return &LureObj;
+    }
+    return &HariObj;
+}
+extern "C" u8 UkiObj[976];
+extern "C" void *GetActiveUkiObj__Fv(void) {
+    if (NowMode == 2) {
+        return NULL;
+    }
+    return &UkiObj;
+}
 INCLUDE_ASM("nonmatchings/game/cfishobj", ExtendLine__Ff);
 INCLUDE_ASM("nonmatchings/game/cfishobj", GetNowLineLength__Fv);
 INCLUDE_ASM("nonmatchings/game/cfishobj", GetMinLineLength__Fv);

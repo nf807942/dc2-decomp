@@ -280,7 +280,20 @@ extern "C" mgCVisualAttr *__ct__13mgCVisualAttrFv(mgCVisualAttr *objet) {
     Initialize__13mgCVisualAttrFv(objet);
     return objet;
 }
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", GetTextureManager__9mgCVisualFv);
+extern "C" u8 mgTexManager[540];
+struct mgCVisual;
+typedef struct mgCVisual {
+    /* 0x0 */ char pad0[8];
+    /* 0x8 */ void *unk8;                              /* inferred */
+} mgCVisual;                                        /* size >= 0xC */
+extern "C" void *GetTextureManager__9mgCVisualFv(mgCVisual *objet) {
+    void *temp_v0;
+    temp_v0 = (void *) (objet->unk8);
+    if (temp_v0 != NULL) {
+        return temp_v0;
+    }
+    return &mgTexManager;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetDrawEnvGifTag__9mgCVisualFP1P13mgRENDER_INFOP10mgCDrawEnv);
 void mgCVisualMDT::Initialize(void) {
     this->field_0x20 = 0;
