@@ -7,6 +7,38 @@ Le compilateur est `mwcps2-3.0-011126`, au niveau `-O4,p`, en `-lang c++`.
 
 ---
 
+## Ce qui est outillé, et ce que ça rend
+
+Un idiome ne vaut au projet que s'il se pose sans intervention.
+`scripts/diff/idiomes.py` en porte huit, appliqués par `make affinage` aux
+fonctions qui compilent entre 85 et 100 %.
+
+**Mesuré le 4 septembre 2026, sur quarante fonctions tirées au hasard dans la
+file :** trois menées à 100 %.
+
+| transformation | essais | menées à 100 % |
+|---|---|---|
+| `seuil_deplace` | 6 | **2** |
+| `early_return_from_guard` | 62 | 1 |
+| `compose_assignment` | 26 | 0 |
+| `compose_flottant` | 23 | 0 |
+| `cas_unique` | 13 | 0 |
+| `constante_a_gauche` | 12 | 0 |
+| `rotate_loop_body` | 8 | 0 |
+
+**Le taux d'applicabilité compte plus que le nombre d'essais.**
+`seuil_deplace` réussit deux fois sur six applications et emporte deux des
+trois succès ; `early_return_from_guard` tire soixante-deux fois pour un seul.
+Un idiome qui vise juste paie fort ; un idiome qui transforme large fait perdre
+du temps de compilation sans rien rendre.
+
+`echange_deux_rangements` a été ajouté depuis et n'est pas encore mesuré.
+
+Extrapolé aux 657 quasi-succès de l'époque : environ 49 fonctions, 6 500
+octets. C'est le chiffre à battre en outillant les idiomes qui suivent.
+
+---
+
 ## Types et disposition
 
 - **Un vecteur se copie en `lq`/`sq` parce que son type porte un quadmot.**
