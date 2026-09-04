@@ -71,6 +71,16 @@ def recompile_et_mesure(symbole: str, unite: str) -> float | None:
     return sonde_m2c.score(symbole, unite)
 
 
+def image_identique() -> bool:
+    """L'image liée rend-elle les octets du disque ?"""
+    if run(["make", "build"], capture_output=True, text=True).returncode != 0:
+        return False
+    image, reference = ROOT / "build" / "main.bin", ROOT / "rom" / "main.bin"
+    if not (image.exists() and reference.exists()):
+        return False
+    return image.read_bytes() == reference.read_bytes()
+
+
 def pose(symbole: str, unite: str) -> tuple[Path, str] | None:
     """Remet le fragment gardé à la place de sa greffe. Rend (source, avant)."""
     source = ROOT / "src" / (unite + ".cpp")
@@ -167,6 +177,16 @@ def main(argv: list[str]) -> int:
                 continue
             part, garde = affine.affine(symbole, unite, part,
                                         recompile_et_mesure)
+            # **objdiff ne voit qu'un objet, jamais le binaire lié.** Une
+            # fonction peut y apparier a 100 % et changer pourtant l'image :
+            # degreffer la derniere fonction d'une unite en retire le
+            # remplissage de queue, et tout ce qui suit se decale. La moisson
+            # verifie l'image depuis qu'elle a produit 546 gains faux ; cette
+            # passe garde de la meme facon, elle doit la meme preuve.
+            if garde and not image_identique():
+                print("  l'image diverge : %s est rendue a sa greffe"
+                      % symbole[:46], flush=True)
+                garde = False
             if garde:
                 gagnees += 1
                 print("  %5d o  %-46s  gagnée" % (taille, symbole[:46]),
