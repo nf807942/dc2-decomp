@@ -58,6 +58,28 @@ une panne : `parse` la convertit désormais en `ValueError`.
 Mesuré sur ce dépôt : **246 fonctions, 67 092 octets**. Sur quatorze tirées au
 hasard, douze se traduisent après le correctif.
 
+## Ce qui reste à faire, et qui n'est pas fait ici
+
+Après ces deux correctifs, 282 fonctions portent encore un `M2C_ERROR`, et deux
+familles s'y partagent le terrain.
+
+**« Read from unset register $aN », quatre témoins sur cinq.** Le binaire lit un
+registre d'argument *après* un `jal`, là où m2c le tient pour écrasé par
+l'appel. Sur `_SPT_SET_VELO_COL__FP12RS_STACKDATAi` :
+
+    daddu $a1, $s2, $zero    ; le compteur, dans le créneau de délai
+    jal   GetSpritePtr__FP11_EFF_SCRIPTi
+    …
+    addiu $a1, $a1, 0x1      ; et relu ici, après l'appel
+
+Ce n'est pas un oubli d'outillage mais le modèle de préservation des registres.
+Un contexte réduit à la seule signature de la fonction traduite ne change rien —
+essayé, mesuré.
+
+**Le jeu d'instructions parallèles 128 bits** — `paddh`, `psrlh`, `pextlb`,
+`pextub`, `qfsrv`, `pnor`, `pcgth`, `mtsab`. Il se concentre sur peu de
+fonctions : `_rix_101` en porte vingt-cinq à elle seule.
+
 diff --git a/m2c/arch_mips.py b/m2c/arch_mips.py
 index fdd13ef..b813b34 100644
 --- a/m2c/arch_mips.py
