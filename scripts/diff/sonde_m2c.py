@@ -271,6 +271,12 @@ _FLECHE = re.compile(r"\b([A-Za-z_]\w*)\s*->\s*(unk[0-9A-Fa-f]+)\b")
 # Un motif ne revient pas sur ce qu'il a consomme : dans
 # `objet->unk0->unk10`, `_FLECHE` prend `(objet, unk0)` puis reprend apres
 # `unk0`, et le second maillon n'est jamais vu. Il se cherche a part.
+# `(*temp_v0)->unkD0(temp_v0)` — l'appel de methode virtuelle : on dereference
+# l'objet pour atteindre sa table, puis on appelle a travers elle. La gauche de
+# la fleche est une expression, non un nom, et `_FLECHE` ne la voyait pas :
+# 63 fonctions, 28 152 octets.
+_FLECHE_ETOILE = re.compile(r"\(\*\s*([A-Za-z_]\w*)\s*\)\s*->\s*(unk[0-9A-Fa-f]+)\b")
+
 _FLECHE_CHAINEE = re.compile(
     r"(unk[0-9A-Fa-f]+)\s*->\s*(unk[0-9A-Fa-f]+)\b")
 _CHAMP_M2C = re.compile(
@@ -335,7 +341,11 @@ def _struct_par_offsets(nom: str, offsets: dict[int, str],
             largeur //= 2
         nom_champ = offsets[decalage]
         if appeles and nom_champ in appeles:
-            lignes.append("    /* 0x%X */ s32 (*%s)();" % (decalage, nom_champ))
+            # L'ellipse plutot qu'une liste vide : l'appel passe l'objet et ce
+            # qui suit, et une liste vide les refuse. Elle est neutre en
+            # octets, c'est mesure.
+            lignes.append("    /* 0x%X */ s32 (*%s)(...);"
+                          % (decalage, nom_champ))
             largeur = 4
         else:
             lignes.append("    /* 0x%X */ %s %s;"
@@ -454,8 +464,12 @@ def complete_structures(structs: list[str], corps: str,
     """
     appeles = set(_APPELE.findall(corps))
     demandes: dict[str, dict[int, str]] = {}
+    # La variable d'un appel virtuel se retient a part : ce n'est pas un
+    # pointeur vers la structure mais un pointeur *vers ce pointeur*.
+    etoilees = {nom for nom, _ in _FLECHE_ETOILE.findall(corps)}
     for variable, champ in (_FLECHE.findall(corps)
-                            + _FLECHE_CHAINEE.findall(corps)):
+                            + _FLECHE_CHAINEE.findall(corps)
+                            + _FLECHE_ETOILE.findall(corps)):
         demandes.setdefault(variable, {})[int(champ[3:], 16)] = champ
     if not demandes:
         return structs, corps
@@ -468,6 +482,17 @@ def complete_structures(structs: list[str], corps: str,
 
     neuves = []
     for variable, offsets in demandes.items():
+        if variable in etoilees:
+            # `void **temp_v0` puis `(*temp_v0)->unkD0(...)` : c'est la table
+            # virtuelle qu'on atteint, et la variable pointe vers le pointeur
+            # qui la porte. Deux etoiles, donc, et la structure forgee au bout.
+            forge = "%s_champs%s" % (variable, marque)
+            neuves.append(_struct_par_offsets(forge, offsets, appeles))
+            corps = re.sub(r"^(\s*)[A-Za-z_]\w*\s*\*\*\s*%s\s*;\s*$"
+                           % re.escape(variable),
+                           r"\1struct %s **%s;" % (forge, variable),
+                           corps, count=1, flags=re.M)
+            continue
         type_ = _type_pointe(variable, corps)
         if type_ is None:
             # La locale ne porte pas d'etoile : m2c l'a declaree `s32` puis
