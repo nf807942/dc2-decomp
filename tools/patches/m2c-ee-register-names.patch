@@ -18,11 +18,111 @@ son `NULL` final, celui que le binaire écrit dans le créneau de délai.
 La traduction se pose à la lecture, là où m2c résout déjà `s8` en `fp` : elle
 ne change pas son modèle de l'EABI, seulement les noms sous lesquels il
 l'atteint.
+
+## L'accumulateur flottant du R5900
+
+Le R5900 porte un accumulateur que les instructions de multiplication-
+accumulation lisent et écrivent sans le nommer : `mula.s $f2, $f2` pose
+`ACC = f2 × f2`, et `madd.s $f12, $f0, $f0` rend `f12 = ACC + f0 × f0` — une
+longueur au carré en deux instructions.
+
+m2c ne le modélise pas et rend `M2C_ERROR(/* unknown instruction */)`, ce qui
+condamne la fonction entière. Mesuré sur ce dépôt : **428 fonctions,
+99 256 octets**, soit 4,6 % des octets qui restent, perdues sur ce seul motif —
+davantage que tout ce que la chaîne avait gagné à ce jour.
+
+Le traiter comme un registre, à la manière de `hi` et `lo` pour les entiers,
+suffit. La normalisation rend `ACC` explicite en premier opérande, comme `mult`
+rend `$zero` explicite ; les formes qui le lisent le déclarent en entrée. Les
+sept instructions couvertes sont `adda.s`, `suba.s`, `mula.s`, `madda.s`,
+`msuba.s`, `madd.s` et `msub.s`.
+
+Vérifié sur quatre fonctions tirées des plus lourdes de la famille : les quatre
+passent de « intraduisible » à zéro `M2C_ERROR`.
+
 diff --git a/m2c/arch_mips.py b/m2c/arch_mips.py
-index fdd13ef..a68f0ae 100644
+index fdd13ef..b813b34 100644
 --- a/m2c/arch_mips.py
 +++ b/m2c/arch_mips.py
-@@ -2092,7 +2092,25 @@ class MipseeArch(MipsArch):
+@@ -104,6 +104,28 @@ from .evaluate import (
+ from .types import FunctionSignature, Type
+ 
+ 
++# Le R5900 porte un accumulateur flottant que les instructions de
++# multiplication-accumulation lisent et ecrivent sans le nommer. m2c ne le
++# modelise pas, et rend `M2C_ERROR(/* unknown instruction: mula.s */)` — 428
++# fonctions du binaire de Dark Chronicle, 99 256 octets, perdues sur ce seul
++# motif. Le traiter comme un registre, a la maniere de `hi` et `lo` pour les
++# entiers, suffit a le rendre.
++R5900_ACC_WRITERS: Set[str] = {
++    "adda.s",
++    "suba.s",
++    "mula.s",
++    "madda.s",
++    "msuba.s",
++}
++
++R5900_ACC_READERS: Set[str] = {
++    "madd.s",
++    "msub.s",
++    "madda.s",
++    "msuba.s",
++}
++
++
+ LENGTH_TWO: Set[str] = {
+     "neg",
+     "negu",
+@@ -967,6 +989,11 @@ class MipsArch(Arch):
+                 raise DecompFailure("Two-argument form of jalr is not supported.")
+             if instr.mnemonic in ("mult", "multu", "dmult", "dmultu", "madd", "maddu"):
+                 return AsmInstruction(instr.mnemonic, [Register("zero"), *args])
++            if instr.mnemonic in R5900_ACC_WRITERS:
++                # Ces instructions du R5900 ecrivent l'accumulateur flottant,
++                # qui n'apparait pas dans leurs operandes. On le rend explicite,
++                # comme `mult` rend `$zero` explicite.
++                return AsmInstruction(instr.mnemonic, [Register("acc"), *args])
+             if instr.mnemonic in LENGTH_THREE:
+                 return cls.normalize_instruction(
+                     AsmInstruction(instr.mnemonic, [args[0]] + args),
+@@ -1253,6 +1280,11 @@ class MipsArch(Arch):
+                     and isinstance(args[2], Register)
+                 )
+                 inputs = [args[0], args[1], args[2]]
++            elif mnemonic in R5900_ACC_READERS:
++                # `madd.s $fd, $fs, $ft` vaut `fd = ACC + fs * ft` : l'accumulateur
++                # est une entree que les operandes ne nomment pas.
++                inputs = [Register("acc")] + [
++                    r for r in args[1:] if isinstance(r, Register)]
+             else:
+                 assert not any(isinstance(a, AsmAddressMode) for a in args)
+                 inputs = [r for r in args[1:] if isinstance(r, Register)]
+@@ -1606,6 +1638,24 @@ class MipsArch(Arch):
+         "sqrt.s": lambda a: fn_op("sqrtf", [as_f32(a.reg(1))], Type.f32()),
+         "div.s": lambda a: BinaryOp.f32(a.reg(1), "/", a.reg(2)),
+         "mul.s": lambda a: BinaryOp.f32(a.reg(1), "*", a.reg(2)),
++        # Multiplication-accumulation du R5900. `ACC` est rendu explicite par
++        # la normalisation : ces formes ont donc toutes une destination en
++        # premier operande, comme les autres.
++        "adda.s": lambda a: BinaryOp.f32(a.reg(1), "+", a.reg(2)),
++        "suba.s": lambda a: BinaryOp.f32(a.reg(1), "-", a.reg(2)),
++        "mula.s": lambda a: BinaryOp.f32(a.reg(1), "*", a.reg(2)),
++        "madd.s": lambda a: BinaryOp.f32(
++            a.regs[Register("acc")], "+",
++            BinaryOp.f32(a.reg(1), "*", a.reg(2))),
++        "msub.s": lambda a: BinaryOp.f32(
++            a.regs[Register("acc")], "-",
++            BinaryOp.f32(a.reg(1), "*", a.reg(2))),
++        "madda.s": lambda a: BinaryOp.f32(
++            a.regs[Register("acc")], "+",
++            BinaryOp.f32(a.reg(1), "*", a.reg(2))),
++        "msuba.s": lambda a: BinaryOp.f32(
++            a.regs[Register("acc")], "-",
++            BinaryOp.f32(a.reg(1), "*", a.reg(2))),
+         # Double-precision arithmetic
+         "add.d": lambda a: handle_add_double(a),
+         "sub.d": lambda a: BinaryOp.f64(a.dreg(1), "-", a.dreg(2)),
+@@ -2092,7 +2142,25 @@ class MipseeArch(MipsArch):
          "31": Register("ra"),
      }
  
