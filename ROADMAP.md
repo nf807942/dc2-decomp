@@ -182,9 +182,30 @@ champ par valeur d'un type absent, la visibilité demandée au point de greffe,
 les structures inférées déclarées en avant, l'emplacement de pile d'un type
 incomplet, et la définition qu'une déclaration en avant faisait écarter.
 
-C'est la forme réelle du travail qui reste : beaucoup de corrections
-mécaniques, chacune mesurable, aucune décisive seule. Sur un horizon de dix
-ans c'est tenable, mais il faut le dire plutôt que d'attendre un déblocage.
+**Et les six correctifs n'ont pas déplacé le taux de compilation** : 8 % avant,
+8 % après. Ils ont déplacé les *causes* — `declaration syntax error` de 14 à 6,
+`illegal function overloading` de 6 à 10 — sans qu'une seule fonction de plus
+ne compile.
+
+C'est le fait structurel de la tranche : **une grosse fonction porte plusieurs
+obstacles indépendants**. Lever une cause ne la débloque pas, cela révèle la
+suivante. Observé à la main sur `Draw__12CMosBookMenuFv` : six correctifs, six
+erreurs différentes, toujours pas compilée.
+
+L'économie des deux tranches est donc opposée, et cela commande l'ordre du
+plan :
+
+| | moins de 512 o | plus de 512 o |
+|---|---|---|
+| obstacles par fonction | ~1 | plusieurs |
+| effet d'un correctif | gain immédiat | déplace la cause |
+| retour | à chaque correctif | quand *presque toutes* les causes sont levées |
+
+La tranche basse se moissonne donc en continu, correctif par correctif, avec
+un retour à chaque pas. La tranche haute est un chantier à seuil : son avancée
+se mesure en **causes éliminées**, non en fonctions gagnées, et elle ne rendra
+rien avant d'en avoir levé l'essentiel. Les compter comme un même travail
+fausse toute projection.
 
 ### Le chiffre qui décide du plan
 
