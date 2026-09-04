@@ -461,3 +461,43 @@ représentatifs, et cela produit des fonctions en même temps que du corpus.
 En parallèle, lever le premier blocage du traducteur déterministe — les appels
 terminaux dont la cible est manglée, 124 fonctions dont la signature est déjà
 dans le binaire.
+
+---
+
+## Point d'arrêt du 4 septembre 2026
+
+État vérifié : **1 158 fonctions écrites, 66 496 octets, 3,00 % du binaire**,
+`make ci` rend `identique au disque`. Corpus d'affinage : 577 fragments.
+
+**Ce que la règle de conversion des globales a donné.** La moisson a rejugé
+1 127 verdicts purgés (`pointer/array required`, `expression syntax error`,
+`illegal type`) et rendu six fonctions de plus, dans six unités. Reconstruction
+complète : l'image fait 2 608 528 octets, seize de trop, et 49 % des octets
+divergent en 8 320 plages éparses — la signature d'un décalage tardif, dont
+chaque relocation antérieure porte la trace. Les six unités sont revenues à leur
+état d'entrée ; le tronc est propre.
+
+Une bissection à trois unités a montré que le surplus **ne vient pas** de
+`ccharacter2`, `ceffectscriptman` ni `cgamedata` : après leur retour en arrière,
+l'image gardait ses seize octets de trop. Le coupable est donc dans
+`cmenukeyfunc`, `text_001E2410` ou `text_002798A0`. Les six sources moissonnées
+sont conservées hors de git, dans `build/moisson_a_verifier/`.
+
+**Ce que cela dit du contrôle par unité.** La chaîne vérifie l'image après chaque
+unité qui gagne, et elle a laissé passer ces six-là. Deux lectures possibles, à
+départager avant de relancer une moisson : soit la vérification n'a pas tourné
+sur ce parcours, soit elle a tourné sur une image déjà divergente et n'a donc
+comparé qu'à elle-même. C'est le premier point à instruire.
+
+### Ce qu'il faut faire ensuite, dans l'ordre
+
+1. Reposer les trois unités suspectes une à une (`build/moisson_a_verifier/`),
+   `make build` entre chaque, pour nommer celle qui coûte seize octets — deux
+   constructions suffisent. Garder les deux qui apparient.
+2. Instruire pourquoi `image_identique()` de `scripts/build/chaine.py` n'a pas
+   arrêté cette moisson. Tant que ce point n'est pas tranché, aucun gain de
+   moisson ne se commet sans `make ci` complet derrière.
+3. Reprendre le profil d'échecs (`m2c ne sait pas traduire`, 451) et grouper les
+   extraits par forme normalisée — la méthode qui a produit chaque gain des
+   dernières séances : le message du compilateur nomme le symptôme, la ligne
+   qu'il souligne nomme la cause.
