@@ -165,10 +165,26 @@ mettre des fonctions *sous mesure*.
 | **plus de 512 o (970 fn)** | **1 300 388** | **61 %** | **l'affinage seul** |
 | dont SDK, runtime, `mg*` | 327 584 | 15 % | oracle extérieur |
 
-**Aucune fonction de plus de 512 octets ne sera gagnée par un traducteur.** m2c
-les amène à compiler et s'arrête là. C'est un fait de forme, non de volume :
-plus une fonction est longue, plus elle porte de décisions du compilateur, et
-il suffit qu'une seule diverge pour que les octets diffèrent.
+**Au-delà de 512 octets, la sortie de m2c ne compile pas.** Mesuré sur 77
+fonctions de cette tranche : 60 échouent à la compilation, 4 compilent, une
+seule atteint la bande d'affinage. Le goulot y est donc **toujours la
+compilation**, non l'appariement — contrairement à ce que ce document a
+d'abord affirmé.
+
+Les causes ne sont pourtant pas nouvelles : ce sont les mêmes familles que sur
+les petites fonctions. Une fonction de 5 000 octets touche dix fois plus de
+types, et il suffit d'un seul non résolu pour la perdre.
+
+**Et il n'y a pas de percée en vue**, seulement une longue traîne de causes à
+une dizaine de cas chacune. Six correctifs mesurés ont porté le taux de
+compilation de 6,3 % à 8 % : la boucle de complétion portée à 24 tours, le
+champ par valeur d'un type absent, la visibilité demandée au point de greffe,
+les structures inférées déclarées en avant, l'emplacement de pile d'un type
+incomplet, et la définition qu'une déclaration en avant faisait écarter.
+
+C'est la forme réelle du travail qui reste : beaucoup de corrections
+mécaniques, chacune mesurable, aucune décisive seule. Sur un horizon de dix
+ans c'est tenable, mais il faut le dire plutôt que d'attendre un déblocage.
 
 ### Le chiffre qui décide du plan
 
