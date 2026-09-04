@@ -72,7 +72,43 @@ INCLUDE_ASM("nonmatchings/game/cbasemenuclass", FadeCheckMenu__14CBaseMenuClassF
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", SetPreCmdTrush__FP14CBaseMenuClassiP13CGameDataUsedP16CMenuPosDataForm);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", SetPreCmdSpectolBreak__FP14CBaseMenuClassiP16CMenuPosDataFormP13CGameDataUsedP13CGameDataUsed);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", SetPreCmdGiftBoxSelect__FP14CBaseMenuClassP13CGameDataUsed);
-INCLUDE_ASM("nonmatchings/game/cbasemenuclass", CheckFishCondition__Fv);
+extern "C" s32 GetMainScene__Fv(void);
+extern "C" s32 menu_GetBattleAreaScene__Fv(void);
+struct temp_s0_champs {
+    char pad0[0x2E60];
+    /* 0x2E60 */ s32 unk2E60;
+};
+struct temp_s1_champs {
+    char pad0[0x5C];
+    /* 0x5C */ s32 unk5C;
+};
+extern "C" s32 GetMenuLoopType__Fv(void);
+extern "C" s32 CheckFishCondition__Fv(void) {
+    s32 temp_v1;
+    s32 var_s0;
+    s32 var_v0;
+    struct temp_s0_champs *temp_s0;
+    struct temp_s1_champs *temp_s1;
+
+    temp_s0 = (struct temp_s0_champs *) (GetMainScene__Fv());
+    temp_s1 = (struct temp_s1_champs *) (menu_GetBattleAreaScene__Fv());
+    temp_v1 = (s32) (temp_s0->unk2E60);
+    var_s0 = 1;
+    if (temp_v1 == 0x7D) {
+        var_s0 = 0;
+    }
+    if ((temp_v1 == 0x63) || (temp_v1 == 0x5F)) {
+        var_s0 = 0;
+    }
+    var_v0 = var_s0;
+    if (GetMenuLoopType__Fv() == 1) {
+        if (temp_s1->unk5C == 0) {
+            var_s0 = 0;
+        }
+        var_v0 = var_s0;
+    }
+    return var_v0;
+}
 void CMENU_USERPARAM::Initialize(void) {
     this->field_0x4 = 0;
     this->field_0x0 = 0;

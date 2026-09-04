@@ -157,7 +157,29 @@ INCLUDE_ASM("nonmatchings/game/crandom", StepFish__FiP15RACE_FISH_PARAM);
 INCLUDE_ASM("nonmatchings/game/crandom", LaneBattleStep__FP15RACE_FISH_PARAMi);
 INCLUDE_ASM("nonmatchings/game/crandom", CollisionFish__FP15RACE_FISH_PARAMi);
 INCLUDE_ASM("nonmatchings/game/crandom", StepGyoRace__FP15RACE_FISH_PARAMP11grRACE_INFO);
-INCLUDE_ASM("nonmatchings/game/crandom", GetRaceDivision__Ff);
+extern "C" s32 GetRaceDivision__Ff(f32 arg0) {
+    s32 var_v0;
+
+    if (arg0 < 2.0f) {
+        return 0;
+    }
+    if (arg0 < 6.0f) {
+        return 1;
+    }
+    if (arg0 < 10.0f) {
+        return 2;
+    }
+    if (arg0 < 14.0f) {
+        return 3;
+    }
+    var_v0 = -1;
+    if (!(arg0 < 16.0f)) {
+        return var_v0;
+    }
+    var_v0 = 4;
+
+    return var_v0;
+}
 INCLUDE_ASM("nonmatchings/game/crandom", GetRaceDivisionLength__Fi);
 INCLUDE_ASM("nonmatchings/game/crandom", GetCourseR__Fff);
 INCLUDE_ASM("nonmatchings/game/crandom", FishModifyParam__FP12grFISH_PARAMPff);

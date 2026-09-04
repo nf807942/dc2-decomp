@@ -332,7 +332,22 @@ INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AddWhp__16CBattleCharaInfoFif)
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetNowWhp__16CBattleCharaInfoFiPi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetWhpNowVol__16CBattleCharaInfoFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SetMagicSwordPow__16CBattleCharaInfoFii);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetMagicSwordElem__16CBattleCharaInfoFv);
+typedef struct CBattleCharaInfo_infere6 {
+    /* 0x00 */ s16 unk0;                            /* inferred */
+    /* 0x02 */ char pad2[0x16];                     /* maybe part of unk0[0xC]void */
+    /* 0x18 */ s16 unk18;                           /* inferred */
+} CBattleCharaInfo_infere6;                                 /* size >= 0x1A */
+extern "C" s16 GetMagicSwordElem__16CBattleCharaInfoFv(CBattleCharaInfo_infere6 *objet) {
+    s16 var_v0;
+
+    var_v0 = -1;
+    if (!(objet->unk0 == 1)) {
+        return var_v0;
+    }
+    var_v0 = objet->unk18;
+
+    return var_v0;
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetMagicSwordPow__16CBattleCharaInfoFv);
 typedef struct CBattleCharaInfo_infere4 {
     /* 0x00 */ s16 unk0;                            /* inferred */
