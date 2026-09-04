@@ -62,7 +62,23 @@ INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_EVENT_INFO__FP12RS_STACKDATA
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _ESM_ALL_CLEAR__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_ANGLE_INNER__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _CAMERA_QUAKE__FP12RS_STACKDATAi_001E3A90);
-INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_CAMERA_MODE__FP12RS_STACKDATAi);
+struct temp_v1_champs_99cdcc {
+    char pad0[0x54];
+    /* 0x54 */ s32 unk54;
+};
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_001E1B60(RS_STACKDATA *);
+extern "C" s32 _SET_CAMERA_MODE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    s32 temp_v0;
+    struct temp_v1_champs_99cdcc *temp_v1;
+
+    temp_v0 = (s32) (GetStackInt__FP12RS_STACKDATA_001E1B60(arg0));
+    temp_v1 = (struct temp_v1_champs_99cdcc *) (nowScene_0037D4E4 + 0x2F90);
+    if (temp_v1 == NULL) {
+        return 0;
+    }
+    temp_v1->unk54 = temp_v0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_CAMERA_SPEED__FP12RS_STACKDATAi_001E3B40);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_CAMERA_CTRL_PARAM1__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_CAMERA_CTRL_PARAM2__FP12RS_STACKDATAi);

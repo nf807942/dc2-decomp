@@ -21,7 +21,9 @@ extern "C" void MinimapDoorEnable__FPf(f32 *arg0) {
 }
 INCLUDE_ASM("nonmatchings/game/cshopmenu", LoadMonsterFile__Fv);
 INCLUDE_ASM("nonmatchings/game/cshopmenu", LoadMonsterFile__Fii);
-INCLUDE_ASM("nonmatchings/game/cshopmenu", ParabolicInitialVectorY__Fffff);
+extern "C" f32 ParabolicInitialVectorY__Fffff(f32 arg0, f32 arg1, f32 arg2, f32 arg3) {
+    return ((2.0f * (arg1 - arg0)) - (arg3 * (arg2 * arg3))) / (2.0f * arg3);
+}
 INCLUDE_ASM("nonmatchings/game/cshopmenu", CalcPosParabolicJump__FPfPfPffff);
 INCLUDE_ASM("nonmatchings/game/cshopmenu", Draw__7CMarkerFv);
 void CMarker::Set(s32 arg0) {
