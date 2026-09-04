@@ -53,7 +53,11 @@ _EXTERN = re.compile(
 # collee au nom, et le motif cherchait alors un symbole commencant par `*`. Les
 # 134 « sortie illisible » de la moisson etaient exactement les fonctions a
 # retour pointeur, jamais tentees une seule fois.
-_ENTETE = re.compile(r"^([A-Za-z_]\w*\s*\**)\s*(%s)\((.*?)\) \{$", re.MULTILINE)
+# `? *GetName__13CGameDataUsedFi(...)` — m2c ecrit `?` le type de retour qu'il
+# n'a pas tranche, et le motif exigeait une lettre : 43 fonctions rendues
+# « sortie illisible » sans qu'aucune ne soit tentee. C'est la meme faute que
+# pour les retours pointeurs, sous une autre forme.
+_ENTETE = re.compile(r"^((?:[A-Za-z_]\w*|\?\d*)\s*\**)\s*(%s)\((.*?)\) {$")
 
 INCLUDE_ASM = 'INCLUDE_ASM("nonmatchings/%s", %s);'
 
@@ -604,6 +608,14 @@ def normalise(texte: str, symbole: str, vues: set[str],
     if entete is None:
         return None
     corps = reste[entete.start():].rstrip()
+    # Le `?` du type de retour se rend comme partout ailleurs : `void` quand il
+    # porte une etoile — la seule chose sure est que c'est une adresse —,
+    # `s32` sinon, qui est la largeur de $v0 et se laisse ignorer quand la
+    # valeur ne sert pas.
+    retour = entete.group(1)
+    if "?" in retour:
+        neuf = ("void " + "*" * retour.count("*")) if "*" in retour else "s32"
+        corps = neuf + corps[len(retour):]
     # m2c nomme `this` le premier paramètre d'une méthode, ce qu'une fonction
     # `extern "C"` ne peut pas faire : `this` est réservé, et MWCC répond
     # « ')' expected » suivi d'une erreur par ligne du corps.
