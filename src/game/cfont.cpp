@@ -280,7 +280,30 @@ void IntiSystemMes(void) {
     SysMesCnt = 0;
     SysMesNo = -1;
 }
-INCLUDE_ASM("nonmatchings/game/cfont", OpenSystemMes__FP6CSceneii);
+extern "C" s32 GetMessage__6CSceneFi(void *, s32);
+#include "sphida.hpp"
+struct inferred;
+struct ClsMes;
+typedef struct ClsMes {
+    /* 0x000 */ char pad0[0x158];
+    /* 0x158 */ s32 unk158;                         /* inferred */
+} ClsMes;                                           /* size >= 0x15C */
+extern "C" s32 MakeMesWin__6ClsMesFi(void *, s32);
+extern "C" s32 Preset__6ClsMesFi(void *, s32);
+extern "C" s32 SetWindowMode__6ClsMesFi(void *, s32);
+extern "C" void OpenSystemMes__FP6CSceneii(CScene *arg0, s32 arg1, s32 arg2) {
+    ClsMes *temp_v0;
+
+    temp_v0 = (ClsMes *) (GetMessage__6CSceneFi(arg0, 1));
+    if (temp_v0 != NULL) {
+        Preset__6ClsMesFi(temp_v0, 4);
+        SetWindowMode__6ClsMesFi(temp_v0, 4);
+        MakeMesWin__6ClsMesFi(temp_v0, arg1);
+        temp_v0->unk158 = 8;
+        SysMesCnt = arg2;
+        SysMesNo = arg1;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cfont", SystemMesClose__FP6CScene);
 #include "sphida.hpp"
 extern "C" void SystemMesClose__FP6CScene(CScene *arg0);
@@ -290,7 +313,7 @@ extern "C" void SystemMesStep__FP6CScene(CScene *arg0) {
             SystemMesClose__FP6CScene(arg0);
             SysMesCnt = 0;
         }
-        SysMesCnt -= 1;
+        SysMesCnt = SysMesCnt - 1;
     }
 }
 INCLUDE_ASM("nonmatchings/game/cfont", EditStartPlaceEffect__FP10CEditPartsPf);

@@ -94,13 +94,73 @@ extern "C" s32 GetMapType__Fi(s32 arg0) {
     }
     return -1;
 }
-INCLUDE_ASM("nonmatchings/game/text_002D3110", GetMapAreaNo__Fi);
-INCLUDE_ASM("nonmatchings/game/text_002D3110", GetMapSelType__Fi);
-INCLUDE_ASM("nonmatchings/game/text_002D3110", GetMapSndDataID__Fi);
+struct temp_v0_champs_74e90a {
+    char pad0[0x18];
+    /* 0x18 */ s32 unk18;
+};
+extern "C" s32 GetMapAreaNo__Fi(s32 arg0) {
+    struct temp_v0_champs_74e90a *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs_74e90a *) (GetMapNameInfo__Fi(arg0));
+    if (temp_v0 != NULL) {
+        return temp_v0->unk18;
+    }
+    return -1;
+}
+struct temp_v0_champs_984e77 {
+    char pad0[0x10];
+    /* 0x10 */ s32 unk10;
+};
+extern "C" s32 GetMapSelType__Fi(s32 arg0) {
+    struct temp_v0_champs_984e77 *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs_984e77 *) (GetMapNameInfo__Fi(arg0));
+    if (temp_v0 != NULL) {
+        return temp_v0->unk10;
+    }
+    return 0;
+}
+struct temp_v0_champs_a0ac94 {
+    char pad0[0x14];
+    /* 0x14 */ s32 unk14;
+};
+extern "C" s32 GetMapSndDataID__Fi(s32 arg0) {
+    struct temp_v0_champs_a0ac94 *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs_a0ac94 *) (GetMapNameInfo__Fi(arg0));
+    if (temp_v0 != NULL) {
+        return temp_v0->unk14;
+    }
+    return -1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002D3110", GetMapName__FiPPc);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", SearchMapNo__FPc);
-INCLUDE_ASM("nonmatchings/game/text_002D3110", GetMapTitle__Fi);
-INCLUDE_ASM("nonmatchings/game/text_002D3110", GetAddMapPath__Fi);
+struct temp_v0_champs_316a69 {
+    char pad0[0x4];
+    /* 0x4 */ s32 unk4;
+};
+extern "C" s32 GetMapTitle__Fi(s32 arg0) {
+    struct temp_v0_champs_316a69 *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs_316a69 *) (GetMapNameInfo__Fi(arg0));
+    if (temp_v0 != NULL) {
+        return temp_v0->unk4;
+    }
+    return 0;
+}
+struct temp_v0_champs_4d9aa0 {
+    char pad0[0x8];
+    /* 0x8 */ s32 unk8;
+};
+extern "C" s32 GetAddMapPath__Fi(s32 arg0) {
+    struct temp_v0_champs_4d9aa0 *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs_4d9aa0 *) (GetMapNameInfo__Fi(arg0));
+    if (temp_v0 != NULL) {
+        return temp_v0->unk8;
+    }
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/text_002D3110", InitMapSelect__FP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", MapTypeSelect__Fv);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", MapSelect__Fv);

@@ -274,7 +274,20 @@ extern "C" void sndFlush__Fv(void) {
 }
 INCLUDE_ASM("nonmatchings/sdk/csound", SeAllStop_Sub__Fi);
 INCLUDE_ASM("nonmatchings/sdk/csound", sndSeAllStop__Fi);
-INCLUDE_ASM("nonmatchings/sdk/csound", sndGetSeDefVol__FUii);
+extern "C" s32 GetSeInfo__FUii(u32, s32);
+struct temp_v0_champs_c29f34 {
+    char pad0[0x8];
+    /* 0x8 */ s32 unk8;
+};
+extern "C" s8 sndGetSeDefVol__FUii(u32 arg0, s32 arg1) {
+    struct temp_v0_champs_c29f34 *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs_c29f34 *) (GetSeInfo__FUii(arg0, arg1));
+    if (temp_v0 != NULL) {
+        return temp_v0->unk8;
+    }
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/sdk/csound", IsBgmPort__Fi);
 INCLUDE_ASM("nonmatchings/sdk/csound", GetCSndPortNo__FiPiPiPi);
 INCLUDE_ASM("nonmatchings/sdk/csound", sndLoadSound__FiPUiP9mgCMemory);
@@ -292,7 +305,24 @@ INCLUDE_ASM("nonmatchings/sdk/csound", sndSePlayVPf__FUiiffi);
 INCLUDE_ASM("nonmatchings/sdk/csound", sndSePlayVf__FUiifi);
 INCLUDE_ASM("nonmatchings/sdk/csound", sndSePause__FUii);
 INCLUDE_ASM("nonmatchings/sdk/csound", sndGetSeStatus__FUii);
-INCLUDE_ASM("nonmatchings/sdk/csound", sndPortSqPause__Fi);
+extern "C" s32 GetPortInfo__Fi(s32);
+struct temp_v0_champs_5398fe {
+    char pad0[0x4];
+    /* 0x4 */ s32 unk4;
+    char pad8[0x204];
+    /* 0x20C */ s32 unk20C;
+    /* 0x210 */ s32 unk210;
+};
+extern "C" s32 sndSqStop__Fii(s32, s32);
+extern "C" void sndPortSqPause__Fi(s32 arg0) {
+    struct temp_v0_champs_5398fe *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs_5398fe *) (GetPortInfo__Fi(arg0));
+    if ((temp_v0 != NULL) && (temp_v0->unk210 == 1)) {
+        sndSqStop__Fii(temp_v0->unk4, temp_v0->unk20C);
+        temp_v0->unk210 = 3;
+    }
+}
 extern "C" s32 GetPortInfo__Fi(s32);
 struct temp_v0_champs {
     char pad0[0x4];

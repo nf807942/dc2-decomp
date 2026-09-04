@@ -301,7 +301,31 @@ extern "C" s32 GetItemDataAttribute__Fi(s32 arg0) {
 }
 INCLUDE_ASM("nonmatchings/game/cgamedata", ConvertUsedItemType__Fi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetItemMessageNo__Fii);
-INCLUDE_ASM("nonmatchings/game/cgamedata", GetItemMessage__Fi);
-INCLUDE_ASM("nonmatchings/game/cgamedata", GetItemIconNo__Fi);
+struct temp_v0_champs_2878ce {
+    char pad0[0x28];
+    /* 0x28 */ s32 unk28;
+};
+extern "C" s32 GetItemMessage__Fi(s32 arg0) {
+    struct temp_v0_champs_2878ce *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs_2878ce *) (GetCommonData__9CGameDataFi(&GameItemDataManage, arg0));
+    if (temp_v0 != NULL) {
+        return temp_v0->unk28;
+    }
+    return 0;
+}
+struct temp_v0_champs_14f01f {
+    char pad0[0x6];
+    /* 0x6 */ s16 unk6;
+};
+extern "C" s16 GetItemIconNo__Fi(s32 arg0) {
+    struct temp_v0_champs_14f01f *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs_14f01f *) (GetCommonData__9CGameDataFi(&GameItemDataManage, arg0));
+    if (temp_v0 != NULL) {
+        return temp_v0->unk6;
+    }
+    return -1;
+}
 INCLUDE_ASM("nonmatchings/game/cgamedata", SetItemSpectolPoint__FiP11ATTACH_USEDi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", ItemCmdMsgSet__FiPi);

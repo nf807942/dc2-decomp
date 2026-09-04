@@ -103,7 +103,20 @@ INCLUDE_ASM("nonmatchings/game/ceditmap", GetePartsInfo__8CEditMapFi);
 INCLUDE_ASM("nonmatchings/game/ceditmap", GetePartsInfo__8CEditMapFPc);
 INCLUDE_ASM("nonmatchings/game/ceditmap", GetePartsInfoAtID__8CEditMapFi);
 INCLUDE_ASM("nonmatchings/game/ceditmap", GetePartsInfoAtType__8CEditMapFi);
-INCLUDE_ASM("nonmatchings/game/ceditmap", GetePartsInfoAtPlaceID__8CEditMapFi);
+extern "C" s32 GetePlaceParts__8CEditMapFi(void *, s32);
+struct temp_v0_champs_fd5b88 {
+    char pad0[0x324];
+    /* 0x324 */ s32 unk324;
+};
+extern "C" s32 GetePartsInfoAtPlaceID__8CEditMapFi(CEditMap *objet, s32 arg0) {
+    struct temp_v0_champs_fd5b88 *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs_fd5b88 *) (GetePlaceParts__8CEditMapFi(objet, arg0));
+    if (temp_v0 != NULL) {
+        return temp_v0->unk324;
+    }
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap", eNewPlaceParts__8CEditMapFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap", eNewHouseInfo__8CEditMapFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap", GetePlaceParts__8CEditMapFi);
@@ -257,11 +270,62 @@ extern "C" s32 GetInfoID__10CEditPartsFv(CEditParts *objet) {
 }
 INCLUDE_ASM("nonmatchings/game/ceditmap", GetLiveNPC__10CEditPartsFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap", IsWallParts__10CEditPartsFv);
-INCLUDE_ASM("nonmatchings/game/ceditmap", IsFence__10CEditPartsFv);
-INCLUDE_ASM("nonmatchings/game/ceditmap", IsBurn__10CEditPartsFv);
+struct CEditParts_infere;
+typedef struct CEditParts_infere {
+    /* 0x000 */ char pad0[0x324];
+    /* 0x324 */ void *unk324;                       /* inferred */
+} CEditParts_infere;                                       /* size >= 0x328 */
+struct temp_v0_champs_c56d0f {
+    char pad0[0x4];
+    /* 0x4 */ s32 unk4;
+};
+extern "C" s32 IsFence__10CEditPartsFv(CEditParts_infere *objet) {
+    struct temp_v0_champs_c56d0f *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs_c56d0f *) (objet->unk324);
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    return (temp_v0->unk4 & 0x130) == 0x130;
+}
+struct CEditParts_infere2;
+typedef struct CEditParts_infere2 {
+    /* 0x000 */ char pad0[0x324];
+    /* 0x324 */ void *unk324;                       /* inferred */
+} CEditParts_infere2;                                       /* size >= 0x328 */
+struct temp_v0_champs_0949e2 {
+    char pad0[0x4];
+    /* 0x4 */ s32 unk4;
+};
+extern "C" s32 IsBurn__10CEditPartsFv(CEditParts_infere2 *objet) {
+    struct temp_v0_champs_0949e2 *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs_0949e2 *) (objet->unk324);
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    return (temp_v0->unk4 & 0x1000) != 0;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap", GetFenceSide__10CEditPartsFPfPf);
 INCLUDE_ASM("nonmatchings/game/ceditmap", GetWallPlane__10CEditPartsFiPQ210CEditParts8WallInfo);
-INCLUDE_ASM("nonmatchings/game/ceditmap", GetWallGroupNum__10CEditPartsFv);
+struct CEditParts_infere3;
+typedef struct CEditParts_infere3 {
+    /* 0x000 */ char pad0[0x324];
+    /* 0x324 */ void *unk324;                       /* inferred */
+} CEditParts_infere3;                                       /* size >= 0x328 */
+struct temp_v0_champs_b5a85f {
+    char pad0[0x254];
+    /* 0x254 */ s32 unk254;
+};
+extern "C" s32 GetWallGroupNum__10CEditPartsFv(CEditParts_infere3 *objet) {
+    struct temp_v0_champs_b5a85f *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs_b5a85f *) (objet->unk324);
+    if (temp_v0 != NULL) {
+        return temp_v0->unk254;
+    }
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap", GetPartsType__10CEditPartsFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap", Copy__10CEditPartsFR9CMapPartsP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/ceditmap", CheckTerritory__10CEditPartsFP10CEditParts);

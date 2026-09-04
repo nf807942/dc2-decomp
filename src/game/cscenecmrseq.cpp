@@ -724,7 +724,20 @@ extern "C" void InitPas__12CSceneObjSeqFv(CSceneObjSeq *objet) {
 }
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SetPasFrm__12CSceneObjSeqFi);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", AddPas__12CSceneObjSeqFPf);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", StartPas__12CSceneObjSeqFi);
+struct temp_v0_champs_ce64ab {
+    /* 0x0 */ s32 unk0;
+    char pad4[0x1C];
+    /* 0x20 */ s32 unk20;
+};
+extern "C" void StartPas__12CSceneObjSeqFi(CSceneObjSeq *objet, s32 arg0) {
+    struct temp_v0_champs_ce64ab *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs_ce64ab *) (SearchNextPosSeq__12CSceneObjSeqFv(objet));
+    if (temp_v0 != NULL) {
+        temp_v0->unk0 = 8;
+        temp_v0->unk20 = arg0;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Jump__12CSceneObjSeqFPffi);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SetEohFramePos__12CSceneObjSeqFiPciPf);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", AddPos__12CSceneObjSeqFPfi);

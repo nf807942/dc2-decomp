@@ -83,7 +83,15 @@ s32 mgRENDER_INFO::GetPlightEnable(void) {
 }
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetFogParam__13mgRENDER_INFOFffUcUcUcff);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", __as__9mgVu0FBOXFR9mgVu0FBOX);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", MG_ADDRESS_CHECK__FPvPc);
+extern "C" u8 _166[18];
+extern "C" void printf(...);
+extern "C" void *MG_ADDRESS_CHECK__FPvPc(void *arg0, s8 *arg1) {
+    if (arg0 == NULL) {
+        printf(&_166);
+        return NULL;
+    }
+    return arg0;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", __nw__FUiP1);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", __nwa__FUiP1);
 typedef struct mgCMemory_infere {

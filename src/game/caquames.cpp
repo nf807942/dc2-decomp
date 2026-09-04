@@ -63,7 +63,31 @@ extern "C" f32 SetFishAdjustScale__Fiiff(s32 arg0, s32 arg1, f32 arg2, f32 arg3)
 INCLUDE_ASM("nonmatchings/game/caquames", Initialize__20CAquaFishActionParamFv);
 INCLUDE_ASM("nonmatchings/game/caquames", __ct__9CAquaFishFv);
 INCLUDE_ASM("nonmatchings/game/caquames", Initialize__9CAquaFishFv);
-INCLUDE_ASM("nonmatchings/game/caquames", SetLiveParam__9CAquaFishFP13CGameDataUsed);
+struct inferred;
+struct CAquaFish;
+struct CGameDataUsed;
+typedef struct CAquaFish {
+    /* 0x000 */ char pad0[0x92C];
+    /* 0x92C */ s32 unk92C;                         /* inferred */
+    /* 0x930 */ s32 unk930;                         /* inferred */
+    /* 0x934 */ char pad934[4];
+    /* 0x938 */ CGameDataUsed *unk938;              /* inferred */
+} CAquaFish;                                        /* size >= 0x93C */
+typedef struct CGameDataUsed {
+    /* 0x00 */ char pad0[0x3C];
+    /* 0x3C */ u16 unk3C;                           /* inferred */
+} CGameDataUsed;                                    /* size >= 0x3E */
+extern "C" s32 GetRandI__Fi(s32);
+extern "C" void SetLiveParam__9CAquaFishFP13CGameDataUsed(CAquaFish *objet, CGameDataUsed *arg0) {
+    CGameDataUsed *temp_v1;
+    s32 temp_s1;
+
+    objet->unk938 = arg0;
+    temp_v1 = (CGameDataUsed *) (objet->unk938);
+    temp_s1 = (s32) ((temp_v1->unk3C / 10) + ((u16) temp_v1->unk3C >> 0x1F));
+    objet->unk930 = (temp_s1 + (GetRandI__Fi(0x14) + 0x1A)) * 0x14;
+    objet->unk92C = 0;
+}
 INCLUDE_ASM("nonmatchings/game/caquames", SetAdjustScale__9CAquaFishFv);
 INCLUDE_ASM("nonmatchings/game/caquames", AddFatigue__9CAquaFishFi);
 INCLUDE_ASM("nonmatchings/game/caquames", GetPosition2D__9CAquaFishFPi);

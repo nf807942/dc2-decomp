@@ -16,7 +16,30 @@ INCLUDE_ASM("nonmatchings/game/cdngfreemap", _GET_ATT_TYPE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", _GET_USER_ATTR__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", _TRANS_RESERV_IMG__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", _GET_STS_ATTR__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/cdngfreemap", _SET_PIYORI_MARK__FP12RS_STACKDATAi);
+typedef struct nowMonster_pointe {
+    char pad0[4720];
+    s32 unk1270;
+    char pad1274[196];
+    s16 unk1338;
+    s16 unk133A;
+} nowMonster_pointe;
+extern "C" nowMonster_pointe *nowMonster;
+struct nowMonster_pointe;
+#include "runscript.hpp"
+struct inferred;
+struct mgCObject;
+typedef struct mgCObject {
+    /* 0x0000 */ char pad0[0x1270];
+    /* 0x1270 */ char pad1270[0xC8];
+    /* 0x1338 */ s16 unk1338;                       /* inferred */
+    /* 0x133A */ s16 unk133A;                       /* inferred */
+} mgCObject;                                        /* size >= 0x133C */
+extern "C" s32 Set__7CPiyoriFP9mgCObjects(...);
+extern "C" s32 _SET_PIYORI_MARK__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    nowMonster->unk1338 = nowMonster->unk133A;
+    Set__7CPiyoriFP9mgCObjects(&nowMonster->unk1270, nowMonster, nowMonster->unk1338);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", _CHECK_PIYORI__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", _GET_BASE_ATTACK__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", _GET_NEAR_MONS_POS__FP12RS_STACKDATAi);

@@ -134,7 +134,20 @@ extern "C" s32 DeleteMdsList__11CMdsListSetFPc(CMdsListSet *objet, s8 *arg0) {
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/cactionchara", LoadIMGFile__11CMdsListSetFPcP15mgCEnterIMGInfoP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/cactionchara", DeleteIMG__11CMdsListSetFPc);
+extern "C" s32 SearchIMGList__11CMdsListSetFPc(...);
+struct temp_v0_champs_05c0e1 {
+    /* 0x0 */ s32 unk0;
+    /* 0x4 */ s32 unk4;
+};
+extern "C" void DeleteIMG__11CMdsListSetFPc(CMdsListSet *objet, s8 *arg0) {
+    struct temp_v0_champs_05c0e1 *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs_05c0e1 *) (SearchIMGList__11CMdsListSetFPc(objet, arg0));
+    if (temp_v0 != NULL) {
+        temp_v0->unk0 = 0;
+        temp_v0->unk4 = 0;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cactionchara", SearchIMGList__11CMdsListSetFPc);
 INCLUDE_ASM("nonmatchings/game/cactionchara", GetTextureBlockNo__11CMdsListSetFiPii);
 INCLUDE_ASM("nonmatchings/game/cactionchara", Initialize__11CMdsListSetFv);

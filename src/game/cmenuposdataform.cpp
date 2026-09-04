@@ -58,7 +58,20 @@ extern "C" void MenuFormPartsPresetItem__FP18MENUFORMPARTS_TYPEiii(MENUFORMPARTS
 }
 INCLUDE_ASM("nonmatchings/game/cmenuposdataform", Initialize__16CMenuPosDataFormFv);
 INCLUDE_ASM("nonmatchings/game/cmenuposdataform", GetPartInfo__16CMenuPosDataFormFPc);
-INCLUDE_ASM("nonmatchings/game/cmenuposdataform", SetPartDrawFlag__16CMenuPosDataFormFPcb);
+extern "C" s32 GetPartInfo__16CMenuPosDataFormFPc(...);
+#include "menu.hpp"
+struct temp_v0_champs_d7f217 {
+    char pad0[0x5];
+    /* 0x5 */ s8 unk5;
+};
+extern "C" void SetPartDrawFlag__16CMenuPosDataFormFPcb(CMenuPosDataForm *objet, s8 *arg0, s8 arg1) {
+    struct temp_v0_champs_d7f217 *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs_d7f217 *) (GetPartInfo__16CMenuPosDataFormFPc(objet, arg0));
+    if (temp_v0 != NULL) {
+        temp_v0->unk5 = arg1;
+    }
+}
 struct inferred;
 #include "menu.hpp"
 typedef struct MENUFORMPARTS_TYPE {
