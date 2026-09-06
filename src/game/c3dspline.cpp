@@ -58,7 +58,20 @@ INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_FORM_RGBA__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_FORM_RGBA_BIT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_ACTION_TABLE_NUM__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_ACTION_DEF__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_ACTION_SETACTION__FP9SPI_STACKi);
+extern "C" u32 menu_formPt;
+extern "C" s32 spiGetStackString__FP9SPI_STACK(...);
+struct SPI_STACK_bdf4f5 {
+    s32 field_0;
+    s32 field_4;
+};
+extern "C" s32 SetAction__16CMenuPosDataFormFPc(...);
+extern "C" s32 _MENU_ACTION_SETACTION__FP9SPI_STACKi(SPI_STACK_bdf4f5 *arg0, s32 arg1) {
+    if (menu_formPt == NULL) {
+        return 0;
+    }
+    SetAction__16CMenuPosDataFormFPc(menu_formPt, spiGetStackString__FP9SPI_STACK(arg0));
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_PARTVIBECNT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_PARTVIBER__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_SHADOW_ONOFF__FP9SPI_STACKi);
@@ -67,7 +80,24 @@ INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_PARTRGBA__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_PART_ALPHA_BLEND__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_PART_ETCINFO__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_PART_BILINEAR__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/c3dspline", MakePartsName__FP9SPI_STACKP18MENUFORMPARTS_TYPE);
+extern "C" u32 MenuSpiStack;
+struct SPI_STACK_e9481d {
+    s32 field_0;
+    s32 field_4;
+};
+struct inferred;
+#include "menu.hpp"
+struct MENUFORMPARTS_TYPE;
+typedef struct MENUFORMPARTS_TYPE {
+    /* 0x0 */ s32 unk0;                             /* inferred */
+} MENUFORMPARTS_TYPE;                               /* size >= 0x4 */
+struct arg1_champs_e9481d {
+    /* 0x0 */ s32 unk0;
+};
+extern "C" s32 mgCopyString__FPcP9mgCMemory(...);
+extern "C" void MakePartsName__FP9SPI_STACKP18MENUFORMPARTS_TYPE(SPI_STACK_e9481d *arg0, MENUFORMPARTS_TYPE *arg1) {
+    ((struct arg1_champs_e9481d *) arg1)->unk0 = mgCopyString__FPcP9mgCMemory(spiGetStackString__FP9SPI_STACK(arg0), MenuSpiStack);
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_PART_DTYPE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_NORMAL__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_NORMAL2__FP9SPI_STACKi);

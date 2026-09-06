@@ -230,7 +230,62 @@ INCLUDE_ASM("nonmatchings/game/text_00266E10", _CHK_INTERSECTION_POINT_PIPE__FP1
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_FCAMERA_FOLLOW__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_FCAMERA_FOLLOW_A__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_FCAMERA_FOLLOW_OFS__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_FCAMERA_FOLLOW_FLAG__FP12RS_STACKDATAi);
+extern "C" s32 GetCamera__6CSceneFi(void *, s32);
+struct inferred;
+struct mgCCameraFollow_307bca {
+    char pad_0[0x48];
+    f32 field_48;
+    char pad_4C[0x4];
+    f32 field_50;
+    char pad_54[0x8];
+    s32 field_5C;
+    char pad_60[0x10];
+    f32 field_70;
+    f32 field_74;
+    f32 field_78;
+    f32 field_7C;
+    f32 field_80;
+    f32 field_84;
+    f32 field_88;
+    f32 field_8C;
+    f32 field_90;
+    f32 field_94;
+    f32 field_98;
+    f32 field_9C;
+    s32 field_A0;
+    char pad_A4[0xC];
+    f32 field_B0;
+    f32 field_B4;
+    f32 field_B8;
+    f32 field_BC;
+    char pad_C0[0x4];
+    s32 field_C4;
+};
+struct CScene_307bca;
+typedef struct CScene_307bca {
+    /* 0x0000 */ char pad0[0x2E54];
+    /* 0x2E54 */ s32 unk2E54;                       /* inferred */
+} CScene_307bca;                                           /* size >= 0x2E58 */
+struct EventScene_champs_307bca {
+    char pad0[0x2E54];
+    /* 0x2E54 */ s32 unk2E54;
+};
+extern "C" s32 FollowOff__15mgCCameraFollowFv(void *);
+extern "C" s32 FollowOn__15mgCCameraFollowFv(void *);
+extern "C" s32 _SET_FCAMERA_FOLLOW_FLAG__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    mgCCameraFollow_307bca *temp_v0;
+
+    temp_v0 = (mgCCameraFollow_307bca *) (GetCamera__6CSceneFi(EventScene, ((struct EventScene_champs_307bca *) EventScene)->unk2E54));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    if (GetStackInt__FP12RS_STACKDATA_00262DA0(arg0) == 1) {
+        FollowOn__15mgCCameraFollowFv(temp_v0);
+    } else {
+        FollowOff__15mgCCameraFollowFv(temp_v0);
+    }
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _FCAMERA_STEP__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_FCAMERA_ANGLE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_FCAMERA_HEIGHT__FP12RS_STACKDATAi);

@@ -133,7 +133,43 @@ INCLUDE_ASM("nonmatchings/game/caquames", Drop__9CFishFoodFv);
 INCLUDE_ASM("nonmatchings/game/caquames", Step__9CFishFoodFv);
 INCLUDE_ASM("nonmatchings/game/caquames", DrawEsaDropRoot__FP9CFishFoodf);
 INCLUDE_ASM("nonmatchings/game/caquames", AquaMesDispAdjustPos__FP6ClsMesPi);
-INCLUDE_ASM("nonmatchings/game/caquames", __ct__8CAquaMesFv);
+struct CAquaMes_6b2193 {
+    char pad_0[0x8];
+    s32 field_8;
+    u8 field_C;
+    char pad_D[0x7];
+    s32 field_14;
+    u8 field_18;
+    u8 field_19;
+    u8 field_1A;
+    char pad_1B[0x1];
+    s32 field_1C;
+    s32 field_20;
+    f32 field_24;
+    s32 field_28;
+    char pad_2C[0x4];
+    s32 field_30;
+    u8 field_34;
+    char pad_35[0x1];
+    s16 field_36;
+    char pad_38[0x4];
+    s32 field_3C;
+    u8 field_40;
+    char pad_41[0x7];
+    u8 field_48;
+    char pad_49[0x7];
+    u8 field_50;
+    char pad_51[0x7];
+    s32 field_58;
+    s32 field_5C;
+    s32 field_60;
+};
+#include "menu.hpp"
+extern "C" s32 Initialize__8CAquaMesFP9mgCMemory(void *, mgCMemory *);
+extern "C" CAquaMes_6b2193 *__ct__8CAquaMesFv(CAquaMes_6b2193 *objet) {
+    Initialize__8CAquaMesFP9mgCMemory(objet, NULL);
+    return objet;
+}
 INCLUDE_ASM("nonmatchings/game/caquames", Initialize__8CAquaMesFP9mgCMemory);
 #include "gen/ClsMes.hpp"
 struct inferred;

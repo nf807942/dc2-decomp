@@ -29,7 +29,34 @@ s32 scsAHDKeep(_SEN_CMR_SEQ * arg0, CSceneCmrSeq * arg1) {
 s32 scsAHDReturn(_SEN_CMR_SEQ *sequence, CSceneCmrSeq *owner) {
     return 2;
 }
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsInitPas__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
+struct _SEN_CMR_SEQ_f5ef6a {
+    s32 field_0;
+    char pad_4[0xC];
+    f32 field_10;
+    f32 field_14;
+    f32 field_18;
+    char pad_1C[0x4];
+    f32 field_20;
+    char pad_24[0xC];
+    s32 field_30;
+    s32 field_34;
+    f32 field_38;
+    s8 field_3C;
+};
+struct CSceneCmrSeq_infere_f5ef6a;
+typedef struct CSceneCmrSeq_infere_f5ef6a {
+    /* 0x000 */ char pad0[0x1C0];
+    /* 0x1C0 */ char pad1C0[1];
+} CSceneCmrSeq_infere_f5ef6a;                                     /* size >= 0x1C1 */
+struct arg1_champs_f5ef6a {
+    char pad0[0x1C0];
+    /* 0x1C0 */ s32 unk1C0;
+};
+extern "C" s32 Initialize__10CCameraPasFv(void *);
+extern "C" s32 scsInitPas__FP12_SEN_CMR_SEQP12CSceneCmrSeq(_SEN_CMR_SEQ_f5ef6a *arg0, CSceneCmrSeq_infere_f5ef6a *arg1) {
+    Initialize__10CCameraPasFv(&((struct arg1_champs_f5ef6a *) arg1)->unk1C0);
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsSetPasFrm__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsAddPas__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsStartPas__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
@@ -329,7 +356,32 @@ extern "C" s32 scsSetPos__FP12_SEN_OBJ_SEQP12CSceneObjSeq(_SEN_OBJ_SEQ_infere14 
 }
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsMove__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsMove2__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsInitPas__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
+struct _SEN_OBJ_SEQ_630ed8 {
+    s32 field_0;
+    char pad_4[0xC];
+    f32 field_10;
+    f32 field_14;
+    f32 field_18;
+    char pad_1C[0x4];
+    s32 field_20;
+    s32 field_24;
+    f32 field_28;
+    s8 field_2C;
+};
+struct CSceneObjSeq_infere_630ed8;
+typedef struct CSceneObjSeq_infere_630ed8 {
+    /* 0x000 */ char pad0[0x140];
+    /* 0x140 */ char pad140[1];
+} CSceneObjSeq_infere_630ed8;                                     /* size >= 0x141 */
+struct arg1_champs_630ed8 {
+    char pad0[0x140];
+    /* 0x140 */ s32 unk140;
+};
+extern "C" s32 Initialize__9CCharaPasFv(void *);
+extern "C" s32 scsInitPas__FP12_SEN_OBJ_SEQP12CSceneObjSeq(_SEN_OBJ_SEQ_630ed8 *arg0, CSceneObjSeq_infere_630ed8 *arg1) {
+    Initialize__9CCharaPasFv(&((struct arg1_champs_630ed8 *) arg1)->unk140);
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsSetPasFrm__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsAddPas__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsStartPas__FP12_SEN_OBJ_SEQP12CSceneObjSeq);

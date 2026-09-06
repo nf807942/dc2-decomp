@@ -268,19 +268,175 @@ INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapPARTS_ATR__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapPARTS_MATERIAL__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapPARTS_COMMENT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapCPOINT__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapWEIGHT__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapGEO_STONE__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapMAX_NUM__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapPAINT_NUM__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapPAINT_USED__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapPARTS_TYPE__FP9SPI_STACKi);
+extern "C" u32 emapNowInfo_0037E114;
+struct SPI_STACK_523170 {
+    s32 field_0;
+    s32 field_4;
+};
+struct emapNowInfo_0037E114_champs_523170 {
+    char pad0[0x10];
+    /* 0x10 */ s32 unk10;
+};
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(...);
+extern "C" s32 emapWEIGHT__FP9SPI_STACKi(SPI_STACK_523170 *arg0, s32 arg1) {
+    if (emapNowInfo_0037E114 == NULL) {
+        return 0;
+    }
+    ((struct emapNowInfo_0037E114_champs_523170 *) emapNowInfo_0037E114)->unk10 = spiGetStackInt__FP9SPI_STACK(arg0);
+    return 1;
+}
+struct SPI_STACK_0772dc {
+    s32 field_0;
+    s32 field_4;
+};
+struct emapNowInfo_0037E114_champs_0772dc {
+    char pad0[0x18];
+    /* 0x18 */ s32 unk18;
+};
+extern "C" s32 emapGEO_STONE__FP9SPI_STACKi(SPI_STACK_0772dc *arg0, s32 arg1) {
+    if (emapNowInfo_0037E114 == NULL) {
+        return 0;
+    }
+    ((struct emapNowInfo_0037E114_champs_0772dc *) emapNowInfo_0037E114)->unk18 = spiGetStackInt__FP9SPI_STACK(arg0);
+    return 1;
+}
+struct SPI_STACK_e0ddfb {
+    s32 field_0;
+    s32 field_4;
+};
+struct emapNowInfo_0037E114_champs_e0ddfb {
+    char pad0[0x14];
+    /* 0x14 */ s32 unk14;
+};
+extern "C" s32 emapMAX_NUM__FP9SPI_STACKi(SPI_STACK_e0ddfb *arg0, s32 arg1) {
+    if (emapNowInfo_0037E114 == NULL) {
+        return 0;
+    }
+    ((struct emapNowInfo_0037E114_champs_e0ddfb *) emapNowInfo_0037E114)->unk14 = spiGetStackInt__FP9SPI_STACK(arg0);
+    return 1;
+}
+struct SPI_STACK_bb866f {
+    s32 field_0;
+    s32 field_4;
+};
+struct emapNowInfo_0037E114_champs_bb866f {
+    char pad0[0x1C];
+    /* 0x1C */ s32 unk1C;
+};
+extern "C" s32 emapPAINT_NUM__FP9SPI_STACKi(SPI_STACK_bb866f *arg0, s32 arg1) {
+    if (emapNowInfo_0037E114 == NULL) {
+        return 0;
+    }
+    ((struct emapNowInfo_0037E114_champs_bb866f *) emapNowInfo_0037E114)->unk1C = spiGetStackInt__FP9SPI_STACK(arg0);
+    return 1;
+}
+struct SPI_STACK_16ef7d {
+    s32 field_0;
+    s32 field_4;
+};
+struct emapNowInfo_0037E114_champs_16ef7d {
+    char pad0[0x20];
+    /* 0x20 */ s32 unk20;
+};
+extern "C" s32 emapPAINT_USED__FP9SPI_STACKi(SPI_STACK_16ef7d *arg0, s32 arg1) {
+    if (emapNowInfo_0037E114 == NULL) {
+        return 0;
+    }
+    ((struct emapNowInfo_0037E114_champs_16ef7d *) emapNowInfo_0037E114)->unk20 = spiGetStackInt__FP9SPI_STACK(arg0);
+    return 1;
+}
+struct SPI_STACK_d30a97 {
+    s32 field_0;
+    s32 field_4;
+};
+struct emapNowInfo_0037E114_champs_d30a97 {
+    char pad0[0x24];
+    /* 0x24 */ s32 unk24;
+};
+extern "C" s32 emapPARTS_TYPE__FP9SPI_STACKi(SPI_STACK_d30a97 *arg0, s32 arg1) {
+    if (emapNowInfo_0037E114 == NULL) {
+        return 0;
+    }
+    ((struct emapNowInfo_0037E114_champs_d30a97 *) emapNowInfo_0037E114)->unk24 = spiGetStackInt__FP9SPI_STACK(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapPLACE_EPS__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapMAP_NO__FP9SPI_STACKi);
+struct SPI_STACK_2b558e {
+    s32 field_0;
+    s32 field_4;
+};
+struct emapNowInfo_0037E114_champs_2b558e {
+    char pad0[0x2C];
+    /* 0x2C */ s32 unk2C;
+};
+extern "C" s32 emapMAP_NO__FP9SPI_STACKi(SPI_STACK_2b558e *arg0, s32 arg1) {
+    if (emapNowInfo_0037E114 == NULL) {
+        return 0;
+    }
+    ((struct emapNowInfo_0037E114_champs_2b558e *) emapNowInfo_0037E114)->unk2C = spiGetStackInt__FP9SPI_STACK(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapPOLYN__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapGROUND_PARTS__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapBLOCK_PARTS__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapRIVER_PARTS__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapFENCE_PARTS__FP9SPI_STACKi);
+struct SPI_STACK_bc7cb3 {
+    s32 field_0;
+    s32 field_4;
+};
+struct emapNowInfo_0037E114_champs_bc7cb3 {
+    char pad0[0x4];
+    /* 0x4 */ s32 unk4;
+};
+extern "C" s32 emapGROUND_PARTS__FP9SPI_STACKi(SPI_STACK_bc7cb3 *arg0, s32 arg1) {
+    if (emapNowInfo_0037E114 == NULL) {
+        return 0;
+    }
+    ((struct emapNowInfo_0037E114_champs_bc7cb3 *) emapNowInfo_0037E114)->unk4 = (s32) (((struct emapNowInfo_0037E114_champs_bc7cb3 *) emapNowInfo_0037E114)->unk4 | 7);
+    return 1;
+}
+struct SPI_STACK_a8cf42 {
+    s32 field_0;
+    s32 field_4;
+};
+struct emapNowInfo_0037E114_champs_a8cf42 {
+    char pad0[0x4];
+    /* 0x4 */ s32 unk4;
+};
+extern "C" s32 emapBLOCK_PARTS__FP9SPI_STACKi(SPI_STACK_a8cf42 *arg0, s32 arg1) {
+    if (emapNowInfo_0037E114 == NULL) {
+        return 0;
+    }
+    ((struct emapNowInfo_0037E114_champs_a8cf42 *) emapNowInfo_0037E114)->unk4 = (s32) (((struct emapNowInfo_0037E114_champs_a8cf42 *) emapNowInfo_0037E114)->unk4 | 0x30);
+    return 1;
+}
+struct SPI_STACK_1afb84 {
+    s32 field_0;
+    s32 field_4;
+};
+struct emapNowInfo_0037E114_champs_1afb84 {
+    char pad0[0x4];
+    /* 0x4 */ s32 unk4;
+};
+extern "C" s32 emapRIVER_PARTS__FP9SPI_STACKi(SPI_STACK_1afb84 *arg0, s32 arg1) {
+    if (emapNowInfo_0037E114 == NULL) {
+        return 0;
+    }
+    ((struct emapNowInfo_0037E114_champs_1afb84 *) emapNowInfo_0037E114)->unk4 = (s32) (((struct emapNowInfo_0037E114_champs_1afb84 *) emapNowInfo_0037E114)->unk4 | 0x80);
+    return 1;
+}
+struct SPI_STACK_2c3eb3 {
+    s32 field_0;
+    s32 field_4;
+};
+struct emapNowInfo_0037E114_champs_2c3eb3 {
+    char pad0[0x4];
+    /* 0x4 */ s32 unk4;
+};
+extern "C" s32 emapFENCE_PARTS__FP9SPI_STACKi(SPI_STACK_2c3eb3 *arg0, s32 arg1) {
+    if (emapNowInfo_0037E114 == NULL) {
+        return 0;
+    }
+    ((struct emapNowInfo_0037E114_champs_2c3eb3 *) emapNowInfo_0037E114)->unk4 = (s32) (((struct emapNowInfo_0037E114_champs_2c3eb3 *) emapNowInfo_0037E114)->unk4 | 0x130);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapRECT__FP9SPI_STACKi);
 extern "C" u32 emapNowInfo_0037E114;
 extern "C" u32 emapRectIdx_0037E124;
@@ -289,7 +445,7 @@ struct SPI_STACK {
     s32 field_0;
     s32 field_4;
 };
-extern "C" s32 spiGetStackInt__FP9SPI_STACK(SPI_STACK *);
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(...);
 extern "C" s32 emapPLACE_RECT__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     if (emapNowInfo_0037E114 == 0) {
         return 0;

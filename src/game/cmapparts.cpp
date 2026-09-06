@@ -199,7 +199,103 @@ struct PieceMaterial;
 
 INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__15CMapTreasureBoxFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetTrBox__4CMapFi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", DeleteTrBox__4CMapFiP12CMapFlagData);
+extern "C" s32 GetTrBox__4CMapFi(void *, s32);
+struct CMap_a89ba9 {
+    char pad_0[0x98];
+    s32 field_98;
+    s32 field_9C;
+    s32 field_A0;
+    char pad_A4[0x1C];
+    s32 field_C0;
+    s32 field_C4;
+    f32 field_C8;
+    s32 field_CC;
+    s32 field_D0;
+    char pad_D4[0x4];
+    s32 field_D8;
+    f32 field_DC;
+    f32 field_E0;
+    s32 field_E4;
+    s32 field_E8;
+    s32 field_EC;
+    f32 field_F0;
+    f32 field_F4;
+    f32 field_F8;
+    char pad_FC[0xC];
+    s32 field_108;
+    char pad_10C[0x200];
+    s32 field_30C;
+    s32 field_310;
+    s32 field_314;
+    s32 field_318;
+    s32 field_31C;
+    s32 field_320;
+    s32 field_324;
+    s32 field_328;
+    char pad_32C[0x4];
+    s32 field_330;
+    s32 field_334;
+    char pad_338[0x8];
+    f32 field_340;
+    char pad_344[0xC];
+    f32 field_350;
+    char pad_354[0xC];
+    s32 field_360;
+    char pad_364[0x4];
+    s32 field_368;
+    char pad_36C[0x304];
+    s32 field_670;
+    char pad_674[0x60C];
+    s32 field_C80;
+    char pad_C84[0x4];
+    f32 field_C88;
+    s32 field_C8C;
+    char pad_C90[0x4];
+    s32 field_C94;
+    s32 field_C98;
+    char pad_C9C[0xC];
+    s32 field_CA8;
+    s32 field_CAC;
+    char pad_CB0[0x34];
+    f32 field_CE4;
+    s32 field_CE8;
+    s32 field_CEC;
+    s32 field_CF0;
+    s32 field_CF4;
+};
+struct CMapFlagData;
+struct temp_v0_champs_a89ba9 {
+    char pad0[0x660];
+    /* 0x660 */ s32 unk660;
+    /* 0x664 */ s32 unk664;
+    char pad668[0xC];
+    /* 0x674 */ s32 unk674;
+};
+struct temp_v1_champs_a89ba9 {
+    char pad0[0x10];
+    /* 0x10 */ s32 unk10;
+};
+extern "C" s32 SetFlag__12CMapFlagDataFii(void *, s32, s32);
+extern "C" void DeleteTrBox__4CMapFiP12CMapFlagData(CMap_a89ba9 *objet, s32 arg0, CMapFlagData *arg1) {
+    s32 temp_a1;
+    struct temp_v0_champs_a89ba9 *temp_v0;
+    struct temp_v1_champs_a89ba9 *temp_v1;
+
+    temp_v0 = (struct temp_v0_champs_a89ba9 *) (GetTrBox__4CMapFi(objet, arg0));
+    if (temp_v0 != NULL) {
+        temp_v0->unk660 = 0;
+        temp_a1 = (s32) (temp_v0->unk664);
+        if (temp_a1 > 0) {
+            if (arg1 != NULL) {
+                SetFlag__12CMapFlagDataFii(arg1, temp_a1, 1);
+            }
+            temp_v1 = (struct temp_v1_champs_a89ba9 *) (temp_v0->unk674);
+            if (temp_v1 != NULL) {
+                temp_v1->unk10 = 0;
+            }
+        }
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", UpdateTrBoxFlag__4CMapFP12CMapFlagData);
 INCLUDE_ASM("nonmatchings/game/cmapparts", LoadData__4CMapFPUiPUiPiP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cmapparts", CheckFuncEvent__FP10CFuncPointPfiP12MapEventInfoPf);
@@ -385,7 +481,25 @@ s32 mapPIECE_MATERIAL_END(SPI_STACK *stack, int argc) {
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE_COL_TYPE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE_TIME__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE_END__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapPARTS_END__FP9SPI_STACKi);
+extern "C" u32 mapMap;
+extern "C" u32 mapNowMapParts;
+extern "C" u32 mapPtsFunc;
+extern "C" s32 pGetData__17CList_9CMapParts_Fv(...);
+struct SPI_STACK_4f76e6 {
+    s32 field_0;
+    s32 field_4;
+};
+extern "C" s32 AddParts__4CMapFP17CList_9CMapParts_(...);
+extern "C" s32 CreateBoundBox__9CMapPartsFv(...);
+extern "C" s32 mapPARTS_END__FP9SPI_STACKi(SPI_STACK_4f76e6 *arg0, s32 arg1) {
+    if (mapNowMapParts == NULL) {
+        return 0;
+    }
+    AddParts__4CMapFP17CList_9CMapParts_(mapMap, mapNowMapParts);
+    mapPtsFunc = 0;
+    CreateBoundBox__9CMapPartsFv(pGetData__17CList_9CMapParts_Fv(mapNowMapParts));
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapMAP_PARTS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapMAP_FAR_CLIP__FP9SPI_STACKi);
 extern "C" u8 mapMapPartsName[256];

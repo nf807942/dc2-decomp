@@ -322,9 +322,65 @@ extern "C" void Initialize__13CVillagerDataFv(CVillagerData *objet) {
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", Add__18CVillagerPlaceInfoFP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", Initialize__13CVillagerMngrFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", GetData__13CVillagerMngrFi);
-INCLUDE_ASM("nonmatchings/game/cscene_002CC360", Stay__13CVillagerMngrFi);
-INCLUDE_ASM("nonmatchings/game/cscene_002CC360", CancelStay__13CVillagerMngrFi);
-INCLUDE_ASM("nonmatchings/game/cscene_002CC360", ExMode__13CVillagerMngrFi);
+extern "C" s32 GetData__13CVillagerMngrFi(void *, s32);
+struct CVillagerMngr_681136 {
+    s32 field_0;
+    s32 field_4;
+};
+struct temp_v0_champs_681136 {
+    char pad0[0x2C];
+    /* 0x2C */ s32 unk2C;
+};
+extern "C" void Stay__13CVillagerMngrFi(CVillagerMngr_681136 *objet, s32 arg0) {
+    struct temp_v0_champs_681136 *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs_681136 *) (GetData__13CVillagerMngrFi(objet, arg0));
+    if (temp_v0 != NULL) {
+        temp_v0->unk2C = (s32) (temp_v0->unk2C + 1);
+    }
+}
+extern "C" s32 GetData__13CVillagerMngrFi(void *, s32);
+struct CVillagerMngr_06bba5 {
+    s32 field_0;
+    s32 field_4;
+};
+struct temp_v0_champs_06bba5 {
+    char pad0[0x2C];
+    /* 0x2C */ s32 unk2C;
+};
+extern "C" void CancelStay__13CVillagerMngrFi(CVillagerMngr_06bba5 *objet, s32 arg0) {
+    struct temp_v0_champs_06bba5 *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs_06bba5 *) (GetData__13CVillagerMngrFi(objet, arg0));
+    if (temp_v0 != NULL) {
+        temp_v0->unk2C = (s32) (temp_v0->unk2C - 1);
+        if (temp_v0->unk2C < 0) {
+            temp_v0->unk2C = 0;
+        }
+    }
+}
+struct CVillagerMngr_217bac {
+    s32 field_0;
+    s32 field_4;
+};
+struct temp_v0_champs_217bac {
+    char pad0[0x20];
+    /* 0x20 */ s32 unk20;
+    /* 0x24 */ s32 unk24;
+    /* 0x28 */ s32 unk28;
+};
+extern "C" void ExMode__13CVillagerMngrFi(CVillagerMngr_217bac *objet, s32 arg0) {
+    struct temp_v0_champs_217bac *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs_217bac *) (GetData__13CVillagerMngrFi(objet, arg0));
+    if (temp_v0 != NULL) {
+        if (temp_v0->unk20 == 0) {
+            temp_v0->unk20 = 1;
+            temp_v0->unk24 = 1;
+        }
+        temp_v0->unk28 = 0;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", SearchDataIDatCharaID__13CVillagerMngrFi);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", Register__13CVillagerMngrFiiP18CVillagerPlaceInfo);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", DeleteCharaID__13CVillagerMngrFi);

@@ -106,7 +106,19 @@ s32 _SE_END(SPI_STACK *stack, int argc) {
 s32 _MOTION_END(SPI_STACK *stack, int argc) {
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/ccharacter2", _EFFECT_START__FP9SPI_STACKi);
+extern "C" u32 eff_pack_ptr;
+extern "C" u32 pack_file;
+extern "C" s32 spiGetStackString__FP9SPI_STACK(...);
+extern "C" u32 eff_pack_size;
+struct SPI_STACK_d070e6 {
+    s32 field_0;
+    s32 field_4;
+};
+extern "C" s32 GetPackFile__FPUiPcPi(...);
+extern "C" s32 _EFFECT_START__FP9SPI_STACKi(SPI_STACK_d070e6 *arg0, s32 arg1) {
+    eff_pack_ptr = GetPackFile__FPUiPcPi(pack_file, spiGetStackString__FP9SPI_STACK(arg0), &eff_pack_size);
+    return eff_pack_ptr != 0;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _EFFECT__FP9SPI_STACKi);
 extern "C" u32 eff_pack_ptr;
 extern "C" u32 eff_pack_size;
@@ -195,7 +207,7 @@ s32 _SKIN_IMG_END(SPI_STACK *stack, int argc) {
 extern "C" u8 _1395_00368260[14];
 extern "C" u32 pack_file;
 extern "C" u8 skin_mds_name[64];
-extern "C" s32 spiGetStackString__FP9SPI_STACK(SPI_STACK *);
+extern "C" s32 spiGetStackString__FP9SPI_STACK(...);
 extern "C" s32 GetPackFile__FPUiPcPi(...);
 extern "C" s32 printf(...);
 extern "C" s32 strcpy(...);

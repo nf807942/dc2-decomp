@@ -307,7 +307,9 @@ def _ouvrante(texte: str, ferme: int) -> int | None:
     return None
 
 
-def fleches_sur_expression(corps: str, marque: str = "") -> tuple[list[str], str]:
+def fleches_sur_expression(corps: str, marque: str = "",
+                           largeurs: dict[int, int] | None = None
+                           ) -> tuple[list[str], str]:
     """Donne un type aux flèches dont la gauche est un calcul.
 
     `(objet + var_s1)->unkF54` : le decalage est sur `objet`, mais l'addition
@@ -347,7 +349,7 @@ def fleches_sur_expression(corps: str, marque: str = "") -> tuple[list[str], str
         offsets.setdefault(cle, {})[int(champ[3:], 16)] = champ
 
     neuves = [_struct_par_offsets("calcul%d_champs%s" % (rangs[cle], marque),
-                                  offsets[cle], appeles)
+                                  offsets[cle], appeles, largeurs)
               for cle in sorted(rangs, key=rangs.get)]
 
     # De la fin vers le debut : une insertion en tete decalerait les suivantes.
@@ -360,6 +362,38 @@ def fleches_sur_expression(corps: str, marque: str = "") -> tuple[list[str], str
     return neuves, corps
 _CHAMP_M2C = re.compile(
     r"/\*\s*0x([0-9A-Fa-f]+)\s*\*/\s*(.+?)\s*(\w+)\s*(\[[^\]]*\])?\s*;")
+
+
+# Un type de m2c et sa taille. m2c ne devine pas ces largeurs : il les lit dans
+# l'opcode — `sh` dit deux octets, `lbu` un. C'est une meilleure preuve que
+# l'alignement du decalage, sur lequel `_struct_par_offsets` retombe sinon.
+_OCTETS_DU_TYPE = {"s8": 1, "u8": 1, "char": 1, "s16": 2, "u16": 2,
+                   "s32": 4, "u32": 4, "f32": 4}
+
+
+def largeurs_m2c(structs: list[str]) -> dict[int, int]:
+    """La largeur que m2c a donnee a chaque decalage, quand elle est sure.
+
+    **Notre structure forgee suppose quatre octets ; le commerce ecrit souvent
+    deux.** Dix-sept quasi-succes divergent par un `sw` la ou le disque porte un
+    `sh`, quatorze par un `lw` contre un `lh` — et dans chacun, m2c avait ecrit
+    la bonne largeur dans sa propre structure inferee, que la forge jetait.
+
+    Un decalage vu sous deux types differents ne rend rien : la structure
+    forgee decrit peut-etre un autre objet, et une largeur fausse coute plus
+    qu'une largeur supposee.
+    """
+    vus: dict[int, set[int]] = {}
+    for bloc in structs:
+        for trouve in _CHAMP_M2C.finditer(bloc):
+            if trouve.group(4):
+                continue
+            taille = _OCTETS_DU_TYPE.get(trouve.group(2).strip())
+            if taille is None:
+                continue
+            vus.setdefault(int(trouve.group(1), 16), set()).add(taille)
+    return {cle: valeurs.pop() for cle, valeurs in vus.items()
+            if len(valeurs) == 1}
 
 
 def _type_pointe(variable: str, corps: str) -> str | None:
@@ -390,7 +424,8 @@ _APPELE = re.compile(r"->\s*(unk[0-9A-Fa-f]+)\s*\(")
 
 
 def _struct_par_offsets(nom: str, offsets: dict[int, str],
-                        appeles: set[str] | None = None) -> str:
+                        appeles: set[str] | None = None,
+                        largeurs: dict[int, int] | None = None) -> str:
     """Une structure bâtie sur les seuls décalages que le corps réclame.
 
     m2c écrit `arg1->unk74` sans avoir inféré de structure pour `arg1` : le
@@ -418,6 +453,11 @@ def _struct_par_offsets(nom: str, offsets: dict[int, str],
         largeur = 4
         while largeur > 1 and (decalage % largeur or place < largeur):
             largeur //= 2
+        # La largeur que m2c a lue dans l'opcode l'emporte sur celle que
+        # l'alignement suppose, tant qu'elle tient dans la place disponible.
+        lue = (largeurs or {}).get(decalage)
+        if lue is not None and lue <= place:
+            largeur = lue
         nom_champ = offsets[decalage]
         if appeles and nom_champ in appeles:
             # L'ellipse plutot qu'une liste vide : l'appel passe l'objet et ce
@@ -543,7 +583,8 @@ def complete_structures(structs: list[str], corps: str,
     """
     # Les calculs d'abord : leur conversion ne laisse derriere elle aucune
     # fleche que les motifs suivants pourraient reprendre a tort.
-    calculees, corps = fleches_sur_expression(corps, marque)
+    largeurs = largeurs_m2c(structs)
+    calculees, corps = fleches_sur_expression(corps, marque, largeurs)
     structs = structs + calculees
 
     appeles = set(_APPELE.findall(corps))
@@ -587,7 +628,7 @@ def complete_structures(structs: list[str], corps: str,
         if (variable not in locales and variable not in etoilees
                 and not _CHAMP_INCONNU.fullmatch(variable)):
             forge = "%s_champs%s" % (variable, marque)
-            neuves.append(_struct_par_offsets(forge, offsets, appeles))
+            neuves.append(_struct_par_offsets(forge, offsets, appeles, largeurs))
             corps = re.sub(r"\b%s\s*->" % re.escape(variable),
                            "((struct %s *) %s)->" % (forge, variable),
                            corps)
@@ -597,7 +638,7 @@ def complete_structures(structs: list[str], corps: str,
             # virtuelle qu'on atteint, et la variable pointe vers le pointeur
             # qui la porte. Deux etoiles, donc, et la structure forgee au bout.
             forge = "%s_champs%s" % (variable, marque)
-            neuves.append(_struct_par_offsets(forge, offsets, appeles))
+            neuves.append(_struct_par_offsets(forge, offsets, appeles, largeurs))
             corps = re.sub(r"^(\s*)[A-Za-z_]\w*\s*\*\*\s*%s\s*;\s*$"
                            % re.escape(variable),
                            r"\1struct %s **%s;" % (forge, variable),
@@ -624,11 +665,11 @@ def complete_structures(structs: list[str], corps: str,
                     rendu = _rend_pointeur(bloc, variable, forge)
                     if rendu is not None:
                         source[rang] = rendu
-                        neuves.append(_struct_par_offsets(forge, offsets, appeles))
+                        neuves.append(_struct_par_offsets(forge, offsets, appeles, largeurs))
                         break
                 continue
             forge = "%s_champs%s" % (variable, marque)
-            neuves.append(_struct_par_offsets(forge, offsets, appeles))
+            neuves.append(_struct_par_offsets(forge, offsets, appeles, largeurs))
             corps = re.sub(r"^(\s+)%s(\s+)%s(\s*;\s*)$"
                            % (re.escape(valeur), re.escape(variable)),
                            r"\1struct %s *%s\3" % (forge, variable),
@@ -642,7 +683,7 @@ def complete_structures(structs: list[str], corps: str,
         # nommée d'après la variable pour que deux paramètres du même type de
         # base ne se disputent pas le nom.
         forge = "%s_champs%s" % (variable, marque)
-        neuves.append(_struct_par_offsets(forge, offsets, appeles))
+        neuves.append(_struct_par_offsets(forge, offsets, appeles, largeurs))
         corps = re.sub(r"\b%s\s*\*\s*%s\b" % (re.escape(type_),
                                               re.escape(variable)),
                        "struct %s *%s" % (forge, variable), corps)

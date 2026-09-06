@@ -58,7 +58,37 @@ INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgEndDraw__FiP14mgCDrawMana
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgStoreFrameImage__Fv);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgEndFrame__FP14mgCDrawManager);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSendPacket__FP14mgCDrawManager);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgEndPacket__FP14mgCDrawManager);
+extern "C" u32 mgVif1Packet;
+struct mgCDrawManager_ddd6cf {
+    s32 field_0;
+    char pad_4[0x4];
+    s32 field_8;
+    s32 field_C;
+    char pad_10[0xC];
+    u32 field_1C;
+    s32 field_20;
+    f32 field_24;
+    f32 field_28;
+    f32 field_2C;
+    f32 field_30;
+    char pad_34[0x10];
+    f32 field_44;
+    f32 field_48;
+    f32 field_4C;
+    char pad_50[0x8];
+    s32 field_58;
+    char pad_5C[0x8];
+    s32 field_64;
+    s32 field_68;
+    s32 field_6C;
+    s32 field_70;
+};
+extern "C" s32 sceVif1PkEnd(...);
+extern "C" s32 sceVif1PkTerminate(...);
+extern "C" void mgEndPacket__FP14mgCDrawManager(mgCDrawManager_ddd6cf *arg0) {
+    sceVif1PkEnd(mgVif1Packet, 0);
+    sceVif1PkTerminate(mgVif1Packet);
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgWaitFrame__Fv);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgDraw__FP8mgCFrame);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgDrawDirect__FP8mgCFrame);

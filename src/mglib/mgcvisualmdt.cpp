@@ -288,7 +288,61 @@ INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", BeginCPSprite__11mgC3DSpriteFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", CPSetSprite__11mgC3DSpriteFPfPfPfPfPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", EndCPSprite__11mgC3DSpriteFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", EndCreatePacket__11mgC3DSpriteFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Initialize__9mgCSpriteFv);
+struct mgCVisualAttr_81cc83 {
+    s32 field_0;
+    s32 field_4;
+    s32 field_8;
+    s32 field_C;
+    s32 field_10;
+    s32 field_14;
+};
+struct mgCSprite;
+typedef struct mgCSprite {
+    /* 0x00 */ s32 unk0;                            /* inferred */
+    /* 0x04 */ s32 unk4;                            /* inferred */
+    /* 0x08 */ s32 unk8;                            /* inferred */
+    /* 0x0C */ char padC[4];
+    /* 0x10 */ s32 unk10;                           /* inferred */
+    /* 0x14 */ s32 unk14;                           /* inferred */
+    /* 0x18 */ char pad18[8];                       /* maybe part of unk14[3]void */
+    /* 0x20 */ char pad20[8];
+    /* 0x28 */ s32 unk28;                           /* inferred */
+    /* 0x2C */ s32 unk2C;                           /* inferred */
+    /* 0x30 */ char pad30[0x10];                    /* maybe part of unk2C[5]void */
+    /* 0x40 */ s32 unk40;                           /* inferred */
+    /* 0x44 */ s32 unk44;                           /* inferred */
+} mgCSprite;                                        /* size >= 0x48 */
+struct objet_champs_81cc83 {
+    /* 0x0 */ s32 unk0;
+    /* 0x4 */ s32 unk4;
+    /* 0x8 */ s32 unk8;
+    char padC[0x4];
+    /* 0x10 */ s32 unk10;
+    /* 0x14 */ s32 unk14;
+    char pad18[0x8];
+    /* 0x20 */ s32 unk20;
+    char pad24[0x4];
+    /* 0x28 */ s32 unk28;
+    /* 0x2C */ s32 unk2C;
+    char pad30[0x10];
+    /* 0x40 */ s32 unk40;
+    /* 0x44 */ s32 unk44;
+};
+extern "C" s32 Initialize__13mgCVisualAttrFv(...);
+extern "C" s32 SetColor__9mgCSpriteFiiii(void *, s32, s32, s32, s32);
+extern "C" void Initialize__9mgCSpriteFv(mgCSprite *objet) {
+    ((struct objet_champs_81cc83 *) objet)->unk0 = 0;
+    ((struct objet_champs_81cc83 *) objet)->unk4 = 0;
+    ((struct objet_champs_81cc83 *) objet)->unk8 = 0;
+    ((struct objet_champs_81cc83 *) objet)->unk14 = 0;
+    ((struct objet_champs_81cc83 *) objet)->unk10 = 0;
+    Initialize__13mgCVisualAttrFv(&((struct objet_champs_81cc83 *) objet)->unk20);
+    ((struct objet_champs_81cc83 *) objet)->unk40 = 0;
+    ((struct objet_champs_81cc83 *) objet)->unk44 = 0xBF800000;
+    SetColor__9mgCSpriteFiiii(objet, 0x80, 0x80, 0x80, 0x80);
+    ((struct objet_champs_81cc83 *) objet)->unk28 = -1;
+    ((struct objet_champs_81cc83 *) objet)->unk2C = -1;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetColor__9mgCSpriteFiiii);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", CreatePacket__9mgCSpriteFP14mgCDrawManager);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Draw__9mgCSpriteFPUiPA4_fP14mgCDrawManager);
@@ -352,7 +406,7 @@ struct mgCVisualAttr {
     s32 field_10;
     s32 field_14;
 };
-extern "C" s32 Initialize__13mgCVisualAttrFv(mgCVisualAttr *objet);
+extern "C" s32 Initialize__13mgCVisualAttrFv(...);
 extern "C" mgCVisualAttr *__ct__13mgCVisualAttrFv(mgCVisualAttr *objet) {
     Initialize__13mgCVisualAttrFv(objet);
     return objet;
