@@ -45,7 +45,19 @@ INCLUDE_ASM = sonde_m2c.INCLUDE_ASM
 
 
 def candidats(combien: int) -> list[tuple[int, str, str]]:
-    """Les quasi-succès dont le corpus porte le C++, les plus lourds d'abord."""
+    """Les quasi-succès dont le corpus porte le C++, les plus proches d'abord.
+
+    **L'ordre est celui de la proximité, non celui du poids.** Un idiome répare
+    une divergence ; une fonction à 99,96 % en porte une, une fonction à 85 %
+    en porte des dizaines, et l'essai coûte le même temps dans les deux cas.
+    Le corpus compte 134 fonctions au-dessus de 99 % — dix au-dessus de 99,96 %,
+    sur des fonctions de cent à trois cents octets. Trier par poids mettait les
+    plus dures devant, et c'est sur elles que le rendement avait été mesuré à
+    trois succès sur cent cinquante essais.
+
+    Le poids départage à proximité égale : à divergence unique, la fonction la
+    plus lourde rapporte davantage.
+    """
     if not CORPUS.exists():
         return []
     etat = json.loads(ETAT.read_text(encoding="utf-8"))["eprouvees"]
@@ -55,9 +67,11 @@ def candidats(combien: int) -> list[tuple[int, str, str]]:
         fiche = etat.get(symbole) or {}
         unite = fiche.get("unite") or unit_of(symbole)
         if unite:
-            lot.append((fiche.get("taille") or 0, symbole, unite))
+            lot.append((fiche.get("part") or 0.0,
+                        fiche.get("taille") or 0, symbole, unite))
     lot.sort(reverse=True)
-    return lot[:combien] if combien else lot
+    rendu = [(taille, symbole, unite) for _, taille, symbole, unite in lot]
+    return rendu[:combien] if combien else rendu
 
 
 def recompile_et_mesure(symbole: str, unite: str) -> float | None:
@@ -144,9 +158,10 @@ def rendement(lot: list[tuple[int, str, str]]) -> int:
 def main(argv: list[str]) -> int:
     parseur = argparse.ArgumentParser(description=__doc__)
     parseur.add_argument("--combien", type=int, default=0,
-                         help="ne traite que les N plus lourdes")
-    # Les plus lourdes sont aussi les plus dures : mesurer le rendement sur
-    # elles seules le sous-estime. Le tirage porte sur toute la file.
+                         help="ne traite que les N plus proches du but")
+    # La tête de file est la plus facile : mesurer le rendement sur elle seule
+    # le surestime, comme le trier par poids le sous-estimait. Le tirage porte
+    # sur toute la file.
     parseur.add_argument("--tirage", type=int, default=0,
                          help="tire N fonctions au hasard dans la file")
     parseur.add_argument("--rendement", action="store_true",
