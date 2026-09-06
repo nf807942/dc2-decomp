@@ -228,6 +228,11 @@ def declare_les_piles(corps: str) -> str:
 _DEFINIT_TYPE = re.compile(r"(?:typedef\s+)?(?:struct|class|union)\s+(\w+)\s*(?::[^{]*)?{")
 _TYPEDEF = re.compile(r"^typedef struct (\w+)")
 _AVANT = re.compile(r"^struct (\w+);")
+# `struct CScene {` sans typedef — m2c ecrit les deux formes, et `_TYPEDEF`
+# ne voyait que la premiere : la moitie de nos definitions passait sans cle,
+# donc sans dedoublonnage ni renommage. 291 fonctions sur « tag redefined »
+# apres deux correctifs qui auraient du les rendre.
+_STRUCT_NU = re.compile(r"^(?:struct|class|union)\s+(\w+)\s*(?::[^{]*)?{")
 _FONCTION = re.compile(r'^extern "C" .*?\b(\w+)\s*\(')
 # `extern "C" EventScriptArg_champs EventScriptArg;` — une donnee, non une
 # fonction : sans cette cle, deux fonctions d'une meme unite la reemettent et
@@ -245,6 +250,7 @@ def _cle(bloc: str) -> tuple[str, str] | None:
     # première locale qui en lit un champ. C'est la même distinction que
     # `deja_vues` contre `deja_declarees`, vue du côté du rejet.
     for motif, genre in ((_TYPEDEF, "type"), (_AVANT, "avant"),
+                         (_STRUCT_NU, "type"),
                          (_FONCTION, "fonction"),
                          (_VARIABLE, "variable")):
         marque = motif.match(tete)
