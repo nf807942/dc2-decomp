@@ -223,6 +223,9 @@ def declare_les_piles(corps: str) -> str:
 
 
 # Ce qu'un bloc de déclaration nomme, et qui ne peut l'être qu'une fois.
+# `typedef struct X {` ou `struct X {` — une definition de type, ou qu elle
+# soit dans l unite.
+_DEFINIT_TYPE = re.compile(r"(?:typedef\s+)?(?:struct|class|union)\s+(\w+)\s*(?::[^{]*)?{")
 _TYPEDEF = re.compile(r"^typedef struct (\w+)")
 _AVANT = re.compile(r"^struct (\w+);")
 _FONCTION = re.compile(r'^extern "C" .*?\b(\w+)\s*\(')
@@ -345,6 +348,19 @@ def assemble(ajoutees: list[str], declarations: str, corps: str,
                             for nom in _types_absents(nette, source))
             en_aval.setdefault(cle, avant + nette)
 
+    # **Un type que l'unité définit plus bas ne se redéfinit pas ici.** `pris`
+    # ne regarde que l'amont, parce que la question « ce nom est-il visible ? »
+    # s'y borne ; mais deux définitions du même tag dans une unité sont fatales
+    # où qu'elles soient. `cactionchara` définit `CActionChara_infere` à la
+    # ligne 398, notre greffe est à la 230, et MWCC répond « tag redefined ».
+    # Mesuré au rejugement de 711 quasi-succès : 90 avaient cessé de compiler,
+    # dont 40 sur ce seul message et ce seul motif.
+    #
+    # La déclaration en avant tient la place : le type n'est employé ici qu'en
+    # pointeur, et sa définition d'en bas reste la seule.
+    types_aval = {nom for nom in _DEFINIT_TYPE.findall(
+        unite[len(source):] if unite else "")}
+
     gardes = []
     for bloc in _blocs("\n".join([b for b in ajoutees + [declarations] if b])):
         cle = _cle(bloc)
@@ -354,6 +370,9 @@ def assemble(ajoutees: list[str], declarations: str, corps: str,
             pris.add(cle)
             if cle in en_aval:
                 gardes.append(en_aval[cle])
+                continue
+            if cle[0] == "type" and cle[1] in types_aval:
+                gardes.append("struct %s;" % cle[1])
                 continue
         gardes.append(bloc)
     return "\n".join(gardes + [corps])
