@@ -192,7 +192,27 @@ INCLUDE_ASM("nonmatchings/game/ccharacter2", _SKIN_IMG__FP9SPI_STACKi);
 s32 _SKIN_IMG_END(SPI_STACK *stack, int argc) {
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/ccharacter2", _SKIN_MODEL__FP9SPI_STACKi);
+extern "C" u8 _1395_00368260[14];
+extern "C" u32 pack_file;
+extern "C" u8 skin_mds_name[64];
+extern "C" s32 spiGetStackString__FP9SPI_STACK(SPI_STACK *);
+extern "C" s32 GetPackFile__FPUiPcPi(...);
+extern "C" s32 printf(...);
+extern "C" s32 strcpy(...);
+extern "C" s32 _SKIN_MODEL__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    s8 *temp_v0;
+
+    if (arg1 != 1) {
+        return 0;
+    }
+    temp_v0 = (s8 *) (spiGetStackString__FP9SPI_STACK(arg0));
+    if (GetPackFile__FPUiPcPi(pack_file, temp_v0, NULL) == 0) {
+        printf(&_1395_00368260, temp_v0);
+        return 0;
+    }
+    strcpy(&skin_mds_name, temp_v0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", CreateChangeFrame__FP10mgLoadDataP8mgCFrame);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _SKIN_MOTION__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _LOD_MODEL_START__FP9SPI_STACKi);
@@ -298,8 +318,45 @@ s32 dynFIX_VERTEX_END(SPI_STACK *stack, int argc) {
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/ccharacter2", FRAME_POSE_Sub__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", dynFRAME_POSE_L__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", dynFRAME_POSE__FP9SPI_STACKi);
+extern "C" s32 FRAME_POSE_Sub__FP9SPI_STACKi(SPI_STACK *, s32);
+struct temp_s0_champs_131d30 {
+    char pad0[0xC];
+    /* 0xC */ s32 unkC;
+};
+extern "C" s32 GetFrame__13CDynamicAnimeFi(...);
+extern "C" s32 dynFRAME_POSE_L__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    s32 temp_v0;
+    struct temp_s0_champs_131d30 *temp_s0;
+
+    temp_s0 = (struct temp_s0_champs_131d30 *) (FRAME_POSE_Sub__FP9SPI_STACKi(arg0, arg1));
+    temp_v0 = (s32) (GetFrame__13CDynamicAnimeFi(dynNowDA, spiGetStackInt__FP9SPI_STACK(arg0)));
+    if ((temp_s0 == NULL) || (temp_v0 == 0)) {
+        return 0;
+    }
+    temp_s0->unkC = 1;
+    return 1;
+}
+extern "C" s32 FRAME_POSE_Sub__FP9SPI_STACKi(SPI_STACK *, s32);
+extern "C" s32 GetFrame__13CDynamicAnimeFi(...);
+#include "gen/mgCFrame.hpp"
+struct temp_s0_champs_8f5fa6 {
+    char pad0[0xC];
+    /* 0xC */ s32 unkC;
+};
+extern "C" s32 DeleteParent__8mgCFrameFv(void *);
+extern "C" s32 dynFRAME_POSE__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    mgCFrame *temp_v0;
+    struct temp_s0_champs_8f5fa6 *temp_s0;
+
+    temp_s0 = (struct temp_s0_champs_8f5fa6 *) (FRAME_POSE_Sub__FP9SPI_STACKi(arg0, arg1));
+    temp_v0 = (mgCFrame *) (GetFrame__13CDynamicAnimeFi(dynNowDA, spiGetStackInt__FP9SPI_STACK(arg0)));
+    if ((temp_s0 == NULL) || (temp_v0 == NULL)) {
+        return 0;
+    }
+    temp_s0->unkC = 0;
+    DeleteParent__8mgCFrameFv(temp_v0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynDRAW_FRAME__FP9SPI_STACKi);
 extern "C" s32 spiGetStackInt__FP9SPI_STACK(SPI_STACK *);
 extern "C" s32 NewBindVertexTable__13CDynamicAnimeFiP9mgCMemory(...);

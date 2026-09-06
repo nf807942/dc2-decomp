@@ -151,7 +151,38 @@ INCLUDE_ASM("nonmatchings/game/ccollisionmdt", GetReadBGFile__Fi);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", StartReadBG__Fv);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", ReadBG__Fv);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", ReadBGSync__Fv);
-INCLUDE_ASM("nonmatchings/game/ccollisionmdt", BreakReadBG__Fv);
+extern "C" u8 bg_read_info[9216];
+struct var_s0_champs_31f614 {
+    /* 0x0 */ s32 unk0;
+    /* 0x4 */ s32 unk4;
+    char pad8[0x4];
+    /* 0xC */ s32 unkC;
+    char pad10[0x108];
+    /* 0x118 */ s32 unk118;
+};
+extern "C" s32 sceCdBreak(...);
+extern "C" s32 sceClose(...);
+extern "C" s32 InitReadBG__Fv(void);
+extern "C" s32 ReadBGSync__Fv(void);
+extern "C" void BreakReadBG__Fv(void) {
+    void *var_s0;
+    s32 var_s1;
+
+    if (ReadBGSync__Fv() != 0) {
+        sceCdBreak();
+        var_s1 = 0;
+        var_s0 = (void *) (&bg_read_info);
+        do {
+            if ((((struct var_s0_champs_31f614 *) var_s0)->unk0 != 0) && (((struct var_s0_champs_31f614 *) var_s0)->unk4 != 1)) {
+                sceClose(((struct var_s0_champs_31f614 *) var_s0)->unk118);
+                ((struct var_s0_champs_31f614 *) var_s0)->unkC = 1;
+            }
+            var_s1 += 1;
+            ((u8 *) var_s0) += 0x120;
+        } while (var_s1 < 0x20);
+        InitReadBG__Fv();
+    }
+}
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", InitCDFile__Fv);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", GetDevType__FPcPc);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", ConvStr__FPc);

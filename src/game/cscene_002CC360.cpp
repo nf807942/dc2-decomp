@@ -105,7 +105,99 @@ INCLUDE_ASM("nonmatchings/game/cscene_002CC360", CancelStayVillager__6CSceneFi);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", ExModeVillager__6CSceneFi);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", SetActiveVillager__6CSceneFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", InScreenChara__6CSceneFPQ26CScene17InScreenCharaInfoPf);
-INCLUDE_ASM("nonmatchings/game/cscene_002CC360", LoadGameObject__6CSceneFiiP9mgCMemory);
+extern "C" u8 GameObjInfo[2880];
+extern "C" u8 _1842_00375BE0[21];
+extern "C" u8 _1843_00375C00[16];
+extern "C" u8 _1844_00375C10[23];
+extern "C" u8 _1845_00375C30[23];
+extern "C" u8 _1846_00375C50[24];
+extern "C" u8 _1847_00375C70[24];
+extern "C" u8 mgTexManager[540];
+struct irregular;
+#include "menu.hpp"
+struct CScene_infere2;
+typedef struct CScene_infere2 {
+    /* 0x0000 */ char pad0[0x3C];
+    /* 0x003C */ u32 *unk3C;                        /* inferred */
+    /* 0x0040 */ char pad40[0x3000];                /* maybe part of unk3C[0xC01]void */
+    /* 0x3040 */ void *unk3040;                     /* inferred */
+} CScene_infere2;                                           /* size >= 0x3044 */
+struct temp_v1_champs_775b33 {
+    char pad0[0x1A08];
+    /* 0x1A08 */ s32 unk1A08;
+};
+struct var_s0_champs_775b33 {
+    /* 0x0 */ s32 unk0;
+    /* 0x4 */ s32 unk4;
+};
+extern "C" s32 DeleteBlock__17mgCTextureManagerFi(void *, s32);
+extern "C" s32 DeleteChara__6CSceneFi(void *, s32);
+extern "C" s32 GetGameChapter__Fi(s32);
+extern "C" s32 LoadChara__6CSceneFiPUiPcP9mgCMemoryP9mgCMemoryP9mgCMemoryii(void *, s32, u32 *, char *, mgCMemory *, mgCMemory *, mgCMemory *, s32, s32);
+extern "C" s32 LoadFile2__FPcPvPii(...);
+extern "C" s32 SetActive__6CSceneFii(void *, s32, s32);
+extern "C" void LoadGameObject__6CSceneFiiP9mgCMemory(CScene_infere2 *objet, s32 arg0, s32 arg1, mgCMemory *arg2) {
+    void *var_s0;
+    s32 temp_a0;
+    s32 temp_v1_2;
+    s32 var_s1;
+    u32 *temp_s2;
+    struct temp_v1_champs_775b33 *temp_v1;
+
+    temp_s2 = (u32 *) (objet->unk3C);
+    var_s0 = (void *) (&GameObjInfo);
+    DeleteChara__6CSceneFi(objet, 0x78);
+    DeleteChara__6CSceneFi(objet, 0x79);
+    DeleteChara__6CSceneFi(objet, 0x7A);
+    DeleteChara__6CSceneFi(objet, 0x7B);
+    DeleteBlock__17mgCTextureManagerFi(&mgTexManager, arg1);
+    temp_v1 = (struct temp_v1_champs_775b33 *) (objet->unk3040);
+    var_s1 = 0;
+    if ((temp_v1 != NULL) && (GetGameChapter__Fi(temp_v1->unk1A08) == 8)) {
+        var_s1 = 1;
+    }
+loop_3:
+    temp_v1_2 = (s32) (((struct var_s0_champs_775b33 *) var_s0)->unk0);
+    if (temp_v1_2 >= 0) {
+        if (temp_v1_2 == arg0) {
+            temp_a0 = (s32) (((struct var_s0_champs_775b33 *) var_s0)->unk4);
+            switch (temp_a0) {                      /* irregular */
+            case 3:
+                if (LoadFile2__FPcPvPii(&_1842_00375BE0, temp_s2, NULL, 0) != 0) {
+                    LoadChara__6CSceneFiPUiPcP9mgCMemoryP9mgCMemoryP9mgCMemoryii(objet, 0x7A, temp_s2, NULL, arg2, arg2, arg2, arg1, (s32) 1);
+                    SetActive__6CSceneFii(objet, 1, 0x7A);
+                    if (LoadFile2__FPcPvPii(&_1843_00375C00, temp_s2, NULL, 0) != 0) {
+                        LoadChara__6CSceneFiPUiPcP9mgCMemoryP9mgCMemoryP9mgCMemoryii(objet, 0x7B, temp_s2, NULL, arg2, arg2, arg2, arg1, (s32) 1);
+                        SetActive__6CSceneFii(objet, 1, 0x7B);
+                    }
+                }
+                break;
+            case 1:
+                if ((var_s1 == 0) && (LoadFile2__FPcPvPii(&_1844_00375C10, temp_s2, NULL, 0) != 0)) {
+                    LoadChara__6CSceneFiPUiPcP9mgCMemoryP9mgCMemoryP9mgCMemoryii(objet, 0x78, temp_s2, NULL, arg2, arg2, arg2, arg1, (s32) 1);
+                    SetActive__6CSceneFii(objet, 1, 0x78);
+                    if (LoadFile2__FPcPvPii(&_1845_00375C30, temp_s2, NULL, 0) != 0) {
+                        LoadChara__6CSceneFiPUiPcP9mgCMemoryP9mgCMemoryP9mgCMemoryii(objet, 0x79, temp_s2, NULL, arg2, arg2, arg2, arg1, (s32) 1);
+                        SetActive__6CSceneFii(objet, 1, 0x79);
+                    }
+                }
+                break;
+            case 2:
+                if ((var_s1 == 0) && (LoadFile2__FPcPvPii(&_1846_00375C50, temp_s2, NULL, 0) != 0)) {
+                    LoadChara__6CSceneFiPUiPcP9mgCMemoryP9mgCMemoryP9mgCMemoryii(objet, 0x78, temp_s2, NULL, arg2, arg2, arg2, arg1, (s32) 1);
+                    SetActive__6CSceneFii(objet, 1, 0x78);
+                    if (LoadFile2__FPcPvPii(&_1847_00375C70, temp_s2, NULL, 0) != 0) {
+                        LoadChara__6CSceneFiPUiPcP9mgCMemoryP9mgCMemoryP9mgCMemoryii(objet, 0x79, temp_s2, NULL, arg2, arg2, arg2, arg1, (s32) 1);
+                        SetActive__6CSceneFii(objet, 1, 0x79);
+                    }
+                }
+                break;
+            }
+        }
+        ((u8 *) var_s0) += 0x50;
+        goto loop_3;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", GetGameObjectEvent__6CSceneFPfP15CSceneEventData);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", DrawGameObject__6CSceneFi);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", CalcReflectionVector__FPfPfPf);
