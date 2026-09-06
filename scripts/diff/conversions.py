@@ -308,7 +308,8 @@ def _types_absents(ligne: str, amont: str) -> list[str]:
 
 
 def assemble(ajoutees: list[str], declarations: str, corps: str,
-             source: str, unite: str = "", marque: str = "") -> str:
+             source: str, unite: str = "", marque: str = "",
+             deja: set[str] | None = None) -> str:
     """Le fragment à poser, sans ce que la source déclare déjà.
 
     **La chaîne cumule les fonctions d'une même unité**, et chacune apporte ses
@@ -358,8 +359,13 @@ def assemble(ajoutees: list[str], declarations: str, corps: str,
     #
     # La déclaration en avant tient la place : le type n'est employé ici qu'en
     # pointeur, et sa définition d'en bas reste la seule.
+    # Ce que l'unité définit plus bas, et ce que ses en-têtes lui donnent : le
+    # tag est pris dans les deux cas. `CScene`, `CSaveData`, `mgCMemory` — les
+    # noms qui reviennent le plus ne sont pas des `_infere` mais de vraies
+    # classes du jeu, que m2c redéfinit à sa façon parce qu'il ne les a pas
+    # vues. 217 fonctions au rejugement.
     types_aval = {nom for nom in _DEFINIT_TYPE.findall(
-        unite[len(source):] if unite else "")}
+        unite[len(source):] if unite else "")} | (deja or set())
 
     # **La déclaration en avant ne suffit pas : le corps lit des champs.** Elle
     # levait bien le « tag redefined » — quarante cas sur quatre-vingt-dix —

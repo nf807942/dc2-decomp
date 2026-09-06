@@ -992,7 +992,8 @@ def eprouve(symbole: str, unite: str, taille: int,
             # et l ecarter laissait cinq fonctions sans leur appele.
             fragment = assemble(ajoutees, declarations, corps,
                                 avant.split(ligne)[0], avant,
-                                _marque(symbole))
+                                _marque(symbole),
+                                deja_declarees(unite, avant.split(ligne)[0]))
             ecris(source, avant.replace(ligne, fragment))
             if objet.exists():
                 objet.unlink()
