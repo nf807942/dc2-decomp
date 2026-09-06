@@ -299,7 +299,33 @@ INCLUDE_ASM("nonmatchings/game/cpullitem", Delete__11CColPrimManFi);
 INCLUDE_ASM("nonmatchings/game/cpullitem", CheckHit__11CColPrimManFi);
 INCLUDE_ASM("nonmatchings/game/cpullitem", IsReversVec__11CColPrimManFP8CColPrim);
 INCLUDE_ASM("nonmatchings/game/cpullitem", Step__11CColPrimManFv);
-INCLUDE_ASM("nonmatchings/game/cpullitem", Initialize__11CColPrimManFP6CScene);
+#include "sphida.hpp"
+struct inferred;
+struct CColPrimMan;
+typedef struct CColPrimMan {
+    /* 0x0 */ CScene *unk0;                         /* inferred */
+} CColPrimMan;                                      /* size >= 0x4 */
+struct temp_s2_champs_d98954 {
+    char pad0[0x10];
+    /* 0x10 */ s32 unk10;
+};
+extern "C" s32 Initialize__8CColPrimFv(void *);
+extern "C" void Initialize__11CColPrimManFP6CScene(CColPrimMan *objet, CScene *arg0) {
+    s32 var_s0;
+    s32 var_s1;
+    struct temp_s2_champs_d98954 *temp_s2;
+
+    var_s1 = 0;
+    objet->unk0 = arg0;
+    var_s0 = 0;
+    do {
+        temp_s2 = (struct temp_s2_champs_d98954 *) (((CColPrimMan *) ((u8 *) objet + var_s1)));
+        Initialize__8CColPrimFv(((struct temp_s2_champs_d98954 *) ((u8 *) temp_s2 + 0x10)));
+        temp_s2->unk10 = var_s0;
+        var_s0 += 1;
+        var_s1 += 0x110;
+    } while (var_s0 < 0x40);
+}
 INCLUDE_ASM("nonmatchings/game/cpullitem", dngGetDebugInfo__Fv);
 extern "C" u8 dbFont[184];
 typedef struct dbinfo_champs {

@@ -83,7 +83,30 @@ s32 CColFrame::Draw(u32 *mask, mgCDrawManager *manager) {
 s32 CColFrame::Draw(mgCDrawManager *manager) {
     return 0;
 }
-INCLUDE_ASM("nonmatchings/game/ccollisionmdt", Initialize__13CCollisionMDTFv);
+struct CCollisionMDT;
+typedef struct CCollisionMDT {
+    /* 0x00 */ s32 unk0;                            /* inferred */
+    /* 0x04 */ char pad4[0xC];                      /* maybe part of unk0[4]void */
+    /* 0x10 */ char unk10;                             /* inferred */
+    /* 0x10 */ char pad10[0x30];
+    /* 0x40 */ s32 unk40;                           /* inferred */
+    /* 0x44 */ s32 unk44;                           /* inferred */
+} CCollisionMDT;                                    /* size >= 0x48 */
+struct objet_champs_332138 {
+    /* 0x0 */ s32 unk0;
+    char pad4[0xC];
+    /* 0x10 */ s32 unk10;
+    char pad14[0x2C];
+    /* 0x40 */ s32 unk40;
+    /* 0x44 */ s32 unk44;
+};
+extern "C" s32 memset(...);
+extern "C" void Initialize__13CCollisionMDTFv(CCollisionMDT *objet) {
+    ((struct objet_champs_332138 *) objet)->unk0 = 0;
+    memset(&((struct objet_champs_332138 *) objet)->unk10, 0, 0x20);
+    ((struct objet_champs_332138 *) objet)->unk40 = 0;
+    ((struct objet_champs_332138 *) objet)->unk44 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", Copy__10CCollisionFR10CCollisionP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", CreateBBox__10CCollisionFv);
 s32 CCollision::GetMaxY(f32 *y) {

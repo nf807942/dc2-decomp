@@ -70,7 +70,45 @@ extern "C" void SetFade__12CEventSpriteFii(CEventSprite_infere *objet, s32 arg0,
 INCLUDE_ASM("nonmatchings/game/cshopmenu", SetColor__12CEventSpriteFiiii);
 INCLUDE_ASM("nonmatchings/game/cshopmenu", Step__12CEventSpriteFv);
 INCLUDE_ASM("nonmatchings/game/cshopmenu", Draw__12CEventSpriteFv);
-INCLUDE_ASM("nonmatchings/game/cshopmenu", Init__12CEventSpriteFv);
+struct inferred;
+struct CEventSprite_infere2;
+typedef struct CEventSprite_infere2 {
+    /* 0x00 */ s32 unk0;                            /* inferred */
+    /* 0x04 */ s32 unk4;                            /* inferred */
+    /* 0x08 */ char unk8;                              /* inferred */
+    /* 0x08 */ char pad8[0x40];
+    /* 0x48 */ char unk48;                             /* inferred */
+    /* 0x48 */ char pad48[0x10];
+    /* 0x58 */ char unk58;                             /* inferred */
+    /* 0x58 */ char pad58[0x10];
+    /* 0x68 */ char unk68;                             /* inferred */
+    /* 0x68 */ char pad68[0x10];
+    /* 0x78 */ char unk78;                             /* inferred */
+    /* 0x78 */ char pad78[1];
+} CEventSprite_infere2;                                     /* size >= 0x79 */
+struct objet_champs_13eca9 {
+    /* 0x0 */ s32 unk0;
+    /* 0x4 */ s32 unk4;
+    /* 0x8 */ s32 unk8;
+    char padC[0x3C];
+    /* 0x48 */ s32 unk48;
+    char pad4C[0xC];
+    /* 0x58 */ s32 unk58;
+    char pad5C[0xC];
+    /* 0x68 */ s32 unk68;
+    char pad6C[0xC];
+    /* 0x78 */ s32 unk78;
+};
+extern "C" s32 memset(...);
+extern "C" void Init__12CEventSpriteFv(CEventSprite_infere2 *objet) {
+    ((struct objet_champs_13eca9 *) objet)->unk0 = 0;
+    ((struct objet_champs_13eca9 *) objet)->unk4 = 0;
+    memset(&((struct objet_champs_13eca9 *) objet)->unk8, 0, 0x40);
+    memset(&((struct objet_champs_13eca9 *) objet)->unk48, 0, 0x10);
+    memset(&((struct objet_champs_13eca9 *) objet)->unk58, 0, 0x10);
+    memset(&((struct objet_champs_13eca9 *) objet)->unk68, 0, 0x10);
+    memset(&((struct objet_champs_13eca9 *) objet)->unk78, -1, 0x10);
+}
 INCLUDE_ASM("nonmatchings/game/cshopmenu", SetName__18CEventSpriteMotherFiPc);
 INCLUDE_ASM("nonmatchings/game/cshopmenu", SetDraw__18CEventSpriteMotherFii);
 INCLUDE_ASM("nonmatchings/game/cshopmenu", SetGet__18CEventSpriteMotherFiiiii);

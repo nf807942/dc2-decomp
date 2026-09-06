@@ -55,7 +55,43 @@ extern "C" void InitActiveLighting__13mgRENDER_INFOFv(mgRENDER_INFO_infere *obje
     memset(GetpLightInfo__13mgRENDER_INFOFv(objet), 0, 0x150);
 }
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", InitLighting__13mgRENDER_INFOFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetLight__13mgRENDER_INFOFPA4_fPA4_f);
+struct mgRENDER_INFO_infere2;
+typedef struct mgRENDER_INFO_infere2 {
+    /* 0x000 */ char pad0[0x3F0];
+    /* 0x3F0 */ s32 unk3F0;                         /* inferred */
+} mgRENDER_INFO_infere2;                                    /* size >= 0x3F4 */
+struct temp_v0_champs_171dca {
+    char pad0[0x30];
+    /* 0x30 */ s32 unk30;
+    /* 0x34 */ s32 unk34;
+    /* 0x38 */ s32 unk38;
+    /* 0x3C */ s32 unk3C;
+    char pad40[0xC];
+    /* 0x4C */ s32 unk4C;
+    char pad50[0xC];
+    /* 0x5C */ s32 unk5C;
+    char pad60[0xC];
+    /* 0x6C */ s32 unk6C;
+    char pad70[0xC];
+    /* 0x7C */ s32 unk7C;
+};
+extern "C" s32 sceVu0CopyMatrix(...);
+extern "C" void SetLight__13mgRENDER_INFOFPA4_fPA4_f(mgRENDER_INFO_infere2 *objet, f32 (*arg0)[4], f32 (*arg1)[4]) {
+    struct temp_v0_champs_171dca *temp_v0;
+
+    objet->unk3F0 = 1;
+    temp_v0 = (struct temp_v0_champs_171dca *) (GetpLightInfo__13mgRENDER_INFOFv(objet));
+    sceVu0CopyMatrix(temp_v0, arg0);
+    sceVu0CopyMatrix(((struct temp_v0_champs_171dca *) ((u8 *) temp_v0 + 0x40)), arg1);
+    temp_v0->unk4C = 0;
+    temp_v0->unk5C = 0;
+    temp_v0->unk6C = 0;
+    temp_v0->unk7C = 0;
+    temp_v0->unk30 = 0;
+    temp_v0->unk34 = 0;
+    temp_v0->unk38 = 0;
+    temp_v0->unk3C = 0;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", GetLight__13mgRENDER_INFOFPA4_fPA4_f);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetLight__13mgRENDER_INFOFiPfPf);
 extern "C" void sceVu0CopyVector(...);

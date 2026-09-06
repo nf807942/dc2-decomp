@@ -172,8 +172,26 @@ extern "C" s32 GetNextSeq__12CSceneCmrSeqFP12_SEN_CMR_SEQi(CSceneCmrSeq_infere *
     return temp_s0;
 }
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", PRDelay__12CSceneCmrSeqFi);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SetPos__12CSceneCmrSeqFPf);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SetRef__12CSceneCmrSeqFPf);
+extern "C" s32 SearchNextPrSeq__12CSceneCmrSeqFv(void *);
+extern "C" s32 sceVu0CopyVector(...);
+extern "C" void SetPos__12CSceneCmrSeqFPf(CSceneCmrSeq *objet, f32 *arg0) {
+    s32 *temp_v0;
+
+    temp_v0 = (s32 *) (SearchNextPrSeq__12CSceneCmrSeqFv(objet));
+    if (temp_v0 != NULL) {
+        *temp_v0 = 2;
+        sceVu0CopyVector(((s32 *) ((u8 *) temp_v0 + 0x10)), arg0);
+    }
+}
+extern "C" void SetRef__12CSceneCmrSeqFPf(CSceneCmrSeq *objet, f32 *arg0) {
+    s32 *temp_v0;
+
+    temp_v0 = (s32 *) (SearchNextPrSeq__12CSceneCmrSeqFv(objet));
+    if (temp_v0 != NULL) {
+        *temp_v0 = 3;
+        sceVu0CopyVector(((s32 *) ((u8 *) temp_v0 + 0x20)), arg0);
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Move__12CSceneCmrSeqFPfPfi);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Move2__12CSceneCmrSeqFPfPfiif);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", MoveRef__12CSceneCmrSeqFPfi);
@@ -188,7 +206,17 @@ extern "C" void InitPas__12CSceneCmrSeqFv(CSceneCmrSeq *objet) {
     }
 }
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SetPasFrm__12CSceneCmrSeqFi);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", AddPas__12CSceneCmrSeqFPfPf);
+extern "C" s32 sceVu0CopyVector(...);
+extern "C" void AddPas__12CSceneCmrSeqFPfPf(CSceneCmrSeq *objet, f32 *arg0, f32 *arg1) {
+    s32 *temp_v0;
+
+    temp_v0 = (s32 *) (SearchNextPrSeq__12CSceneCmrSeqFv(objet));
+    if (temp_v0 != NULL) {
+        *temp_v0 = 0xA;
+        sceVu0CopyVector(((s32 *) ((u8 *) temp_v0 + 0x10)), arg0);
+        sceVu0CopyVector(((s32 *) ((u8 *) temp_v0 + 0x20)), arg1);
+    }
+}
 extern "C" void StartPas__12CSceneCmrSeqFv(CSceneCmrSeq *objet) {
     s32 *temp_v0;
 
@@ -710,7 +738,16 @@ INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SearchNextSeSeq__12CSceneObjSeqFv)
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", CheckEnd__12CSceneObjSeqFv);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Play__12CSceneObjSeqFv);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", PosDelay__12CSceneObjSeqFi);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SetPos__12CSceneObjSeqFPf);
+extern "C" s32 SearchNextPosSeq__12CSceneObjSeqFv(void *);
+extern "C" void SetPos__12CSceneObjSeqFPf(CSceneObjSeq *objet, f32 *arg0) {
+    s32 *temp_v0;
+
+    temp_v0 = (s32 *) (SearchNextPosSeq__12CSceneObjSeqFv(objet));
+    if (temp_v0 != NULL) {
+        *temp_v0 = 2;
+        sceVu0CopyVector(((s32 *) ((u8 *) temp_v0 + 0x10)), arg0);
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Move__12CSceneObjSeqFPfii);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Move2__12CSceneObjSeqFPfiif);
 extern "C" s32 SearchNextPosSeq__12CSceneObjSeqFv(void *);
@@ -723,7 +760,15 @@ extern "C" void InitPas__12CSceneObjSeqFv(CSceneObjSeq *objet) {
     }
 }
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SetPasFrm__12CSceneObjSeqFi);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", AddPas__12CSceneObjSeqFPf);
+extern "C" void AddPas__12CSceneObjSeqFPf(CSceneObjSeq *objet, f32 *arg0) {
+    s32 *temp_v0;
+
+    temp_v0 = (s32 *) (SearchNextPosSeq__12CSceneObjSeqFv(objet));
+    if (temp_v0 != NULL) {
+        *temp_v0 = 7;
+        sceVu0CopyVector(((s32 *) ((u8 *) temp_v0 + 0x10)), arg0);
+    }
+}
 struct temp_v0_champs_ce64ab {
     /* 0x0 */ s32 unk0;
     char pad4[0x1C];
@@ -743,7 +788,16 @@ INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SetEohFramePos__12CSceneObjSeqFiPc
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", AddPos__12CSceneObjSeqFPfi);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", AttachCamera__12CSceneObjSeqFfi);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", RotDelay__12CSceneObjSeqFi);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", SetRot__12CSceneObjSeqFPf);
+extern "C" s32 SearchNextRotSeq__12CSceneObjSeqFv(void *);
+extern "C" void SetRot__12CSceneObjSeqFPf(CSceneObjSeq *objet, f32 *arg0) {
+    s32 *temp_v0;
+
+    temp_v0 = (s32 *) (SearchNextRotSeq__12CSceneObjSeqFv(objet));
+    if (temp_v0 != NULL) {
+        *temp_v0 = 0xE;
+        sceVu0CopyVector(((s32 *) ((u8 *) temp_v0 + 0x10)), arg0);
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Rotation__12CSceneObjSeqFPfi);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Rotation2__12CSceneObjSeqFPfiif);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Reference__12CSceneObjSeqFPfi);

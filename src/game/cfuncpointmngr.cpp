@@ -67,7 +67,19 @@ INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", Add__14CFuncPointMngrFiP19CList_
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", Reserve__14CFuncPointMngrFiP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", __ct__19CList_10CFuncPoint_Fv);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", GetReserve__14CFuncPointMngrFv);
-INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", AddFromReserve__14CFuncPointMngrFi);
+extern "C" s32 GetReserve__14CFuncPointMngrFv(void *);
+extern "C" s32 Add__14CFuncPointMngrFiP19CList_10CFuncPoint_(void *, s32, CList_10CFuncPoint_ *);
+extern "C" s32 Initialize__10CFuncPointFv(void *);
+extern "C" s32 AddFromReserve__14CFuncPointMngrFi(CFuncPointMngr *objet, s32 arg0) {
+    CList_10CFuncPoint_ *temp_v0;
+
+    temp_v0 = (CList_10CFuncPoint_ *) (GetReserve__14CFuncPointMngrFv(objet));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    Initialize__10CFuncPointFv(((CList_10CFuncPoint_ *) ((u8 *) temp_v0 + 0x10)));
+    return Add__14CFuncPointMngrFiP19CList_10CFuncPoint_(objet, arg0, temp_v0);
+}
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", GetNum__14CFuncPointMngrFi);
 extern "C" s32 Get__14CFuncPointMngrFv(void *);
 struct var_v0_champs {
