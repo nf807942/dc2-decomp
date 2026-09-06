@@ -204,7 +204,14 @@ extern "C" s32 _GEOSTONE_SET_FLAG__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _GEOSTONE_SET_REFERENCE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _GEOSTONE_DEL_REFERENCE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _GET_ROBO_MOVE_TYPE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002798A0", _SET_EXIT_FLAG__FP12RS_STACKDATAi);
+struct EventScene_champs_d974f8 {
+    char pad0[0x2F64];
+    /* 0x2F64 */ s32 unk2F64;
+};
+extern "C" s32 _SET_EXIT_FLAG__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    ((struct EventScene_champs_d974f8 *) EventScene)->unk2F64 = GetStackInt__FP12RS_STACKDATA_00262DA0(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _GET_EXIT_FLAG__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _GET_E3_VERSION__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _CHK_PAD_CTRL__FP12RS_STACKDATAi);

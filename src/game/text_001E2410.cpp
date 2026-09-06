@@ -82,7 +82,46 @@ extern "C" s32 _SET_CAMERA_MODE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1)
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_CAMERA_SPEED__FP12RS_STACKDATAi_001E3B40);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_CAMERA_CTRL_PARAM1__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_CAMERA_CTRL_PARAM2__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_001E2410", _RESET_CAMERA_CTRL_PARAM__FP12RS_STACKDATAi);
+extern "C" s32 GetCamera__6CSceneFi(...);
+extern "C" s32 GetActiveParam__14CCameraControlFv(...);
+struct inferred;
+struct CScene;
+typedef struct CScene {
+    /* 0x0000 */ char pad0[0x2E54];
+    /* 0x2E54 */ s32 unk2E54;                       /* inferred */
+} CScene;                                           /* size >= 0x2E58 */
+struct nowScene_0037D4E4_champs_18dd10 {
+    char pad0[0x2E54];
+    /* 0x2E54 */ s32 unk2E54;
+};
+struct temp_v0_champs_18dd10 {
+    /* 0x0 */ s32 unk0;
+    /* 0x4 */ s32 unk4;
+    /* 0x8 */ s32 unk8;
+    /* 0xC */ s32 unkC;
+    /* 0x10 */ s32 unk10;
+    /* 0x14 */ s32 unk14;
+    /* 0x18 */ s32 unk18;
+    /* 0x1C */ s32 unk1C;
+    /* 0x20 */ s32 unk20;
+    /* 0x24 */ s32 unk24;
+};
+extern "C" s32 _RESET_CAMERA_CTRL_PARAM__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    struct temp_v0_champs_18dd10 *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs_18dd10 *) (GetActiveParam__14CCameraControlFv(GetCamera__6CSceneFi(nowScene_0037D4E4, ((struct nowScene_0037D4E4_champs_18dd10 *) nowScene_0037D4E4)->unk2E54)));
+    temp_v0->unk0 = 0x42C80000;
+    temp_v0->unk4 = 0x43200000;
+    temp_v0->unk8 = 0x41900000;
+    temp_v0->unkC = 0x41200000;
+    temp_v0->unk14 = 0x42200000;
+    temp_v0->unk18 = 0xC1700000;
+    temp_v0->unk1C = 0x41A00000;
+    temp_v0->unk20 = 0xC1700000;
+    temp_v0->unk10 = 0xC1700000;
+    temp_v0->unk24 = 0x41C80000;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_RND__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_RNDF__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _V_PUSH__FP12RS_STACKDATAi);

@@ -274,7 +274,22 @@ extern "C" s32 dynVERTEX_START__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynVERTEX__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynVERTEX_L__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynVERTEX_END__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", dynFIX_VERTEX_START__FP9SPI_STACKi);
+struct inferred;
+struct CDynamicAnime_infere;
+typedef struct CDynamicAnime_infere {
+    /* 0x00 */ char pad0[0x10];
+    /* 0x10 */ s32 unk10;                           /* inferred */
+} CDynamicAnime_infere;                                    /* size >= 0x14 */
+struct dynNowDA_champs_73b007 {
+    char pad0[0x10];
+    /* 0x10 */ s32 unk10;
+};
+extern "C" s32 NewFixVertexTable__13CDynamicAnimeFiP9mgCMemory(...);
+extern "C" s32 dynFIX_VERTEX_START__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    spiGetStackInt__FP9SPI_STACK(arg0);
+    NewFixVertexTable__13CDynamicAnimeFiP9mgCMemory(dynNowDA, ((struct dynNowDA_champs_73b007 *) dynNowDA)->unk10, dynStack);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynFixVertex__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynFIX_VERTEX__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynFIX_VERTEX_C__FP9SPI_STACKi);
@@ -345,7 +360,16 @@ extern "C" void Initialize__12CDACollisionFv(CDACollision_infere *objet) {
 s32 dynCOLLISION_END(SPI_STACK *stack, int argc) {
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/ccharacter2", dynGRAVITY__FP9SPI_STACKi);
+struct dynNowDA_champs_0c1c0d {
+    char pad0[0x5C];
+    /* 0x5C */ s32 unk5C;
+};
+extern "C" s32 spiGetStackVector__FPfP9SPI_STACK(...);
+extern "C" s32 dynGRAVITY__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    spiGetStackVector__FPfP9SPI_STACK(dynNowDA + 0x50, arg0);
+    ((struct dynNowDA_champs_0c1c0d *) dynNowDA)->unk5C = 0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynK__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", dynWind__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", Load__13CDynamicAnimeFPciP8mgCFrameP9mgCMemory);

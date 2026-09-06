@@ -236,7 +236,19 @@ INCLUDE_ASM("nonmatchings/game/cgamedata", _DATAITEM__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", _DATAATTACHINIT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", _DATAATTACH_ST__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", _DATAATTACH_ST2__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cgamedata", _DATAATTACH_ST_SP__FP9SPI_STACKi);
+extern "C" u32 SpiAttach;
+struct SpiAttach_champs_25b384 {
+    char pad0[0x14];
+    /* 0x14 */ s32 unk14;
+};
+extern "C" s32 _DATAATTACH_ST_SP__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    if (SpiAttach == NULL) {
+        return 1;
+    }
+    ((struct SpiAttach_champs_25b384 *) SpiAttach)->unk14 = spiGetStackInt__FP9SPI_STACK(arg0);
+    SpiAttach += 0x18;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cgamedata", _DATAROBOINIT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", _DATAROBO_ANALYZE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", _DATAFISHINIT__FP9SPI_STACKi);

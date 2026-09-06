@@ -221,7 +221,31 @@ INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _CHR_SET_FRAME_SHOW__FP12RS_ST
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _CHR_CHK_MOT_END__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _CHR_SET_LIGHT_COLOR__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _SPT_ASSIGN_SPRITE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _SPT_DELETE_SPRITE__FP12RS_STACKDATAi);
+extern "C" u32 EffScriptMan;
+extern "C" u32 now_script;
+#include "runscript.hpp"
+struct _ES_SPRITE {
+    char pad_0[0x4];
+    s32 field_4;
+};
+struct now_script_champs_52d9e2 {
+    char pad0[0x28];
+    /* 0x28 */ s32 unk28;
+    /* 0x2C */ s32 unk2C;
+};
+extern "C" s32 DeleteSprite__16CEffectScriptManFP10_ES_SPRITE(...);
+extern "C" s32 _SPT_DELETE_SPRITE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    _ES_SPRITE *temp_a1;
+
+    temp_a1 = (_ES_SPRITE *) (((struct now_script_champs_52d9e2 *) now_script)->unk28);
+    if (temp_a1 == NULL) {
+        return 0;
+    }
+    DeleteSprite__16CEffectScriptManFP10_ES_SPRITE(EffScriptMan, temp_a1);
+    ((struct now_script_champs_52d9e2 *) now_script)->unk28 = NULL;
+    ((struct now_script_champs_52d9e2 *) now_script)->unk2C = 0;
+    return 1;
+}
 extern "C" u32 now_script;
 #include "runscript.hpp"
 extern "C" void strcpy(s32, s32);
