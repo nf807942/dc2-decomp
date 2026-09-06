@@ -35,7 +35,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from lib.project import (ROOT, functions, grafted_by_source,  # noqa: E402
                          run, unit_of)
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from conversions import (cast_les_affectations,  # noqa: E402
+from conversions import (arithmetique_sur_void,  # noqa: E402
+                         cast_les_affectations,
                          assemble, declare_les_piles, nettoie_declarations,
                          declarations_portees, remplit_les_appels, renomme,
                          nettoie_locales, taille_les_piles_typees,
@@ -279,6 +280,9 @@ _FLECHE_ETOILE = re.compile(r"\(\*\s*([A-Za-z_]\w*)\s*\)\s*->\s*(unk[0-9A-Fa-f]+
 
 _FLECHE_CHAINEE = re.compile(
     r"(unk[0-9A-Fa-f]+)\s*->\s*(unk[0-9A-Fa-f]+)\b")
+# Le nom d'un champ que m2c n'a pas su typer. Il ressemble à une variable et
+# n'en est pas une : rien ne le déclare, et rien ne l'adresse.
+_CHAMP_INCONNU = re.compile(r"unk[0-9A-Fa-f]+")
 
 # `(objet + var_s1)->unkF54`, `((arg1 << 5) + objet)->unk184` : la gauche de la
 # fleche est un calcul, et aucun des motifs ci-dessus ne prend un nom derriere
@@ -571,7 +575,16 @@ def complete_structures(structs: list[str], corps: str,
         # declaration : `((struct X *) now_script)->unk40`. Rien d'autre dans
         # l'unite n'en est change. Premiere cause d'echec de compilation :
         # 430 fonctions, 133 808 octets.
-        if variable not in locales and variable not in etoilees:
+        # **Un `unkNN` n'est jamais une globale, c'est un champ.** Le maillon
+        # d'une flèche chaînée arrive ici sous le même nom qu'une variable, et
+        # la conversion au site d'emploi produisait alors
+        # `temp_v0->((struct unk1C_champs *) unk1C)->unk4` — une aberration que
+        # MWCC signale par « identifier expected » ou « illegal function
+        # overloading », curseur sur notre propre parenthèse. Il faut le rendre
+        # pointeur dans la structure qui le porte, ce que fait la branche
+        # `_rend_pointeur` plus bas.
+        if (variable not in locales and variable not in etoilees
+                and not _CHAMP_INCONNU.fullmatch(variable)):
             forge = "%s_champs%s" % (variable, marque)
             neuves.append(_struct_par_offsets(forge, offsets, appeles))
             corps = re.sub(r"\b%s\s*->" % re.escape(variable),
@@ -598,11 +611,18 @@ def complete_structures(structs: list[str], corps: str,
                 # Ni locale ni parametre : le nom vit dans une structure
                 # inferee, que le corps dereference a son tour —
                 # `objet->unk0->unk10()`. On rend ce champ pointeur.
+                # Les structures forgées à ce tour comptent autant que celles
+                # que m2c donne : le premier maillon d'une flèche chaînée vient
+                # d'être créé ici même, et ne chercher que dans `structs` le
+                # laissait `s32` — « pointer/array required » sur le maillon
+                # suivant, pour une correction qui n'avait manqué que d'un
+                # rang.
                 forge = "%s_champs%s" % (variable, marque)
-                for rang, bloc in enumerate(structs):
+                for source, rang, bloc in ([(structs, r, b) for r, b in enumerate(structs)]
+                                           + [(neuves, r, b) for r, b in enumerate(neuves)]):
                     rendu = _rend_pointeur(bloc, variable, forge)
                     if rendu is not None:
-                        structs[rang] = rendu
+                        source[rang] = rendu
                         neuves.append(_struct_par_offsets(forge, offsets, appeles))
                         break
                 continue
@@ -797,6 +817,10 @@ def normalise(texte: str, symbole: str, vues: set[str],
     # MWCC, en C++, refuse la conversion implicite que le C tolere : c'est la
     # premiere cause d'echec de compilation de la chaine.
     corps = nettoie_locales(corps)
+    # Le pas d'octet d'un pointeur sans type, rendu explicite. Apres la forge
+    # des structures : ses conversions laissent le calcul intact a l'interieur,
+    # et c'est ce calcul que MWCC refuse.
+    corps = arithmetique_sur_void(corps)
     # Un appel sans argument que sa declaration attend n est pas une
     # contradiction : la valeur etait deja dans le registre.
     corps = remplit_les_appels(
@@ -885,7 +909,15 @@ def eprouve(symbole: str, unite: str, taille: int,
 
     objet = ROOT / "build" / "src" / (unite + ".o")
     ajoutees: list[str] = []
-    vus_types: set[str] = set()
+    # **Un tag déjà déclaré ne se redéclare pas, plein ou vide.** La boucle de
+    # complétion pose la disposition que l'atlas donne d'un type cité par une
+    # déclaration neuve, sans regarder si l'unité le porte déjà : MWCC répond
+    # « struct/union/enum/class tag 'CMenuKeyFunc' redefined » et l'unité
+    # entière échoue. Première cause d'échec de compilation de la moisson :
+    # 533 fonctions, 257 560 octets. Ce que l'amont déclare et ce que m2c a
+    # lui-même défini comptent pour vus.
+    vus_types: set[str] = (deja_declarees(unite, amont)
+                           | set(_DECLARE.findall(declarations)))
     ellipses: set[str] = set()
     try:
         # Le compilateur dit ce qui manque, la table des symboles dit quoi

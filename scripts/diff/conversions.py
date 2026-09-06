@@ -447,3 +447,34 @@ def declarations_portees(source: str) -> dict[str, str]:
             continue
         portees.setdefault(cle[1], ligne)
     return portees
+
+
+# `void *temp_v0;` puis `temp_v0 + 8` : m2c compte en octets sur un pointeur
+# sans type, ce que le C tolere par extension et que MWCC refuse en C++ —
+# « illegal type », curseur sur la parenthese fermante. 396 fonctions,
+# 106 944 octets, premiere forme de la cause.
+#
+# La contre-oblique se pose par `chr(92)` : ecrite en clair dans un correctif,
+# elle devient l'octet 8 et le motif ne trouve plus rien, en silence.
+_DECLARE_VOID = re.compile(r"\bvoid\s*\*\s*(\w+)\b")
+
+
+def arithmetique_sur_void(corps: str) -> str:
+    """Rend explicite le pas d'octet d'un calcul sur un pointeur sans type.
+
+    **La conversion se pose sur l'emploi, jamais sur la declaration.** Changer
+    `void *temp_v0;` en `u8 *temp_v0;` rendrait bien l'addition legale, mais
+    l'affectation qui la remplit vient d'un appel qui rend `void *` — et le C++
+    refuse cette conversion-la sans ecriture explicite. On deplacerait donc
+    l'echec d'un message a l'autre.
+
+    Le pas reste celui de l'octet, qui est ce que m2c veut dire : `(u8 *)` ne
+    met rien a l'echelle.
+    """
+    noms = set(_DECLARE_VOID.findall(corps))
+    for nom in sorted(noms):
+        corps = re.sub(
+            r"\b%s\s*([+-])(?!>)" % re.escape(nom),
+            lambda trouve, nom=nom: "((u8 *) %s) %s" % (nom, trouve.group(1)),
+            corps)
+    return corps
