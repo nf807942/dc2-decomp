@@ -266,6 +266,44 @@ def _blocs(declarations: str) -> list[str]:
     return rendu
 
 
+def _types_absents(ligne: str, amont: str) -> list[str]:
+    """Les types que cette déclaration cite et que l'amont ne porte pas.
+
+    **Adopter une déclaration d'aval, c'est adopter les types qu'elle nomme.**
+    Une greffe posée plus bas dans l'unité écrit `typedef struct Sphida_pointe
+    { … }` puis `extern "C" Sphida_pointe *Sphida;`. La ligne s'adopte
+    d'elle-même — c'est une ligne, elle finit par un point-virgule — mais son
+    `typedef` tient sur plusieurs lignes et reste, lui, en aval. Le fragment
+    posé cite alors un type que rien ne définit encore, et MWCC répond
+    « declaration syntax error », curseur juste avant le nom du type. 215
+    fonctions, 109 912 octets.
+
+    Le remède est une déclaration en avant, non le rejet de la ligne : deux
+    formes divergentes du même nom `extern "C"` ne coexistent pas, et refuser
+    l'adoption ne ferait que remplacer « declaration syntax error » par
+    « redeclared ». En C++, `struct X;` suffit à rendre `X *` légal, et le
+    `typedef struct X { … } X;` qui suit plus bas en reste la définition.
+
+    Le nom déclaré ne compte pas parmi les types cités : c'est lui qu'on
+    déclare.
+    """
+    tete = ligne.split("(", 1)[0]
+    mots = re.findall(r"[A-Za-z_]\w*", ligne)
+    declare = re.findall(r"[A-Za-z_]\w*", tete)[-1:]
+    absents: list[str] = []
+    for mot in mots:
+        if mot in _BASE_C or mot in {"extern", "C", "const", "typedef"}:
+            continue
+        if mot in declare or mot in absents:
+            continue
+        if re.search(r"\b(?:struct|class|union)\s+%s\b" % re.escape(mot), amont):
+            continue
+        if re.search(r"\b%s\s*[;(]" % re.escape(mot), amont):
+            continue
+        absents.append(mot)
+    return absents
+
+
 def assemble(ajoutees: list[str], declarations: str, corps: str,
              source: str, unite: str = "") -> str:
     """Le fragment à poser, sans ce que la source déclare déjà.
@@ -303,7 +341,9 @@ def assemble(ajoutees: list[str], declarations: str, corps: str,
             continue
         cle = _cle(nette)
         if cle and cle not in pris:
-            en_aval.setdefault(cle, nette)
+            avant = "".join("struct %s;" % nom + chr(10)
+                            for nom in _types_absents(nette, source))
+            en_aval.setdefault(cle, avant + nette)
 
     gardes = []
     for bloc in _blocs("\n".join([b for b in ajoutees + [declarations] if b])):
