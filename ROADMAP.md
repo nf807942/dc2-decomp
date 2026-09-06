@@ -500,3 +500,39 @@ comparé qu'à elle-même. C'est le premier point à instruire.
    extraits par forme normalisée — la méthode qui a produit chaque gain des
    dernières séances : le message du compilateur nomme le symptôme, la ligne
    qu'il souligne nomme la cause.
+
+---
+
+## Où en est la moisson, le 6 septembre 2026 au soir
+
+**1 186 fonctions, 69 320 octets, 3,13 %**, `identique au disque`. Six familles
+de causes ont été instruites dans la journée, toutes portant sur l'outillage :
+la donnée que seul le désassemblage nomme, la flèche sur un calcul, le tag posé
+par-dessus celui de m2c, le pas d'octet d'un pointeur sans type, le maillon
+d'une flèche chaînée pris pour une globale, la déclaration adoptée sans son type.
+
+**Le rendement de la moisson décroît, et le chiffre le dit sans ambiguïté** :
+17 fonctions gagnées sur 465 rejugées, puis 5 sur 1 007, puis 0 sur les 750
+premières des 837 suivantes. Les familles restantes portent les grosses
+fonctions, et lever leur erreur de compilation ne suffit pas à les apparier.
+
+**Le gisement s'est déplacé vers les quasi-succès** : 700 fonctions entre 85 et
+100 %, 105 440 octets, dont **134 au-dessus de 99 %** et dix au-dessus de
+99,96 % — une instruction d'écart sur des fonctions de cent à trois cents
+octets. L'affinage les prenait par le poids, donc par le plus dur ; il les prend
+désormais par la proximité (`39ab137`).
+
+### Ce qu'il faut faire ensuite, dans l'ordre
+
+1. `make affinage --rendement` sur la nouvelle tête de file. La mesure
+   précédente — trois succès sur cent cinquante essais — portait sur les
+   fonctions les plus lourdes ; elle ne dit rien de celles qui sont à une
+   instruction du but.
+2. Exposer le diff **par instruction**, et non la seule part appariée. objdiff
+   rend déjà l'alignement ; tant que le verdict est un scalaire par fonction,
+   ni l'affinage ni rien d'autre ne sait quelle ligne créditer. C'est la
+   première recommandation de la note de faisabilité sur l'apprentissage, et
+   elle vaut indépendamment d'elle.
+3. Reprendre `m2c ne sait pas traduire` (451 fonctions), dont les deux causes
+   connues sont documentées et non tentées : « Read from unset register $aN »
+   et le jeu d'instructions parallèles 128 bits.
