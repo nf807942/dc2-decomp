@@ -264,7 +264,12 @@ def main(argv: list[str]) -> int:
                 # quoi réparer — 256 « declaration syntax error » ne venaient
                 # que de trois unités amputées, ce que le chevron sous une
                 # accolade seule a nommé du premier coup.
-                "extrait": verdict.get("extrait", ""), "unite": unite}
+                "extrait": verdict.get("extrait", ""), "unite": unite,
+                # Les instructions qui divergent, sur un quasi-succès. C'est
+                # ce qui permet de grouper les échecs par *forme d'écart*
+                # plutôt que par message du compilateur — la même méthode, un
+                # cran plus bas.
+                "ecarts": verdict.get("ecarts", [])}
 
             # **Le quasi-succes est le vrai produit de la moisson.** 657
             # fonctions compilent entre 85 et 100 % — 87 236 octets de binaire

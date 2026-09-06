@@ -135,7 +135,7 @@ O_FILES   := $(addprefix $(BUILD_DIR)/, $(S_FILES:.s=.o) $(BIN_FILES:.bin=.o) \
              $(addsuffix .o, $(basename $(SRC_FILES))))
 
 .PHONY: all setup tools patch split build objects check diff decompile measure \
-        atlas carve clean distclean contexte injecte provenance chaine affinage instructions controle ci etat progress report
+        atlas carve clean distclean contexte injecte provenance chaine affinage ecarts instructions controle ci etat progress report
 
 all: build
 
@@ -310,6 +310,12 @@ chaine:
 # debloque au lieu de garder.
 affinage:
 	@$(PYTHON) scripts/build/affinage.py $(ARGS)
+
+# `match_percent` dit de combien on s'ecarte, jamais ou. Cette passe repose
+# chaque quasi-succes et releve les instructions qui divergent, puis les range
+# par forme : c'est ce qui remplace le tirage d'idiomes a l'aveugle.
+ecarts:
+	@$(PYTHON) scripts/build/ecarts.py $(ARGS)
 
 # Ce que m2c ne sait pas lire, compte en fonctions perdues et en octets. Une
 # seule instruction inconnue perd la fonction entiere : c'est ce releve qui a

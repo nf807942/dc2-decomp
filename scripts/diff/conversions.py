@@ -518,3 +518,42 @@ def arithmetique_sur_void(corps: str) -> str:
             lambda trouve, nom=nom: "((u8 *) %s) %s" % (nom, trouve.group(1)),
             corps)
     return corps
+
+
+def arithmetique_en_octets(corps: str) -> str:
+    """Ramène au pas de l'octet un calcul sur un pointeur typé.
+
+    **m2c compte toujours en octets** : il lit `addiu $a0, $s0, 0x40` et écrit
+    `p + 0x40`. Quand il a su typer `p`, MWCC met ce 0x40 à l'échelle du type
+    pointé et émet `0x2000` — le pas de la structure, cent vingt-huit fois
+    l'octet. Mesuré par `make ecarts` sur les six fonctions les plus proches du
+    but : **cinq divergences sur neuf sont exactement ce facteur**, et trois de
+    ces fonctions ne divergent que par là. Les rapports observés sont 128, 184
+    et 4 — le premier sur `SetLight`, le deuxième sur `DrawMiniMapSymbol`, le
+    troisième sur un `f32 *`.
+
+    La conversion se pose sur l'expression entière et rend le type d'origine :
+    `((f32 *) ((u8 *) p + 4))`. Rendre `u8 *` tout court ferait échouer
+    l'affectation qui reçoit la valeur — le C++ ne convertit pas un `u8 *` en
+    `f32 *` sans qu'on l'écrive.
+
+    L'opérande de droite se borne à un nombre ou à un nom : `p - q` entre deux
+    pointeurs est une différence, déjà comptée en éléments des deux côtés, et
+    la toucher changerait un calcul juste.
+    """
+    types = types_locaux(corps)
+    pointeurs = {nom: t for nom, t in types.items() if "*" in t}
+    for nom in sorted(pointeurs, key=len, reverse=True):
+        type_ = " ".join(pointeurs[nom].split())
+        autres = {a for a in pointeurs if a != nom}
+
+        def pose(trouve: re.Match, nom=nom, type_=type_, autres=autres) -> str:
+            signe, droite = trouve.group(1), trouve.group(2)
+            if droite in autres:
+                return trouve.group(0)
+            return "((%s) ((u8 *) %s %s %s))" % (type_, nom, signe, droite)
+
+        corps = re.sub(
+            r"\b%s\s*([+-])(?!>)\s*(0[xX][0-9A-Fa-f]+|\d+|[A-Za-z_]\w*)\b"
+            % re.escape(nom), pose, corps)
+    return corps

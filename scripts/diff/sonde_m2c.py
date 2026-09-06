@@ -35,7 +35,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from lib.project import (ROOT, functions, grafted_by_source,  # noqa: E402
                          run, unit_of)
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from conversions import (arithmetique_sur_void,  # noqa: E402
+from conversions import (arithmetique_en_octets,  # noqa: E402
+                         arithmetique_sur_void,
                          cast_les_affectations,
                          assemble, declare_les_piles, nettoie_declarations,
                          declarations_portees, remplit_les_appels, renomme,
@@ -821,6 +822,9 @@ def normalise(texte: str, symbole: str, vues: set[str],
     # des structures : ses conversions laissent le calcul intact a l'interieur,
     # et c'est ce calcul que MWCC refuse.
     corps = arithmetique_sur_void(corps)
+    # Et le pas d'un pointeur typé, que MWCC mettrait à l'échelle du type
+    # pointé là où m2c comptait en octets.
+    corps = arithmetique_en_octets(corps)
     # Un appel sans argument que sa declaration attend n est pas une
     # contradiction : la valeur etait deja dans le registre.
     corps = remplit_les_appels(
@@ -861,6 +865,52 @@ def score(symbole: str, unite: str) -> float | None:
         if entree.get("name") == symbole:
             return float(entree.get("match_percent") or 0.0)
     return None
+
+
+def ecarts(symbole: str, unite: str, combien: int = 8) -> list[str]:
+    """Les instructions par lesquelles notre objet s'écarte du commerce.
+
+    **`match_percent` dit de combien on s'écarte, jamais où.** Sur une fonction
+    à 99,96 %, une seule instruction diverge, et le score seul ne la nomme pas :
+    l'affinage tirait alors ses idiomes à l'aveugle, et les soixante fonctions
+    les plus proches n'en ont vu aucun réussir. objdiff, lui, aligne les deux
+    suites et marque chaque instruction — c'est cet alignement qu'on relève.
+
+    Les deux côtés arrivent de même longueur, les manques comblés par des
+    lignes vides : le rang suffit donc à apparier commerce et construction.
+    """
+    cible = "build/ref/asm/text/%s.o" % unite
+    base = "build/src/%s.o" % unite
+    resultat = run(["objdiff-cli", "diff", "-1", cible, "-2", base,
+                    "-o", "-", "--format", "json", symbole],
+                   capture_output=True, text=True)
+    if resultat.returncode != 0:
+        return []
+    try:
+        charge = json.loads(resultat.stdout)
+    except json.JSONDecodeError:
+        return []
+
+    def suite(cote: str) -> list[dict]:
+        for entree in charge.get(cote, {}).get("symbols", []):
+            if entree.get("name") == symbole and entree.get("instructions"):
+                return entree["instructions"]
+        return []
+
+    def texte(ligne: dict) -> str:
+        return (ligne.get("instruction") or {}).get("formatted", "").strip()
+
+    releve = []
+    for gauche, droite in zip(suite("left"), suite("right")):
+        genre = gauche.get("diff_kind") or droite.get("diff_kind")
+        if not genre or genre == "DIFF_NONE":
+            continue
+        releve.append("%s %s | %s" % (genre.replace("DIFF_", ""),
+                                      texte(gauche) or "—",
+                                      texte(droite) or "—"))
+        if len(releve) >= combien:
+            break
+    return releve
 
 
 def eprouve(symbole: str, unite: str, taille: int,
@@ -1037,6 +1087,12 @@ def eprouve(symbole: str, unite: str, taille: int,
         # quel quand la fonction apparie, sans refaire le chemin.
         verdict.update({"issue": "mesurée", "part": part,
                         "fragment": fragment, "declarations": ajoutees})
+        # **Où l'on s'écarte, et pas seulement de combien.** Le relevé ne se
+        # fait que sur les quasi-succès : ailleurs il compterait des dizaines
+        # d'instructions et ne dirait rien qu'un score ne dise déjà. Il coûte
+        # un appel d'objdiff, l'objet étant déjà construit.
+        if 85.0 <= part < 99.999:
+            verdict["ecarts"] = ecarts(symbole, unite)
         return verdict
     finally:
         # `garde` laisse en place ce qui apparie : la chaîne cumule les
