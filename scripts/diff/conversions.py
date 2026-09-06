@@ -269,23 +269,22 @@ def _blocs(declarations: str) -> list[str]:
 def _types_absents(ligne: str, amont: str) -> list[str]:
     """Les types que cette déclaration cite et que l'amont ne porte pas.
 
-    **Adopter une déclaration d'aval, c'est adopter les types qu'elle nomme.**
-    Une greffe posée plus bas dans l'unité écrit `typedef struct Sphida_pointe
-    { … }` puis `extern "C" Sphida_pointe *Sphida;`. La ligne s'adopte
-    d'elle-même — c'est une ligne, elle finit par un point-virgule — mais son
-    `typedef` tient sur plusieurs lignes et reste, lui, en aval. Le fragment
-    posé cite alors un type que rien ne définit encore, et MWCC répond
-    « declaration syntax error », curseur juste avant le nom du type. 215
-    fonctions, 109 912 octets.
+    **Mesuré et rendu.** Une greffe posée plus bas dans l'unité écrit
+    `typedef struct Sphida_pointe { … }` puis `extern "C" Sphida_pointe
+    *Sphida;`. Seule la seconde tient sur une ligne, donc seule elle s'adopte,
+    et le fragment cite alors un type que rien ne définit encore —
+    « declaration syntax error », 215 fonctions.
 
-    Le remède est une déclaration en avant, non le rejet de la ligne : deux
-    formes divergentes du même nom `extern "C"` ne coexistent pas, et refuser
-    l'adoption ne ferait que remplacer « declaration syntax error » par
-    « redeclared ». En C++, `struct X;` suffit à rendre `X *` légal, et le
-    `typedef struct X { … } X;` qui suit plus bas en reste la définition.
+    Poser `struct Sphida_pointe;` devant réparait la citation et cassait
+    ailleurs : **MWCC tient une coquille vide pour une déclaration que la
+    définition d'en bas redéfinit**, et répond « struct/union/enum/class tag
+    redefined ». Mesuré au rejugement des 711 quasi-succès : 90 d'entre eux ont
+    cessé de compiler, dont 40 sur ce seul message. La déclaration en avant a
+    donc été retirée.
 
-    Le nom déclaré ne compte pas parmi les types cités : c'est lui qu'on
-    déclare.
+    La fonction reste, elle nomme le manque sans prétendre le combler : c'est
+    par elle qu'une réponse se mesurera, et l'énoncé du problème vaut mieux
+    qu'une réparation qui coûte plus qu'elle ne rend.
     """
     tete = ligne.split("(", 1)[0]
     mots = re.findall(r"[A-Za-z_]\w*", ligne)
@@ -341,9 +340,7 @@ def assemble(ajoutees: list[str], declarations: str, corps: str,
             continue
         cle = _cle(nette)
         if cle and cle not in pris:
-            avant = "".join("struct %s;" % nom + chr(10)
-                            for nom in _types_absents(nette, source))
-            en_aval.setdefault(cle, avant + nette)
+            en_aval.setdefault(cle, nette)
 
     gardes = []
     for bloc in _blocs("\n".join([b for b in ajoutees + [declarations] if b])):
