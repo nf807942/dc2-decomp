@@ -991,7 +991,8 @@ def eprouve(symbole: str, unite: str, taille: int,
             # declaration posee plus bas dans le fichier ne vaut pas ici,
             # et l ecarter laissait cinq fonctions sans leur appele.
             fragment = assemble(ajoutees, declarations, corps,
-                                avant.split(ligne)[0], avant)
+                                avant.split(ligne)[0], avant,
+                                _marque(symbole))
             ecris(source, avant.replace(ligne, fragment))
             if objet.exists():
                 objet.unlink()

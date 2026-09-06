@@ -308,7 +308,7 @@ def _types_absents(ligne: str, amont: str) -> list[str]:
 
 
 def assemble(ajoutees: list[str], declarations: str, corps: str,
-             source: str, unite: str = "") -> str:
+             source: str, unite: str = "", marque: str = "") -> str:
     """Le fragment à poser, sans ce que la source déclare déjà.
 
     **La chaîne cumule les fonctions d'une même unité**, et chacune apporte ses
@@ -361,8 +361,25 @@ def assemble(ajoutees: list[str], declarations: str, corps: str,
     types_aval = {nom for nom in _DEFINIT_TYPE.findall(
         unite[len(source):] if unite else "")}
 
+    # **La déclaration en avant ne suffit pas : le corps lit des champs.** Elle
+    # levait bien le « tag redefined » — quarante cas sur quatre-vingt-dix —
+    # mais rendait le type incomplet, et MWCC répondait alors « illegal use of
+    # incomplete struct » sur la première lecture de champ, seize fois.
+    #
+    # Ces types sont les nôtres : m2c les forge et les nomme
+    # `CActionChara_infere`, la même chaîne pour deux fonctions qui n'en ont pas
+    # la même idée. Les renommer par la marque du symbole rend les deux
+    # définitions étrangères l'une à l'autre, et chacune reste complète.
+    texte = "\n".join([b for b in ajoutees + [declarations] if b])
+    collisions = {cle[1] for cle in map(_cle, _blocs(texte))
+                  if cle and cle[0] == "type" and cle[1] in types_aval}
+    for nom in sorted(collisions):
+        motif = re.compile(r"\b%s\b" % re.escape(nom))
+        texte = motif.sub(nom + marque, texte)
+        corps = motif.sub(nom + marque, corps)
+
     gardes = []
-    for bloc in _blocs("\n".join([b for b in ajoutees + [declarations] if b])):
+    for bloc in _blocs(texte):
         cle = _cle(bloc)
         if cle is not None:
             if cle in pris:
@@ -370,9 +387,6 @@ def assemble(ajoutees: list[str], declarations: str, corps: str,
             pris.add(cle)
             if cle in en_aval:
                 gardes.append(en_aval[cle])
-                continue
-            if cle[0] == "type" and cle[1] in types_aval:
-                gardes.append("struct %s;" % cle[1])
                 continue
         gardes.append(bloc)
     return "\n".join(gardes + [corps])
