@@ -75,7 +75,29 @@ INCLUDE_ASM("nonmatchings/game/gamedataused", AddNum__13CGameDataUsedFii);
 INCLUDE_ASM("nonmatchings/game/gamedataused", GetUseCapacity__13CGameDataUsedFv);
 INCLUDE_ASM("nonmatchings/game/gamedataused", AddFishHp__13CGameDataUsedFi);
 INCLUDE_ASM("nonmatchings/game/gamedataused", Boiled__13CGameDataUsedFv);
-INCLUDE_ASM("nonmatchings/game/gamedataused", IsActiveSet__13CGameDataUsedFv);
+extern "C" s32 GetCommonItemData__Fi(s32);
+struct CGameDataUsed_infere_3a34f9;
+typedef struct CGameDataUsed_infere_3a34f9 {
+    /* 0x0 */ char pad0[2];
+    /* 0x2 */ s16 unk2;                             /* inferred */
+} CGameDataUsed_infere_3a34f9;                                    /* size >= 0x4 */
+struct objet_champs_3a34f9 {
+    char pad0[0x2];
+    /* 0x2 */ s16 unk2;
+};
+struct temp_v0_champs_3a34f9 {
+    char pad0[0x1C];
+    /* 0x1C */ s32 unk1C;
+};
+extern "C" u8 IsActiveSet__13CGameDataUsedFv(CGameDataUsed_infere_3a34f9 *objet) {
+    struct temp_v0_champs_3a34f9 *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs_3a34f9 *) (GetCommonItemData__Fi((s32) ((struct objet_champs_3a34f9 *) objet)->unk2));
+    if (temp_v0 != NULL) {
+        return temp_v0->unk1C;
+    }
+    return 0U;
+}
 INCLUDE_ASM("nonmatchings/game/gamedataused", SetName__13CGameDataUsedFPc);
 INCLUDE_ASM("nonmatchings/game/gamedataused", GetName__13CGameDataUsedFi);
 INCLUDE_ASM("nonmatchings/game/gamedataused", TransToPassword__13CGameDataUsedFPci);
@@ -159,7 +181,34 @@ INCLUDE_ASM("nonmatchings/game/gamedataused", IsBuildUp__13CGameDataUsedFPiPiPi)
 INCLUDE_ASM("nonmatchings/game/gamedataused", IsFishingRod__13CGameDataUsedFv);
 INCLUDE_ASM("nonmatchings/game/gamedataused", GetActiveElem__13CGameDataUsedFv);
 INCLUDE_ASM("nonmatchings/game/gamedataused", GetAttackType__13CGameDataUsedFv);
-INCLUDE_ASM("nonmatchings/game/gamedataused", GetModelNo__13CGameDataUsedFv);
+extern "C" s32 GetWeaponInfoData__Fi(s32);
+struct match;
+struct CGameDataUsed_infere2_54f1f6;
+typedef struct CGameDataUsed_infere2_54f1f6 {
+    /* 0x0 */ s16 unk0;                             /* inferred */
+    /* 0x2 */ s16 unk2;                             /* inferred */
+} CGameDataUsed_infere2_54f1f6;                                    /* size >= 0x4 */
+struct objet_champs_54f1f6 {
+    /* 0x0 */ s16 unk0;
+    /* 0x2 */ s16 unk2;
+};
+struct temp_v0_champs_54f1f6 {
+    char pad0[0x49];
+    /* 0x49 */ s8 unk49;
+};
+extern "C" s8 GetModelNo__13CGameDataUsedFv(CGameDataUsed_infere2_54f1f6 *objet) {
+    struct temp_v0_champs_54f1f6 *temp_v0;
+
+    if (((struct objet_champs_54f1f6 *) objet)->unk0 == 3) {
+        temp_v0 = (struct temp_v0_champs_54f1f6 *) (GetWeaponInfoData__Fi((s32) ((struct objet_champs_54f1f6 *) objet)->unk2));
+        if (temp_v0 != NULL) {
+            return temp_v0->unk49;
+        }
+        /* Duplicate return node #4. Try simplifying control flow for better match */
+        return -1;
+    }
+    return -1;
+}
 INCLUDE_ASM("nonmatchings/game/gamedataused", GetMainCharaModelName__FiPci);
 INCLUDE_ASM("nonmatchings/game/gamedataused", CheckParamLimmit__13CGameDataUsedFv);
 typedef struct CGameDataUsed_infere3 {
@@ -184,7 +233,78 @@ INCLUDE_ASM("nonmatchings/game/gamedataused", GetGiftBoxItemNo__13CGameDataUsedF
 INCLUDE_ASM("nonmatchings/game/gamedataused", GetGiftBoxSameItemNum__13CGameDataUsedFi);
 INCLUDE_ASM("nonmatchings/game/gamedataused", CopyGameData__13CGameDataUsedFP13CGameDataUsed);
 INCLUDE_ASM("nonmatchings/game/gamedataused", CopyDataWeapon__13CGameDataUsedFi);
-INCLUDE_ASM("nonmatchings/game/gamedataused", CopyDataAttach__13CGameDataUsedFi);
+extern "C" u8 GameItemDataManage[48];
+extern "C" s32 GetAttachData__9CGameDataFi(void *, s32);
+struct CGameDataUsed_infere2_9617c4;
+typedef struct CGameDataUsed_infere2_9617c4 {
+    /* 0x00 */ s16 unk0;                            /* inferred */
+    /* 0x02 */ s16 unk2;                            /* inferred */
+    /* 0x04 */ s8 unk4;                             /* inferred */
+    /* 0x05 */ char pad5[0xD];                      /* maybe part of unk4[0xE]void */
+    /* 0x12 */ s16 unk12;                           /* inferred */
+    /* 0x14 */ s16 unk14;                           /* inferred */
+    /* 0x16 */ s16 unk16;                           /* inferred */
+    /* 0x18 */ s16 unk18;                           /* inferred */
+    /* 0x1A */ s16 unk1A;                           /* inferred */
+    /* 0x1C */ s16 unk1C;                           /* inferred */
+    /* 0x1E */ s16 unk1E;                           /* inferred */
+    /* 0x20 */ s16 unk20;                           /* inferred */
+    /* 0x22 */ s16 unk22;                           /* inferred */
+    /* 0x24 */ s16 unk24;                           /* inferred */
+    /* 0x26 */ char pad26[6];                       /* maybe part of unk24[4]void */
+    /* 0x2C */ s32 unk2C;                           /* inferred */
+    /* 0x30 */ char pad30[0x1A];                    /* maybe part of unk2C[7]void */
+    /* 0x4A */ s16 unk4A;                           /* inferred */
+} CGameDataUsed_infere2_9617c4;                                    /* size >= 0x4C */
+struct temp_v0_champs_9617c4 {
+    /* 0x0 */ s16 unk0;
+    /* 0x2 */ s16 unk2;
+    /* 0x4 */ s16 unk4;
+    /* 0x6 */ s16 unk6;
+    /* 0x8 */ s16 unk8;
+    /* 0xA */ s16 unkA;
+    /* 0xC */ s16 unkC;
+    /* 0xE */ s16 unkE;
+    /* 0x10 */ s16 unk10;
+    /* 0x12 */ s16 unk12;
+    /* 0x14 */ s32 unk14;
+};
+extern "C" s32 GetItemDataType__Fi(s32);
+extern "C" s32 AddNum__13CGameDataUsedFii(void *, s32, s32);
+extern "C" s32 CheckTypeEnableStack__13CGameDataUsedFv(void *);
+extern "C" s32 CopyDataAttach__13CGameDataUsedFi(CGameDataUsed_infere2_9617c4 *objet, s32 arg0) {
+    struct temp_v0_champs_9617c4 *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs_9617c4 *) (GetAttachData__9CGameDataFi(&GameItemDataManage, arg0));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    if (arg0 == objet->unk2) {
+        if (CheckTypeEnableStack__13CGameDataUsedFv(objet) != 0) {
+            AddNum__13CGameDataUsedFii(objet, 1, 1);
+            return 1;
+        }
+        goto block_6;
+    }
+block_6:
+    objet->unk0 = 2;
+    objet->unk2 = (s16) arg0;
+    objet->unk4 = GetItemDataType__Fi(arg0);
+    objet->unk12 = temp_v0->unk0;
+    objet->unk14 = temp_v0->unk2;
+    objet->unk16 = temp_v0->unk4;
+    objet->unk18 = temp_v0->unk6;
+    objet->unk1A = temp_v0->unk8;
+    objet->unk1C = temp_v0->unkA;
+    objet->unk1E = temp_v0->unkC;
+    objet->unk20 = temp_v0->unkE;
+    objet->unk22 = temp_v0->unk10;
+    objet->unk24 = temp_v0->unk12;
+    objet->unk2C = 0;
+    objet->unk2C |= temp_v0->unk14;
+    objet->unk4A = 1;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/gamedataused", CopyDataItem__13CGameDataUsedFi);
 INCLUDE_ASM("nonmatchings/game/gamedataused", CopyDataFish__13CGameDataUsedFi);
 typedef struct CGameDataUsed_infere2 {

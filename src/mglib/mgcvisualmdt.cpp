@@ -15,7 +15,7 @@ struct mgCDrawEnv {
     s64 field_0;
     s64 field_8;
 };
-extern "C" s32 Initialize__10mgCDrawEnvFi(mgCDrawEnv *objet, s32 arg0);
+extern "C" s32 Initialize__10mgCDrawEnvFi(...);
 extern "C" mgCDrawEnv *__ct__10mgCDrawEnvFv(mgCDrawEnv *objet) {
     Initialize__10mgCDrawEnvFi(objet, 0);
     return objet;
@@ -37,7 +37,48 @@ INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Initialize__10mgCDrawEnvFi);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetAlpha__10mgCDrawEnvFi);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", GetAlphaMacroID__10mgCDrawEnvFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetZBuf__10mgCDrawEnvFi);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Initialize__13mgRENDER_INFOFv);
+struct inferred;
+struct mgRENDER_INFO_infere_b5eb30;
+typedef struct mgRENDER_INFO_infere_b5eb30 {
+    /* 0x0000 */ char pad0[0x3F0];
+    /* 0x03F0 */ s32 unk3F0;                        /* inferred */
+    /* 0x03F4 */ char pad3F4[0xB2C];                /* maybe part of unk3F0[0x2CC]void */
+    /* 0x0F20 */ mgCDrawEnv unkF20;                 /* inferred */
+    /* 0x0F20 */ char padF20[0x40];
+    /* 0x0F60 */ mgCDrawEnv unkF60;                 /* inferred */
+    /* 0x0F60 */ char padF60[0x40];
+    /* 0x0FA0 */ s32 unkFA0;                        /* inferred */
+    /* 0x0FA4 */ s32 unkFA4;                        /* inferred */
+    /* 0x0FA8 */ s32 unkFA8;                        /* inferred */
+    /* 0x0FAC */ s32 unkFAC;                        /* inferred */
+    /* 0x0FB0 */ char padFB0[0x60];                 /* maybe part of unkFAC[0x19]void */
+    /* 0x1010 */ s32 unk1010;                       /* inferred */
+} mgRENDER_INFO_infere_b5eb30;                                    /* size >= 0x1014 */
+struct objet_champs_b5eb30 {
+    char pad0[0x3F0];
+    /* 0x3F0 */ s32 unk3F0;
+    char pad3F4[0xB2C];
+    /* 0xF20 */ s32 unkF20;
+    char padF24[0x3C];
+    /* 0xF60 */ s32 unkF60;
+    char padF64[0x3C];
+    /* 0xFA0 */ s32 unkFA0;
+    /* 0xFA4 */ s32 unkFA4;
+    /* 0xFA8 */ s32 unkFA8;
+    /* 0xFAC */ s32 unkFAC;
+    char padFB0[0x60];
+    /* 0x1010 */ s32 unk1010;
+};
+extern "C" void Initialize__13mgRENDER_INFOFv(mgRENDER_INFO_infere_b5eb30 *objet) {
+    Initialize__10mgCDrawEnvFi(&((struct objet_champs_b5eb30 *) objet)->unkF20, 0);
+    Initialize__10mgCDrawEnvFi(&((struct objet_champs_b5eb30 *) objet)->unkF60, 1);
+    ((struct objet_champs_b5eb30 *) objet)->unkFA4 = 0;
+    ((struct objet_champs_b5eb30 *) objet)->unkFA8 = 0;
+    ((struct objet_champs_b5eb30 *) objet)->unkFAC = 1;
+    ((struct objet_champs_b5eb30 *) objet)->unk1010 = 0;
+    ((struct objet_champs_b5eb30 *) objet)->unkFA0 = 0;
+    ((struct objet_champs_b5eb30 *) objet)->unk3F0 = 1;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetRenderInfo__13mgRENDER_INFOFfiiffif);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetViewMatrix__13mgRENDER_INFOFPA4_fPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetDropShadowMatrix__13mgRENDER_INFOFPfPfPf);

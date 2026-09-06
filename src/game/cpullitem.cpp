@@ -178,7 +178,39 @@ extern "C" void StopVoice__16CRoboVoiceSystemFi(CRoboVoiceSystem_infere *objet, 
 }
 INCLUDE_ASM("nonmatchings/game/cpullitem", Step__16CRoboVoiceSystemFv);
 INCLUDE_ASM("nonmatchings/game/cpullitem", SetDamage__8CColPrimFPci);
-INCLUDE_ASM("nonmatchings/game/cpullitem", SetCoord__8CColPrimFPff);
+struct CColPrim_infere_ec9f0f;
+typedef struct CColPrim_infere_ec9f0f {
+    /* 0x00 */ char pad0[0x20];
+    /* 0x20 */ s32 unk20;                           /* inferred */
+    /* 0x24 */ char pad24[0xC];                     /* maybe part of unk20[4]void */
+    /* 0x30 */ s32 unk30;                           /* inferred */
+    /* 0x34 */ char pad34[0xC];                     /* maybe part of unk30[4]void */
+    /* 0x40 */ f32 unk40;                           /* inferred */
+    /* 0x44 */ char pad44[0x1C];                    /* maybe part of unk40[8]void */
+    /* 0x60 */ f32 unk60;                           /* inferred */
+    /* 0x64 */ char pad64[0x20];                    /* maybe part of unk60[9]void */
+    /* 0x84 */ f32 unk84;                           /* inferred */
+    /* 0x88 */ char pad88[0x28];                    /* maybe part of unk84[0xB]void */
+    /* 0xB0 */ f32 unkB0;                           /* inferred */
+} CColPrim_infere_ec9f0f;                                         /* size >= 0xB4 */
+struct arg0_champs_ec9f0f {
+    char pad0[0xC];
+    /* 0xC */ s32 unkC;
+};
+extern "C" s32 sceVu0CopyVector(...);
+extern "C" void SetCoord__8CColPrimFPff(CColPrim_infere_ec9f0f *objet, struct arg0_champs_ec9f0f *arg0, f32 arg1) {
+    arg0->unkC = 0x3F800000;
+    if (objet->unk20 == 0) {
+        sceVu0CopyVector(&objet->unk40);
+        sceVu0CopyVector(&objet->unk60, arg0);
+        sceVu0CopyVector(&objet->unkB0, arg0);
+    } else {
+        sceVu0CopyVector(&objet->unk60, &objet->unk40);
+        sceVu0CopyVector(&objet->unk40, arg0);
+    }
+    objet->unk84 = arg1;
+    objet->unk30 = 1;
+}
 typedef struct CColPrim_infere {
     /* 0x00 */ char pad0[0x20];
     /* 0x20 */ s32 unk20;                           /* inferred */

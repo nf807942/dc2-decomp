@@ -206,7 +206,26 @@ INCLUDE_ASM("nonmatchings/game/cuserdatamanager", UseNpcAbility__16CUserDataMana
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AllWeaponRepair__16CUserDataManagerFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", RefreshNPCStatus__16CUserDataManagerFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetFishingRodNo__16CUserDataManagerFv);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", NowFishingStyle__16CUserDataManagerFv);
+#include "gamedataused.hpp"
+struct CUserDataManager_2a7d53;
+typedef struct CUserDataManager_2a7d53 {
+    /* 0x0000 */ char pad0[0x40B8];
+    /* 0x40B8 */ char pad40B8[1];
+} CUserDataManager_2a7d53;                                 /* size >= 0x40B9 */
+struct objet_champs_2a7d53 {
+    char pad0[0x40B8];
+    /* 0x40B8 */ s32 unk40B8;
+};
+extern "C" s32 IsFishingRod__13CGameDataUsedFv(void *);
+extern "C" s32 NowFishingStyle__16CUserDataManagerFv(CUserDataManager_2a7d53 *objet) {
+    CGameDataUsed *temp_a0;
+
+    temp_a0 = (CGameDataUsed *) (&((struct objet_champs_2a7d53 *) objet)->unk40B8);
+    if (temp_a0 != NULL) {
+        return IsFishingRod__13CGameDataUsedFv(temp_a0);
+    }
+    return 0;
+}
 struct CUserDataManager;
 extern "C" void GetActiveEsa__16CUserDataManagerFi(CUserDataManager *objet, s32 arg0);
 extern "C" s32 GetFishingRodNo__16CUserDataManagerFv(CUserDataManager *objet);

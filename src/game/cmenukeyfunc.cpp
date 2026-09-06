@@ -93,7 +93,26 @@ INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", GetDebugInputKey__12CMenuKeyFuncFR
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", MenuSwapItem__12CMenuKeyFuncFP13CGameDataUsedP18MENU_SWAPITEM_INFOib);
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", GetGameDataUsedForSWAPINFO__FP18MENU_SWAPITEM_INFO);
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", ReturnItemMenu__12CMenuKeyFuncFi);
-INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", InitHaveData__12CMenuKeyFuncFv);
+struct CMenuKeyFunc_190b82;
+typedef struct CMenuKeyFunc_190b82 {
+    /* 0x000 */ char pad0[0xC0];
+    /* 0x0C0 */ char padC0[0x6C];
+    /* 0x12C */ char pad12C[1];
+} CMenuKeyFunc_190b82;                                     /* size >= 0x12D */
+struct objet_champs_190b82 {
+    char pad0[0xC0];
+    /* 0xC0 */ s32 unkC0;
+    char padC4[0x68];
+    /* 0x12C */ s32 unk12C;
+};
+extern "C" s32 Init__13CGameDataUsedFv(void *);
+extern "C" s32 Set__18MENU_SWAPITEM_INFOFiiii(void *, s32, s32, s32, s32);
+extern "C" s32 SetHaveItemInfo__12CMenuKeyFuncFii(void *, s32, s32);
+extern "C" void InitHaveData__12CMenuKeyFuncFv(CMenuKeyFunc_190b82 *objet) {
+    Init__13CGameDataUsedFv(&((struct objet_champs_190b82 *) objet)->unkC0);
+    Set__18MENU_SWAPITEM_INFOFiiii(&((struct objet_champs_190b82 *) objet)->unk12C, -1, 0, -1, 0);
+    SetHaveItemInfo__12CMenuKeyFuncFii(objet, 0, 1);
+}
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", SetHaveItemInfo__12CMenuKeyFuncFii);
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", menu_inputkey_limmit_check_line__12CMenuKeyFuncFi);
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", menu_inputkey_limmit_check_glid__12CMenuKeyFuncFi);

@@ -334,7 +334,67 @@ INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetScale__9mgCObjectFPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Initialize__9mgCObjectFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", __ct__8mgCFrameFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Initialize__12mgCFrameBaseFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", Initialize__8mgCFrameFv);
+struct mgCFrame_infere_014b63;
+typedef struct mgCFrame_infere_014b63 {
+    /* 0x000 */ char pad0[0x50];
+    /* 0x050 */ s32 unk50;                          /* inferred */
+    /* 0x054 */ s32 unk54;                          /* inferred */
+    /* 0x058 */ s32 unk58;                          /* inferred */
+    /* 0x05C */ s32 unk5C;                          /* inferred */
+    /* 0x060 */ s32 unk60;                          /* inferred */
+    /* 0x064 */ s32 unk64;                          /* inferred */
+    /* 0x068 */ s32 unk68;                          /* inferred */
+    /* 0x06C */ s32 unk6C;                          /* inferred */
+    /* 0x070 */ char unk70;                            /* inferred */
+    /* 0x070 */ char pad70[0x40];
+    /* 0x0B0 */ char unkB0;                            /* inferred */
+    /* 0x0B0 */ char padB0[0x40];
+    /* 0x0F0 */ s32 unkF0;                          /* inferred */
+    /* 0x0F4 */ s32 unkF4;                          /* inferred */
+    /* 0x0F8 */ s32 unkF8;                          /* inferred */
+    /* 0x0FC */ s32 unkFC;                          /* inferred */
+    /* 0x100 */ s32 unk100;                         /* inferred */
+} mgCFrame_infere_014b63;                                         /* size >= 0x104 */
+struct objet_champs_014b63 {
+    char pad0[0x50];
+    /* 0x50 */ s32 unk50;
+    /* 0x54 */ s32 unk54;
+    /* 0x58 */ s32 unk58;
+    /* 0x5C */ s32 unk5C;
+    /* 0x60 */ s32 unk60;
+    /* 0x64 */ s32 unk64;
+    /* 0x68 */ s32 unk68;
+    /* 0x6C */ s32 unk6C;
+    /* 0x70 */ s32 unk70;
+    char pad74[0x3C];
+    /* 0xB0 */ s32 unkB0;
+    char padB4[0x3C];
+    /* 0xF0 */ s32 unkF0;
+    /* 0xF4 */ s32 unkF4;
+    /* 0xF8 */ s32 unkF8;
+    /* 0xFC */ s32 unkFC;
+    /* 0x100 */ s32 unk100;
+};
+extern "C" s32 sceVu0UnitMatrix(...);
+extern "C" s32 Initialize__9mgCObjectFv(void *);
+extern "C" void Initialize__8mgCFrameFv(mgCFrame_infere_014b63 *objet) {
+    ((struct objet_champs_014b63 *) objet)->unk60 = 0;
+    ((struct objet_champs_014b63 *) objet)->unk5C = 0;
+    ((struct objet_champs_014b63 *) objet)->unk58 = 0;
+    ((struct objet_champs_014b63 *) objet)->unk54 = 0;
+    sceVu0UnitMatrix(&((struct objet_champs_014b63 *) objet)->unk70);
+    sceVu0UnitMatrix(&((struct objet_champs_014b63 *) objet)->unkB0);
+    ((struct objet_champs_014b63 *) objet)->unk50 = 0;
+    ((struct objet_champs_014b63 *) objet)->unk100 = 0;
+    ((struct objet_champs_014b63 *) objet)->unkFC = 0;
+    ((struct objet_champs_014b63 *) objet)->unkF8 = 0;
+    ((struct objet_champs_014b63 *) objet)->unkF4 = 0;
+    ((struct objet_champs_014b63 *) objet)->unk64 = 0;
+    ((struct objet_champs_014b63 *) objet)->unk68 = 0;
+    ((struct objet_champs_014b63 *) objet)->unk6C = 0;
+    ((struct objet_champs_014b63 *) objet)->unkF0 = 0;
+    Initialize__9mgCObjectFv((mgCObject *) objet);
+}
 void mgCFrame::SetName(char * arg0) {
     this->field_0x50 = arg0;
 }

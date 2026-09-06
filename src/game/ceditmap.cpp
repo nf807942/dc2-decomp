@@ -268,7 +268,28 @@ extern "C" s32 GetInfoID__10CEditPartsFv(CEditParts *objet) {
     }
     return -1;
 }
-INCLUDE_ASM("nonmatchings/game/ceditmap", GetLiveNPC__10CEditPartsFv);
+struct CEditParts_infere_2c6891;
+typedef struct CEditParts_infere_2c6891 {
+    /* 0x000 */ char pad0[0x328];
+    /* 0x328 */ void *unk328;                       /* inferred */
+} CEditParts_infere_2c6891;                                       /* size >= 0x32C */
+struct objet_champs_2c6891 {
+    char pad0[0x328];
+    /* 0x328 */ s32 unk328;
+};
+struct temp_v0_champs_2c6891 {
+    char pad0[0x4];
+    /* 0x4 */ s32 unk4;
+};
+extern "C" s32 GetLiveNPC__10CEditPartsFv(CEditParts_infere_2c6891 *objet) {
+    struct temp_v0_champs_2c6891 *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs_2c6891 *) (((struct objet_champs_2c6891 *) objet)->unk328);
+    if (temp_v0 != NULL) {
+        return temp_v0->unk4;
+    }
+    return -1;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap", IsWallParts__10CEditPartsFv);
 struct CEditParts_infere;
 typedef struct CEditParts_infere {

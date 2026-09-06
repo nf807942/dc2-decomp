@@ -196,7 +196,37 @@ INCLUDE_ASM("nonmatchings/sdk/csound", SendPan__9sndCSeSeqFi);
 INCLUDE_ASM("nonmatchings/sdk/csound", SendPitch__9sndCSeSeqFi);
 INCLUDE_ASM("nonmatchings/sdk/csound", SaerchVoice__8sndTrackFii);
 INCLUDE_ASM("nonmatchings/sdk/csound", GetEmptyVoice__8sndTrackFv);
-INCLUDE_ASM("nonmatchings/sdk/csound", NoteOn__8sndTrackFii);
+extern "C" s32 GetEmptyVoice__8sndTrackFv(void *);
+struct sndTrack_infere_8ca519;
+typedef struct sndTrack_infere_8ca519 {
+    /* 0x0 */ char pad0[2];
+    /* 0x2 */ s8 unk2;                              /* inferred */
+    /* 0x3 */ char pad3[3];                         /* maybe part of unk2[4]void */
+    /* 0x6 */ s8 unk6;                              /* inferred */
+} sndTrack_infere_8ca519;                                         /* size >= 0x7 */
+struct temp_v0_champs_8ca519 {
+    /* 0x0 */ s8 unk0;
+    /* 0x1 */ s8 unk1;
+    /* 0x2 */ s8 unk2;
+    /* 0x3 */ s8 unk3;
+};
+extern "C" s32 SaerchVoice__8sndTrackFii(void *, s32, s32);
+extern "C" s32 NoteOn__8sndTrackFii(sndTrack_infere_8ca519 *objet, s32 arg0, s32 arg1) {
+    struct temp_v0_champs_8ca519 *temp_v0;
+
+    if (SaerchVoice__8sndTrackFii(objet, (s32) objet->unk2, arg0) != 0) {
+        return 1;
+    }
+    temp_v0 = (struct temp_v0_champs_8ca519 *) (GetEmptyVoice__8sndTrackFv(objet));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    temp_v0->unk0 = 1;
+    temp_v0->unk2 = (s8) arg0;
+    temp_v0->unk1 = (s8) objet->unk2;
+    temp_v0->unk3 = (s8) objet->unk6;
+    return 1;
+}
 extern "C" s32 SaerchVoice__8sndTrackFii(void *, s32, s32);
 struct inferred;
 typedef struct sndTrack_infere {

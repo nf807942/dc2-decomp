@@ -232,7 +232,37 @@ INCLUDE_ASM("nonmatchings/game/cactionchara", EntryBodyCol__12CActionCharaFif);
 INCLUDE_ASM("nonmatchings/game/cactionchara", EntryDamage2__12CActionCharaFPcPcPcfPcffPc);
 INCLUDE_ASM("nonmatchings/game/cactionchara", EntryDamage2__12CActionCharaFP8mgCFrameP8mgCFramePcfPcffPc);
 INCLUDE_ASM("nonmatchings/game/cactionchara", AllDeleteDamage__12CActionCharaFv);
-INCLUDE_ASM("nonmatchings/game/cactionchara", GetSwEffectPtr__12CActionCharaFv);
+struct CActionChara_infere_4bcc74;
+typedef struct CActionChara_infere_4bcc74 {
+    /* 0x000 */ char pad0[0x7E4];
+    /* 0x7E4 */ char unk7E4;                           /* inferred */
+    /* 0x7E4 */ char pad7E4[1];
+} CActionChara_infere_4bcc74;                                     /* size >= 0x7E5 */
+struct objet_champs_4bcc74 {
+    char pad0[0x7E4];
+    /* 0x7E4 */ s32 unk7E4;
+};
+struct var_v0_champs_4bcc74 {
+    char pad0[0x8];
+    /* 0x8 */ s32 unk8;
+};
+extern "C" void *GetSwEffectPtr__12CActionCharaFv(CActionChara_infere_4bcc74 *objet) {
+    void *var_v0;
+    s32 var_a0;
+
+    var_v0 = (void *) (&((struct objet_champs_4bcc74 *) objet)->unk7E4);
+    var_a0 = 0;
+loop_1:
+    if (((struct var_v0_champs_4bcc74 *) var_v0)->unk8 == 0) {
+        return var_v0;
+    }
+    var_a0 += 1;
+    ((u8 *) var_v0) += 0x20;
+    if (var_a0 >= 9) {
+        return NULL;
+    }
+    goto loop_1;
+}
 INCLUDE_ASM("nonmatchings/game/cactionchara", SetSoundInfoCopy__12CActionCharaFv);
 typedef struct CActionChara_infere10 {
     /* 0x000 */ char pad0[0x54];
