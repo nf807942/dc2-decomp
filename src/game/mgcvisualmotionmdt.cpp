@@ -255,7 +255,14 @@ extern "C" s32 _GROUP_START__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
 }
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", _GROUP__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", _ITEM__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", _FLOOR_START__FP9SPI_STACKi);
+struct nowTbFloor_champs_59299b {
+    char pad0[0x1A408];
+    /* 0x1A408 */ s32 unk1A408;
+};
+extern "C" s32 _FLOOR_START__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    ((struct nowTbFloor_champs_59299b *) nowTbFloor)->unk1A408 = spiGetStackInt__FP9SPI_STACK(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", _FLOOR__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", CreatTresuarBoxInfo__FP22TRESURE_BOX_FLOOR_INFOPci);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", PickupRandomItemCheckMax__FP22TRESURE_BOX_FLOOR_INFOi);

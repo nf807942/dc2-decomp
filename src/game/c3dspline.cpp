@@ -383,7 +383,26 @@ extern "C" s32 GetEventMessage__Fi(s32 arg0) {
     }
     return var_v0;
 }
-INCLUDE_ASM("nonmatchings/game/c3dspline", GetActiveCamera__Fv);
+struct inferred;
+struct CScene_infere;
+typedef struct CScene_infere {
+    /* 0x0000 */ char pad0[0x2E54];
+    /* 0x2E54 */ s32 unk2E54;                       /* inferred */
+} CScene_infere;                                           /* size >= 0x2E58 */
+struct EventScene_champs_55c73b {
+    char pad0[0x2E54];
+    /* 0x2E54 */ s32 unk2E54;
+};
+extern "C" s32 GetCamera__6CSceneFi(void *, s32);
+extern "C" s32 GetActiveCamera__Fv(void) {
+    s32 var_v0;
+
+    var_v0 = 0;
+    if (EventScene != NULL) {
+        var_v0 = GetCamera__6CSceneFi(EventScene, ((struct EventScene_champs_55c73b *) EventScene)->unk2E54);
+    }
+    return var_v0;
+}
 extern "C" s32 GetCharacter__6CSceneFi(void *, s32);
 extern "C" s32 GetCharacter__Fi(s32 arg0) {
     s32 var_v0;

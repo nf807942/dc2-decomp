@@ -148,7 +148,65 @@ INCLUDE_ASM("nonmatchings/game/cbasemenuclass", AfterSpectolFusion__FP13CGameDat
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", FusionColor__FiiPf);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", SpectolFrameCalc__FP12CActionCharai);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", TransSpectolDataSave__FP13CGameDataUsedi);
-INCLUDE_ASM("nonmatchings/game/cbasemenuclass", CheckNowRoboUseCapacity__FPi);
+extern "C" s32 GetItemInfoData__Fi(s32);
+typedef struct MenuUserParam_champs {
+    char pad0[8];
+    s32 unk8;
+    char padC[12];
+} MenuUserParam_champs;
+extern "C" MenuUserParam_champs MenuUserParam;
+struct ROBO_DATA {
+    f32 field_0;
+    f32 field_4;
+    u16 field_8;
+    u16 field_A;
+    char pad_C[0x2];
+    s16 field_E;
+    s16 field_10;
+    s16 field_12;
+    char pad_14[0x4];
+    s16 field_18;
+    char pad_1A[0x2];
+    s8 field_1C;
+    s8 field_1D;
+    char pad_1E[0x6];
+    f32 field_24;
+    char pad_28[0x3];
+    s8 field_2B;
+    f32 field_2C;
+    char pad_30[0xC];
+    s16 field_3C;
+    s16 field_3E;
+    char pad_40[0x90];
+    s16 field_D0;
+    char pad_D2[0x10E];
+    s16 field_1E0;
+    s16 field_1E2;
+    char pad_1E4[0x4];
+    u16 field_1E8;
+};
+struct MenuCommonInfo_champs_1ab1f1 {
+    char pad0[0xC2];
+    /* 0xC2 */ s16 unkC2;
+};
+struct temp_v0_champs_1ab1f1 {
+    char pad0[0xA];
+    /* 0xA */ s16 unkA;
+};
+extern "C" s32 CheckNowRoboUseCapacity__FP9ROBO_DATAPi(...);
+extern "C" s32 CheckNowRoboUseCapacity__FPi(s32 *arg0) {
+    s32 temp_s0;
+    struct temp_v0_champs_1ab1f1 *temp_v0;
+
+    temp_s0 = CheckNowRoboUseCapacity__FP9ROBO_DATAPi(MenuUserParam.unk8, arg0);
+    if (*arg0 == 0) {
+        temp_v0 = (struct temp_v0_champs_1ab1f1 *) (GetItemInfoData__Fi((s32) ((struct MenuCommonInfo_champs_1ab1f1 *) MenuCommonInfo)->unkC2));
+        if (temp_v0 != NULL) {
+            *arg0 = (s32) temp_v0->unkA;
+        }
+    }
+    return temp_s0;
+}
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", ExchangeItemInfoMake__FP18MENU_SWAPITEM_INFOPA4_iii);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", MenuCheckLine__FPiii);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", MenuKeySelectCheck__FiPiPiiiii);

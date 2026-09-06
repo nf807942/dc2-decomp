@@ -49,21 +49,67 @@ extern "C" s32 _SPHIDA_SET_PAR_COUNT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_GET_PAR_COUNT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_GET_MINI_LEVEL__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_GET_TEXB__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_SET_STATUS_FLAG__FP12RS_STACKDATAi);
+struct Sphida_champs_255774 {
+    char pad0[0x34];
+    /* 0x34 */ s32 unk34;
+};
+extern "C" s32 _SPHIDA_SET_STATUS_FLAG__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    s32 temp_v0;
+
+    temp_v0 = (s32) (GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
+    if (Sphida == NULL) {
+        return 0;
+    }
+    ((struct Sphida_champs_255774 *) Sphida)->unk34 = temp_v0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_RESET_POWGAGE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_START_POWGAGE__FP12RS_STACKDATAi);
+struct Sphida_champs_c93686 {
+    char pad0[0x1C];
+    /* 0x1C */ s32 unk1C;
+};
+extern "C" s32 _SPHIDA_START_POWGAGE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    if (Sphida == NULL) {
+        return 0;
+    }
+    ((struct Sphida_champs_c93686 *) Sphida)->unk1C = 0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_TRIGGER_POWGAGE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_GET_SHOT_POW__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_GET_POWGAGE_CODE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_SET_POWGAGE_SAFE_LEVEL__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_GET_CULB_DEF__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_SET_SPIN_MARK_POS__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_SET_CULB_NO__FP12RS_STACKDATAi);
+struct Sphida_champs_97f4b7 {
+    char pad0[0x1FC];
+    /* 0x1FC */ s32 unk1FC;
+};
+extern "C" s32 _SPHIDA_SET_CULB_NO__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    s32 temp_v0;
+
+    temp_v0 = (s32) (GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
+    if (Sphida == NULL) {
+        return 0;
+    }
+    ((struct Sphida_champs_97f4b7 *) Sphida)->unk1FC = temp_v0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_CALC_CARRY__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_GET_PG_CURSOR_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_SET_COL_MODEL__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_GET_PRIZE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_SET_LAST_CHALLENGE__FP12RS_STACKDATAi);
+struct Sphida_champs_c38fcd {
+    char pad0[0x204];
+    /* 0x204 */ s32 unk204;
+};
+extern "C" s32 _SPHIDA_SET_LAST_CHALLENGE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    if (Sphida == NULL) {
+        return 0;
+    }
+    ((struct Sphida_champs_c38fcd *) Sphida)->unk204 = GetStackInt__FP12RS_STACKDATA_00262DA0(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_GET_LAST_CHALLENGE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_GET_OMAKE_MODE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_SET_NOW_HOLE__FP12RS_STACKDATAi);

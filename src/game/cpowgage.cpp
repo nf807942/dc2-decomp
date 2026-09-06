@@ -57,8 +57,29 @@ extern "C" s32 _BTL_SE_STOP__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     sndSeStop__FUiii(temp_s0, GetStackInt__FP12RS_STACKDATA_002E8280(arg0), 0);
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/cpowgage", _BSE_SE_PLAY__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/cpowgage", _BSE_SE_STOP__FP12RS_STACKDATAi);
+struct now_scene_champs_ac1ee1 {
+    char pad0[0xA498];
+    /* 0xA498 */ s32 unkA498;
+};
+extern "C" s32 sndSePlay__FUiii(u32, s32, s32);
+extern "C" s32 _BSE_SE_PLAY__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    u32 temp_s0;
+
+    temp_s0 = ((struct now_scene_champs_ac1ee1 *) now_scene)->unkA498;
+    sndSePlay__FUiii(temp_s0, GetStackInt__FP12RS_STACKDATA_002E8280(arg0), 0);
+    return 1;
+}
+struct now_scene_champs_4fa9c5 {
+    char pad0[0xA498];
+    /* 0xA498 */ s32 unkA498;
+};
+extern "C" s32 _BSE_SE_STOP__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    u32 temp_s0;
+
+    temp_s0 = ((struct now_scene_champs_4fa9c5 *) now_scene)->unkA498;
+    sndSeStop__FUiii(temp_s0, GetStackInt__FP12RS_STACKDATA_002E8280(arg0), 0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cpowgage", _MON_SE_PLAY2__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _MON_SE_STOP2__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _SET_LIGHT_FLAG__FP12RS_STACKDATAi);
@@ -117,7 +138,24 @@ INCLUDE_ASM("nonmatchings/game/cpowgage", _ES_SET_VECT1__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _ES_SET_VECT2__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _ES_SET_TARGET_ID__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _ES_SET_VALUE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/cpowgage", _ES_SET_COLPRIM__FP12RS_STACKDATAi);
+extern "C" u32 EffScriptMan;
+struct now_script_champs_7ac8f3 {
+    char pad0[0xA8];
+    /* 0xA8 */ s32 unkA8;
+    char padAC[0x88];
+    /* 0x134 */ s32 unk134;
+};
+extern "C" s32 SetColPrim__16CEffectScriptManFP8CColPrimii(...);
+extern "C" s32 _ES_SET_COLPRIM__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    CColPrim *temp_a1;
+
+    temp_a1 = (CColPrim *) (((struct now_script_champs_7ac8f3 *) now_script)->unk134);
+    if (temp_a1 == NULL) {
+        return 0;
+    }
+    SetColPrim__16CEffectScriptManFP8CColPrimii(EffScriptMan, temp_a1, ((struct now_script_champs_7ac8f3 *) now_script)->unkA8, -1);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cpowgage", _GET_EOH_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", SetEffectScript__FP10CRunScriptPcP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cpowgage", SetEffectScriptFunc__Fv);

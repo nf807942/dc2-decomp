@@ -317,9 +317,23 @@ extern "C" s32 __DIR__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     g_tmp_effc->unk20 = spiGetStackInt__FP9SPI_STACK(arg0);
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/ceffectctrl", __NUM__FP9SPI_STACKi);
+struct g_tmp_effc_champs_ccf519 {
+    char pad0[0x24];
+    /* 0x24 */ s32 unk24;
+};
+extern "C" s32 __NUM__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    ((struct g_tmp_effc_champs_ccf519 *) g_tmp_effc)->unk24 = spiGetStackInt__FP9SPI_STACK(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", __NUM_RAND__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ceffectctrl", __COUNT__FP9SPI_STACKi);
+struct g_tmp_effc_champs_dc8039 {
+    char pad0[0x34];
+    /* 0x34 */ s32 unk34;
+};
+extern "C" s32 __COUNT__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    ((struct g_tmp_effc_champs_dc8039 *) g_tmp_effc)->unk34 = spiGetStackInt__FP9SPI_STACK(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", __CNT_RAND__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", __REPEAT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", __REP_RAND__FP9SPI_STACKi);
@@ -345,8 +359,22 @@ INCLUDE_ASM("nonmatchings/game/ceffectctrl", __SCALE_P1__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", __SCALE_P1_RAND__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", __SCALE_P2__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", __SCALE_P2_RAND__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ceffectctrl", __ALPHA_BLEND__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ceffectctrl", __ALPHA_TYPE__FP9SPI_STACKi);
+struct g_tmp_effc_champs_2a1b0c {
+    char pad0[0x220];
+    /* 0x220 */ s32 unk220;
+};
+extern "C" s32 __ALPHA_BLEND__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    ((struct g_tmp_effc_champs_2a1b0c *) g_tmp_effc)->unk220 = spiGetStackInt__FP9SPI_STACK(arg0);
+    return 1;
+}
+struct g_tmp_effc_champs_495a0c {
+    char pad0[0x224];
+    /* 0x224 */ s32 unk224;
+};
+extern "C" s32 __ALPHA_TYPE__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    ((struct g_tmp_effc_champs_495a0c *) g_tmp_effc)->unk224 = spiGetStackInt__FP9SPI_STACK(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", __ALPHA__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", __ALPHA_RAND__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", __ALPHA_P1__FP9SPI_STACKi);
@@ -354,7 +382,14 @@ INCLUDE_ASM("nonmatchings/game/ceffectctrl", __ALPHA_P1_RAND__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", __ALPHA_P2__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", __ALPHA_P2_RAND__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", __TEX_GET_RECT__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ceffectctrl", __TEX_GET_TYPE__FP9SPI_STACKi);
+struct g_tmp_effc_champs_d1f959 {
+    char pad0[0x2E0];
+    /* 0x2E0 */ s32 unk2E0;
+};
+extern "C" s32 __TEX_GET_TYPE__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    ((struct g_tmp_effc_champs_d1f959 *) g_tmp_effc)->unk2E0 = spiGetStackInt__FP9SPI_STACK(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", __TEX_NAME__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", __GRAVITY__FP9SPI_STACKi);
 typedef struct CEffectManager_infere {

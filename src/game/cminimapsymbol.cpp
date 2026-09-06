@@ -124,6 +124,13 @@ extern "C" s32 _ROOM_FIXED__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", _GRID_SIZE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", _ROOM_ID__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", _ROOM_SIZE__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cminimapsymbol", _ROOM_RATE__FP9SPI_STACKi);
+struct nowPriset_champs_f0d9ee {
+    char pad0[0x10];
+    /* 0x10 */ s32 unk10;
+};
+extern "C" s32 _ROOM_RATE__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    ((struct nowPriset_champs_f0d9ee *) nowPriset)->unk10 = spiGetStackInt__FP9SPI_STACK(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", _RD__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", _ROOM_END__FP9SPI_STACKi);

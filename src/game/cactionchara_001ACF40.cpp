@@ -234,7 +234,55 @@ INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", EditStep__Fv);
 INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", EditDraw__Fv);
 INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", UpdateTrBoxFlag__Fi);
 INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", BurnEditParts__Fv);
-INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", editLoadSound__Fi);
+extern "C" u32 read_buffer;
+struct inferred;
+struct CScene_infere;
+typedef struct CScene_infere {
+    /* 0x0000 */ char pad0[0x906C];
+    /* 0x906C */ s32 unk906C;                       /* inferred */
+} CScene_infere;                                           /* size >= 0x9070 */
+struct MainScene_0037D328_champs_ef01bb {
+    char pad0[0x906C];
+    /* 0x906C */ s32 unk906C;
+};
+extern "C" s32 AutoChangeBGMVol__6CSceneFi(void *, s32);
+extern "C" s32 CheckLoadBGM__6CSceneFi(void *, s32);
+extern "C" s32 GetDefBgmNo__6CSceneFi(void *, s32);
+extern "C" s32 GetMapSndDataID__Fi(s32);
+extern "C" s32 LoadBGM__6CSceneFiP1(...);
+extern "C" s32 LoadSound__6CSceneFiP1(...);
+extern "C" s32 PlayBGM__6CSceneFiif(void *, s32, s32, f32);
+extern "C" s32 StepSnd__6CSceneFv(void *);
+extern "C" s32 StopBGM__6CSceneFi(void *, s32);
+extern "C" s32 sndStep__Ff(f32);
+extern "C" void editLoadSound__Fi(s32 arg0) {
+    s32 temp_v0;
+    s32 temp_v0_2;
+
+    temp_v0 = GetMapSndDataID__Fi(arg0);
+    LoadSound__6CSceneFiP1(MainScene_0037D328, temp_v0, read_buffer);
+    if (((struct MainScene_0037D328_champs_ef01bb *) MainScene_0037D328)->unk906C == 0) {
+        temp_v0_2 = GetDefBgmNo__6CSceneFi(MainScene_0037D328, temp_v0);
+        if (temp_v0_2 == -1) {
+            StopBGM__6CSceneFi(MainScene_0037D328, 0);
+        }
+        if ((CheckLoadBGM__6CSceneFi(MainScene_0037D328, temp_v0_2) == 0) || (temp_v0_2 == 0x270F)) {
+            PlayBGM__6CSceneFiif(MainScene_0037D328, 0, -1, 1.0f);
+            return;
+        }
+        StopBGM__6CSceneFi(MainScene_0037D328, 0);
+        if (LoadBGM__6CSceneFiP1(MainScene_0037D328, temp_v0_2, read_buffer) != 0) {
+            PlayBGM__6CSceneFiif(MainScene_0037D328, 0, -1, 1.0f);
+            if (temp_v0_2 == 0) {
+                AutoChangeBGMVol__6CSceneFi(MainScene_0037D328, 1);
+                StepSnd__6CSceneFv(MainScene_0037D328);
+                sndStep__Ff(2.0f);
+            }
+        }
+    } else {
+        ((struct MainScene_0037D328_champs_ef01bb *) MainScene_0037D328)->unk906C = 0;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", EditMapJump__Fi);
 INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", EditGotoInterior__Fii);
 INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", EditExitInterior__Fi);
