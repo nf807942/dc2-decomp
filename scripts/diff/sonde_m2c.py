@@ -279,6 +279,80 @@ _FLECHE_ETOILE = re.compile(r"\(\*\s*([A-Za-z_]\w*)\s*\)\s*->\s*(unk[0-9A-Fa-f]+
 
 _FLECHE_CHAINEE = re.compile(
     r"(unk[0-9A-Fa-f]+)\s*->\s*(unk[0-9A-Fa-f]+)\b")
+
+# `(objet + var_s1)->unkF54`, `((arg1 << 5) + objet)->unk184` : la gauche de la
+# fleche est un calcul, et aucun des motifs ci-dessus ne prend un nom derriere
+# une parenthese fermante. 226 fonctions, 69 524 octets.
+_FLECHE_APRES_PAREN = re.compile(r"\)\s*->\s*(unk[0-9A-Fa-f]+)\b")
+# `(mgCCamera *) x` : le type est nomme, et l'atlas le donne. Le forger a
+# nouveau perdrait ce que le binaire dit de lui.
+_CONVERSION_NOMMEE = re.compile(r"^\s*\(\s*[A-Za-z_]\w*\s*\*+\s*\)")
+
+
+def _ouvrante(texte: str, ferme: int) -> int | None:
+    """L'indice de la parenthèse qui ouvre celle refermée en `ferme`."""
+    profondeur = 0
+    for rang in range(ferme, -1, -1):
+        if texte[rang] == ")":
+            profondeur += 1
+        elif texte[rang] == "(":
+            profondeur -= 1
+            if profondeur == 0:
+                return rang
+    return None
+
+
+def fleches_sur_expression(corps: str, marque: str = "") -> tuple[list[str], str]:
+    """Donne un type aux flèches dont la gauche est un calcul.
+
+    `(objet + var_s1)->unkF54` : le decalage est sur `objet`, mais l'addition
+    compte en octets — m2c raisonne sur des adresses, non sur des elements.
+    **Typer `objet` mettrait l'addition a l'echelle de la structure** et
+    changerait l'adresse en silence. La conversion se pose donc sur le calcul
+    entier, au site d'emploi : `((struct F *) (objet + var_s1))->unkF54`.
+    L'arithmetique reste en octets, le champ existe, et rien d'autre dans
+    l'unite ne bouge.
+
+    Chaque expression a sa structure, nommee par son rang : deux calculs
+    differents sur le meme objet en recoivent deux, ce qui ne coute rien —
+    la conversion est locale a chaque site.
+    """
+    trouves = []
+    for marqueur in _FLECHE_APRES_PAREN.finditer(corps):
+        ferme = marqueur.start()
+        ouvre = _ouvrante(corps, ferme)
+        if ouvre is None:
+            continue
+        expression = corps[ouvre + 1:ferme]
+        # Un nom seul, ou `*nom` : les autres branches s'en chargent, et mieux.
+        if re.fullmatch(r"\s*\*?\s*[A-Za-z_]\w*\s*", expression):
+            continue
+        if _CONVERSION_NOMMEE.match(expression):
+            continue
+        trouves.append((ouvre, ferme, expression, marqueur.group(1)))
+    if not trouves:
+        return [], corps
+
+    appeles = set(_APPELE.findall(corps))
+    rangs: dict[str, int] = {}
+    offsets: dict[str, dict[int, str]] = {}
+    for _, _, expression, champ in trouves:
+        cle = " ".join(expression.split())
+        rangs.setdefault(cle, len(rangs))
+        offsets.setdefault(cle, {})[int(champ[3:], 16)] = champ
+
+    neuves = [_struct_par_offsets("calcul%d_champs%s" % (rangs[cle], marque),
+                                  offsets[cle], appeles)
+              for cle in sorted(rangs, key=rangs.get)]
+
+    # De la fin vers le debut : une insertion en tete decalerait les suivantes.
+    for ouvre, ferme, expression, _ in reversed(trouves):
+        cle = " ".join(expression.split())
+        corps = (corps[:ouvre]
+                 + "((struct calcul%d_champs%s *) (%s))"
+                 % (rangs[cle], marque, expression)
+                 + corps[ferme + 1:])
+    return neuves, corps
 _CHAMP_M2C = re.compile(
     r"/\*\s*0x([0-9A-Fa-f]+)\s*\*/\s*(.+?)\s*(\w+)\s*(\[[^\]]*\])?\s*;")
 
@@ -462,6 +536,11 @@ def complete_structures(structs: list[str], corps: str,
     structure existe sans le champ, 24 % d'« expression syntax error » quand
     elle n'existe pas du tout. Le même défaut, vu des deux côtés.
     """
+    # Les calculs d'abord : leur conversion ne laisse derriere elle aucune
+    # fleche que les motifs suivants pourraient reprendre a tort.
+    calculees, corps = fleches_sur_expression(corps, marque)
+    structs = structs + calculees
+
     appeles = set(_APPELE.findall(corps))
     demandes: dict[str, dict[int, str]] = {}
     # La variable d'un appel virtuel se retient a part : ce n'est pas un
@@ -970,13 +1049,58 @@ _OBJET = re.compile(r"^(\w+) = 0x[0-9A-Fa-f]+; // size:0x([0-9A-Fa-f]+)",
 _TAILLES: dict[str, int] | None = None
 
 
+_ADRESSE = re.compile(r"^(\w+) = (0x[0-9A-Fa-f]+);", re.MULTILINE)
+_ETIQUETTE = re.compile(r"^dlabel (\S+)$", re.MULTILINE)
+
+
+def etiquettes_desassemblees() -> dict[str, int]:
+    """La taille des données que seul le désassemblage nomme.
+
+    Une donnée sans symbole reçoit du désassembleur un nom tiré de son adresse
+    — `D_00364E70`. La table ELF ne la connaît pas, `declaration` la prenait
+    donc pour un type et n'écrivait rien : **170 fonctions de la moisson
+    butaient sur « undefined identifier 'D_…' »**, dont 169 se nomment ici.
+
+    La taille se déduit de l'écart à l'étiquette suivante, toutes sections
+    confondues et rangées par adresse. **Ce n'est pas la taille du symbole**,
+    mais celle de la place qu'il occupe : le remplissage d'alignement y est
+    compté. L'écart majore donc, et une majoration ne change la déclaration que
+    si elle fait sortir la donnée de la fenêtre de `$gp` — auquel cas la
+    fonction n'apparie pas et retourne à sa greffe, ce qu'elle faisait déjà.
+    """
+    adresses: dict[str, int] = {}
+    table = (ROOT / "config" / "elf_symbol_addrs.txt").read_text(encoding="utf-8")
+    for nom, valeur in _ADRESSE.findall(table):
+        adresses[nom] = int(valeur, 16)
+
+    places: list[tuple[int, str]] = []
+    for fichier in sorted((ROOT / "asm" / "data").rglob("*.s")):
+        for nom in _ETIQUETTE.findall(fichier.read_text(encoding="utf-8")):
+            tire = re.fullmatch(r"D_([0-9A-Fa-f]{8})", nom)
+            adresse = int(tire.group(1), 16) if tire else adresses.get(nom)
+            if adresse is not None:
+                places.append((adresse, nom))
+    places.sort()
+
+    tailles: dict[str, int] = {}
+    for rang, (adresse, nom) in enumerate(places[:-1]):
+        suivante = places[rang + 1][0]
+        if suivante > adresse:
+            tailles[nom] = suivante - adresse
+    return tailles
+
+
 def objets() -> dict[str, int]:
     """La taille de chaque donnée du binaire, qui décide de sa déclaration."""
     global _TAILLES
     if _TAILLES is None:
         table = (ROOT / "config" / "elf_symbol_addrs.txt").read_text(encoding="utf-8")
-        _TAILLES = {nom: int(taille, 16) for nom, taille in _OBJET.findall(table)
-                    if "type:func" not in nom}
+        # Le désassemblage d'abord, la table ELF ensuite : celle-ci porte la
+        # taille exacte du symbole, l'autre ne majore que ce qu'elle seule
+        # nomme.
+        _TAILLES = etiquettes_desassemblees()
+        _TAILLES.update({nom: int(taille, 16) for nom, taille in _OBJET.findall(table)
+                         if "type:func" not in nom})
     return _TAILLES
 
 
