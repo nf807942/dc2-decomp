@@ -307,6 +307,17 @@ def main(argv: list[str]) -> int:
                     fiche["issue"] = "image divergente"
                     fiche["part"] = None
             gagnees, gagnes = avant_unite, octets_avant_unite
+        elif gagnees == avant_unite:
+            # **Une unite qui n'a rien gagne doit sortir comme elle est
+            # entree.** Le controle ci-dessus ne s'arme que sur un gain ; une
+            # source qu'un affinage sans succes aurait laissee modifiee ne
+            # serait donc relue par personne. Comparer les textes coute un
+            # `read`, la ou verifier l'image couterait un lien complet.
+            source = ROOT / "src" / (unite + ".cpp")
+            if source.read_text(encoding="utf-8") != depart_unite:
+                print("  %s a change sans gagner : retour a son etat d'entree"
+                      % unite, flush=True)
+                source.write_text(depart_unite, encoding="utf-8")
         enregistre(etat)
 
     ecoule = time.time() - depart

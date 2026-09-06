@@ -15,7 +15,8 @@ ce qui distingue une correction d'un coup de chance.
 reculer le score est rejetée, mais une qui le laisse égal est gardée : deux
 idiomes se composent souvent sans que le premier paie seul, et `SearchCharaTexb`
 en est l'exemple — le calcul rentré dans la boucle ne valait rien avant que la
-sortie ne soit redoublée.
+sortie ne soit redoublée. Ces formes intermédiaires ne vivent que le temps de la
+descente : faute d'un 100 %, la source revient à son état d'entrée.
 """
 
 from __future__ import annotations
@@ -57,9 +58,21 @@ def affine(symbole: str, unite: str, depart: float,
     source = ROOT / "src" / (unite + ".cpp")
     meilleur = depart
     texte = source.read_text(encoding="utf-8")
+    # **Un affinage qui n'apparie pas ne laisse rien.** Les formes gardées à
+    # score égal ne valent que le temps de la descente : la chaîne ne vérifie
+    # l'image que sur une unité qui gagne, si bien qu'une source affinée sans
+    # gain n'était relue par personne. `cmenukeyfunc` a ainsi porté un corps
+    # remonté derrière son `return` — seize octets de trop et l'image entière
+    # divergente, pour une fonction que la chaîne comptait comme perdue.
+    entree = texte
     bornes = definition(texte, symbole)
     if bornes is None:
         return depart, False
+
+    def rends(part: float) -> tuple[float, bool]:
+        if part < 99.999:
+            ecris(source, entree)
+        return part, part >= 99.999
 
     rng = random.Random(0)
     for _tour in range(tours):
@@ -86,7 +99,7 @@ def affine(symbole: str, unite: str, depart: float,
                 meilleur = part
                 progres = True
                 if part >= 99.999:
-                    return part, True
+                    return rends(part)
                 break
             if progres:
                 break
@@ -94,4 +107,4 @@ def affine(symbole: str, unite: str, depart: float,
             ecris(source, garde)
             break
 
-    return meilleur, meilleur >= 99.999
+    return rends(meilleur)

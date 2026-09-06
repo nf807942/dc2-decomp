@@ -65,6 +65,13 @@ def early_return_from_guard(text: str, _rng: random.Random) -> list[str]:
     de fonction avec sa valeur dans le créneau de délai, là où une sortie unique
     donne un branchement direct. Mesuré sur `CScene::SearchCharaTexb` : 93,33 %
     avec une seule sortie, 100 % avec deux.
+
+    **Le corps remonté passe derrière la sortie finale**, donc la garde doit
+    être la dernière instruction avant elle : rien d'autre ne peut la séparer du
+    `return`. Sans cette condition, ce qui vivait dans le `if` atterrit après le
+    `return` de queue et ne s'exécute plus — mesuré sur `cmenukeyfunc`, où un
+    `objet->unk8 = 0;` est devenu du code mort, l'unité a grandi de seize octets
+    et l'image entière a divergé sur 8 320 plages.
     """
     fin = re.search(r"\n(\s*)(return [^;]+;)\s*\n\}\s*$", text)
     if fin is None:
@@ -76,6 +83,8 @@ def early_return_from_guard(text: str, _rng: random.Random) -> list[str]:
         ouvrant = text.index("{", garde.start())
         fermant = brace_fermante(text, ouvrant)
         if fermant is None or fermant > fin.start():
+            continue
+        if text[fermant + 1:fin.start()].strip():
             continue
         indent, condition = garde.group(1), garde.group(2)
         corps = text[ouvrant + 1:fermant].strip("\n")
