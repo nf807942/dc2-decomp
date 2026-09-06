@@ -491,12 +491,11 @@ comparé qu'à elle-même. C'est le premier point à instruire.
 
 ### Ce qu'il faut faire ensuite, dans l'ordre
 
-1. Reposer les trois unités suspectes une à une (`build/moisson_a_verifier/`),
-   `make build` entre chaque, pour nommer celle qui coûte seize octets — deux
-   constructions suffisent. Garder les deux qui apparient.
-2. Instruire pourquoi `image_identique()` de `scripts/build/chaine.py` n'a pas
-   arrêté cette moisson. Tant que ce point n'est pas tranché, aucun gain de
-   moisson ne se commet sans `make ci` complet derrière.
+1. ~~Nommer l'unité qui coûte seize octets.~~ Fait : `cmenukeyfunc`, et les
+   cinq autres sont gardées (`de9ca9e`).
+2. ~~Instruire le silence de `image_identique()`.~~ Fait : elle ne s'armait que
+   sur une unité qui gagne, et l'unité en cause avait été réécrite par un
+   affinage sans gain (`9205119`, raconté sous `ed0d3e9`).
 3. Reprendre le profil d'échecs (`m2c ne sait pas traduire`, 451) et grouper les
    extraits par forme normalisée — la méthode qui a produit chaque gain des
    dernières séances : le message du compilateur nomme le symptôme, la ligne
