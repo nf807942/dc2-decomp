@@ -82,7 +82,16 @@ extern "C" s32 _BSE_SE_STOP__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
 }
 INCLUDE_ASM("nonmatchings/game/cpowgage", _MON_SE_PLAY2__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _MON_SE_STOP2__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/cpowgage", _SET_LIGHT_FLAG__FP12RS_STACKDATAi);
+struct now_script_pointe;
+extern "C" now_script_pointe *now_script;
+struct now_script_champs_59493c {
+    char pad0[0x138];
+    /* 0x138 */ s32 unk138;
+};
+extern "C" s32 _SET_LIGHT_FLAG__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    ((struct now_script_champs_59493c *) now_script)->unk138 = GetStackInt__FP12RS_STACKDATA_002E8280(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cpowgage", _SCN_GET_CHR_ENTOBJ_POS__FP12RS_STACKDATAi);
 extern "C" u8 _3398[62];
 extern "C" s32 printf(...);
@@ -131,7 +140,21 @@ extern "C" s32 _COLPRIM_DELETE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) 
 INCLUDE_ASM("nonmatchings/game/cpowgage", _COLPRIM_GET_HITCNT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _COLPRIM_GET_GIFT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _COLPRIM_GET_REVCNT__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/cpowgage", _COLPRIM_SET_DAMAGE__FP12RS_STACKDATAi);
+struct now_script_champs_1ac566 {
+    char pad0[0x134];
+    /* 0x134 */ struct unk134_champs_1ac566 *unk134;
+};
+struct unk134_champs_1ac566 {
+    char pad0[0x88];
+    /* 0x88 */ s32 unk88;
+};
+extern "C" s32 _COLPRIM_SET_DAMAGE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    if (((struct now_script_champs_1ac566 *) now_script)->unk134 == NULL) {
+        return 0;
+    }
+    ((struct now_script_champs_1ac566 *) now_script)->unk134->unk88 = GetStackInt__FP12RS_STACKDATA_002E8280(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cpowgage", _COLPRIM_GET_HIT_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _ES_CREATE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _ES_SET_VECT1__FP12RS_STACKDATAi);

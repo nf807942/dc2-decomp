@@ -164,7 +164,19 @@ INCLUDE_ASM("nonmatchings/game/ceffectscriptman", GetStackInt__FP12RS_STACKDATA_
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", GetStackFloat__FP12RS_STACKDATA_002E82C0);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", GetStackVector__FPfP12RS_STACKDATA_002E82F0);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", GetStackString__FP12RS_STACKDATA_002E8340);
-INCLUDE_ASM("nonmatchings/game/ceffectscriptman", SetStack__FP12RS_STACKDATAi_002E8350);
+struct arg0_champs_aef12e {
+    /* 0x0 */ s32 unk0;
+    /* 0x4 */ struct unk4_champs_aef12e *unk4;
+};
+struct unk4_champs_aef12e {
+    char pad0[0x4];
+    /* 0x4 */ s32 unk4;
+};
+extern "C" void SetStack__FP12RS_STACKDATAi_002E8350(struct arg0_champs_aef12e *arg0, s32 arg1) {
+    if (arg0->unk0 == 3) {
+        arg0->unk4->unk4 = arg1;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", SetStack__FP12RS_STACKDATAf_002E8370);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _ZERO_VECTOR__FP12RS_STACKDATAi_002E8390);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _NORMAL_VECTOR__FP12RS_STACKDATAi_002E83E0);

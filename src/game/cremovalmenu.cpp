@@ -94,7 +94,36 @@ extern "C" s32 GetPictureNum__15CInventUserDataFPi(CInventUserData *objet, struc
     arg0->unk4 = 0x1E;
     return arg0->unk0;
 }
-INCLUDE_ASM("nonmatchings/game/cremovalmenu", CalcPhotoExp__15CInventUserDataFv);
+struct calcul0_champs_896dfc {
+    char pad0[0x44DD0];
+    /* 0x44DD0 */ s32 unk44DD0;
+};
+extern "C" s32 GetUserDataMan__Fv(void);
+extern "C" s32 CalcPhotoExp__15CInventUserDataFv(CInventUserData *objet) {
+    s16 temp_v1;
+    s32 temp_v0;
+    s32 var_a0;
+    s32 var_a1;
+    s32 var_s0;
+
+    var_s0 = 0;
+    temp_v0 = GetUserDataMan__Fv();
+    var_a0 = 0;
+    var_a1 = 0;
+    do {
+        temp_v1 = ((struct calcul0_champs_896dfc *) (temp_v0 + var_a1))->unk44DD0;
+        if (temp_v1 > 0) {
+            if (temp_v1 < 0x3E8) {
+                var_s0 += 2;
+            } else {
+                var_s0 += 5;
+            }
+        }
+        var_a0 += 1;
+        var_a1 += 2;
+    } while (var_a0 < 0x200);
+    return var_s0;
+}
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", LevelCheck__15CInventUserDataFP17USER_PICTURE_INFO);
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", GetLevel__15CInventUserDataFv);
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", SetCreateItemFlag__15CInventUserDataFii);

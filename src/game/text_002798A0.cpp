@@ -16,16 +16,71 @@ struct RS_STACKDATA;
 extern GeoStoneData GeoStone;
 
 
-INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_SET_MINIMAP_FLAG__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_SET_MM_LINE_FLAG__FP12RS_STACKDATAi);
+struct Sphida_pointe;
+extern "C" Sphida_pointe *Sphida;
+struct Sphida_champs_7d6b3d {
+    char pad0[0x2C];
+    /* 0x2C */ s32 unk2C;
+};
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(...);
+extern "C" s32 _SPHIDA_SET_MINIMAP_FLAG__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    s32 temp_v0;
+
+    temp_v0 = (s32) (GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
+    if (Sphida == NULL) {
+        return 0;
+    }
+    ((struct Sphida_champs_7d6b3d *) Sphida)->unk2C = temp_v0;
+    return 1;
+}
+struct Sphida_champs_50b6cc {
+    char pad0[0x30];
+    /* 0x30 */ s32 unk30;
+};
+extern "C" s32 _SPHIDA_SET_MM_LINE_FLAG__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    s32 temp_v0;
+
+    temp_v0 = (s32) (GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
+    if (Sphida == NULL) {
+        return 0;
+    }
+    ((struct Sphida_champs_50b6cc *) Sphida)->unk30 = temp_v0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_SET_MM_LINE_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_SET_PIN_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_GET_PIN_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_SET_BALL_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_GET_BALL_POS__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_SET_PIN_COL__FP12RS_STACKDATAi);
+struct Sphida_champs_7072c7 {
+    char pad0[0xB0];
+    /* 0xB0 */ s32 unkB0;
+};
+extern "C" s32 _SPHIDA_SET_PIN_COL__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    s32 temp_v0;
+
+    temp_v0 = (s32) (GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
+    if (Sphida == NULL) {
+        return 0;
+    }
+    ((struct Sphida_champs_7072c7 *) Sphida)->unkB0 = temp_v0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_GET_PIN_COL__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_SET_BALL_COL__FP12RS_STACKDATAi);
+struct Sphida_champs_a984eb {
+    char pad0[0xB4];
+    /* 0xB4 */ s32 unkB4;
+};
+extern "C" s32 _SPHIDA_SET_BALL_COL__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    s32 temp_v0;
+
+    temp_v0 = (s32) (GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
+    if (Sphida == NULL) {
+        return 0;
+    }
+    ((struct Sphida_champs_a984eb *) Sphida)->unkB4 = temp_v0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_GET_BALL_COL__FP12RS_STACKDATAi);
 extern "C" u32 DebugFlag;
 typedef struct Sphida_pointe {
