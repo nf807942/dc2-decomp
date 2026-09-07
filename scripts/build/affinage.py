@@ -74,13 +74,40 @@ def candidats(combien: int) -> list[tuple[int, str, str]]:
     return rendu[:combien] if combien else rendu
 
 
+# Ce que MWCC a dit du dernier échec de compilation. Un `None` rendu par la
+# mesure ne distingue pas un type inconnu d'un fragment périmé, et c'est ce
+# silence qui fait prendre l'outillage pour une propriété du binaire.
+derniere_erreur: str = ""
+
+
+def _diagnostic(sortie: str) -> str:
+    """La plainte du compilateur, réduite à ce qui nomme la cause.
+
+    MWCC préfixe chaque diagnostic d'un dièse et rappelle au-dessus la ligne
+    fautive ; `###` n'annonce que l'outil. Les douze dernières lignes suffisent :
+    au-delà, c'est la même faute répétée sur d'autres sites.
+    """
+    lignes = [l.rstrip() for l in sortie.splitlines()
+              if l.startswith("#") and not l.startswith("###")]
+    return "\n".join(lignes[-12:])
+
+
 def recompile_et_mesure(symbole: str, unite: str) -> float | None:
-    """Reconstruit l'unité puis rend l'appariement — l'objet d'avant mentirait."""
+    """Reconstruit l'unité puis rend l'appariement — l'objet d'avant mentirait.
+
+    Un échec laisse sa cause dans `derniere_erreur` : mwccgap écrit déjà la
+    plainte de MWCC sur son flux d'erreur, et la jeter obligeait à recompiler à
+    la main pour savoir ce qui n'allait pas.
+    """
+    global derniere_erreur
+    derniere_erreur = ""
     objet = ROOT / "build" / "src" / (unite + ".o")
     if objet.exists():
         objet.unlink()
-    if run(["make", str(objet.relative_to(ROOT))],
-           capture_output=True, text=True).returncode != 0:
+    fait = run(["make", str(objet.relative_to(ROOT))],
+               capture_output=True, text=True)
+    if fait.returncode != 0:
+        derniere_erreur = _diagnostic((fait.stdout or "") + (fait.stderr or ""))
         return None
     return sonde_m2c.score(symbole, unite)
 
