@@ -183,7 +183,30 @@ INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetAnalyzeData__9CEditDataFii);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetAnalyzeSrc__9CEditDataFi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetAnalyzePercent__9CEditDataFi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetAnalyzeFlag__9CEditDataFiiPiPi);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetAnalyzeFlag__9CEditDataFii);
+struct CEditData {
+    s32 field_0;
+    s32 field_4;
+    s32 field_8;
+    s32 field_C;
+    char pad_10[0x2A30];
+    s32 field_2A40;
+    char pad_2A44[0x21FC];
+    u8 field_4C40;
+    char pad_4C41[0x3FF];
+    s32 field_5040;
+};
+extern "C" s32 GetAnalyzeFlag__9CEditDataFiiPiPi(void *, s32, s32, s32 *, s32 *);
+extern "C" void GetAnalyzeFlag__9CEditDataFii(CEditData *objet, s32 arg0, s32 arg1) {
+    /* Les emplacements de pile portent la taille que le commerce leur donne,
+     * lue sur l'ecart entre deux adresses prises, et ils sont declares dans
+     * l'ordre croissant de leur decalage : MWCC attribue la pile dans l'ordre
+     * des declarations, m2c les ecrit a l'envers. Deux entiers a la place de
+     * ces tableaux rendaient un cadre de la moitie, et l'ordre de m2c les
+     * echangeait. */
+    s32 sp10[8];
+    s32 sp30[8];
+    GetAnalyzeFlag__9CEditDataFiiPiPi(objet, arg0, arg1, sp10, sp30);
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", dbgSetContintionFlag__9CEditDataFiii);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", dbgSetAnalyzeFlag__9CEditDataFiii);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", dbgSetAllContintionFlag__9CEditDataFii);

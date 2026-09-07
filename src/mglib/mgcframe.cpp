@@ -320,7 +320,18 @@ INCLUDE_ASM("nonmatchings/mglib/mgcframe", test2__FPfPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgInsideScreen__FP9mgVu0FBOX);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgInsideScreen__FP9mgVu0FBOXPA4_f);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgInsideScreen__FP9mgVu0FBOXPA4_fPfPf);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgInsideScreen__FPA4_fPA4_f);
+extern "C" s32 mgInsideScreen__FPA4_fPA4_fPfPf(...);
+extern "C" void mgInsideScreen__FPA4_fPA4_f(f32 (*arg0)[4], f32 (*arg1)[4]) {
+    /* Les emplacements de pile portent la taille que le commerce leur donne,
+     * lue sur l'ecart entre deux adresses prises, et ils sont declares dans
+     * l'ordre croissant de leur decalage : MWCC attribue la pile dans l'ordre
+     * des declarations, m2c les ecrit a l'envers. Deux entiers a la place de
+     * ces tableaux rendaient un cadre de la moitie, et l'ordre de m2c les
+     * echangeait. */
+    f32 sp10[4];
+    f32 sp20[4];
+    mgInsideScreen__FPA4_fPA4_fPfPf(arg0, arg1, sp10, sp20);
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgInsideScreen__FPA4_fPA4_fPfPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetPosition__9mgCObjectFPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetPosition__9mgCObjectFfff);
