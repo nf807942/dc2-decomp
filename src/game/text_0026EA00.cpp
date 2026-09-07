@@ -87,16 +87,124 @@ INCLUDE_ASM("nonmatchings/game/text_0026EA00", _SET_MES_DRAWSPEED__FP12RS_STACKD
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _SET_MES_CURSOR__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _SET_MES_OKURI__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _SET_MES_WIN_FLAG__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_0026EA00", _CHECK_MES_COMPLETE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_0026EA00", _CHECK_MES_WAIT__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_0026EA00", _CHECK_MES__FP12RS_STACKDATAi);
+extern "C" s32 GetMes__Fi(s32);
+#include "gen/ClsMes.hpp"
+struct inferred;
+struct RS_STACKDATA_infere_c9bb90;
+typedef struct RS_STACKDATA_infere_c9bb90 {
+    /* 0x0 */ char pad0[8];
+    /* 0x8 */ char unk8;                               /* inferred */
+    /* 0x8 */ char pad8[1];
+} RS_STACKDATA_infere_c9bb90;                                     /* size >= 0x9 */
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(...);
+extern "C" s32 SetStack__FP12RS_STACKDATAi_00262E70(...);
+extern "C" s32 State__6ClsMesFv(void *);
+extern "C" s32 _CHECK_MES_COMPLETE__FP12RS_STACKDATAi(RS_STACKDATA_infere_c9bb90 *arg0, s32 arg1) {
+    char *next_slot;
+    ClsMes *temp_v0;
+
+    /* L'adresse du second emplacement de pile se calcule avant la garde :
+     * MWCC la range alors dans le creneau de delai du branchement, ce que
+     * le commerce fait. Posee apres, elle rend 94 % — la forme de
+     * l'expression n'y change rien, sa place seule decide. */
+    next_slot = &arg0->unk8;
+    temp_v0 = (ClsMes *) (GetMes__Fi(GetStackInt__FP12RS_STACKDATA_00262DA0(arg0)));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    SetStack__FP12RS_STACKDATAi_00262E70(next_slot, State__6ClsMesFv(temp_v0) == 3);
+    return 1;
+}
+extern "C" s32 GetMes__Fi(s32);
+#include "gen/ClsMes.hpp"
+struct inferred;
+struct RS_STACKDATA_infere_4de93d;
+typedef struct RS_STACKDATA_infere_4de93d {
+    /* 0x0 */ char pad0[8];
+    /* 0x8 */ char unk8;                               /* inferred */
+    /* 0x8 */ char pad8[1];
+} RS_STACKDATA_infere_4de93d;                                     /* size >= 0x9 */
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(...);
+extern "C" s32 SetStack__FP12RS_STACKDATAi_00262E70(...);
+extern "C" s32 State__6ClsMesFv(void *);
+extern "C" s32 _CHECK_MES_WAIT__FP12RS_STACKDATAi(RS_STACKDATA_infere_4de93d *arg0, s32 arg1) {
+    char *next_slot;
+    ClsMes *temp_v0;
+
+    /* L'adresse du second emplacement de pile se calcule avant la garde :
+     * MWCC la range alors dans le creneau de delai du branchement, ce que
+     * le commerce fait. Posee apres, elle rend 94 % — la forme de
+     * l'expression n'y change rien, sa place seule decide. */
+    next_slot = &arg0->unk8;
+    temp_v0 = (ClsMes *) (GetMes__Fi(GetStackInt__FP12RS_STACKDATA_00262DA0(arg0)));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    SetStack__FP12RS_STACKDATAi_00262E70(next_slot, State__6ClsMesFv(temp_v0) == 5);
+    return 1;
+}
+extern "C" s32 GetMes__Fi(s32);
+#include "gen/ClsMes.hpp"
+struct inferred;
+struct RS_STACKDATA_infere_a2730f;
+typedef struct RS_STACKDATA_infere_a2730f {
+    /* 0x0 */ char pad0[8];
+    /* 0x8 */ char unk8;                               /* inferred */
+    /* 0x8 */ char pad8[1];
+} RS_STACKDATA_infere_a2730f;                                     /* size >= 0x9 */
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(...);
+extern "C" s32 SetStack__FP12RS_STACKDATAi_00262E70(...);
+extern "C" s32 State__6ClsMesFv(void *);
+extern "C" s32 _CHECK_MES__FP12RS_STACKDATAi(RS_STACKDATA_infere_a2730f *arg0, s32 arg1) {
+    char *next_slot;
+    ClsMes *temp_v0;
+
+    /* L'adresse du second emplacement de pile se calcule avant la garde :
+     * MWCC la range alors dans le creneau de delai du branchement, ce que
+     * le commerce fait. Posee apres, elle rend 94 % — la forme de
+     * l'expression n'y change rien, sa place seule decide. */
+    next_slot = &arg0->unk8;
+    temp_v0 = (ClsMes *) (GetMes__Fi(GetStackInt__FP12RS_STACKDATA_00262DA0(arg0)));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    SetStack__FP12RS_STACKDATAi_00262E70(next_slot, State__6ClsMesFv(temp_v0) == 0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _SET_MES_FUKIDASHI__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _SET_MES_WINDOW_MODE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _SET_MES_PRESET__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _SET_MES_ITEM_DIRECT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _SET_MES_ITEM__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _SET_MES_VALUE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_0026EA00", _GET_MES_STATUS__FP12RS_STACKDATAi);
+extern "C" s32 GetMes__Fi(s32);
+#include "gen/ClsMes.hpp"
+struct inferred;
+struct RS_STACKDATA_infere_5475c0;
+typedef struct RS_STACKDATA_infere_5475c0 {
+    /* 0x0 */ char pad0[8];
+    /* 0x8 */ char unk8;                               /* inferred */
+    /* 0x8 */ char pad8[1];
+} RS_STACKDATA_infere_5475c0;                                     /* size >= 0x9 */
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(...);
+extern "C" s32 SetStack__FP12RS_STACKDATAi_00262E70(...);
+extern "C" s32 State__6ClsMesFv(void *);
+extern "C" s32 _GET_MES_STATUS__FP12RS_STACKDATAi(RS_STACKDATA_infere_5475c0 *arg0, s32 arg1) {
+    char *next_slot;
+    ClsMes *temp_v0;
+
+    /* L'adresse du second emplacement de pile se calcule avant la garde :
+     * MWCC la range alors dans le creneau de delai du branchement, ce que
+     * le commerce fait. Posee apres, elle rend 94 % — la forme de
+     * l'expression n'y change rien, sa place seule decide. */
+    next_slot = &arg0->unk8;
+    temp_v0 = (ClsMes *) (GetMes__Fi(GetStackInt__FP12RS_STACKDATA_00262DA0(arg0)));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    SetStack__FP12RS_STACKDATAi_00262E70(next_slot, State__6ClsMesFv(temp_v0));
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _GET_PARTY_CHARA_MES_NO__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _MES_SET_BUFF__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _GET_MES_WINDOW_MODE__FP12RS_STACKDATAi);

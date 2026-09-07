@@ -27,6 +27,7 @@ import argparse
 import collections
 import json
 import random
+import re
 import sys
 import time
 from pathlib import Path
@@ -122,6 +123,34 @@ def image_identique() -> bool:
     return image.read_bytes() == reference.read_bytes()
 
 
+# `struct X {` ou `typedef struct X {` — un tag que le fragment *définit*, et
+# qu'il est donc en droit de renommer. Un tag qu'il ne fait qu'employer ne se
+# touche pas : il désigne un type de l'unité.
+_DEFINIT = re.compile(r"\b(?:typedef\s+)?(?:struct|class|union)\s+(\w+)\s*\{")
+
+
+def _sans_collision(fragment: str, symbole: str, amont: str,
+                    unite: str) -> str:
+    """Renomme les tags que le fragment définit et que l'unité déclare déjà.
+
+    Chaque fragment de `build/proches/` a été normalisé contre l'unité *telle
+    qu'elle était* à la moisson. L'unité gagne des fonctions depuis, et deux
+    sœurs y posent le même `RS_STACKDATA_infere` : MWCC répond
+    « struct/union/enum/class tag redefined » et l'on perd une fonction déjà
+    mesurée à 100 %. Cinq l'ont été avant que ce renommage n'existe.
+
+    La marque est celle de la moisson, dérivée du symbole : stable d'un essai à
+    l'autre, donc un même fragment se pose toujours sous le même nom.
+    """
+    declarees = sonde_m2c.deja_declarees(unite, amont)
+    marque = sonde_m2c._marque(symbole)
+    for tag in sorted(set(_DEFINIT.findall(fragment))):
+        if tag in declarees and not tag.endswith(marque):
+            fragment = re.sub(r"\b%s\b" % re.escape(tag), tag + marque,
+                              fragment)
+    return fragment
+
+
 def pose(symbole: str, unite: str) -> tuple[Path, str] | None:
     """Remet le fragment gardé à la place de sa greffe. Rend (source, avant)."""
     source = ROOT / "src" / (unite + ".cpp")
@@ -130,6 +159,11 @@ def pose(symbole: str, unite: str) -> tuple[Path, str] | None:
     if ligne not in avant:
         return None
     fragment = (CORPUS / (symbole + ".cpp")).read_text(encoding="utf-8")
+    # **L'unité entière, non l'amont.** Un type déclaré plus bas n'est pas
+    # *visible* au point de greffe, mais MWCC refuse la redéfinition d'un tag où
+    # qu'elle soit dans l'unité. « Faut-il poser ce type ? » se borne à l'amont ;
+    # « ce nom est-il déjà pris ? » ne se borne pas.
+    fragment = _sans_collision(fragment, symbole, avant, unite)
     ecris(source, avant.replace(ligne, fragment))
     return source, avant
 

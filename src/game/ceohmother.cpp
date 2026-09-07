@@ -13,7 +13,90 @@ extern EdEventInfoData EdEventInfo;
 
 
 INCLUDE_ASM("nonmatchings/game/ceohmother", CalcPosWorldCoordGyaku__FPf);
-INCLUDE_ASM("nonmatchings/game/ceohmother", SetCamWorldCoord__FP9mgCCamera);
+extern "C" u32 SetWorldCoordFlg;
+struct mgCCamera_ac1778 {
+    s32 field_0;
+    f32 field_4;
+    f32 field_8;
+    f32 field_C;
+    f32 field_10;
+    f32 field_14;
+    f32 field_18;
+    f32 field_1C;
+    f32 field_20;
+    f32 field_24;
+    f32 field_28;
+    f32 field_2C;
+    f32 field_30;
+    f32 field_34;
+    f32 field_38;
+    f32 field_3C;
+    f32 field_40;
+    s32 field_44;
+    f32 field_48;
+    f32 field_4C;
+    f32 field_50;
+    f32 field_54;
+    f32 field_58;
+    s32 field_5C;
+    char pad_60[0x14];
+    f32 field_74;
+    f32 field_78;
+    f32 field_7C;
+    f32 field_80;
+    f32 field_84;
+    f32 field_88;
+    f32 field_8C;
+    f32 field_90;
+    f32 field_94;
+    f32 field_98;
+    f32 field_9C;
+    s32 field_A0;
+    f32 field_A4;
+    f32 field_A8;
+    char pad_AC[0x4];
+    f32 field_B0;
+    f32 field_B4;
+    f32 field_B8;
+    f32 field_BC;
+    char pad_C0[0x24];
+    f32 field_E4;
+    f32 field_E8;
+    f32 field_EC;
+    char pad_F0[0xB4];
+    f32 field_1A4;
+    f32 field_1A8;
+    f32 field_1AC;
+    f32 field_1B0;
+    f32 field_1B4;
+    f32 field_1B8;
+    f32 field_1BC;
+    f32 field_1C0;
+    f32 field_1C4;
+    f32 field_1C8;
+    s32 field_1CC;
+    char pad_1D0[0x4];
+    f32 field_1D4;
+    f32 field_1D8;
+    f32 field_1DC;
+};
+extern "C" s32 CalcPosWorldCoord__FPf(f32 *);
+extern "C" s32 GetPos__9mgCCameraFPf(void *, f32 *);
+extern "C" s32 GetRef__9mgCCameraFPf(void *, f32 *);
+extern "C" s32 SetPos__9mgCCameraFPf(void *, f32 *);
+extern "C" s32 SetRef__9mgCCameraFPf(void *, f32 *);
+extern "C" void SetCamWorldCoord__FP9mgCCamera(mgCCamera_ac1778 *arg0) {
+    f32 sp20[4];
+    f32 sp30[4];
+    if ((SetWorldCoordFlg != 0) && (arg0 != NULL)) {
+        GetPos__9mgCCameraFPf(arg0, sp20);
+        GetRef__9mgCCameraFPf(arg0, sp30);
+        CalcPosWorldCoord__FPf(sp20);
+        CalcPosWorldCoord__FPf(sp30);
+        SetPos__9mgCCameraFPf(arg0, sp20);
+        SetRef__9mgCCameraFPf(arg0, sp30);
+    }
+}
 extern "C" u32 SetWorldCoordFlg;
 struct mgCCamera {
     s32 field_0;
@@ -93,6 +176,10 @@ extern "C" void SetCamWorldCoordGyaku__FP9mgCCamera(mgCCamera *arg0) {
      * des declarations, m2c les ecrit a l'envers. Deux entiers a la place de
      * ces tableaux rendaient un cadre de la moitie, et l'ordre de m2c les
      * echangeait. */
+    /* Les emplacements de pile portent la taille que le commerce leur donne,
+     * lue sur l'ecart entre deux adresses prises, et ils sont declares dans
+     * l'ordre croissant de leur decalage : MWCC attribue la pile dans
+     * l'ordre des declarations, m2c les ecrit a l'envers. */
     f32 sp20[4];
     f32 sp30[4];
     if ((SetWorldCoordFlg != 0) && (arg0 != NULL)) {
