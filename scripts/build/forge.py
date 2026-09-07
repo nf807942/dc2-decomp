@@ -102,6 +102,16 @@ def descend(symbole: str, unite: str, jet: str, ecarts: list[str],
     """Le faisceau. Rend (meilleur score, meilleure forme, réparations employées)."""
     front = [(None, jet, [])]          # (score, texte, chemin)
     meilleur = (None, jet, [])
+    # **Le jet se mesure toujours, même si rien ne s'y applique.** Sans cela,
+    # une fonction qu'aucune réparation ne touche ressortait avec un score nul,
+    # et l'état ne distinguait plus « rien n'a compilé » de « rien n'a été
+    # essayé ». Sur le premier passage, 341 fonctions sur 651 portaient ce zéro,
+    # et il a fallu remonter jusqu'au compilateur pour découvrir qu'elles
+    # compilaient très bien.
+    depart = banc.banc(symbole, unite, [jet])[0]
+    if depart is not None:
+        meilleur = (depart, jet, [])
+        front = [meilleur]
     for _ in range(profondeur):
         formes, tracas = [], []
         for _, texte, chemin in front:
@@ -113,10 +123,6 @@ def descend(symbole: str, unite: str, jet: str, ecarts: list[str],
                     tracas.append(chemin + [reparation.__name__])
         if not formes:
             break
-        # Le jet lui-même sert de repère au premier tour.
-        if meilleur[0] is None:
-            formes.insert(0, jet)
-            tracas.insert(0, [])
         scores = banc.banc(symbole, unite, formes)
         classe = sorted(
             ((s, t, c) for s, t, c in zip(scores, formes, tracas)
@@ -184,7 +190,10 @@ def main(argv: list[str]) -> int:
                                        options.profondeur, options.largeur)
         essais += 1
         fiche_etat = {"part": score, "chemin": chemin,
-                      "depart": fiche["part"], "taille": fiche["taille"]}
+                      "depart": fiche["part"], "taille": fiche["taille"],
+                      # Distinguer les deux silences : une reparation qui ne
+                      # s'applique pas n'est pas une forme qui ne compile pas.
+                      "applicable": bool(chemin)}
         if score is not None and score >= 100.0:
             for nom in chemin:
                 gains[nom] += 1
