@@ -17,7 +17,27 @@ INCLUDE_ASM("nonmatchings/game/cmosbookmenu", DrawMainCharaBG__Fv);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", MenuNPCModelLoad__FP9mgCMemoryii);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", MenuNPCLoadCheck__FP12CActionCharaP9mgCMemoryi);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", UpdateCostumeList__15CMenuCostumeSelFiUl);
-INCLUDE_ASM("nonmatchings/game/cmosbookmenu", CosutmeSelDefaultSet__FiPs);
+extern "C" s32 CosutmeSelDefaultSet__FiPs(s32 arg0, s16 *arg1) {
+    s32 var_a2;
+    s32 var_v0;
+
+    var_v0 = 0;
+    var_a2 = 0;
+loop_1:
+    if (arg0 == *(arg1 + var_a2)) {
+        return var_v0;
+    }
+    /* m2c compte les pas de pointeur en octets ; MWCC les met a
+    * l'echelle du type pointe. Le pas est donc ecrit en elements,
+    * et le commerce rend la meme constante. */
+    var_v0 += 1;
+    var_a2 += 1;
+    if (var_v0 >= 5) {
+        return 0;
+    }
+    goto loop_1;
+}
+
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", LoadMenuData__15CMenuCostumeSelFP9mgCMemoryPi);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", KeyStep__15CMenuCostumeSelFv);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", Draw__15CMenuCostumeSelFv);

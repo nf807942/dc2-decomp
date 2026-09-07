@@ -207,7 +207,28 @@ INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetSaveFileInfoFromMc__18CMe
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetAllSaveFileInfo__18CMemoryCardManagerFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", McCheckMCPs2__FP12MC_CARD_INFO);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", McCheckMCPs2Boot__FP12MC_CARD_INFOi);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetCosInfo__Fi);
+extern "C" u8 cosbit_table[136];
+extern "C" s16 *GetCosInfo__Fi(s32 arg0) {
+    s16 *var_v0;
+    s32 var_a1;
+
+    var_a1 = 0;
+    var_v0 = (s16 *) (&cosbit_table);
+loop_1:
+    if (*var_v0 == arg0) {
+        return var_v0;
+    }
+    var_a1 += 1;
+    /* m2c compte les pas de pointeur en octets ; MWCC les met a
+    * l'echelle du type pointe. Le pas est donc ecrit en elements,
+    * et le commerce rend la meme constante. */
+    var_v0 += 2;
+    if (var_a1 >= 0x22) {
+        return NULL;
+    }
+    goto loop_1;
+}
+
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", CreatSmoothPassSW__FPA4_fPA4_fiiii);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Draw__17CSWordAfterEffectFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", CreatPointList__17CSWordAfterEffectFv);

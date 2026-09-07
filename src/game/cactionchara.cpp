@@ -227,7 +227,36 @@ INCLUDE_ASM("nonmatchings/game/cactionchara", ResetScript__12CActionCharaFv);
 INCLUDE_ASM("nonmatchings/game/cactionchara", CheckRunEvent__12CActionCharaFv);
 INCLUDE_ASM("nonmatchings/game/cactionchara", SetMaskFlag__12CActionCharaFii);
 INCLUDE_ASM("nonmatchings/game/cactionchara", EntryObject__12CActionCharaFPci);
-INCLUDE_ASM("nonmatchings/game/cactionchara", CalcCollision__12CActionCharaFv);
+struct CActionChara_infere_2070c5;
+typedef struct CActionChara_infere_2070c5 {
+    /* 0x000 */ char pad0[0xC00];
+    /* 0xC00 */ mgCFrame *unkC00;                   /* inferred */
+} CActionChara_infere_2070c5;                                     /* size >= 0xC04 */
+struct objet_champs_2070c5 {
+    char pad0[0xC00];
+    /* 0xC00 */ s32 unkC00;
+};
+extern "C" s32 GetWorldPosition0__8mgCFrameFPf(void *, f32 *);
+extern "C" void CalcCollision__12CActionCharaFv(CActionChara_infere_2070c5 *objet) {
+    mgCFrame **var_s0;
+    mgCFrame *temp_a0;
+    s32 var_s1;
+
+    var_s1 = 0;
+    var_s0 = (mgCFrame **) (&((struct objet_champs_2070c5 *) objet)->unkC00);
+    do {
+        temp_a0 = (mgCFrame *) (*var_s0);
+        if (temp_a0 != NULL) {
+            GetWorldPosition0__8mgCFrameFPf(temp_a0, (f32 *) (((mgCFrame **) ((u8 *) var_s0 + 0x10))));
+        }
+        var_s1 += 1;
+        /* m2c compte les pas de pointeur en octets ; MWCC les met a
+        * l'echelle du type pointe. Le pas est donc ecrit en elements,
+        * et le commerce rend la meme constante. */
+        var_s0 += 8;
+    } while (var_s1 < 8);
+}
+
 INCLUDE_ASM("nonmatchings/game/cactionchara", EntryBodyCol__12CActionCharaFif);
 INCLUDE_ASM("nonmatchings/game/cactionchara", EntryDamage2__12CActionCharaFPcPcPcfPcffPc);
 INCLUDE_ASM("nonmatchings/game/cactionchara", EntryDamage2__12CActionCharaFP8mgCFrameP8mgCFramePcfPcffPc);
