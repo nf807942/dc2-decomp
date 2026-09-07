@@ -135,7 +135,7 @@ O_FILES   := $(addprefix $(BUILD_DIR)/, $(S_FILES:.s=.o) $(BIN_FILES:.bin=.o) \
              $(addsuffix .o, $(basename $(SRC_FILES))))
 
 .PHONY: all setup tools patch split build objects check diff decompile measure \
-        atlas carve clean distclean contexte injecte provenance chaine affinage ecarts classes lot banc forge instructions controle ci etat progress report
+        atlas carve clean distclean contexte injecte provenance chaine affinage ecarts classes lot banc forge tailles instructions controle ci etat progress report
 
 all: build
 
@@ -349,6 +349,13 @@ banc:
 #   ARGS="--rendement"   le seul compte par reparation
 forge:
 	@$(PYTHON) scripts/build/forge.py $(ARGS)
+
+# La taille exacte de chaque classe, lue aux sites ou le jeu l'alloue. m2c ecrit
+# `size >= 0x67C` parce qu'il ne voit que les champs employes ; le binaire, lui,
+# passe le sizeof en argument a `operator new`, et la table virtuelle ecrite
+# juste apres nomme la classe concrete. Une seconde, sur l'hote.
+tailles:
+	@$(PYTHON) scripts/build/tailles.py $(ARGS)
 
 # Ce que m2c ne sait pas lire, compte en fonctions perdues et en octets. Une
 # seule instruction inconnue perd la fonction entiere : c'est ce releve qui a
