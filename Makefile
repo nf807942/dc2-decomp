@@ -135,7 +135,7 @@ O_FILES   := $(addprefix $(BUILD_DIR)/, $(S_FILES:.s=.o) $(BIN_FILES:.bin=.o) \
              $(addsuffix .o, $(basename $(SRC_FILES))))
 
 .PHONY: all setup tools patch split build objects check diff decompile measure \
-        atlas carve clean distclean contexte injecte provenance chaine affinage ecarts classes lot banc forge tailles vtables instructions controle ci etat progress report
+        atlas carve clean distclean contexte injecte provenance chaine affinage ecarts classes lot banc forge tailles vtables champs instructions controle ci etat progress report
 
 all: build
 
@@ -362,6 +362,13 @@ tailles:
 # classe au bon rang. Une seconde, sur l'hote.
 vtables:
 	@$(PYTHON) scripts/build/vtables.py $(ARGS)
+
+# Le decalage et la largeur de chaque champ, en suivant `this` depuis `$a0`. Le
+# mangling donne la classe, l'instruction donne la largeur : rien n'est infere.
+# `ARGS=--controle` recoupe avec les tailles prouvees a l'allocation, deux
+# derivations independantes qui doivent concorder.
+champs:
+	@$(PYTHON) scripts/build/champs.py $(ARGS)
 
 # Ce que m2c ne sait pas lire, compte en fonctions perdues et en octets. Une
 # seule instruction inconnue perd la fonction entiere : c'est ce releve qui a
