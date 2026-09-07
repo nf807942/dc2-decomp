@@ -224,7 +224,21 @@ INCLUDE_ASM("nonmatchings/game/text_001E2410", _ESM_GET_USER_ID__FP12RS_STACKDAT
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _ESM_SET_VALUE__FP12RS_STACKDATAi_001E8010);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _LOAD_EFFECT_SCRIPT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SW_EFFECT__FP12RS_STACKDATAi_001E8250);
-INCLUDE_ASM("nonmatchings/game/text_001E2410", _ESM_GET_NOTUESD_TEXB__FP12RS_STACKDATAi);
+struct ActiveMonster_pointe;
+extern "C" ActiveMonster_pointe *ActiveMonster;
+struct ActiveMonster_champs_f346d5 {
+    char pad0[0xFFF0];
+    /* 0xFFF0 */ s32 unkFFF0;
+};
+extern "C" s32 GetNotUsedTexb__16CEffectScriptManFv(...);
+extern "C" s32 SetStack__FP12RS_STACKDATAi_001E1BE0(RS_STACKDATA *, s32);
+extern "C" s32 _ESM_GET_NOTUESD_TEXB__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    if (arg1 != 1) {
+        return 0;
+    }
+    SetStack__FP12RS_STACKDATAi_001E1BE0(arg0, GetNotUsedTexb__16CEffectScriptManFv(((struct ActiveMonster_champs_f346d5 *) ActiveMonster)->unkFFF0));
+    return 1;
+}
 typedef struct ActiveMonster_pointe {
     char pad0[65520];
     s32 unkFFF0;
