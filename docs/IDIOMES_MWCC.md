@@ -51,6 +51,33 @@ et que nous laissons vide.
 `addiu sp, sp, K`, **97 donnent au commerce une pile plus grande que la nôtre**.
 L'original garde donc plus que nos sources n'expriment. La cause reste à établir.
 
+## Un pas de pointeur s'écrit en éléments, jamais en octets
+
+C'est le troisième idiome que le classement a fait sortir, et il vise la classe
+`constante` — celle qui domine les fonctions les plus proches du but : sur les
+soixante premières, vingt-six en relèvent.
+
+Sa divergence est toujours la même instruction, `addiu rX, rY, K`, avec deux
+constantes dont **le rapport est entier**. `GetCosInfo__Fi` avance un `s16 *`
+de `+= 4` en pensant quatre octets, et MWCC émet huit. `IsRun__14CRepairManagerFv`
+fait `objet + var_a1` sur un `CRepairManager *` de 492 octets, et un pas de
+quatre octets devient `0x7b0`.
+
+**m2c compte en octets, MWCC met à l'échelle du type pointé.** Deux réparations,
+selon que la constante du commerce est ou non un multiple de ce type :
+
+- **le pas en éléments** — la constante de la source se divise par le rapport,
+  `+= 4` devient `+= 2` sur un `s16 *` ;
+- **le pas en octets** — la conversion se pose sur l'expression entière,
+  `(T *) ((u8 *) p + i)`, quand aucun compte d'éléments ne rend la valeur voulue.
+
+Rien n'oblige à savoir laquelle est juste : `make lot` mesure les deux pour un
+peu plus d'une seconde. **28 essais sur la classe entière, trois fonctions
+menées à 100 %** — `CalcCollision__12CActionCharaFv`, `GetCosInfo__Fi`,
+`CosutmeSelDefaultSet__FiPs`, 204 octets, image identique au disque. Le pas en
+octets porte `__ct__10CEohMotherFv` de 95,96 % à 99,99 %, à une instruction du
+but.
+
 ## Un emplacement de pile porte la taille et l'ordre que le commerce impose
 
 C'est le second idiome que le classement a fait sortir, et il vise la classe
