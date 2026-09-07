@@ -233,6 +233,9 @@ typedef struct CActionChara_infere_2070c5 {
     /* 0xC00 */ mgCFrame *unkC00;                   /* inferred */
 } CActionChara_infere_2070c5;                                     /* size >= 0xC04 */
 struct objet_champs_2070c5 {
+    /* Le remplissage est reduit de quatre octets par rapport a ce que m2c a
+     * infere : l'alignement du champ suivant reportait celui-ci d'un mot, et
+     * le commerce le lit un mot plus bas. */
     char pad0[0xC00];
     /* 0xC00 */ s32 unkC00;
 };
@@ -536,7 +539,36 @@ extern "C" void DrawEffect__12CActionCharaFv(CActionChara_infere9 *objet) {
     }
 }
 INCLUDE_ASM("nonmatchings/game/cactionchara", StepEffect__12CActionCharaFv);
-INCLUDE_ASM("nonmatchings/game/cactionchara", SearchChara__12CActionCharaFPc);
+struct CActionChara_infere2_890643;
+typedef struct CActionChara_infere2_890643 {
+    /* 0x000 */ char pad0[0xF0];
+    /* 0x0F0 */ char unkF0;                            /* inferred */
+    /* 0x0F0 */ char padF0[0x584];
+    /* 0x678 */ CActionChara_infere2_890643 *unk678;               /* inferred */
+} CActionChara_infere2_890643;                                     /* size >= 0x67C */
+extern "C" s32 strcmp(...);
+extern "C" CActionChara_infere2_890643 *SearchChara__12CActionCharaFPc(CActionChara_infere2_890643 *objet, s8 *arg0) {
+    void *var_a0;
+    CActionChara_infere2_890643 *var_s0;
+
+    var_s0 = (CActionChara_infere2_890643 *) (objet);
+    if (objet != NULL) {
+        var_a0 = (void *) (&var_s0->unkF0);
+loop_2:
+        if (strcmp(var_a0, arg0) == 0) {
+            return var_s0;
+        }
+        var_s0 = (CActionChara_infere2_890643 *) (var_s0->unk678);
+        var_a0 = (void *) (&var_s0->unkF0);
+        if (var_s0 == NULL) {
+            goto block_5;
+        }
+        goto loop_2;
+    }
+block_5:
+    return NULL;
+}
+
 typedef struct CActionChara_infere2 {
     /* 0x000 */ char pad0[0x70];
     /* 0x070 */ mgCFrame *unk70;                    /* inferred */

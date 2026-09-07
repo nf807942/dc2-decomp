@@ -32,7 +32,92 @@ void CSceneData::Initialize(void) {
 INCLUDE_ASM("nonmatchings/game/cscene", AssignData__15CSceneCharacterFP11CCharacter2Pc);
 INCLUDE_ASM("nonmatchings/game/cscene", Initialize__15CSceneCharacterFv);
 INCLUDE_ASM("nonmatchings/game/cscene", Initialize__9CSceneMapFv);
-INCLUDE_ASM("nonmatchings/game/cscene", AssignData__9CSceneMapFP4CMapPc);
+struct CMap {
+    char pad_0[0x98];
+    s32 field_98;
+    s32 field_9C;
+    s32 field_A0;
+    char pad_A4[0x1C];
+    s32 field_C0;
+    s32 field_C4;
+    f32 field_C8;
+    s32 field_CC;
+    s32 field_D0;
+    char pad_D4[0x4];
+    s32 field_D8;
+    f32 field_DC;
+    f32 field_E0;
+    s32 field_E4;
+    s32 field_E8;
+    s32 field_EC;
+    f32 field_F0;
+    f32 field_F4;
+    f32 field_F8;
+    char pad_FC[0xC];
+    s32 field_108;
+    char pad_10C[0x200];
+    s32 field_30C;
+    s32 field_310;
+    s32 field_314;
+    s32 field_318;
+    s32 field_31C;
+    s32 field_320;
+    s32 field_324;
+    s32 field_328;
+    char pad_32C[0x4];
+    s32 field_330;
+    s32 field_334;
+    char pad_338[0x8];
+    f32 field_340;
+    char pad_344[0xC];
+    f32 field_350;
+    char pad_354[0xC];
+    s32 field_360;
+    char pad_364[0x4];
+    s32 field_368;
+    char pad_36C[0x304];
+    s32 field_670;
+    char pad_674[0x60C];
+    s32 field_C80;
+    char pad_C84[0x4];
+    f32 field_C88;
+    s32 field_C8C;
+    char pad_C90[0x4];
+    s32 field_C94;
+    s32 field_C98;
+    char pad_C9C[0xC];
+    s32 field_CA8;
+    s32 field_CAC;
+    char pad_CB0[0x34];
+    f32 field_CE4;
+    s32 field_CE8;
+    s32 field_CEC;
+    s32 field_CF0;
+    s32 field_CF4;
+};
+struct inferred;
+struct CSceneMap;
+typedef struct CSceneMap {
+    /* 0x00 */ s32 unk0;                            /* inferred */
+    /* 0x04 */ char pad4[4];
+    /* 0x08 */ char unk8;                              /* inferred */
+    /* 0x08 */ char pad8[0x28];
+    /* 0x34 */ CMap *unk34;                         /* inferred */
+} CSceneMap;                                        /* size >= 0x38 */
+extern "C" s32 strcpy(...);
+extern "C" s32 Initialize__9CSceneMapFv(void *);
+extern "C" s32 AssignData__9CSceneMapFP4CMapPc(CSceneMap *objet, CMap *arg0, s8 *arg1) {
+    if ((arg1 == NULL) || (arg0 == NULL)) {
+        return 0;
+    }
+    Initialize__9CSceneMapFv(objet);
+    objet->unk0 = 0;
+    objet->unk34 = arg0;
+    strcpy(&objet->unk8, arg1);
+    objet->unk0 |= 4;
+    return 1;
+}
+
 INCLUDE_ASM("nonmatchings/game/cscene", Initialize__13CSceneMessageFv);
 #include "gen/ClsMes.hpp"
 struct inferred;
@@ -245,6 +330,9 @@ INCLUDE_ASM("nonmatchings/game/cscene", SetCharaNo__6CSceneFii);
 struct CScene;
 extern "C" s32 GetSceneCharacter__6CSceneFi(void *, s32);
 struct temp_v0_champs {
+    /* Le remplissage est reduit de quatre octets par rapport a ce que m2c a
+     * infere : l'alignement du champ suivant reportait celui-ci d'un mot, et
+     * le commerce le lit un mot plus bas. */
     char pad0[0x3C];
     /* 0x3C */ s32 unk3C;
 };
