@@ -23,6 +23,7 @@ typedef struct CPosDataManage_infere {
     /* 0x1C */ s16 unk1C;                           /* inferred */
     /* 0x1E */ s8 unk1E;                            /* inferred */
 } CPosDataManage_infere;                                   /* size >= 0x1F */
+/* Pose par `make forge`, qui a compose les reparations connues et verifie l'image entiere. Voir docs/IDIOMES_MWCC.md pour le detail de chacune. */
 extern "C" void Initialize__14CPosDataManageFv(CPosDataManage_infere *objet) {
     objet->unk0 = 0;
     objet->unk4 = 0;
@@ -44,7 +45,14 @@ INCLUDE_ASM("nonmatchings/game/cposdatamanage", GetEtcTblValue__14CPosDataManage
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", GetEtcTbl2__14CPosDataManageFPc);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", GetEtcTbl2Value__14CPosDataManageFPcPfi);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", EtcTbl2Clear__14CPosDataManageFii);
-INCLUDE_ASM("nonmatchings/game/cposdatamanage", GetMenuMainIconChar__Fi);
+extern "C" u8 temp_3925[32];
+extern "C" u8 _3927[];
+extern "C" s32 sprintf(...);
+extern "C" void *GetMenuMainIconChar__Fi(s32 arg0) {
+    sprintf(&temp_3925, &_3927, arg0 - 2);
+    return &temp_3925;
+}
+
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", GetFormInfo__14CPosDataManageFPc);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", GetFormInfo__14CPosDataManageFi);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", FormInfoClear__14CPosDataManageFii);
@@ -158,7 +166,36 @@ INCLUDE_ASM("nonmatchings/game/cposdatamanage", Initialize__14CRepairManagerFv);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", SetStack__14CRepairManagerFP9mgCMemoryi);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Clear__14CRepairManagerFv);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", LoadDataBG__14CRepairManagerFP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/cposdatamanage", CheckDataBG__14CRepairManagerFi);
+extern "C" u8 _4888[20];
+extern "C" u8 mgTexManager[540];
+extern "C" s32 GetPackFile__FPUiPcPi(...);
+extern "C" u8 _4890[11];
+extern "C" u8 _4889[];
+struct CRepairManager;
+typedef struct CRepairManager {
+    /* 0x000 */ s8 unk0;                            /* inferred */
+    /* 0x001 */ u8 unk1;                            /* inferred */
+    /* 0x002 */ s16 unk2;                           /* inferred */
+    /* 0x004 */ char pad4[0x1A4];                   /* maybe part of unk2[0xD3]void */
+    /* 0x1A8 */ s32 unk1A8;                         /* inferred */
+    /* 0x1AC */ u32 *unk1AC;                        /* inferred */
+} CRepairManager;                                   /* size >= 0x1B0 */
+extern "C" s32 DeleteBlock__17mgCTextureManagerFi(void *, s32);
+extern "C" s32 GetTexture__17mgCTextureManagerFPci(...);
+extern "C" s32 MenuEnterIMG__FiPUcPc(...);
+extern "C" void CheckDataBG__14CRepairManagerFi(CRepairManager *objet, s32 arg0) {
+    s32 sp3C;
+
+    if (objet->unk1 == 0) {
+        DeleteBlock__17mgCTextureManagerFi(&mgTexManager, arg0);
+        objet->unk2 = (s16) arg0;
+        MenuEnterIMG__FiPUcPc(arg0, GetPackFile__FPUiPcPi(objet->unk1AC, &_4888, &sp3C), &_4889);
+        objet->unk1A8 = GetTexture__17mgCTextureManagerFPci(&mgTexManager, &_4890, -1);
+        objet->unk1 = 1;
+        objet->unk0 = 0;
+    }
+}
+
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", SetRepairData__14CRepairManagerFP9mgCMemoryiPUi);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", GeneratePoly__14CRepairManagerFPfi);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Generate__14CRepairManagerFii);

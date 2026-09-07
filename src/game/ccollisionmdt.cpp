@@ -55,6 +55,7 @@ typedef struct CCollision_infere {
     /* 0x20 */ f32 unk20;                           /* inferred */
 } CCollision_infere;                                       /* size >= 0x24 */
 extern "C" s32 mgClipBoxVertex__FPfPfPf(f32 *, f32 *, f32 *);
+/* Pose par `make forge`, qui a compose les reparations connues et verifie l'image entiere. Voir docs/IDIOMES_MWCC.md pour le detail de chacune. */
 extern "C" s32 InsidePoint__10CCollisionFPf(CCollision_infere *objet, f32 *arg0) {
     return mgClipBoxVertex__FPfPfPf(arg0, &objet->unk10, &objet->unk20) != 0;
 }
@@ -254,6 +255,20 @@ INCLUDE_ASM("nonmatchings/game/ccollisionmdt", WriteFile__FPcPvi);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", GetPackFile__FPUiPcPi);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", GetPackFile__FPUiiPPcPi);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", GetPackFileExt__FPUiPcPPUiiPiPPc);
-INCLUDE_ASM("nonmatchings/game/ccollisionmdt", GetPackFileNum__FPUi);
+extern "C" s32 GetPackFile__FPUiiPPcPi(...);
+extern "C" s32 GetPackFileNum__FPUi(u32 *arg0) {
+    s32 sp38;
+    s8 *sp3C;
+    s32 var_s0;
+
+    var_s0 = 0;
+loop_1:
+    if (GetPackFile__FPUiiPPcPi(arg0, var_s0, &sp3C, &sp38) != 0) {
+        var_s0 += 1;
+        goto loop_1;
+    }
+    return var_s0;
+}
+
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", DivPathName__FPcPcPc);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", DivPathNameExt__FPcPcPcPc);

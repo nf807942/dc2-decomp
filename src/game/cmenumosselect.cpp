@@ -33,7 +33,29 @@ INCLUDE_ASM("nonmatchings/game/cmenumosselect", MenuItemChrLoadEndCheck__FP17MEN
 INCLUDE_ASM("nonmatchings/game/cmenumosselect", MenuItemRoboDataLoad__FP9mgCMemoryPP17MENU_BGREAD_INFO2i);
 INCLUDE_ASM("nonmatchings/game/cmenumosselect", DeleteOutLineMenu__FP12CActionCharai);
 INCLUDE_ASM("nonmatchings/game/cmenumosselect", MenuItemRoboDataLoadEndCheck__FPP17MENU_BGREAD_INFO2P9mgCMemoryPP12CActionCharaii);
-INCLUDE_ASM("nonmatchings/game/cmenumosselect", MenuRoboPartsLightOff__FP8mgCFrame);
+extern "C" u8 _4517_00374C70[];
+extern "C" s32 SearchFrame__8mgCFrameFPc(...);
+#include "gen/mgCFrame.hpp"
+struct temp_v0_champs_a42004 {
+    char pad0[0xF4];
+    /* 0xF4 */ struct unkF4_champs_a42004 *unkF4;
+};
+struct unkF4_champs_a42004 {
+    char pad0[0x18];
+    /* 0x18 */ s32 unk18;
+};
+/* Pose par `make forge`, qui a compose les reparations connues et verifie l'image entiere. Voir docs/IDIOMES_MWCC.md pour le detail de chacune. */
+extern "C" void MenuRoboPartsLightOff__FP8mgCFrame(mgCFrame *arg0) {
+    struct temp_v0_champs_a42004 *temp_v0;
+
+    if (arg0 != NULL) {
+        temp_v0 = (struct temp_v0_champs_a42004 *) (SearchFrame__8mgCFrameFPc(arg0, &_4517_00374C70));
+        if (temp_v0 != NULL) {
+            temp_v0->unkF4->unk18 = 0;
+        }
+    }
+}
+
 INCLUDE_ASM("nonmatchings/game/cmenumosselect", MenuMonsterLoadBG__FP9mgCMemoryPP17MENU_BGREAD_INFO2ii);
 INCLUDE_ASM("nonmatchings/game/cmenumosselect", MenuMonsterLoadBGCheck__FPP17MENU_BGREAD_INFO2PP12CActionCharaii);
 INCLUDE_ASM("nonmatchings/game/cmenumosselect", MenuItemCharaDataLoadEndCheckAfter__FPP17MENU_BGREAD_INFO2i);

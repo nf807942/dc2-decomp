@@ -35,6 +35,7 @@ typedef struct CMenuEffect_infere {
     /* 0x10 */ s32 unk10;                           /* inferred */
 } CMenuEffect_infere;                                      /* size >= 0x14 */
 extern "C" s32 Alloc__9mgCMemoryFi(void *, s32);
+/* Pose par `make forge`, qui a compose les reparations connues et verifie l'image entiere. Voir docs/IDIOMES_MWCC.md pour le detail de chacune. */
 extern "C" void SetMemory__11CMenuEffectFP9mgCMemory(CMenuEffect_infere *objet, mgCMemory *arg0) {
     u32 temp_v1;
     u32 var_v0;
@@ -101,7 +102,25 @@ s32 GetMenuEtcFlag(void) {
 s32 GetMenuPrim(void) {
     return MenuPrim;
 }
-INCLUDE_ASM("nonmatchings/game/cmenueffect", MenuMainImageDataEnter__Fi);
+extern "C" s32 GetMenuMainIMGPtr__Fv(void);
+extern "C" u8 _1028_0036FBD0[];
+extern "C" u8 mgTexManager[540];
+struct mgCEnterIMGInfo {
+    char pad_0[0x4];
+    s32 field_4;
+};
+extern "C" s32 EnterIMGFile__17mgCTextureManagerFPUciP9mgCMemoryP15mgCEnterIMGInfo(void *, u8 *, s32, mgCMemory *, mgCEnterIMGInfo *);
+extern "C" s32 ResetTextureBlockNo__14CPosDataManageFPci(...);
+extern "C" void MenuMainImageDataEnter__Fi(s32 arg0) {
+    u8 *temp_v0;
+
+    temp_v0 = (u8 *) (GetMenuMainIMGPtr__Fv());
+    if (temp_v0 != NULL) {
+        EnterIMGFile__17mgCTextureManagerFPUciP9mgCMemoryP15mgCEnterIMGInfo(&mgTexManager, temp_v0, arg0, NULL, NULL);
+        ResetTextureBlockNo__14CPosDataManageFPci(MenuPosData, &_1028_0036FBD0, arg0);
+    }
+}
+
 void SetMenuFrameRate(s32 value) {
     mgFrameRate = value;
 }

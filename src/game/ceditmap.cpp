@@ -108,6 +108,7 @@ struct temp_v0_champs_fd5b88 {
     char pad0[0x324];
     /* 0x324 */ s32 unk324;
 };
+/* Pose par `make forge`, qui a compose les reparations connues et verifie l'image entiere. Voir docs/IDIOMES_MWCC.md pour le detail de chacune. */
 extern "C" s32 GetePartsInfoAtPlaceID__8CEditMapFi(CEditMap *objet, s32 arg0) {
     struct temp_v0_champs_fd5b88 *temp_v0;
 
@@ -247,7 +248,32 @@ extern "C" s32 GetDefColor__14CEditPartsInfoFiPf(CEditPartsInfo_infere *objet, s
     }
     return GetDefColor__9CMapPartsFiPf(temp_a0, arg0, arg1);
 }
-INCLUDE_ASM("nonmatchings/game/ceditmap", LiveChara__10CEditHouseFv);
+struct CEditHouse {
+    char pad_0[0x4];
+    s32 field_4;
+};
+struct calcul0_champs_e79c5e {
+    char pad0[0x4];
+    /* 0x4 */ s32 unk4;
+};
+extern "C" s32 LiveChara__10CEditHouseFv(CEditHouse *objet) {
+    s32 var_v1;
+    s32 var_a1;
+
+    var_v1 = 0;
+    var_a1 = 0;
+loop_1:
+    if (((struct calcul0_champs_e79c5e *) ((u8 *) objet + var_a1))->unk4 > 0) {
+        return 1;
+    }
+    var_v1 += 1;
+    var_a1 += 4;
+    if (var_v1 >= 3) {
+        return 0;
+    }
+    goto loop_1;
+}
+
 INCLUDE_ASM("nonmatchings/game/ceditmap", Initialize__10CEditPartsFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap", StandardPos__Ff);
 INCLUDE_ASM("nonmatchings/game/ceditmap", SetPosition__10CEditPartsFPf);

@@ -13,6 +13,7 @@
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _CMRS_MOVE_REF__FP12RS_STACKDATAi);
 extern "C" u8 CameraSeq[2832];
 extern "C" s32 InitPas__12CSceneCmrSeqFv(void *);
+/* Pose par `make forge`, qui a compose les reparations connues et verifie l'image entiere. Voir docs/IDIOMES_MWCC.md pour le detail de chacune. */
 extern "C" s32 _CMRS_INIT_PAS__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     InitPas__12CSceneCmrSeqFv(&CameraSeq);
     return 1;
@@ -420,7 +421,18 @@ extern "C" s32 _LOAD_SOUND__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _STREAM_CLOSE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", CommandStreamOpen2__FiPc);
+extern "C" u8 _6781_00372150[15];
+extern "C" u8 _6782_00372160[];
+extern "C" s32 strcat(...);
+extern "C" s32 strcpy(...);
+extern "C" s32 CommandStreamOpen2__FiPc(s32 arg0, s8 *arg1) {
+    s32 sp20[16];
+    strcpy(sp20, &_6781_00372150);
+    strcat(sp20, arg1);
+    strcat(sp20, &_6782_00372160);
+    return 1;
+}
+
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _STREAM_OPEN2__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _LOAD_BGM_PACK__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _GET_BGM_NO__FP12RS_STACKDATAi);

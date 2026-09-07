@@ -36,7 +36,52 @@ INCLUDE_ASM("nonmatchings/game/clsmes", DrawCross__6ClsMesFP11mgCDrawPrim);
 INCLUDE_ASM("nonmatchings/game/clsmes", DrawRightDelta__6ClsMesFP11mgCDrawPrim);
 INCLUDE_ASM("nonmatchings/game/clsmes", DrawDigit__6ClsMesFP11mgCDrawPrimiiiiP10RGBAQ_TYPE);
 INCLUDE_ASM("nonmatchings/game/clsmes", DrawPushButton__6ClsMesFP11mgCDrawPrimii);
-INCLUDE_ASM("nonmatchings/game/clsmes", CalcCenteringXY__6ClsMesFPiPi);
+struct inferred;
+struct ClsMes;
+typedef struct ClsMes {
+    /* 0x0000 */ char pad0[0xCC];
+    /* 0x00CC */ s32 unkCC;                         /* inferred */
+    /* 0x00D0 */ char padD0[8];                     /* maybe part of unkCC[3]void */
+    /* 0x00D8 */ s32 unkD8;                         /* inferred */
+    /* 0x00DC */ char padDC[4];
+    /* 0x00E0 */ s32 unkE0;                         /* inferred */
+    /* 0x00E4 */ s32 unkE4;                         /* inferred */
+    /* 0x00E8 */ char padE8[0x50];                  /* maybe part of unkE4[0x15]void */
+    /* 0x0138 */ s32 unk138;                        /* inferred */
+    /* 0x013C */ char pad13C[0x1D14];               /* maybe part of unk138[0x746]void */
+    /* 0x1E50 */ s32 unk1E50;                       /* inferred */
+} ClsMes;                                           /* size >= 0x1E54 */
+/* Pose par `make forge`, qui a compose les reparations connues et verifie l'image entiere. Voir docs/IDIOMES_MWCC.md pour le detail de chacune. */
+extern "C" void CalcCenteringXY__6ClsMesFPiPi(ClsMes *objet, s32 *arg0, s32 *arg1) {
+    s32 temp_a3;
+    s32 var_v1;
+    s32 temp_a3_2;
+    s32 var_v1_2;
+    s32 temp_a0;
+
+    *arg0 = 0;
+    if (objet->unk138 == 1) {
+        temp_a3 = (s32) (objet->unkE0);
+        if (temp_a3 < 0x2D) {
+            temp_a3_2 = 0x2D - temp_a3;
+            var_v1 = temp_a3_2 >> 1;
+            if (temp_a3_2 < 0) {
+                var_v1 = (s32) (temp_a3_2 + 1) >> 1;
+            }
+            *arg0 = var_v1;
+        }
+    }
+    *arg1 = 0;
+    if ((objet->unk138 != 1) && (objet->unk1E50 != 0)) {
+        temp_a0 = (s32) ((objet->unkD8 * objet->unkCC) - objet->unkE4);
+        var_v1_2 = temp_a0 >> 1;
+        if (temp_a0 < 0) {
+            var_v1_2 = (s32) (temp_a0 + 1) >> 1;
+        }
+        *arg1 = var_v1_2;
+    }
+}
+
 INCLUDE_ASM("nonmatchings/game/clsmes", SetAbsWinData__6ClsMesFP4RECT);
 INCLUDE_ASM("nonmatchings/game/clsmes", SetOuterRectXYFromFukidashiPos__6ClsMesFP4RECT);
 INCLUDE_ASM("nonmatchings/game/clsmes", CalcWindowOutRectFromInRect__Fi4RECTP4RECT);
@@ -48,7 +93,30 @@ INCLUDE_ASM("nonmatchings/game/clsmes", CalcIntersectionPointSphereAndLine__FPff
 INCLUDE_ASM("nonmatchings/game/clsmes", CheckPosInOutForArea__FPfPfPf);
 INCLUDE_ASM("nonmatchings/game/clsmes", CalcMoveNextPos__FPfPffPf);
 INCLUDE_ASM("nonmatchings/game/clsmes", InitMovieCC__Fv);
-INCLUDE_ASM("nonmatchings/game/clsmes", MyStrCpyLineFeed__FPcPc);
+extern "C" u8 _4574[];
+extern "C" s32 strncmp(...);
+extern "C" void MyStrCpyLineFeed__FPcPc(s8 *arg0, s8 *arg1) {
+    s8 *var_s0;
+    s8 *var_s1;
+
+    var_s1 = (s8 *) (arg1);
+    var_s0 = (s8 *) (arg0);
+loop_1:
+    if (*var_s1 != 0xA) {
+        if (strncmp(var_s1, &_4574, 2) == 0) {
+            var_s1 += 2;
+            *var_s0 = 0xA;
+            var_s0 += 1;
+        } else {
+            *var_s0 = *var_s1;
+            var_s1 += 1;
+            var_s0 += 1;
+        }
+        goto loop_1;
+    }
+    *var_s0 = 0;
+}
+
 extern "C" void GetNextLineTop__FPPc(s8 **arg0) {
     s8 *var_a2;
 
