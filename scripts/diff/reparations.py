@@ -287,13 +287,24 @@ def ordre_declarations(fragment: str, ecarts: list[str]) -> list[str]:
         return []
     tete, queue = contigus[0].start(), contigus[-1].end()
     lignes = [t.group(0) for t in contigus]
+    # **Le plafond se paie en fonctions perdues.** Coupé à vingt-quatre ordres,
+    # il laissait `CalcCenteringXY__6ClsMesFPiPi` à 98 % : ses cinq déclarations
+    # font cent vingt ordres, et c'est un des quatre-vingt-seize écartés qui
+    # rend 100 %. Le banc mesure une forme en trois millisecondes, donc cent
+    # vingt ordres coûtent moins d'une demi-seconde ; il n'y a plus de raison de
+    # couper avant que le nombre lui-même ne devienne le problème.
+    #
+    # **Et l'espace des sorties est bien plus petit que celui des sources** :
+    # ces cent vingt ordres ne rendent que *trois* assembleurs distincts. C'est
+    # ce qui rend l'énumération exhaustive praticable là où le compte des
+    # permutations la ferait croire hors de portée.
     formes = []
     for ordre in itertools.permutations(lignes):
         if list(ordre) == lignes:
             continue
         formes.append(fragment[:debut] + corps[:tete] + "\n".join(ordre)
                       + corps[queue:] + fragment[fin:])
-        if len(formes) >= 120:
+        if len(formes) >= 5039:       # sept déclarations, sept secondes au banc
             break
     return formes
 
