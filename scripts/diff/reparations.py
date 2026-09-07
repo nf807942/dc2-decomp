@@ -246,14 +246,20 @@ def adressage(fragment: str, ecarts: list[str]) -> list[str]:
                 sens[nom] = "relatif"
     formes = []
     for nom, quoi in sens.items():
-        motif = re.compile(r'^(extern "C" [A-Za-z_][\w ]*\**\s*%s)\[(\d*)\];'
-                           % re.escape(nom), re.MULTILINE)
+        # **La déclaration scalaire compte autant que le tableau.** Exiger des
+        # crochets écartait seize des trente-trois fonctions concernées, dont
+        # toutes celles où m2c écrit `extern "C" u8 _1296_003695B8;`. Un scalaire
+        # est petit, donc MWCC le range en `sdata` et l'atteint par `$gp` — c'est
+        # exactement le cas qu'il faut corriger.
+        motif = re.compile(r'^(extern "C" [A-Za-z_][\w ]*\**\s*%s)'
+                           r'(?:\[(\d*)\])?;' % re.escape(nom), re.MULTILINE)
         trouve = motif.search(fragment)
         if trouve is None:
             continue
-        if quoi == "absolu" and trouve.group(2):
-            taille = "[]"
-        elif quoi == "relatif" and not trouve.group(2):
+        crochets = trouve.group(2)
+        if quoi == "absolu" and crochets != "":
+            taille = "[]"          # taille inconnue : rien ne peut aller en sdata
+        elif quoi == "relatif" and crochets == "":
             taille = "[4]"
         else:
             continue
