@@ -84,11 +84,13 @@ le détail est plus bas. Sur les moyennes, quatre-vingts pour cent des jets ne
 compilent pas, et les causes sont hétérogènes — aucune ne domine, chacune
 demande son diagnostic. m2c lui-même renonce sur un sur six.
 
-**Le permuteur ne rattrape pas un jet m2c.** Sur la meilleure candidate, **121
-essais n'ont pas bougé de 93,21 %** : l'écart était un décalage de branchement
-dans une boucle, hors de portée de ses vingt-neuf transformations. Le permuteur
-garde sa valeur là où il l'a prouvée — une allocation de registres sur du code
-déjà juste —, pas comme finisseur.
+~~**Le permuteur ne rattrape pas un jet m2c.**~~ **Démenti le 7 septembre 2026,
+et c'est le coût qui mentait.** Les 121 essais sans gain avaient été payés
+4,8 secondes pièce, ce qui bornait la recherche à quelques dizaines de formes.
+`make lot` mesure une forme en 546 ms sans regreffer l'unité : sur la classe
+`registres`, **427 essais en quatre minutes et demie ont rendu sept fonctions**,
+par la seule permutation des déclarations locales. Le permuteur est un finisseur
+qui marche ; ce qui manquait était le droit d'énumérer.
 
 **Un contexte partiel rend m2c moins bon que pas de contexte du tout.** Sans
 contexte, il infère un type entier et en émet la déclaration ; avec une version

@@ -51,6 +51,34 @@ et que nous laissons vide.
 `addiu sp, sp, K`, **97 donnent au commerce une pile plus grande que la nôtre**.
 L'original garde donc plus que nos sources n'expriment. La cause reste à établir.
 
+## L'ordre des déclarations reproduit l'allocation de registres — et le permuteur redevient utile
+
+La classe `registres` est celle dont la divergence ne porte ni sur un opcode, ni
+sur une constante, ni sur un décalage : les deux suites font la même chose, avec
+d'autres registres. Le dépôt l'avait rangée du côté du permuteur, puis avait
+conclu que **le permuteur ne rattrape pas un jet m2c** — 121 essais sans bouger
+sur la meilleure candidate.
+
+**Ce verdict tenait au coût, non à la méthode.** Un essai valait alors 4,8
+secondes, ce qui bornait la recherche à quelques dizaines de formes. À 546 ms,
+les vingt-quatre ordres de quatre déclarations tiennent en treize secondes.
+
+Mesuré sur la classe entière : **427 essais, quatre minutes et demie, sept
+fonctions menées à 100 %** — `KnowScoop__17CScoopDataManagerFv`,
+`Draw__9CStarDustFP10mgCTextureii`, `Search__14CFuncPointMngrFPc`,
+`dynFRAME__FP9SPI_STACKi`, `GetTagProgSize__6CMovieFii`,
+`GetFrameNum__8mgCFrameFv`, `GetMpegWorkSize__6CMovieFii`, 972 octets, image
+identique au disque.
+
+La règle sous-jacente était déjà consignée pour les compteurs de boucle : MWCC
+attribue ses registres dans l'ordre où les variables lui viennent. Ce qui manquait
+n'était pas la règle mais le droit d'énumérer.
+
+**La marge reste mince** : m2c déclare peu de locales, et la moitié des fonctions
+de la classe n'en ont que deux, soit un seul autre ordre. Ce n'est pas une
+machine à décompiler ; c'est un finisseur qui marche, ce qu'on avait cessé de
+croire.
+
 ## Un champ inféré tombe un mot trop loin quand l'alignement le reporte
 
 Quatrième idiome, et le plus simple à poser. La classe `disposition` a la
