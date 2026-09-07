@@ -58,10 +58,14 @@ _BRANCHE = frozenset("b beq bne beqz bnez blez bgez bltz bgtz bc1t bc1f j jal "
                      "beql bnel".split())
 
 # Les accès mémoire, par largeur et par banc de registres. Deux opcodes qui ne
-# diffèrent que par là ne disent pas une forme de source mais **un type** : le
-# champ que nous déclarons sur seize bits, le commerce le lit sur trente-deux.
-# C'est un fait pour l'atlas, réparable sans toucher au corps de la fonction,
-# et c'est pourquoi il ne se range pas avec les idiomes.
+# diffèrent que par là disent **un type**, non une forme de source : le champ
+# que nous lisons sur seize bits, le commerce le lit sur trente-deux.
+#
+# Ce n'est pas pour autant la *déclaration* du champ. Mesuré sur quatorze
+# témoins de la classe : treize portaient déjà la largeur du commerce dans leur
+# structure, et la seule correction possible n'a pas bougé le score. La largeur
+# vient donc du type de l'expression — la locale qui reçoit, le retour, ou le
+# prototype de l'appelé —, et la classe reste à instruire.
 _LARGEUR = {
     "lb": (1, "e"), "lbu": (1, "e"), "sb": (1, "e"),
     "lh": (2, "e"), "lhu": (2, "e"), "sh": (2, "e"),
@@ -194,9 +198,11 @@ def dominante(causes: list[tuple[str, dict]]) -> tuple[str, dict]:
 CONSEIL = {
     "cadre": "la pile diverge : un registre sauvegardé de trop ou de moins."
              " `x += c` en épargne un et seize octets (IDIOMES_MWCC).",
-    "largeur": "le champ n'a pas la largeur déclarée : le commerce le lit sur"
-               " une autre taille, ou dans l'autre banc de registres. Fait"
-               " d'atlas, réparable dans l'en-tête sans toucher au corps.",
+    "largeur": "le commerce lit le champ sur une autre taille, ou dans l'autre"
+               " banc de registres. **Ce n'est pas la déclaration du champ** :"
+               " sur quatorze témoins, treize la portaient déjà juste. La"
+               " largeur vient du type de l'expression — locale, retour, ou"
+               " prototype de l'appelé.",
     "disposition": "un champ manque ou est de trop dans la classe, avant le"
                    " décalage cité. C'est un fait pour l'atlas, pas un idiome.",
     "opcode": "deux formes de source rendent deux opcodes : `s = f()` rend"

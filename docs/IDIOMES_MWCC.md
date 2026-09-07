@@ -7,6 +7,67 @@ Le compilateur est `mwcps2-3.0-011126`, au niveau `-O4,p`, en `-lang c++`.
 
 ---
 
+## Les divergences se rangent par cause, et la mesure la nomme
+
+`make classes` impute chaque quasi-succès à la cause qui domine ses écarts, et
+pèse chaque classe en octets. Le relevé brut de `make ecarts` mélange les causes
+et leurs conséquences : sur `SetSprite__12CDamageScoreFPfiiii`, huit `sw`
+divergent tous de quatre octets sur la même base — c'est *un* champ manquant, non
+huit écarts ; et un `sd ra, K(sp)` ne dit rien de plus que le `addiu sp, sp, K`
+qui le porte.
+
+**686 fonctions relevées, 99 144 octets**, au 7 septembre 2026 :
+
+| classe | fn | octets | part |
+|---|---|---|---|
+| `opcode` | 220 | 29 728 | 30,0 % |
+| `cadre` | 75 | 17 068 | 17,2 % |
+| `manquante` | 107 | 16 268 | 16,4 % |
+| `registres` | 102 | 10 696 | 10,8 % |
+| `largeur` | 69 | 9 232 | 9,3 % |
+| `constante` | 46 | 6 048 | 6,1 % |
+| `en_trop` | 31 | 4 340 | 4,4 % |
+| `disposition` | 20 | 4 028 | 4,1 % |
+
+`ARGS="--sous opcode"` range une classe par signature. La plus lourde y est
+`addiu → daddu`, 42 fonctions et 4 552 octets, suivie de `addiu → addu`, six
+fonctions mais 3 084 octets — les deux faces de l'idiome déjà connu, `s = f()`
+contre `s += f()`. Le classement ne prouve pas la cause ; il dit sur quelles
+fonctions la même question se pose, et c'est ce qui remplace le tirage à
+l'aveugle.
+
+**Le cadre de pile penche d'un seul côté** : sur 107 divergences de
+`addiu sp, sp, K`, **97 nous donnent une pile plus grande que le commerce**. Nous
+sauvegardons donc des registres que l'original n'a pas besoin de garder. Le
+fait est mesuré, sa cause reste à établir.
+
+## La classe `largeur` n'est pas une déclaration de champ — mesuré et démenti
+
+L'hypothèse était mécanique : un `lh` chez nous contre un `lw` au commerce dit
+que le champ vaut trente-deux bits, il suffit de le corriger dans la structure
+que m2c a écrite. Une sonde l'a posée sur les quatorze plus petits témoins de la
+classe, corrigeant le champ au décalage exact que la divergence nomme.
+
+**Treize des quatorze n'avaient aucun champ à corriger** : leur structure portait
+déjà la largeur du commerce. Le quatorzième, `RemainFusion__13CGameDataUsedFv`,
+a bien été corrigé — `f32/s16 → s32` au décalage zéro — et n'a pas bougé de
+90,62 %.
+
+La largeur vient donc d'ailleurs que de la structure : du type de la locale qui
+reçoit la valeur, du retour de la fonction, ou du prototype de l'appelé. Sur
+`_GET_TIME__FP12RS_STACKDATAi`, nous chargeons `lwc1 fa0` là où le commerce fait
+`lw a0` — un banc de registres entier de différence, sur un appel dont le
+mangling annonce un `float`.
+
+**Une première sonde avait annoncé treize corrections et zéro gain**, ce qui
+semblait un démenti franc. Elle substituait en réalité `s32` par `s32` : le motif
+visait la structure déjà juste, et rien ne vérifiait que le texte avait changé.
+C'est le piège que ce dépôt connaît — un motif qui lit m2c se vérifie sur sa
+sortie, jamais sur l'idée qu'on s'en fait — et il coûte ici un démenti pour un
+autre.
+
+---
+
 ## Ce qui est outillé, et ce que ça rend
 
 Un idiome ne vaut au projet que s'il se pose sans intervention.
