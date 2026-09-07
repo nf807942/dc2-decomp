@@ -73,6 +73,59 @@ dix ans praticable là où la force brute ne l'est pas.
 
 ---
 
+## Ce que la forge rapporte, par réparation
+
+`make forge` a passé les 648 quasi-succès en 4 h 15, sans surveillance, en
+composant les sept réparations connues en faisceau de profondeur deux. **Neuf
+fonctions gardées, 836 octets**, chacune prouvée par reconstruction complète.
+
+| réparation | fonctions | octets |
+|---|---|---|
+| `adressage` | 6 | 548 |
+| `ordre_declarations` | 3 | 288 |
+| `pile_taille_et_ordre` | 1 | 80 |
+| `pas_en_octets` | 1 | 60 |
+| `adresse_avant_garde` | 0 | 0 |
+| `pas_en_elements` | 0 | 0 |
+| `remplissage` | 0 | 0 |
+
+**Les zéros ne disent pas qu'une réparation ne vaut rien** : les trois dernières
+avaient déjà été passées à la main sur tout le corpus dans la journée, et elles
+y avaient rendu treize, trois et trois fonctions. La table dit ce qu'il reste à
+prendre, non ce qui a été pris.
+
+Ce qu'elle sert : **elle remplace l'intuition sur la réparation à outiller
+ensuite.** `adressage` est la plus productive de celles qui restent, et c'est un
+fait mesuré, non une impression.
+
+La forge coûte 23,6 s par fonction à profondeur deux. Un passage complet du
+corpus tient donc dans une nuit, et rien n'empêche de le relancer à chaque
+réparation nouvelle.
+
+## L'axe des types prouvés ne débloque pas la compilation — mesuré
+
+Quatre extracteurs lisent le binaire en une seconde chacun : `make tailles`
+donne la taille de 42 classes à l'argument d'`operator new`, `make vtables` le
+rang des méthodes des 75 tables et 11 chaînes d'héritage écrites par les
+constructeurs, `make champs` 4 444 champs sur 268 classes par le flot de `this`,
+`make entetes` les joint. Les deux relevés indépendants **concordent sur les 40
+classes qu'ils partagent, sans un conflit**.
+
+**Et cela ne fait compiler personne.** `make contexte_prouve` donne à m2c
+quarante classes complètes par construction et 535 prototypes tirés du
+mangling ; mesuré deux fois sur trente méthodes de ces classes, avec la
+couverture vérifiée : **zéro fonction compile avant, zéro après**.
+
+Le mur de compilation n'est donc pas une affaire de disposition de classe. Sur
+les 929 fonctions de plus de 512 octets, aucune cause ne domine et les quatorze
+premières font chacune entre dix-huit et quatre-vingt-un cas. C'est la longue
+traîne que ce document annonçait, et il faut la prendre au sérieux : elle ne se
+lèvera pas d'un coup.
+
+Les relevés gardent leur valeur propre — ils sont exacts et mutuellement
+cohérents, et ils nommeront les champs quand une fonction compilera. Mais ils ne
+font pas compiler.
+
 ## Ce que la mesure a démenti, et qu'il ne faut pas refaire
 
 Quatre voies ont été outillées puis mesurées. Deux ne produisent pas, et les
