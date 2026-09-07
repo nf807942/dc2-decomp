@@ -316,10 +316,15 @@ def ordre_declarations(fragment: str, ecarts: list[str]) -> list[str]:
 
 
 from prouve import disposition_prouvee  # noqa: E402,E501  (après les motifs)
+from pointeurs import (elements_partout, octets_partout,  # noqa: E402
+                       pointeur_en_octets)
 
 # L'ordre n'a pas d'importance : le banc les mesure toutes.
 REPARATIONS = [
     disposition_prouvee,
+    octets_partout,
+    elements_partout,
+    pointeur_en_octets,
     adresse_avant_garde,
     pile_taille_et_ordre,
     pas_en_octets,
