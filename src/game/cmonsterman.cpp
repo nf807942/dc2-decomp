@@ -19,7 +19,50 @@ INCLUDE_ASM("nonmatchings/game/cmonsterman", CheckThrowTarget__11CMonsterManFP8m
 INCLUDE_ASM("nonmatchings/game/cmonsterman", SearchBaseIndex__11CMonsterManFi);
 INCLUDE_ASM("nonmatchings/game/cmonsterman", GetMonsterNum__11CMonsterManFf);
 INCLUDE_ASM("nonmatchings/game/cmonsterman", GetReferPtr2__11CMonsterManFi);
-INCLUDE_ASM("nonmatchings/game/cmonsterman", SearchActiveMonsterBlock__11CMonsterManFv);
+struct CMonsterMan {
+    char pad_0[0xFFF4];
+    s32 field_FFF4;
+    s32 field_FFF8;
+    s32 field_FFFC;
+    char pad_10000[0x80];
+    s16 field_10080;
+    char pad_10082[0x5E];
+    s32 field_100E0;
+};
+struct calcul0_champs_4987d4 {
+    char pad0[0x484];
+    /* 0x484 */ s32 unk484;
+};
+struct temp_v1_champs_4987d4 {
+    char pad0[0x1330];
+    /* 0x1330 */ s32 unk1330;
+};
+extern "C" s32 SearchActiveMonsterBlock__11CMonsterManFv(CMonsterMan *objet) {
+    s32 var_a1;
+    s32 var_v0;
+    struct temp_v1_champs_4987d4 *temp_v1;
+
+    var_v0 = 0;
+    var_a1 = 0;
+loop_1:
+    /* La conversion en `u8 *` porte l'arithmetique en octets. Sans elle, MWCC
+     * met le pas a l'echelle du type pointe et la constante emise est
+     * multipliee d'autant. */
+    temp_v1 = (struct temp_v1_champs_4987d4 *) (((struct calcul0_champs_4987d4 *) ((u8 *) objet + var_a1))->unk484);
+    if (temp_v1 == NULL) {
+        return var_v0;
+    }
+    if (temp_v1->unk1330 == 0) {
+        return var_v0;
+    }
+    var_v0 += 1;
+    var_a1 += 4;
+    if (var_v0 >= 0x18) {
+        return -1;
+    }
+    goto loop_1;
+}
+
 INCLUDE_ASM("nonmatchings/game/cmonsterman", SearchReferBlock__11CMonsterManFv);
 INCLUDE_ASM("nonmatchings/game/cmonsterman", EntryRefer__11CMonsterManFiP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cmonsterman", LoadReferMonsterFile__11CMonsterManFiP16BASE_MONSTER_TBLP9mgCMemory);

@@ -97,9 +97,71 @@ extern "C" s32 _RESET_PAKU_ANIM__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1)
 }
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _TRG_PAKU_ANIM__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _RESET_CAMERA__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_ACTIVE_CHR_NO__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_ACTIVE_CHR_NO__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _DNG_SET_FLOOR_ID__FP12RS_STACKDATAi);
+struct var_s0_champs_aef074 {
+    char pad0[0x44D96];
+    /* 0x44D96 */ s16 unk44D96;
+};
+extern "C" s32 GetSaveData__Fv(void);
+extern "C" s32 SetStack__FP12RS_STACKDATAi_00262E70(RS_STACKDATA *, s32);
+extern "C" s32 _GET_ACTIVE_CHR_NO__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    s32 temp_v0;
+    struct var_s0_champs_aef074 *var_s0;
+
+    var_s0 = (struct var_s0_champs_aef074 *) (NULL);
+    temp_v0 = GetSaveData__Fv();
+    if (temp_v0 != 0) {
+        /* La conversion en `u8 *` porte l'arithmetique en octets. Sans elle,
+         * MWCC met le pas a l'echelle du type pointe et la constante emise
+         * est multipliee d'autant. */
+        var_s0 = (struct var_s0_champs_aef074 *) ((u8 *) temp_v0 + 0x1D2A0);
+    }
+    if (var_s0 == NULL) {
+        return 0;
+    }
+    SetStack__FP12RS_STACKDATAi_00262E70(arg0, var_s0->unk44D96);
+    return 1;
+}
+
+#include "dngfloormanager.hpp"
+extern "C" s32 GetSaveData__Fv(void);
+extern "C" s32 SetActiveChrNo__16CUserDataManagerFi(void *, s32);
+extern "C" s32 _SET_ACTIVE_CHR_NO__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    CUserDataManager *var_s0;
+    s32 temp_v0;
+
+    var_s0 = (CUserDataManager *) (NULL);
+    temp_v0 = GetSaveData__Fv();
+    if (temp_v0 != 0) {
+        var_s0 = (CUserDataManager *) ((u8 *) temp_v0 + 0x1D2A0);
+    }
+    if (var_s0 == NULL) {
+        return 0;
+    }
+    SetActiveChrNo__16CUserDataManagerFi(var_s0, GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
+    return 1;
+}
+
+#include "dngfloormanager.hpp"
+extern "C" s32 GetSaveData__Fv(void);
+extern "C" s32 SetFloorID__16CSaveDataDungeonFi(void *, s32);
+extern "C" s32 _DNG_SET_FLOOR_ID__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    CSaveDataDungeon *temp_a0;
+    s32 temp_s0;
+    s32 temp_v0;
+
+    temp_s0 = (s32) (GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
+    temp_v0 = GetSaveData__Fv();
+    if (temp_v0 == 0) {
+        return 0;
+    }
+    temp_a0 = (CSaveDataDungeon *) ((u8 *) temp_v0 + 0x1C5B4);
+    if (temp_a0 == NULL) {
+        return 0;
+    }
+    SetFloorID__16CSaveDataDungeonFi(temp_a0, temp_s0);
+    return 1;
+}
+
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _DNG_GET_FLOOR_ID__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_PAKU_MOTION__FP12RS_STACKDATAi);
 extern "C" u32 PakuMotionEohNo;
@@ -124,7 +186,26 @@ INCLUDE_ASM("nonmatchings/game/text_00266E10", _LOAD_DUNGEON_MAP_FILE__FP12RS_ST
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _LOAD_MONSTER_FILE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_NPC_STATUS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_NPC_STATUS__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_NOW_PARTY_CHARA__FP12RS_STACKDATAi);
+#include "dngfloormanager.hpp"
+extern "C" s32 GetSaveData__Fv(void);
+extern "C" s32 NowPartyCharaID__16CUserDataManagerFv(void *);
+extern "C" s32 SetStack__FP12RS_STACKDATAi_00262E70(RS_STACKDATA *, s32);
+extern "C" s32 _GET_NOW_PARTY_CHARA__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    CUserDataManager *var_s0;
+    s32 temp_v0;
+
+    var_s0 = (CUserDataManager *) (NULL);
+    temp_v0 = GetSaveData__Fv();
+    if (temp_v0 != 0) {
+        var_s0 = (CUserDataManager *) ((u8 *) temp_v0 + 0x1D2A0);
+    }
+    if (var_s0 == NULL) {
+        return 0;
+    }
+    SetStack__FP12RS_STACKDATAi_00262E70(arg0, NowPartyCharaID__16CUserDataManagerFv(var_s0));
+    return 1;
+}
+
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_LOCAL_CNT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_LOCAL_CNT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_LOCAL_CNT2__FP12RS_STACKDATAi);
@@ -395,8 +476,47 @@ INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_FCAMERA_DIST__FP12RS_STACKDA
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_INVENTION_ID__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _FUNCTION_MAP_JUMP__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _FUNCTION_DOOR_MODE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_MONEY__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _ADD_MONEY__FP12RS_STACKDATAi);
+struct temp_v0_2_champs_b9a5ba {
+    char pad0[0x44D9C];
+    /* 0x44D9C */ s32 unk44D9C;
+};
+extern "C" s32 GetSaveData__Fv(void);
+extern "C" s32 SetStack__FP12RS_STACKDATAi_00262E70(RS_STACKDATA *, s32);
+extern "C" s32 _GET_MONEY__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    s32 temp_v0;
+    struct temp_v0_2_champs_b9a5ba *temp_v0_2;
+
+    temp_v0 = GetSaveData__Fv();
+    if (temp_v0 == 0) {
+        return 0;
+    }
+    temp_v0_2 = (struct temp_v0_2_champs_b9a5ba *) ((u8 *) temp_v0 + 0x1D2A0);
+    if (temp_v0_2 == NULL) {
+        return 0;
+    }
+    SetStack__FP12RS_STACKDATAi_00262E70(arg0, temp_v0_2->unk44D9C);
+    return 1;
+}
+
+#include "dngfloormanager.hpp"
+extern "C" s32 AddMoney__16CUserDataManagerFi(void *, s32);
+extern "C" s32 GetSaveData__Fv(void);
+extern "C" s32 _ADD_MONEY__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    CUserDataManager *temp_s0;
+    s32 temp_v0;
+
+    temp_v0 = GetSaveData__Fv();
+    if (temp_v0 == 0) {
+        return 0;
+    }
+    temp_s0 = (CUserDataManager *) ((u8 *) temp_v0 + 0x1D2A0);
+    if (temp_s0 == NULL) {
+        return 0;
+    }
+    AddMoney__16CUserDataManagerFi(temp_s0, GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
+    return 1;
+}
+
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_ITEM_NUM__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _CHECK_BUTTON__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_LANGUAGE__FP12RS_STACKDATAi);

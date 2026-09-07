@@ -26,7 +26,35 @@ extern "C" s32 srand(...);
 extern "C" void title_init_rand__Fv(void) {
     srand(mgGetVSyncCount__Fv());
 }
-INCLUDE_ASM("nonmatchings/game/cfuncpointmngr_002A1E80", SetSoundMode__Fv);
+extern "C" u8 CSnd;
+struct temp_v0_2_champs_6d2dd0 {
+    char pad0[0xC];
+    /* 0xC */ s32 unkC;
+};
+extern "C" s32 GetSaveData__Fv(void);
+extern "C" s32 SetStereoMode__6CSoundFi(void *, s32);
+extern "C" void SetSoundMode__Fv(void) {
+    s32 temp_v0;
+    struct temp_v0_2_champs_6d2dd0 *temp_v0_2;
+
+    temp_v0 = GetSaveData__Fv();
+    if (temp_v0 != 0) {
+        /* La conversion en `u8 *` porte l'arithmetique en octets. Sans elle,
+         * MWCC met le pas a l'echelle du type pointe et la constante emise
+         * est multipliee d'autant. */
+        temp_v0_2 = (struct temp_v0_2_champs_6d2dd0 *) ((u8 *) temp_v0 + 0x1C574);
+        if (temp_v0_2 != NULL) {
+            if (temp_v0_2->unkC == 0) {
+                SetStereoMode__6CSoundFi(&CSnd, 1);
+                return;
+            }
+            goto block_5;
+        }
+block_5:
+        SetStereoMode__6CSoundFi(&CSnd, 0);
+    }
+}
+
 void InitTitleOmakeFlag(void) {
     TitleOmakeFlag = 0;
     OmakeFlag = 0;

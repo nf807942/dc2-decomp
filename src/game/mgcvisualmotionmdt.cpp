@@ -46,7 +46,75 @@ s32 LoadFileSocket(char *path, u32 *size) {
 }
 void WriteFileSocket(char * arg0, u32 * arg1, s32 arg2) {
 }
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Initialize__18mgCVisualMotionMDTFv);
+struct inferred;
+#include "gen/mgCVisualMDT.hpp"
+struct mgCVisualMotionMDT_infere;
+typedef struct mgCVisualMotionMDT_infere {
+    /* 0x000 */ char pad0[0x10];
+    /* 0x010 */ s32 unk10;                          /* inferred */
+    /* 0x014 */ s32 unk14;                          /* inferred */
+    /* 0x018 */ char pad18[0x3C];                   /* maybe part of unk14[0x10]void */
+    /* 0x054 */ s32 unk54;                          /* inferred */
+    /* 0x058 */ s32 unk58;                          /* inferred */
+    /* 0x05C */ char pad5C[0xA4];                   /* maybe part of unk58[0x2A]void */
+    /* 0x100 */ s32 unk100;                         /* inferred */
+    /* 0x104 */ s32 unk104;                         /* inferred */
+} mgCVisualMotionMDT_infere;                               /* size >= 0x108 */
+struct temp_a3_champs_f7b4e4 {
+    char pad0[0x80];
+    /* 0x80 */ s32 unk80;
+    /* 0x84 */ s32 unk84;
+    /* 0x88 */ s32 unk88;
+    /* 0x8C */ s32 unk8C;
+    /* 0x90 */ s32 unk90;
+    /* 0x94 */ s32 unk94;
+    /* 0x98 */ s32 unk98;
+    /* 0x9C */ s32 unk9C;
+};
+struct objet_champs_f7b4e4 {
+    char pad0[0x10];
+    /* 0x10 */ s32 unk10;
+    /* 0x14 */ s32 unk14;
+    char pad18[0x3C];
+    /* 0x54 */ s32 unk54;
+    /* 0x58 */ s32 unk58;
+    char pad5C[0xA4];
+    /* 0x100 */ s32 unk100;
+    /* 0x104 */ s32 unk104;
+};
+extern "C" s32 Initialize__12mgCVisualMDTFv(void *);
+extern "C" void Initialize__18mgCVisualMotionMDTFv(mgCVisualMotionMDT_infere *objet) {
+    s32 var_a1;
+    s32 var_a2;
+    struct temp_a3_champs_f7b4e4 *temp_a3;
+
+    Initialize__12mgCVisualMDTFv((mgCVisualMDT *) objet);
+    var_a1 = 0;
+    var_a2 = 0;
+    do {
+        /* La conversion en `u8 *` porte l'arithmetique en octets. Sans elle,
+         * MWCC met le pas a l'echelle du type pointe et la constante emise
+         * est multipliee d'autant. */
+        temp_a3 = (struct temp_a3_champs_f7b4e4 *) ((u8 *) objet + var_a2);
+        var_a1 += 8;
+        temp_a3->unk80 = -1;
+        temp_a3->unk84 = -1;
+        var_a2 += 0x20;
+        temp_a3->unk88 = -1;
+        temp_a3->unk8C = -1;
+        temp_a3->unk90 = -1;
+        temp_a3->unk94 = -1;
+        temp_a3->unk98 = -1;
+        temp_a3->unk9C = -1;
+    } while (var_a1 < 0x20);
+    ((struct objet_champs_f7b4e4 *) objet)->unk10 = 0x7C;
+    ((struct objet_champs_f7b4e4 *) objet)->unk14 = 0x94;
+    ((struct objet_champs_f7b4e4 *) objet)->unk100 = 0;
+    ((struct objet_champs_f7b4e4 *) objet)->unk104 = 0;
+    ((struct objet_champs_f7b4e4 *) objet)->unk58 = 0;
+    ((struct objet_champs_f7b4e4 *) objet)->unk54 = 0;
+}
+
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", CreateVertexWeight__18mgCVisualMotionMDTFPUiiP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", __ct__14mgVertexWeightFv);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", ChangeWeight__18mgCVisualMotionMDTFPP8mgCFramePA4_A4_fi);
