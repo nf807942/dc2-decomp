@@ -51,6 +51,49 @@ et que nous laissons vide.
 `addiu sp, sp, K`, **97 donnent au commerce une pile plus grande que la nôtre**.
 L'original garde donc plus que nos sources n'expriment. La cause reste à établir.
 
+## Un emplacement de pile porte la taille et l'ordre que le commerce impose
+
+C'est le second idiome que le classement a fait sortir, et il vise la classe
+`cadre` — 75 fonctions, 17 068 octets, 17,2 % des octets divergents.
+
+`GetAnalyzeFlag__9CEditDataFii` le dit en quatre lignes. Le commerce ouvre un
+cadre de `0x50` et passe deux adresses, `sp+0x10` et `sp+0x30` ; nous ouvrons
+`0x20` et passons `sp+0x1c` et `sp+0x18`. m2c avait déclaré deux `s32` là où
+l'original a deux tampons de trente-deux octets.
+
+**Deux faits, et aucun ne se devine.**
+
+- **La taille d'un emplacement se lit sur l'écart entre deux adresses prises**,
+  le dernier borné par la taille du cadre. Ici `0x30 - 0x10` et `0x50 - 0x30`,
+  soit `0x20` chacun.
+- **MWCC attribue la pile dans l'ordre des déclarations, la plus basse à la
+  première déclarée — et m2c les écrit à l'envers.** Élargir sans réordonner
+  mène à 99,75 % : le cadre devient juste, les deux tampons restent échangés.
+  Réordonner mène à 100 %.
+
+Le nom que m2c donne à la locale porte déjà le décalage du commerce, puisqu'il
+lit le désassemblage de référence : `sp10` est bien `sp+0x10` de l'original.
+Rien n'est à inférer, tout est à lire.
+
+**Rendement mesuré sur la classe entière** : 31 fonctions applicables sur 75,
+quatre menées à 100 %, vingt améliorées sans y parvenir. Trois sont gardées —
+`GetAnalyzeFlag__9CEditDataFii`, `mgInsideScreen__FPA4_fPA4_f`,
+`SetCamWorldCoordGyaku__FP9mgCCamera`, 172 octets — la quatrième butant sur la
+redéfinition des types que sa sœur venait de poser dans la même unité.
+
+`SetCamWorldCoordGyaku__FP9mgCCamera` pose une définition de `mgCCamera`, qui
+est une classe de base. L'image reste identique parce que rien d'autre ne
+l'emploie encore ; cette disposition devra être reprise le jour où une dérivée
+sera reconstruite.
+
+**Deux fois de suite, la sonde s'est tue au lieu d'échouer.** L'épilogue
+`addiu sp, sp, 0x50` était compté comme une adresse prise, et l'inversion de
+l'ordre ne s'appliquait à rien parce que son motif exigeait `spNN;` quand les
+déclarations portaient déjà `spNN[8];`. Les deux ordres rendaient alors le même
+chiffre, ce qui ressemblait à un démenti de l'idiome. C'est la troisième fois
+dans cette séance qu'une transformation nulle se fait passer pour une mesure :
+**une sonde doit prouver qu'elle a changé le texte avant de le compiler.**
+
 ## Une adresse décalée se calcule avant la garde, non après
 
 C'est le premier idiome que le classement des divergences a fait sortir, et il
