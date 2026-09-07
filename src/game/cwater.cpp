@@ -14,7 +14,107 @@
 #include "gen/CWaterFrame.hpp"
 #include "gen/dbgCJISFont.hpp"
 
-INCLUDE_ASM("nonmatchings/game/cwater", Initialize__7CMapSkyFv);
+struct inferred;
+struct CMapSky;
+typedef struct CMapSky {
+    /* 0x00 */ char pad0[0x80];
+    /* 0x80 */ s32 unk80;                           /* inferred */
+    /* 0x84 */ s32 unk84;                           /* inferred */
+} CMapSky;                                          /* size >= 0x88 */
+struct temp_t0_champs_4de5e1 {
+    /* 0x0 */ s32 unk0;
+    char pad4[0xC];
+    /* 0x10 */ s32 unk10;
+    char pad14[0xC];
+    /* 0x20 */ s32 unk20;
+    char pad24[0xC];
+    /* 0x30 */ s32 unk30;
+    char pad34[0xC];
+    /* 0x40 */ s32 unk40;
+    char pad44[0xC];
+    /* 0x50 */ s32 unk50;
+    char pad54[0xC];
+    /* 0x60 */ s32 unk60;
+    char pad64[0xC];
+    /* 0x70 */ s32 unk70;
+};
+struct temp_a3_champs_4de5e1 {
+    char pad0[0x88];
+    /* 0x88 */ s32 unk88;
+    /* 0x8C */ s32 unk8C;
+    /* 0x90 */ s32 unk90;
+    /* 0x94 */ s32 unk94;
+    /* 0x98 */ s32 unk98;
+    /* 0x9C */ s32 unk9C;
+    /* 0xA0 */ s32 unkA0;
+    /* 0xA4 */ s32 unkA4;
+    /* 0xA8 */ s32 unkA8;
+    /* 0xAC */ s32 unkAC;
+    /* 0xB0 */ s32 unkB0;
+    /* 0xB4 */ s32 unkB4;
+    /* 0xB8 */ s32 unkB8;
+    /* 0xBC */ s32 unkBC;
+    /* 0xC0 */ s32 unkC0;
+    /* 0xC4 */ s32 unkC4;
+};
+struct objet_champs_4de5e1 {
+    char pad0[0x80];
+    /* 0x80 */ s32 unk80;
+    /* 0x84 */ s32 unk84;
+};
+extern "C" void Initialize__7CMapSkyFv(CMapSky *objet) {
+    s32 var_a1;
+    s32 var_a2;
+    s32 var_a2_2;
+    s32 var_a3;
+    struct temp_a3_champs_4de5e1 *temp_a3;
+    struct temp_t0_champs_4de5e1 *temp_t0;
+
+    var_a2 = 0;
+    var_a3 = 0;
+    do {
+        /* La conversion en `u8 *` porte l'arithmetique en octets. Sans elle,
+         * MWCC met le pas a l'echelle du type pointe et la constante emise
+         * est multipliee d'autant. */
+        temp_t0 = (struct temp_t0_champs_4de5e1 *) ((u8 *) objet + var_a3);
+        var_a2 += 1;
+        temp_t0->unk0 = 0;
+        temp_t0->unk30 = 0;
+        var_a3 += 4;
+        temp_t0->unk60 = 0;
+        temp_t0->unk40 = 0;
+        temp_t0->unk10 = 0;
+        temp_t0->unk50 = 0;
+        temp_t0->unk20 = 0;
+        temp_t0->unk70 = -1;
+    } while (var_a2 < 4);
+    var_a1 = 0;
+    var_a2_2 = 0;
+    do {
+        temp_a3 = (struct temp_a3_champs_4de5e1 *) ((u8 *) objet + var_a2_2);
+        var_a1 += 8;
+        temp_a3->unk88 = 0;
+        temp_a3->unk8C = 0;
+        var_a2_2 += 0x40;
+        temp_a3->unk90 = 0;
+        temp_a3->unk94 = 0;
+        temp_a3->unk98 = 0;
+        temp_a3->unk9C = 0;
+        temp_a3->unkA0 = 0;
+        temp_a3->unkA4 = 0;
+        temp_a3->unkA8 = 0;
+        temp_a3->unkAC = 0;
+        temp_a3->unkB0 = 0;
+        temp_a3->unkB4 = 0;
+        temp_a3->unkB8 = 0;
+        temp_a3->unkBC = 0;
+        temp_a3->unkC0 = 0;
+        temp_a3->unkC4 = 0;
+    } while (var_a1 < 0x10);
+    ((struct objet_champs_4de5e1 *) objet)->unk80 = 0;
+    ((struct objet_champs_4de5e1 *) objet)->unk84 = 0;
+}
+
 INCLUDE_ASM("nonmatchings/game/cwater", DrawSkyBack__7CMapSkyFPfPfPf);
 INCLUDE_ASM("nonmatchings/game/cwater", DrawSky__7CMapSkyFPfPfPfiPfPf);
 INCLUDE_ASM("nonmatchings/game/cwater", LoadPack__7CMapSkyFPUiiP9mgCMemory);
