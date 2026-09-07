@@ -309,8 +309,11 @@ def ordre_declarations(fragment: str, ecarts: list[str]) -> list[str]:
     return formes
 
 
+from prouve import disposition_prouvee  # noqa: E402,E501  (après les motifs)
+
 # L'ordre n'a pas d'importance : le banc les mesure toutes.
 REPARATIONS = [
+    disposition_prouvee,
     adresse_avant_garde,
     pile_taille_et_ordre,
     pas_en_octets,

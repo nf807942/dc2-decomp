@@ -135,7 +135,7 @@ O_FILES   := $(addprefix $(BUILD_DIR)/, $(S_FILES:.s=.o) $(BIN_FILES:.bin=.o) \
              $(addsuffix .o, $(basename $(SRC_FILES))))
 
 .PHONY: all setup tools patch split build objects check diff decompile measure \
-        atlas carve clean distclean contexte injecte provenance chaine affinage ecarts classes lot banc forge tailles vtables champs instructions controle ci etat progress report
+        atlas carve clean distclean contexte injecte provenance chaine affinage ecarts classes lot banc forge tailles vtables champs entetes instructions controle ci etat progress report
 
 all: build
 
@@ -369,6 +369,13 @@ vtables:
 # derivations independantes qui doivent concorder.
 champs:
 	@$(PYTHON) scripts/build/champs.py $(ARGS)
+
+# Les quatre releves joints en declarations de classe, chaque champ portant le
+# symbole qui le prouve. `ARGS=--ecris` les pose sous include/prouve/, a cote
+# des en-tetes engendres et non a leur place : les ecraser mettrait en jeu ce
+# qui compile deja pour un gain non mesure.
+entetes:
+	@$(PYTHON) scripts/build/entetes.py $(ARGS)
 
 # Ce que m2c ne sait pas lire, compte en fonctions perdues et en octets. Une
 # seule instruction inconnue perd la fonction entiere : c'est ce releve qui a
