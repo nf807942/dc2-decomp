@@ -102,5 +102,34 @@ INCLUDE_ASM("nonmatchings/game/text_0026EA00", _MES_SET_BUFF__FP12RS_STACKDATAi)
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _GET_MES_WINDOW_MODE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _GET_MES_VOICE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _SET_MES_QUESTION_GYOU__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_0026EA00", _GET_MES_QUESTION_GYOU__FP12RS_STACKDATAi);
+extern "C" s32 GetMes__Fi(s32);
+struct RS_STACKDATA_infere;
+typedef struct RS_STACKDATA_infere {
+    /* 0x0 */ char pad0[8];
+    /* 0x8 */ char unk8;                               /* inferred */
+    /* 0x8 */ char pad8[1];
+} RS_STACKDATA_infere;                                     /* size >= 0x9 */
+struct temp_v0_champs_9cde97 {
+    char pad0[0x228C];
+    /* 0x228C */ s32 unk228C;
+};
+extern "C" s32 SetStack__FP12RS_STACKDATAi_00262E70(...);
+extern "C" s32 _GET_MES_QUESTION_GYOU__FP12RS_STACKDATAi(RS_STACKDATA_infere *arg0, s32 arg1) {
+    char *next_slot;
+
+    /* L'adresse du second emplacement de pile se calcule avant la garde : MWCC
+     * la range alors dans le creneau de delai du branchement, ce que le
+     * commerce fait. Posee apres la garde, elle rend 94 % — la forme de
+     * l'expression n'y change rien, sa place seule decide. */
+    next_slot = &arg0->unk8;
+
+    struct temp_v0_champs_9cde97 *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs_9cde97 *) (GetMes__Fi(GetStackInt__FP12RS_STACKDATA_00262DA0(arg0)));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    SetStack__FP12RS_STACKDATAi_00262E70(next_slot, temp_v0->unk228C);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _SET_MES_CLOSE_CNT__FP12RS_STACKDATAi);

@@ -48,7 +48,33 @@ INCLUDE_ASM("nonmatchings/game/c3dspline", menu_dtype_init__FP16CMenuPosDataForm
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_FORM_DTYPE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_FORM_MTYPE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_FORM_DRAWFLG__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_FORM_VIBECNT__FP9SPI_STACKi);
+extern "C" u32 menu_formPt;
+struct SPI_STACK_7a2f96;
+typedef struct SPI_STACK_7a2f96 {
+    /* 0x0 */ char pad0[8];
+    /* 0x8 */ char unk8;                               /* inferred */
+    /* 0x8 */ char pad8[1];
+} SPI_STACK_7a2f96;                                        /* size >= 0x9 */
+struct menu_formPt_champs_7a2f96 {
+    char pad0[0x8];
+    /* 0x8 */ s16 unk8;
+    /* 0xA */ s16 unkA;
+};
+extern "C" s32 _MENU_FORM_VIBECNT__FP9SPI_STACKi(SPI_STACK_7a2f96 *arg0, s32 arg1) {
+    char *next_slot;
+
+    /* L'adresse du second emplacement de pile se calcule avant la garde : MWCC
+     * la range alors dans le creneau de delai du branchement, ce que le
+     * commerce fait. Posee apres la garde, elle rend 94 % — la forme de
+     * l'expression n'y change rien, sa place seule decide. */
+    next_slot = &arg0->unk8;
+    if (menu_formPt == NULL) {
+        return 0;
+    }
+    ((struct menu_formPt_champs_7a2f96 *) menu_formPt)->unk8 = spiGetStackInt__FP9SPI_STACK(arg0);
+    ((struct menu_formPt_champs_7a2f96 *) menu_formPt)->unkA = spiGetStackInt__FP9SPI_STACK((SPI_STACK_7a2f96 *) next_slot);
+    return 1;
+}
 s32 _MENU_FORM_SETEND(SPI_STACK *stack, int argc) {
     return 1;
 }
@@ -85,7 +111,6 @@ struct SPI_STACK_e9481d {
     s32 field_0;
     s32 field_4;
 };
-struct inferred;
 #include "menu.hpp"
 struct MENUFORMPARTS_TYPE;
 typedef struct MENUFORMPARTS_TYPE {
@@ -413,7 +438,6 @@ extern "C" s32 GetEventMessage__Fi(s32 arg0) {
     }
     return var_v0;
 }
-struct inferred;
 struct CScene_infere;
 typedef struct CScene_infere {
     /* 0x0000 */ char pad0[0x2E54];
@@ -499,7 +523,6 @@ void CCameraPas::Run(void) {
 }
 INCLUDE_ASM("nonmatchings/game/c3dspline", Step__10CCameraPasFPfPf);
 INCLUDE_ASM("nonmatchings/game/c3dspline", CheckEnd__10CCameraPasFv);
-struct inferred;
 typedef struct CCharaPas_infere {
     /* 0x000 */ char pad0[0x108];
     /* 0x108 */ C3DSpline unk108;                   /* inferred */
@@ -527,7 +550,6 @@ void CCharaPas::SetFrame(s32 arg0) {
 s32 CCharaPas::GetFrame(void) {
     return this->field_0x100;
 }
-struct inferred;
 typedef struct CSceneCmrSeq_infere {
     /* 0x00 */ char pad0[0x38];
     /* 0x38 */ s32 unk38;                           /* inferred */
@@ -549,7 +571,6 @@ extern "C" s32 scsPRDelay__FP12_SEN_CMR_SEQP12CSceneCmrSeq(_SEN_CMR_SEQ_infere *
 }
 INCLUDE_ASM("nonmatchings/game/c3dspline", scsSetPos__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/c3dspline", scsSetRef__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
-struct inferred;
 typedef struct CSceneCmrSeq_infere2 {
     /* 0x00 */ char pad0[0x3C];
     /* 0x3C */ s32 unk3C;                           /* inferred */

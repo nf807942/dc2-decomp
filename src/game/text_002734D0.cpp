@@ -477,7 +477,28 @@ INCLUDE_ASM("nonmatchings/game/text_002734D0", _EOH_SET_STEP__FP12RS_STACKDATAi)
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _EOH_SET_TEX_ANIM__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _EOH_SET_SCALE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _EOH_SET_SHOW__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _EOH_GET_SHOW__FP12RS_STACKDATAi);
+extern "C" u8 EventObjHandleMother[512];
+struct RS_STACKDATA_infere;
+typedef struct RS_STACKDATA_infere {
+    /* 0x0 */ char pad0[8];
+    /* 0x8 */ char unk8;                               /* inferred */
+    /* 0x8 */ char pad8[1];
+} RS_STACKDATA_infere;                                     /* size >= 0x9 */
+extern "C" s32 GetShow__10CEohMotherFiPi(void *, s32, s32 *);
+extern "C" void _EOH_GET_SHOW__FP12RS_STACKDATAi(RS_STACKDATA_infere *arg0, s32 arg1) {
+    char *next_slot;
+
+    /* L'adresse du second emplacement de pile se calcule avant la garde : MWCC
+     * la range alors dans le creneau de delai du branchement, ce que le
+     * commerce fait. Posee apres la garde, elle rend 94 % — la forme de
+     * l'expression n'y change rien, sa place seule decide. */
+    next_slot = &arg0->unk8;
+
+    s32 sp2C;
+    if (GetShow__10CEohMotherFiPi(&EventObjHandleMother, GetStackInt__FP12RS_STACKDATA_00262DA0(arg0), &sp2C) != 0) {
+        SetStack__FP12RS_STACKDATAi_00262E70(next_slot, sp2C);
+    }
+}
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _EOH_SET_FRAME_SHOW__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _EOH_SET_SHADOW__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _EOH_SET_TRANSLATE__FP12RS_STACKDATAi);

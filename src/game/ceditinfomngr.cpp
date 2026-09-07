@@ -267,7 +267,34 @@ INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapPARTS_NAME__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapPARTS_ATR__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapPARTS_MATERIAL__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapPARTS_COMMENT__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapCPOINT__FP9SPI_STACKi);
+extern "C" u32 emapNowInfo_0037E114;
+struct SPI_STACK_94ad22;
+typedef struct SPI_STACK_94ad22 {
+    /* 0x0 */ char pad0[8];
+    /* 0x8 */ char unk8;                               /* inferred */
+    /* 0x8 */ char pad8[1];
+} SPI_STACK_94ad22;                                        /* size >= 0x9 */
+struct emapNowInfo_0037E114_champs_94ad22 {
+    char pad0[0x8];
+    /* 0x8 */ s32 unk8;
+    /* 0xC */ s32 unkC;
+};
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(...);
+extern "C" s32 emapCPOINT__FP9SPI_STACKi(SPI_STACK_94ad22 *arg0, s32 arg1) {
+    char *next_slot;
+
+    /* L'adresse du second emplacement de pile se calcule avant la garde : MWCC
+     * la range alors dans le creneau de delai du branchement, ce que le
+     * commerce fait. Posee apres la garde, elle rend 94 % — la forme de
+     * l'expression n'y change rien, sa place seule decide. */
+    next_slot = &arg0->unk8;
+    if (emapNowInfo_0037E114 == NULL) {
+        return 0;
+    }
+    ((struct emapNowInfo_0037E114_champs_94ad22 *) emapNowInfo_0037E114)->unk8 = spiGetStackInt__FP9SPI_STACK(arg0);
+    ((struct emapNowInfo_0037E114_champs_94ad22 *) emapNowInfo_0037E114)->unkC = spiGetStackInt__FP9SPI_STACK((SPI_STACK_94ad22 *) next_slot);
+    return 1;
+}
 extern "C" u32 emapNowInfo_0037E114;
 struct SPI_STACK_523170 {
     s32 field_0;
