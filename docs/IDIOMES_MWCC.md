@@ -51,6 +51,53 @@ et que nous laissons vide.
 `addiu sp, sp, K`, **97 donnent au commerce une pile plus grande que la nôtre**.
 L'original garde donc plus que nos sources n'expriment. La cause reste à établir.
 
+## Une adresse décalée se calcule avant la garde, non après
+
+C'est le premier idiome que le classement des divergences a fait sortir, et il
+tient trois fonctions.
+
+`_DATAWEP__FP9SPI_STACKi` appelle deux fois le même accesseur, sur `arg0` puis
+sur `arg0 + 1`, derrière une garde `if (SpiWeaponPt == NULL) return 0;`. Le
+commerce ouvre ainsi :
+
+```
+bnez   $v0, .L00195E70
+ addiu $s0, $a0, 0x8        <- créneau de délai
+```
+
+Il calcule l'adresse du second argument **dans le créneau de délai de la
+garde**, donc avant elle. Nous y mettions `daddu $s0, $a0, zero` : nous gardions
+la base et calculions le décalage au site d'appel.
+
+**Ce n'est pas la forme de l'expression qui décide, c'est sa place.** Neuf
+formes ont été mesurées sur cette fonction, toutes à **94,29 %** au centième
+près : `arg0 + 1`, `&arg0[1]`, `(SPI_STACK *) ((u8 *) arg0 + 8)`, la base tenue
+dans une locale, l'adresse décalée hissée dans une locale *après* la garde, la
+cible hissée, les valeurs prises avant les rangements, la garde inversée.
+
+Deux formes rendent **100 %**, et toutes deux calculent l'adresse avant la
+garde :
+
+```c
+suivant = arg0 + 1;
+if (SpiWeaponPt == NULL) {
+    return 0;
+}
+```
+
+et la même affectation portée dans la condition, `if ((suivant = arg0 + 1,
+SpiWeaponPt) == NULL)`. La première est celle qui est écrite ; c'est la forme
+qu'un humain aurait tapée.
+
+Vérifié par reconstruction complète : `_DATAWEP__`, `_DATAWEP_ST__` et
+`_DATAWEP_ST_L__`, 252 octets, image identique au disque.
+
+Cet idiome complète celui du créneau de délai déjà consigné — « un créneau de
+délai vide se comble en évaluant l'affectation *dans* la condition » — en
+disant que le simple placement **avant** la garde suffit, sans opérateur
+virgule. La classe `daddu → addiu` compte 42 fonctions et 4 724 octets, et la
+classe `nop → addiu` seize de plus : c'est là qu'il faut l'essayer ensuite.
+
 ## La colonne de gauche est le commerce — l'avoir lue à l'envers a retourné deux verdicts
 
 `sonde_m2c.ecarts` passe la référence à objdiff en `-1`, donc à gauche, et notre
