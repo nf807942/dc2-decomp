@@ -60,7 +60,22 @@ def file_de_travail(combien: int) -> list[tuple[str, dict]]:
     Une réparation corrige une divergence : une fonction à 99,9 % en porte une,
     une fonction à 85 % en porte des dizaines, et l'essai coûte le même temps.
     """
+    # **La file est le corpus, non le relevé d'écarts.** `classes.json` ne
+    # couvre que les fonctions dont `make ecarts` a relevé les divergences, soit
+    # la bande 85-100 % ; or deux réparations sur sept — l'ordre des
+    # déclarations et le pas en octets — n'ont aucun besoin de ce relevé. Se
+    # borner à `classes.json` retranchait donc de la recherche tout ce qui
+    # compile plus bas.
     fiches = json.loads(CLASSES.read_text(encoding="utf-8"))
+    juges = json.loads(CHAINE.read_text(encoding="utf-8"))["eprouvees"]
+    for chemin in lot.CORPUS.glob("*.cpp"):
+        symbole = chemin.stem
+        if symbole in fiches:
+            continue
+        fiche = juges.get(symbole)
+        if fiche and fiche.get("part") is not None and fiche.get("unite"):
+            fiches[symbole] = {"part": fiche["part"], "taille": fiche["taille"],
+                               "unite": fiche["unite"], "classe": "sans relevé"}
     ordre = sorted(fiches.items(),
                    key=lambda kv: (-(kv[1]["part"] or 0), -kv[1]["taille"]))
     # Une fonction déjà écrite n'a plus de greffe à remplacer : la mesurer

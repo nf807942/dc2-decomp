@@ -271,16 +271,23 @@ def main(argv: list[str]) -> int:
                 # cran plus bas.
                 "ecarts": verdict.get("ecarts", [])}
 
-            # **Le quasi-succes est le vrai produit de la moisson.** 657
-            # fonctions compilent entre 85 et 100 % — 87 236 octets de binaire
-            # dont 5 708 seulement divergent —, et la chaine les rendait a leur
-            # greffe en jetant leur C++. L'affinage n'avait donc qu'une seule
-            # chance, immediate, et repartir de zero demandait de retraduire.
+            # **Ce qui compile est le vrai produit de la moisson.** La chaine
+            # rendait ces fonctions a leur greffe en jetant leur C++ ;
+            # l'affinage n'avait donc qu'une chance, immediate, et repartir de
+            # zero demandait de retraduire.
+            #
+            # **La borne basse est passee de 85 % a 60 %**, et ce n'est pas un
+            # elargissement de confort. Elle datait d'un temps ou un essai
+            # coutait cinq secondes, ce qui interdisait de chercher loin ; le
+            # banc le ramene a trois millisecondes et la forge compose les
+            # reparations en faisceau. **599 fonctions mesurees entre 70 et
+            # 85 %, 118 328 octets, n'avaient aucun fragment garde** et
+            # restaient donc hors de toute recherche.
             #
             # Le fragment se garde sous `build/`, hors de git : il est derive du
-            # jeu. C'est le corpus sur lequel un idiome se mesure sans que rien
-            # ne recompile m2c.
-            if (part is not None and 85.0 <= part < 99.999
+            # jeu. C'est le corpus sur lequel une reparation se mesure sans que
+            # rien ne recompile m2c.
+            if (part is not None and 60.0 <= part < 99.999
                     and verdict.get("fragment")):
                 garde = ROOT / "build" / "proches"
                 garde.mkdir(parents=True, exist_ok=True)
