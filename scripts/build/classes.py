@@ -44,8 +44,16 @@ if hasattr(sys.stdout, "reconfigure"):
 ETAT = ROOT / "progress" / "chaine.json"
 SORTIE = ROOT / "progress" / "classes.json"
 
-# Un écart tel que `make ecarts` l'écrit : « GENRE <nous> | <commerce> », le
-# côté absent rendu par un tiret cadratin.
+# Un écart tel que `make ecarts` l'écrit : « GENRE <commerce> | <nous> », le côté
+# absent rendu par un tiret cadratin.
+#
+# **L'ordre des colonnes est celui d'objdiff, non celui de la lecture.**
+# `sonde_m2c.ecarts` passe la référence en `-1`, donc à gauche, et notre objet en
+# `-2`. Lire l'inverse retourne chaque verdict : le cadre de pile paraissait plus
+# grand chez nous qu'au commerce alors que c'est le contraire, et l'idiome de
+# l'adresse prise une fois semblait démenti alors qu'il était confirmé. Vérifié
+# sur `GetAnalyzeFlag__9CEditDataFii`, dont le commerce ouvre bien à -0x50, la
+# valeur que porte la colonne de gauche.
 _ECART = re.compile(r"^(\w+) (.*?) \| (.*)$")
 # `lw a3, 0x4(a6)` — l'accès mémoire, dont le décalage porte la disposition.
 _ACCES = re.compile(r"^(\w+)\s+(\S+),\s*(-?0x[0-9a-fA-F]+)\((\w+)\)$")
@@ -102,7 +110,7 @@ def cause(ecart: str) -> tuple[str, dict]:
     trouve = _ECART.match(ecart)
     if not trouve:
         return "illisible", {}
-    genre, nous, eux = trouve.groups()
+    genre, eux, nous = trouve.groups()
     op_n, arg_n = _membres(nous)
     op_e, arg_e = _membres(eux)
 

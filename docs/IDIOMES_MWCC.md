@@ -22,49 +22,73 @@ qui le porte.
 |---|---|---|---|
 | `opcode` | 220 | 29 728 | 30,0 % |
 | `cadre` | 75 | 17 068 | 17,2 % |
-| `manquante` | 107 | 16 268 | 16,4 % |
+| `manquante` | 84 | 12 932 | 13,0 % |
 | `registres` | 102 | 10 696 | 10,8 % |
 | `largeur` | 69 | 9 232 | 9,3 % |
+| `en_trop` | 54 | 7 676 | 7,7 % |
 | `constante` | 46 | 6 048 | 6,1 % |
-| `en_trop` | 31 | 4 340 | 4,4 % |
 | `disposition` | 20 | 4 028 | 4,1 % |
 
-`ARGS="--sous opcode"` range une classe par signature. La plus lourde y est
-`addiu → daddu`, 42 fonctions et 4 552 octets, suivie de `addiu → addu`, six
-fonctions mais 3 084 octets — les deux faces de l'idiome déjà connu, `s = f()`
-contre `s += f()`. Le classement ne prouve pas la cause ; il dit sur quelles
-fonctions la même question se pose, et c'est ce qui remplace le tirage à
-l'aveugle.
+`ARGS="--sous opcode"` range une classe par signature, notre opcode d'abord :
+
+| signature | fn | octets |
+|---|---|---|
+| `daddu → addiu` | 42 | 4 724 |
+| `addu → addiu` | 5 | 2 388 |
+| `blez → slt` | 12 | 2 376 |
+| `nop → addiu` | 16 | 2 208 |
+| `beqz → bnez` | 15 | 2 076 |
+
+La plus lourde **confirme l'idiome de l'adresse prise une fois** : nous gardons
+la base dans un registre sauvegardé (`daddu s0, a0, zero`) là où le commerce y
+matérialise l'adresse décalée (`addiu s0, a0, 0x8`). Quarante-deux fonctions
+posent la même question.
+
+`nop → addiu`, seize fonctions, est le créneau de délai que le commerce comble
+et que nous laissons vide.
 
 **Le cadre de pile penche d'un seul côté** : sur 107 divergences de
-`addiu sp, sp, K`, **97 nous donnent une pile plus grande que le commerce**. Nous
-sauvegardons donc des registres que l'original n'a pas besoin de garder. Le
-fait est mesuré, sa cause reste à établir.
+`addiu sp, sp, K`, **97 donnent au commerce une pile plus grande que la nôtre**.
+L'original garde donc plus que nos sources n'expriment. La cause reste à établir.
+
+## La colonne de gauche est le commerce — l'avoir lue à l'envers a retourné deux verdicts
+
+`sonde_m2c.ecarts` passe la référence à objdiff en `-1`, donc à gauche, et notre
+objet en `-2`. La première version de `make classes` a lu l'inverse, et rien dans
+le relevé ne le signalait.
+
+Les deux conclusions qui en sont sorties étaient exactement retournées : le cadre
+de pile paraissait plus grand chez nous qu'au commerce, et la classe dominante
+semblait dire que le commerce gardait la base — ce qui contredisait l'idiome
+« un champ atteint plusieurs fois se prend par son adresse », déjà mesuré
+ailleurs. C'est cette contradiction qui a mis sur la piste.
+
+**Le désassemblage entier a tranché en une seconde**, comme la règle du dépôt le
+veut : `GetAnalyzeFlag__9CEditDataFii` ouvre à `addiu $sp, $sp, -0x50` dans
+`ref/asm`, et c'est la colonne de gauche qui porte `-0x50`. Trois hypothèses
+avaient déjà été éprouvées sur `_DATAWEP__FP9SPI_STACKi` avant cela, toutes à
+94,29 % — quatre formes de l'expression d'appel, puis cinq structures de corps,
+puis deux formes hissant l'adresse. Aucune ne pouvait réussir : elles visaient
+le geste inverse de celui qu'il fallait.
 
 ## La classe `largeur` n'est pas une déclaration de champ — mesuré et démenti
 
-L'hypothèse était mécanique : un `lh` chez nous contre un `lw` au commerce dit
+L'hypothèse était mécanique : un `lh` chez nous contre un `lw` au commerce dirait
 que le champ vaut trente-deux bits, il suffit de le corriger dans la structure
 que m2c a écrite. Une sonde l'a posée sur les quatorze plus petits témoins de la
 classe, corrigeant le champ au décalage exact que la divergence nomme.
 
-**Treize des quatorze n'avaient aucun champ à corriger** : leur structure portait
-déjà la largeur du commerce. Le quatorzième, `RemainFusion__13CGameDataUsedFv`,
-a bien été corrigé — `f32/s16 → s32` au décalage zéro — et n'a pas bougé de
-90,62 %.
+La première version a annoncé **treize corrections et zéro gain**. Elle
+substituait en réalité `s32` par `s32` : son motif visait la structure déjà
+juste, et rien ne vérifiait que le texte avait changé. C'est le piège que ce
+dépôt connaît — un motif qui lit m2c se vérifie sur sa sortie, jamais sur l'idée
+qu'on s'en fait — et il coûte ici un démenti pour un autre.
 
-La largeur vient donc d'ailleurs que de la structure : du type de la locale qui
-reçoit la valeur, du retour de la fonction, ou du prototype de l'appelé. Sur
-`_GET_TIME__FP12RS_STACKDATAi`, nous chargeons `lwc1 fa0` là où le commerce fait
-`lw a0` — un banc de registres entier de différence, sur un appel dont le
-mangling annonce un `float`.
-
-**Une première sonde avait annoncé treize corrections et zéro gain**, ce qui
-semblait un démenti franc. Elle substituait en réalité `s32` par `s32` : le motif
-visait la structure déjà juste, et rien ne vérifiait que le texte avait changé.
-C'est le piège que ce dépôt connaît — un motif qui lit m2c se vérifie sur sa
-sortie, jamais sur l'idée qu'on s'en fait — et il coûte ici un démenti pour un
-autre.
+Rendue incapable de compter une correction nulle, la sonde dit la vérité :
+**treize des quatorze témoins n'ont aucun champ de largeur fausse**, leur
+structure porte déjà celle du commerce. Le quatorzième, corrigé pour de bon, n'a
+pas bougé de 90,62 %. La largeur vient donc du type de l'expression — la locale
+qui reçoit, le retour, ou le prototype de l'appelé.
 
 ---
 
