@@ -135,7 +135,7 @@ O_FILES   := $(addprefix $(BUILD_DIR)/, $(S_FILES:.s=.o) $(BIN_FILES:.bin=.o) \
              $(addsuffix .o, $(basename $(SRC_FILES))))
 
 .PHONY: all setup tools patch split build objects check diff decompile measure \
-        atlas carve clean distclean contexte injecte provenance chaine affinage ecarts classes instructions controle ci etat progress report
+        atlas carve clean distclean contexte injecte provenance chaine affinage ecarts classes lot instructions controle ci etat progress report
 
 all: build
 
@@ -326,6 +326,13 @@ ecarts:
 #   ARGS="--classe cadre"  la liste entiere
 classes:
 	@$(PYTHON) scripts/build/classes.py $(ARGS)
+
+# Mesurer une forme sans regreffer son unite : 550 ms au lieu de deux a cinq
+# secondes, pour le meme chiffre au centieme pres. `ARGS=--fidelite 40` refait
+# la mesure qui l'autorise, en comparant le score hors greffe a celui de
+# l'unite sur quarante tirages.
+lot:
+	@$(PYTHON) scripts/diff/lot.py $(ARGS)
 
 # Ce que m2c ne sait pas lire, compte en fonctions perdues et en octets. Une
 # seule instruction inconnue perd la fonction entiere : c'est ce releve qui a

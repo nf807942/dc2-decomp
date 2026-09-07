@@ -287,6 +287,33 @@ découpée.
   remplissage qui *termine* la plage, lui, revient de l'alignement du
   sous-segment voisin.
 
+## Mesurer une forme sans regreffer son unité
+
+`make lot` compile l'unité privée de ses `INCLUDE_ASM`, le fragment à la place
+de la greffe, et interroge objdiff sur ce seul symbole. **546 ms par mesure**,
+contre deux à cinq secondes par `make` sur l'unité.
+
+**La réserve du dépôt a été levée par la mesure.** « La position d'une fonction
+dans sa section décide de l'alignement de ses têtes de boucle » : si cela
+mordait, une fonction mesurée hors greffe ne rendrait pas le score qu'elle rend
+en unité. Sur soixante fonctions tirées au hasard dans le corpus des
+quasi-succès, **cinquante-cinq ont rendu le même score au centième près, et
+aucune n'a divergé** ; les cinq restantes ne compilent pas hors greffe, pour la
+même péremption de fragment qui les gêne déjà en unité. La règle citée porte sur
+les octets de l'image liée, non sur l'appariement d'un symbole.
+
+**Le contexte se prend à l'unité, jamais inventé.** Une première version
+déclarait tout nom inconnu comme une fonction à l'ellipse : seize fonctions sur
+quarante étaient perdues, parce qu'un nom inconnu est aussi bien une globale ou
+un type, et qu'un type déclaré en fonction rend « declaration syntax error ».
+L'unité porte ces déclarations, exactes — et **la taille déclarée d'une globale
+décide de `%gp_rel` contre `%hi`/`%lo`**, ce qui interdit d'improviser.
+
+Ce que cela ne remplace pas : `match_percent` départage deux formes, il ne
+prouve pas un gain. La reconstruction complète reste le seul verdict.
+
+---
+
 ## Le coût d'un essai
 
 - **Le coût d'un essai suit la taille de l'unité.** mwccgap regreffe toutes les
