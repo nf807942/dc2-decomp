@@ -51,6 +51,38 @@ et que nous laissons vide.
 `addiu sp, sp, K`, **97 donnent au commerce une pile plus grande que la nôtre**.
 L'original garde donc plus que nos sources n'expriment. La cause reste à établir.
 
+## Un champ inféré tombe un mot trop loin quand l'alignement le reporte
+
+Quatrième idiome, et le plus simple à poser. La classe `disposition` a la
+divergence la plus lisible des huit : même registre de base, même opcode, deux
+décalages qui diffèrent. `SetSprite__12CDamageScoreFPfiiii` en porte huit,
+toutes de quatre octets — c'est *un* champ décalé, non huit écarts.
+
+`SearchChara__12CActionCharaFPc` le montre en trois lignes. m2c écrit :
+
+```c
+/* 0x000 */ char pad0[0xF0];
+/* 0x0F0 */ char unkF0;
+/* 0x0F0 */ char padF0[0x588];
+/* 0x678 */ CActionChara_infere2_890643 *unk678;
+```
+
+`0xF0 + 1 + 0x588` fait `0x679`, et le pointeur qui suit s'aligne sur quatre :
+MWCC le place à `0x67C`. Le commerce le lit à `0x678`. **L'alignement du champ
+suivant reporte celui-ci d'un mot**, et m2c ne le voit pas parce qu'il compte
+sans aligner. Réduire le remplissage de quatre octets rend la disposition juste.
+
+`make lot` essaie chaque remplissage de la structure pour une seconde, sans
+savoir lequel est le bon. **88 essais sur la classe entière, trois fonctions
+menées à 100 %** — `AssignData__9CSceneMapFP4CMapPc`,
+`SearchChara__12CActionCharaFPc`, `SetSprite__12CDamageScoreFPfiiii`, 352
+octets, image identique au disque.
+
+**Le motif a d'abord ignoré toutes les structures concernées.** Il exigeait que
+la ligne commence par `char`, quand m2c la préfixe d'un commentaire de décalage :
+40 essais, zéro amélioration, et l'apparence d'un démenti. C'est la cinquième
+fois de la séance qu'un motif décrit ce qu'on s'attendait à lire.
+
 ## Un pas de pointeur s'écrit en éléments, jamais en octets
 
 C'est le troisième idiome que le classement a fait sortir, et il vise la classe
