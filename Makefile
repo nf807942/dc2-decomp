@@ -135,7 +135,7 @@ O_FILES   := $(addprefix $(BUILD_DIR)/, $(S_FILES:.s=.o) $(BIN_FILES:.bin=.o) \
              $(addsuffix .o, $(basename $(SRC_FILES))))
 
 .PHONY: all setup tools patch split build objects check diff decompile measure \
-        atlas carve clean distclean contexte injecte provenance chaine affinage ecarts classes lot banc forge tailles vtables champs entetes instructions controle ci etat progress report
+        atlas carve clean distclean contexte injecte provenance chaine affinage ecarts classes lot banc forge tailles vtables champs entetes contexte_prouve instructions controle ci etat progress report
 
 all: build
 
@@ -376,6 +376,13 @@ champs:
 # qui compile deja pour un gain non mesure.
 entetes:
 	@$(PYTHON) scripts/build/entetes.py $(ARGS)
+
+# Le contexte que m2c lit, n'emettant que des types *complets* : une classe dont
+# la taille est prouvee a un site d'allocation, fermee par un remplissage
+# explicite. Mesure deux fois sur des methodes de ces classes : aucun effet sur
+# le taux de compilation. Il ecrit build/ctx.c ; l'effacer le desarme.
+contexte_prouve:
+	@$(PYTHON) scripts/build/contexte_prouve.py $(ARGS)
 
 # Ce que m2c ne sait pas lire, compte en fonctions perdues et en octets. Une
 # seule instruction inconnue perd la fonction entiere : c'est ce releve qui a
