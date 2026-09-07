@@ -23,6 +23,10 @@ struct sceMpegCbDataError;
 class CMovie {
 public:
     char pad_0[0x14];
+    /* L'ordre des declarations decide de l'attribution des registres chez
+     * MWCC. Celui-ci n'est pas celui de m2c : il a ete trouve en enumerant
+     * les ordres possibles, et c'est le seul qui rende les octets du disque.
+     * */
     s32 field_14;
     s32 field_18;
     s32 field_1C;
@@ -174,9 +178,43 @@ INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", GetViBufDataSize__6CMovieFv);
 s32 CMovie::GetViBufTagSize(void) {
     return 0x1010;
 }
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", GetMpegWorkSize__6CMovieFii);
+extern "C" s32 GetMpegWorkSize__6CMovieFii(CMovie *objet, s32 arg0, s32 arg1) {
+    s32 var_v0;
+    s32 temp_v1;
+
+    temp_v1 = arg0 * arg1 * 9;
+    var_v0 = temp_v1 >> 1;
+    if (temp_v1 < 0) {
+        var_v0 = (s32) (temp_v1 + 1) >> 1;
+    }
+    return var_v0 + 0x1768;
+}
+
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", GetReadBufSize__6CMovieFv);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", GetTagProgSize__6CMovieFii);
+extern "C" s32 GetTagProgSize__6CMovieFii(CMovie *objet, s32 arg0, s32 arg1) {
+    s32 temp_v0;
+    s32 var_v0;
+    s32 temp_v1;
+    s32 var_v0_2;
+    s32 var_v1;
+
+    var_v0_2 = arg0 >> 4;
+    if (arg0 < 0) {
+        var_v0_2 = (s32) (arg0 + 0xF) >> 4;
+    }
+    temp_v0 = var_v0_2 * arg1;
+    var_v1 = temp_v0 >> 4;
+    if (temp_v0 < 0) {
+        var_v1 = (s32) (temp_v0 + 0xF) >> 4;
+    }
+    temp_v1 = (((var_v1 * 6) + 0x6E) * 4) + 0x3F;
+    var_v0 = temp_v1 >> 6;
+    if (temp_v1 < 0) {
+        var_v0 = (s32) (temp_v1 + 0x3F) >> 6;
+    }
+    return var_v0 << 8;
+}
+
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", videoDecCreate__6CMovieFP8VideoDecPUciP1P1iP9TimeStampi);
 #include "mpeg.hpp"
 struct sceMpegCbData;

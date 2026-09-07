@@ -132,6 +132,10 @@ extern "C" mgCCameraFollow_infere *__ct__15mgCCameraFollowFffff(mgCCameraFollow_
     objet->unk94 = arg1;
     objet->unkA0 = 1;
     mgZeroVector__FPf(&objet->unk80);
+    /* L'ordre des declarations decide de l'attribution des registres chez
+     * MWCC. Celui-ci n'est pas celui de m2c : il a ete trouve en enumerant
+     * les ordres possibles, et c'est le seul qui rende les octets du disque.
+     * */
     return objet;
 }
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Iam__15mgCCameraFollowFv);
@@ -416,7 +420,33 @@ INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetBSphere__8mgCFrameFPff);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetFrame__8mgCFrameFi);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", RemakeBBox__8mgCFrameFPfPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetWorldBBox__8mgCFrameFP9mgVu0FBOX);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetFrameNum__8mgCFrameFv);
+struct mgCFrame_infere_8178eb;
+typedef struct mgCFrame_infere_8178eb {
+    /* 0x00 */ char pad0[0x58];
+    /* 0x58 */ mgCFrame_infere_8178eb *unk58;                     /* inferred */
+    /* 0x5C */ mgCFrame_infere_8178eb *unk5C;                     /* inferred */
+} mgCFrame_infere_8178eb;                                         /* size >= 0x60 */
+struct objet_champs_8178eb {
+    char pad0[0x58];
+    /* 0x58 */ s32 unk58;
+};
+extern "C" s32 GetFrameNum__8mgCFrameFv(mgCFrame_infere_8178eb *objet) {
+    s32 temp_v0;
+    s32 var_s0;
+    mgCFrame_infere_8178eb *var_s1;
+
+    var_s1 = (mgCFrame_infere_8178eb *) (((struct objet_champs_8178eb *) objet)->unk58);
+    var_s0 = 1;
+    if (var_s1 != NULL) {
+        do {
+            temp_v0 = (s32) (GetFrameNum__8mgCFrameFv(var_s1));
+            var_s1 = (mgCFrame_infere_8178eb *) (var_s1->unk5C);
+            var_s0 += temp_v0;
+        } while (var_s1 != NULL);
+    }
+    return var_s0;
+}
+
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetParent__8mgCFrameFP8mgCFrame);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetBrother__8mgCFrameFP8mgCFrame);
 typedef struct mgCFrame_infere {

@@ -24,6 +24,10 @@ INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", DrawEffect__8CEditMapFv);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", AnimeStep__8CEditMapFP12CObjAnimeEnv);
 struct match;
 extern "C" s32 CheckTime__Ffff(f32 arg0, f32 arg1, f32 arg2) {
+    /* L'ordre des declarations decide de l'attribution des registres chez
+     * MWCC. Celui-ci n'est pas celui de m2c : il a ete trouve en enumerant
+     * les ordres possibles, et c'est le seul qui rende les octets du disque.
+     * */
     s32 var_v0;
 
     if (!(arg2 <= arg1)) {
@@ -112,7 +116,39 @@ INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", Get__14CFuncPointMngrFv);
 void CFuncPointMngr::GetEnd(void) {
     this->field_0x2C = 0;
 }
-INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", Search__14CFuncPointMngrFPc);
+extern "C" s32 strcasecmp(...);
+extern "C" s32 *Search__14CFuncPointMngrFPc(CFuncPointMngr *objet, s8 *arg0) {
+    s32 *temp_v0;
+    s32 *temp_v0_2;
+    s32 var_s0;
+    s32 *var_s1;
+
+    var_s0 = 1;
+loop_1:
+    GetStart__14CFuncPointMngrFi(objet, var_s0);
+    temp_v0 = (s32 *) (Get__14CFuncPointMngrFv(objet));
+    var_s1 = (s32 *) (temp_v0);
+    if (temp_v0 != NULL) {
+loop_2:
+        if (strcasecmp(*var_s1, arg0) == 0) {
+            return var_s1;
+        }
+        temp_v0_2 = (s32 *) (Get__14CFuncPointMngrFv(objet));
+        var_s1 = (s32 *) (temp_v0_2);
+        if (temp_v0_2 == NULL) {
+            goto block_5;
+        }
+        goto loop_2;
+    }
+block_5:
+    GetEnd__14CFuncPointMngrFv(objet);
+    var_s0 += 1;
+    if (var_s0 >= 0xA) {
+        return NULL;
+    }
+    goto loop_1;
+}
+
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", GetLight__14CFuncPointMngrFPfP10CFuncPointiP15CFuncPointChecki);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", Step__14CFuncPointMngrFiP15CFuncPointCheck);
 extern "C" s32 Get__14CFuncPointMngrFv(void *);

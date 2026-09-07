@@ -100,6 +100,10 @@ struct calcul0_champs_896dfc {
 };
 extern "C" s32 GetUserDataMan__Fv(void);
 extern "C" s32 CalcPhotoExp__15CInventUserDataFv(CInventUserData *objet) {
+    /* L'ordre des declarations decide de l'attribution des registres chez
+     * MWCC. Celui-ci n'est pas celui de m2c : il a ete trouve en enumerant
+     * les ordres possibles, et c'est le seul qui rende les octets du disque.
+     * */
     s16 temp_v1;
     s32 temp_v0;
     s32 var_a0;
@@ -147,7 +151,34 @@ extern "C" void SetViewFlag__17CScoopDataManagerFii(CScoopDataManager *objet, s3
         *temp_v0 = (s8) arg1;
     }
 }
-INCLUDE_ASM("nonmatchings/game/cremovalmenu", KnowScoop__17CScoopDataManagerFv);
+extern "C" s32 GetScoopDataTableIndex__Fi(s32);
+struct temp_v0_champs_fd2d4f {
+    /* 0x0 */ s16 unk0;
+    /* 0x2 */ s16 unk2;
+};
+extern "C" s32 CheckBitFlagMenu__Fi(s32);
+extern "C" s32 KnowScoop__17CScoopDataManagerFv(CScoopDataManager *objet) {
+    s32 var_s0;
+    s32 var_s1;
+    struct temp_v0_champs_fd2d4f *temp_v0;
+    s8 *temp_v0_2;
+
+    var_s1 = 0;
+    var_s0 = 0;
+    do {
+        temp_v0 = (struct temp_v0_champs_fd2d4f *) (GetScoopDataTableIndex__Fi(var_s1));
+        if (temp_v0 != NULL) {
+            temp_v0_2 = (s8 *) (GetScoopInfo__17CScoopDataManagerFi(objet, (s32) temp_v0->unk0));
+            if ((temp_v0_2 != NULL) && (CheckBitFlagMenu__Fi((s32) temp_v0->unk2) != 0) && (*temp_v0_2 == 0)) {
+                SetViewFlag__17CScoopDataManagerFii(objet, (s32) temp_v0->unk0, 1);
+                var_s0 += 1;
+            }
+        }
+        var_s1 += 1;
+    } while (var_s1 < 0x35);
+    return var_s0;
+}
+
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", CheckScoop__17CScoopDataManagerFv);
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", GetScoopTotal__17CScoopDataManagerFPi);
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", _PIC_INFO__FP9SPI_STACKi);

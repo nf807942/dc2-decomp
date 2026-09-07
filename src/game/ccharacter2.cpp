@@ -16,6 +16,10 @@
 class CDACollision {
 public:
     char pad_0[0x4];
+    /* L'ordre des declarations decide de l'attribution des registres chez
+     * MWCC. Celui-ci n'est pas celui de m2c : il a ete trouve en enumerant
+     * les ordres possibles, et c'est le seul qui rende les octets du disque.
+     * */
     s32 field_4;
     char pad_8[0x8];
     f32 field_10;
@@ -293,7 +297,32 @@ extern "C" s32 dynFRAME_START__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     NewFrameTable__13CDynamicAnimeFiP9mgCMemory(dynNowDA, spiGetStackInt__FP9SPI_STACK(arg0), dynStack);
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/ccharacter2", dynFRAME__FP9SPI_STACKi);
+extern "C" u8 _855_00368458[14];
+extern "C" u32 dynFrameCount;
+extern "C" u32 dynTopFrame;
+extern "C" s32 SearchFrame__8mgCFrameFPc(...);
+#include "gen/mgCFrame.hpp"
+extern "C" s32 printf(...);
+extern "C" s32 SetFrame__13CDynamicAnimeFiP8mgCFrame(...);
+extern "C" s32 dynFRAME__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    s32 temp_a1;
+    s8 *temp_v0;
+    mgCFrame *temp_v0_2;
+
+    temp_v0 = (s8 *) (spiGetStackString__FP9SPI_STACK(arg0));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    temp_v0_2 = (mgCFrame *) (SearchFrame__8mgCFrameFPc(dynTopFrame, temp_v0));
+    if (temp_v0_2 == NULL) {
+        printf(&_855_00368458, temp_v0);
+    }
+    temp_a1 = dynFrameCount;
+    dynFrameCount = temp_a1 + 1;
+    SetFrame__13CDynamicAnimeFiP8mgCFrame(dynNowDA, temp_a1, temp_v0_2);
+    return 1;
+}
+
 s32 dynFRAME_END(SPI_STACK *stack, int argc) {
     return 1;
 }

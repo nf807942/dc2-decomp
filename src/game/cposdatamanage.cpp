@@ -57,6 +57,10 @@ struct var_v0_champs {
     /* 0x70 */ s32 unk70;
 };
 extern "C" void *GetDrawTopList__14CPosDataManageFv(CPosDataManage *objet) {
+    /* L'ordre des declarations decide de l'attribution des registres chez
+     * MWCC. Celui-ci n'est pas celui de m2c : il a ete trouve en enumerant
+     * les ordres possibles, et c'est le seul qui rende les octets du disque.
+     * */
     void *temp_v1;
     struct var_v0_champs *var_v0;
 
@@ -338,7 +342,46 @@ extern "C" void Step__9CStarDustFv(CStarDust_infere *objet) {
         }
     }
 }
-INCLUDE_ASM("nonmatchings/game/cposdatamanage", Draw__9CStarDustFP10mgCTextureii);
+extern "C" s32 GetMenuPrim__Fv(void);
+#include "gen/mgCDrawPrim.hpp"
+struct CStarDust_infere2;
+typedef struct CStarDust_infere2 {
+    /* 0x0 */ f32 unk0;                             /* inferred */
+    /* 0x4 */ f32 unk4;                             /* inferred */
+    /* 0x8 */ s16 unk8;                             /* inferred */
+    /* 0xA */ u8 unkA;                              /* inferred */
+} CStarDust_infere2;                                        /* size >= 0xB */
+extern "C" s32 Begin__11mgCDrawPrimFi(void *, s32);
+extern "C" s32 Color__11mgCDrawPrimFiiii(void *, s32, s32, s32, s32);
+extern "C" s32 End__11mgCDrawPrimFv(void *);
+extern "C" s32 SetSpriteEnv__FP11mgCDrawPrimi(mgCDrawPrim *, s32);
+extern "C" s32 TextureCrd__11mgCDrawPrimFii(void *, s32, s32);
+extern "C" s32 Texture__11mgCDrawPrimFP10mgCTexture(void *, mgCTexture *);
+extern "C" s32 Vertex__11mgCDrawPrimFfff(void *, f32, f32, f32);
+extern "C" void Draw__9CStarDustFP10mgCTextureii(CStarDust_infere2 *objet, mgCTexture *arg0, s32 arg1, s32 arg2) {
+    s16 temp_v0;
+    s32 var_s4;
+    mgCDrawPrim *temp_v0_2;
+
+    if ((objet->unkA != 0) && (arg0 != NULL)) {
+        temp_v0 = (s16) (objet->unk8);
+        var_s4 = 0x80;
+        if (temp_v0 < 8) {
+            var_s4 = temp_v0 * 0x10;
+        }
+        temp_v0_2 = (mgCDrawPrim *) (GetMenuPrim__Fv());
+        SetSpriteEnv__FP11mgCDrawPrimi(temp_v0_2, 4);
+        Begin__11mgCDrawPrimFi(temp_v0_2, 6);
+        Texture__11mgCDrawPrimFP10mgCTexture(temp_v0_2, arg0);
+        Color__11mgCDrawPrimFiiii(temp_v0_2, 0x80, 0x80, 0x80, var_s4);
+        TextureCrd__11mgCDrawPrimFii(temp_v0_2, arg1, arg2);
+        Vertex__11mgCDrawPrimFfff(temp_v0_2, objet->unk0, objet->unk4, 0.0f);
+        TextureCrd__11mgCDrawPrimFii(temp_v0_2, arg1 + 8, arg2 + 8);
+        Vertex__11mgCDrawPrimFfff(temp_v0_2, 8.0f + objet->unk0, 8.0f + objet->unk4, 0.0f);
+        End__11mgCDrawPrimFv(temp_v0_2);
+    }
+}
+
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", CheckNotRunStarDust__FP9CStarDusti);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", CheckRunStarDust__FP9CStarDusti);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Generate__16CEffVerticalLineFPfff);
