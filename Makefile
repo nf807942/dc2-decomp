@@ -341,6 +341,15 @@ lot:
 banc:
 	@$(PYTHON) scripts/diff/banc.py $(ARGS)
 
+# La forge : applique toutes les reparations connues, les compose en faisceau,
+# mesure au banc, et ne garde que ce dont la reconstruction complete rend le
+# sha1 du disque. Elle tourne sans surveillance et dit ce que chaque reparation
+# rapporte, ce qui remplace l'intuition sur laquelle outiller ensuite.
+#   ARGS="--garde"       pose pour de bon
+#   ARGS="--rendement"   le seul compte par reparation
+forge:
+	@$(PYTHON) scripts/build/forge.py $(ARGS)
+
 # Ce que m2c ne sait pas lire, compte en fonctions perdues et en octets. Une
 # seule instruction inconnue perd la fonction entiere : c'est ce releve qui a
 # designe l'accumulateur flottant du R5900 comme le plus gros verrou.
