@@ -224,9 +224,58 @@ INCLUDE_ASM("nonmatchings/game/cgamedata", _DATACOM__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", _MES_SYS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", _MES_SYS_SPECTOL__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", _DATAWEPNUM__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cgamedata", _DATAWEP__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cgamedata", _DATAWEP_ST__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cgamedata", _DATAWEP_ST_L__FP9SPI_STACKi);
+extern "C" u32 SpiWeaponPt;
+
+/* Les six champs que les trois fonctions ci-dessous ecrivent. Le reste de
+ * l'objet que `SpiWeaponPt` designe n'est pas connu. */
+struct SpiWeapon_champs {
+    /* 0x0 */ s16 unk0;
+    /* 0x2 */ s16 unk2;
+    /* 0x4 */ s16 unk4;
+    /* 0x6 */ s16 unk6;
+    /* 0x8 */ s16 unk8;
+    /* 0xA */ s16 unkA;
+};
+
+/* L'adresse du second emplacement de pile se calcule *avant* la garde. MWCC la
+ * range alors dans le creneau de delai du branchement — `addiu $s0, $a0, 0x8`
+ * chez le commerce — la ou une affectation posee apres la garde lui fait garder
+ * la base et calculer le decalage au site d'appel. Mesure sur cette fonction :
+ * 94,29 % avec l'adresse calculee apres la garde, quelle que soit la forme de
+ * l'expression, 100 % avec ce placement. */
+extern "C" s32 _DATAWEP__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    SPI_STACK *suivant;
+
+    suivant = arg0 + 1;
+    if (SpiWeaponPt == NULL) {
+        return 0;
+    }
+    ((struct SpiWeapon_champs *) SpiWeaponPt)->unk0 = spiGetStackInt__FP9SPI_STACK(arg0);
+    ((struct SpiWeapon_champs *) SpiWeaponPt)->unk2 = spiGetStackInt__FP9SPI_STACK(suivant);
+    return 1;
+}
+extern "C" s32 _DATAWEP_ST__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    SPI_STACK *suivant;
+
+    suivant = arg0 + 1;
+    if (SpiWeaponPt == NULL) {
+        return 0;
+    }
+    ((struct SpiWeapon_champs *) SpiWeaponPt)->unk4 = spiGetStackInt__FP9SPI_STACK(arg0);
+    ((struct SpiWeapon_champs *) SpiWeaponPt)->unk6 = spiGetStackInt__FP9SPI_STACK(suivant);
+    return 1;
+}
+extern "C" s32 _DATAWEP_ST_L__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    SPI_STACK *suivant;
+
+    suivant = arg0 + 1;
+    if (SpiWeaponPt == NULL) {
+        return 0;
+    }
+    ((struct SpiWeapon_champs *) SpiWeaponPt)->unk8 = spiGetStackInt__FP9SPI_STACK(arg0);
+    ((struct SpiWeapon_champs *) SpiWeaponPt)->unkA = spiGetStackInt__FP9SPI_STACK(suivant);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cgamedata", _DATAWEP2_ST__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", _DATAWEP2_ST_L__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", _DATAWEP_SPE__FP9SPI_STACKi);
