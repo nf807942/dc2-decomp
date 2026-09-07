@@ -87,6 +87,65 @@ def relève() -> dict[str, list[str]]:
     return tables
 
 
+# `glabel __ct__8mgCFrameFv` ouvre un constructeur.
+_CT_OUVRE = re.compile(r"^glabel (__ct__\w+)\s*$")
+_CT_FERME = re.compile(r"^(?:endlabel|glabel|nmlabel) ")
+_VT_CITE = re.compile(r"%(?:hi|lo|gp_rel)\(__vt__(\w+)\)")
+
+
+def _classe_du_ct(symbole):
+    """`__ct__8mgCFrameFv` -> `mgCFrame`."""
+    trouve = re.match(r"^__ct__(\d+)(.+)$", symbole)
+    if not trouve:
+        return None
+    longueur, reste = int(trouve.group(1)), trouve.group(2)
+    return reste[:longueur] if len(reste) >= longueur else None
+
+
+def chaines():
+    """La chaine d'heritage de chaque classe, lue dans ses constructeurs.
+
+    **C'est une preuve, non une deduction.** Un constructeur ecrit le pointeur
+    de table virtuelle *une fois par niveau*, de la base au derive :
+
+        sw  %lo(__vt__9mgCObject)     ($a0)
+        sw  %lo(__vt__12mgCFrameBase) ($s0)
+        sw  %lo(__vt__8mgCFrame)      ($s0)
+
+    La suite se lit donc telle quelle. Le prefixe partage des tables, lui, ne
+    departageait pas cinq soeurs de meme rang ; ici il n'y a rien a departager.
+    """
+    rendu = {}
+    for chemin in sorted((ROOT / "ref" / "asm" / "text").rglob("*.s")):
+        texte = chemin.read_text(encoding="utf-8", errors="replace")
+        courant, suite = None, []
+        for ligne in texte.splitlines():
+            ouvre = _CT_OUVRE.match(ligne)
+            if ouvre:
+                courant, suite = ouvre.group(1), []
+                continue
+            if courant and _CT_FERME.match(ligne):
+                # **Le nom du constructeur dit la classe, pas la derniere table
+                # citee.** Un constructeur batit aussi ses membres et cite leurs
+                # tables : s'y fier donnait `CFuncPointMngr` pour base de
+                # `CEditParts`. On ne garde donc la chaine que si elle se termine
+                # bien par la classe que le symbole nomme.
+                classe = _classe_du_ct(courant)
+                if classe and len(suite) > 1 and suite[-1] == classe:
+                    ancien = rendu.get(classe)
+                    if ancien is None or len(suite) > len(ancien):
+                        rendu[classe] = suite
+                courant, suite = None, []
+                continue
+            if courant is None:
+                continue
+            for cite in _VT_CITE.findall(ligne):
+                nom = _nom_de_classe("__vt__" + cite)
+                if not suite or suite[-1] != nom:
+                    suite.append(nom)
+    return rendu
+
+
 def bases(tables):
     """Les bases candidates de chaque classe, par plus long prefixe partage.
 
@@ -117,10 +176,19 @@ def bases(tables):
 def fiches() -> dict[str, dict]:
     tables = relève()
     parents = bases(tables)
+    liens = chaines()
     rendu = {}
     for classe, entrees in tables.items():
         candidates, herites = parents.get(classe, ([], 0))
         parent = candidates[0] if len(candidates) == 1 else None
+        # La chaine lue dans le constructeur prime sur le prefixe partage :
+        # elle est ecrite, l'autre est devinee.
+        chaine = liens.get(classe)
+        preuve = "préfixe" if parent else ""
+        if chaine and len(chaine) > 1:
+            parent, candidates = chaine[-2], []
+            herites = len(tables.get(parent, [])) or herites
+            preuve = "constructeur"
         # Les deux premières entrées sont réservées par MWCC : la i-ième méthode
         # déclarée est en `(i + 1) * 4`, la première en `0x08`.
         propres = [(rang, symbole) for rang, symbole in enumerate(entrees)
@@ -128,6 +196,11 @@ def fiches() -> dict[str, dict]:
         rendu[classe] = {
             "entrees": len(entrees),
             "base": parent,
+            # **Un heritage lu dans un constructeur est prouve ; un heritage
+            # devine par prefixe partage ne l'est pas.** Les confondre ferait
+            # prendre une coincidence de rangs pour un fait du binaire.
+            "preuve": preuve,
+            "chaine": liens.get(classe, []),
             "bases_possibles": candidates if len(candidates) > 1 else [],
             "heritees": max(herites - 2, 0) if parent else 0,
             "muettes": max(herites, 2) - 2,
@@ -167,13 +240,19 @@ def main(argv: list[str]) -> int:
     avec = sum(1 for f in rendu.values() if f["base"])
     print("%d tables virtuelles, %d dont l'héritage se lit\n"
           % (len(rendu), avec))
-    print("  %-26s %5s %6s  %s" % ("classe", "slots", "propres", "base"))
+    prouves = sum(1 for f in rendu.values() if f["preuve"] == "constructeur")
+    print("  %d héritages prouvés par un constructeur,"
+          " %d devinés par préfixe" % (prouves, avec - prouves))
+    print()
+    print("  %-24s %5s %6s  %-16s %s"
+          % ("classe", "slots", "propres", "base", "preuve"))
     for classe, fiche in sorted(rendu.items(),
-                                key=lambda kv: -kv[1]["entrees"])[:28]:
-        print("  %-26s %5d %6d  %s"
+                                key=lambda kv: -kv[1]["entrees"])[:26]:
+        print("  %-24s %5d %6d  %-16s %s"
               % (classe, fiche["entrees"], len(fiche["propres"]),
                  fiche["base"] or ("%d candidates" % len(fiche["bases_possibles"])
-                                   if fiche["bases_possibles"] else "—")))
+                                   if fiche["bases_possibles"] else "—"),
+                 fiche["preuve"]))
     return 0
 
 
