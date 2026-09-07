@@ -135,7 +135,7 @@ O_FILES   := $(addprefix $(BUILD_DIR)/, $(S_FILES:.s=.o) $(BIN_FILES:.bin=.o) \
              $(addsuffix .o, $(basename $(SRC_FILES))))
 
 .PHONY: all setup tools patch split build objects check diff decompile measure \
-        atlas carve clean distclean contexte injecte provenance chaine affinage ecarts instructions controle ci etat progress report
+        atlas carve clean distclean contexte injecte provenance chaine affinage ecarts classes instructions controle ci etat progress report
 
 all: build
 
@@ -316,6 +316,16 @@ affinage:
 # par forme : c'est ce qui remplace le tirage d'idiomes a l'aveugle.
 ecarts:
 	@$(PYTHON) scripts/build/ecarts.py $(ARGS)
+
+# Le releve d'ecarts melange les causes et leurs consequences : sept `sw`
+# decales de quatre octets sur la meme base sont *un* champ manquant, et un
+# `sd ra, K(sp)` ne dit rien de plus que le cadre de pile qui le porte. Cette
+# passe impute chaque fonction a la cause qui domine ses ecarts et pese chaque
+# classe en octets. Elle ne compile rien : une seconde, sur l'hote.
+#   ARGS="--sous largeur"  range une classe par signature
+#   ARGS="--classe cadre"  la liste entiere
+classes:
+	@$(PYTHON) scripts/build/classes.py $(ARGS)
 
 # Ce que m2c ne sait pas lire, compte en fonctions perdues et en octets. Une
 # seule instruction inconnue perd la fonction entiere : c'est ce releve qui a
