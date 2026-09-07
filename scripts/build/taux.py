@@ -23,6 +23,14 @@ normalisation et la compilation sont refaites. Un correctif de normalisation se
 juge donc sur trois cents fonctions le temps d'un café, et l'on peut enfin
 itérer sur la seule partie du problème qui porte les octets.
 
+**Le harnais est validé contre la moisson**, qui écrit dans les sources et met
+des heures : sur quarante fonctions, **trente-neuf verdicts identiques**. Le seul
+désaccord porte sur `illegal function overloading`, un mécanisme que cette boucle
+ne reproduit pas. Sans cette vérification, la mesure ne vaudrait rien : une
+première version, qui oubliait la boucle de complétion, annonçait 17,5 % au lieu
+de 30 % et faisait dominer `undefined identifier` — c'est-à-dire exactement ce
+que la complétion existe pour régler.
+
 Le cache vit sous `build/jets/`, hors de git : il est dérivé du jeu.
 """
 
@@ -32,6 +40,7 @@ import argparse
 import collections
 import json
 import random
+import re
 import sys
 import time
 from pathlib import Path
@@ -48,6 +57,12 @@ if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 
 CHAINE = ROOT / "progress" / "chaine.json"
+# Le meme plafond que la chaine : une fonction qui touche trente types reclame
+# trente tours, et la boucle s'arrete d'elle-meme des qu'un tour n'apprend rien.
+TOURS = 24
+# `function call 'f(int)' does not match 'f(void)'` — l'appele est le meme,
+# la facon de l'appeler differe d'une fonction de l'unite a l'autre.
+_ARITE = re.compile(r"function call '(\w+)\(")
 JETS = ROOT / "build" / "jets"
 
 
@@ -89,10 +104,53 @@ def compile_ou_non(symbole: str, unite: str) -> tuple[bool, str]:
     if rendu is None:
         return False, "normalisation illisible"
     declarations, corps = rendu
-    (part, plainte), = lot.formes(symbole, unite, [declarations + corps])
-    if part is not None:
-        return True, ""
-    return False, _famille(plainte)
+
+    # **La boucle de complétion vit dans `eprouve`, pas dans `normalise`.**
+    # L'oublier faisait mesurer un taux de 17,5 % où `undefined identifier`
+    # dominait — c'est-à-dire exactement ce que la complétion existe pour
+    # régler. On la reproduit donc, en réemployant les deux fonctions du dépôt
+    # qui la portent : `declaration` dit ce qu'il faut écrire pour qu'un nom
+    # existe, `assemble` retire ce que l'unité déclare déjà.
+    ajoutees: list[str] = []
+    vus: set[str] = set()
+    ellipses: set[str] = set()
+    plainte = ""
+    for _ in range(TOURS):
+        fragment = sonde_m2c.assemble(ajoutees, declarations, corps, amont,
+                                      unite, sonde_m2c._marque(symbole),
+                                      deja_declarees(unite, amont))
+        (part, plainte), = lot.formes(symbole, unite, [fragment])
+        if part is not None:
+            return True, ""
+        # **Un appelé ne s'appelle pas partout de la même façon.** Deux
+        # fonctions d'une unité passent au même symbole des arguments
+        # différents, et un nom `extern "C"` ne se surcharge pas. `(...)` les
+        # accepte l'une et l'autre, et le dépôt a mesuré que l'ellipse ne coûte
+        # aucun octet. Omettre ce traitement expliquait quatre des cinq
+        # désaccords entre ce harnais et la moisson.
+        conflits = set(_ARITE.findall(plainte)) - ellipses
+        if conflits:
+            ellipses |= conflits
+            for appele in conflits:
+                motif = re.compile(
+                    r'^extern "C" ([^;(]*?)\b%s\s*\([^;{}\n]*\);$'
+                    % re.escape(appele), re.MULTILINE)
+                remplacement = 'extern "C" \\1%s(...);' % appele
+                declarations = motif.sub(remplacement, declarations)
+                ajoutees = [motif.sub(remplacement, d) for d in ajoutees]
+            continue
+
+        manquants = set(sonde_m2c._INCONNU.findall(plainte)) - vus
+        if not manquants:
+            return False, _famille(plainte)
+        vus |= manquants
+        neuves = [d for d in (sonde_m2c.declaration(nom, declarations + corps)
+                              for nom in sorted(manquants))
+                  if d and d not in ajoutees]
+        if not neuves:
+            return False, _famille(plainte)
+        ajoutees += neuves
+    return False, "déclarations sans fin"
 
 
 # Les familles de plaintes, pour que le compte dise où porter l'effort.
