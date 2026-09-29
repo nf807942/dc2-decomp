@@ -176,7 +176,17 @@ void CDngFreeMap::InitTexture(void) {
     this->field_0xD4 = 0;
     this->field_0xD0 = -1;
 }
-INCLUDE_ASM("nonmatchings/game/cdngfreemap", SetUserGlid__11CDngFreeMapFi);
+struct CDngFreeMapUserGlid {
+    /* 0x00 */ char pad0[0xC4];
+    /* 0xC4 */ s32 unkC4;
+};
+extern "C" s32 GetRoomGlid__11CDngFreeMapFi(void *, s32);
+extern "C" void SetUserGlid__11CDngFreeMapFi(CDngFreeMapUserGlid *objet, s32 arg0) {
+    objet->unkC4 = 0;
+    if (0 <= arg0) {
+        objet->unkC4 = GetRoomGlid__11CDngFreeMapFi(objet, arg0);
+    }
+}
 typedef struct CDngFreeMap_infere {
     /* 0x000 */ char pad0[0x100];
     /* 0x100 */ f32 unk100;                         /* inferred */
@@ -214,13 +224,88 @@ extern "C" s32 GetNextGlid__11CDngFreeMapFP9GLID_INFOPi(CDngFreeMap_infere2 *obj
 }
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", GetRoomGlid__11CDngFreeMapFi);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", GetEntranceRoomGlid__11CDngFreeMapFv);
-INCLUDE_ASM("nonmatchings/game/cdngfreemap", SetTextureInfo__11CDngFreeMapFv);
+extern "C" u8 mgTexManager[540];
+extern "C" char _1018_0036D9A0[];
+extern "C" char _1019_0036D9A8[];
+extern "C" char _1020_0036D9B0[];
+extern "C" char _1021_0036D9B8[];
+struct CDngFreeMapTexInfo {
+    char pad0[0xD4];
+    /* 0xD4 */ s32 unkD4;
+    /* 0xD8 */ s32 unkD8;
+    /* 0xDC */ s32 unkDC;
+    /* 0xE0 */ s32 unkE0;
+};
+extern "C" s32 GetTexture__17mgCTextureManagerFPci(...);
+extern "C" void SetTextureInfo__11CDngFreeMapFv(CDngFreeMapTexInfo *objet) {
+    objet->unkD8 = GetTexture__17mgCTextureManagerFPci(&mgTexManager, _1018_0036D9A0, -1);
+    objet->unkDC = GetTexture__17mgCTextureManagerFPci(&mgTexManager, _1019_0036D9A8, -1);
+    objet->unkE0 = GetTexture__17mgCTextureManagerFPci(&mgTexManager, _1020_0036D9B0, -1);
+    objet->unkD4 = GetTexture__17mgCTextureManagerFPci(&mgTexManager, _1021_0036D9B8, -1);
+}
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", ResetDngMapPos__11CDngFreeMapFii);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", DrawBackPattern__11CDngFreeMapFi);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", DrawDngName__11CDngFreeMapFi);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", DrawLast__11CDngFreeMapFv);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", DrawRoot__11CDngFreeMapF9mgRect_f_P16DNGMAP_ROOT_INFOiUii);
-INCLUDE_ASM("nonmatchings/game/cdngfreemap", DrawGlidCheck__11CDngFreeMapFP9GLID_INFO);
+struct GlidCheckCase {
+    /* 0x0 */ s16 unk0;
+    /* 0x2 */ s16 unk2;
+    /* 0x4 */ s16 unk4;
+    char pad6[0x26];
+    /* 0x2C */ s32 unk2C;
+    char pad30[0x35];
+    /* 0x65 */ u8 unk65;
+};
+struct GlidCheckInfo {
+    /* 0x0 */ s16 unk0;
+    /* 0x2 */ s16 unk2;
+    /* 0x4 */ s16 unk4;
+    char pad6[6];
+    /* 0xC */ struct GlidCheckCase *voisins[4];
+};
+extern "C" s32 DrawGlidCheck__11CDngFreeMapFP9GLID_INFO(CDngFreeMap *objet, GlidCheckInfo *arg0) {
+    s32 var_v0;
+    s32 var_v1;
+    struct GlidCheckCase *temp_t2;
+
+    if (arg0 == NULL) {
+        return 0;
+    }
+    var_v0 = 0;
+    var_v1 = 0;
+    do {
+        temp_t2 = arg0->voisins[var_v1];
+        if ((temp_t2 != NULL) && (arg0->unk0 == 0) && (temp_t2->unk0 == 1)) {
+            if ((var_v1 == 0) && ((temp_t2->unk4 + 1) == arg0->unk4)) {
+                var_v0 |= 2;
+            }
+            if ((var_v1 == 2) && ((temp_t2->unk2 + 1) == arg0->unk2)) {
+                var_v0 |= 8;
+            }
+            if (((temp_t2->unk2C & 0x10) || (temp_t2->unk2C & 8)) && (temp_t2->unk65 != 0)) {
+                if (temp_t2->unk2 == arg0->unk2) {
+                    if (temp_t2->unk4 == (arg0->unk4 - 1)) {
+                        var_v0 |= 0x40;
+                    }
+                    if (temp_t2->unk4 == (arg0->unk4 + 1)) {
+                        var_v0 |= 0x80;
+                    }
+                }
+                if (temp_t2->unk4 == arg0->unk4) {
+                    if (temp_t2->unk2 == (arg0->unk2 - 1)) {
+                        var_v0 |= 0x100;
+                    }
+                    if (temp_t2->unk2 == (arg0->unk2 + 1)) {
+                        var_v0 |= 0x200;
+                    }
+                }
+            }
+        }
+        var_v1 += 1;
+    } while (var_v1 < 4);
+    return var_v0;
+}
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", DrawRoomOne__11CDngFreeMapF9mgRect_f_P16DNGMAP_ROOM_INFOUiif);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", DrawGlid__11CDngFreeMapF9mgRect_f_);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", CheckGeoramaMateria__FP22TRESURE_BOX_FLOOR_INFOiPi);
@@ -230,8 +315,30 @@ INCLUDE_ASM("nonmatchings/game/cdngfreemap", DrawTreeMap__11CDngFreeMapFi);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", DrawPlayer__11CDngFreeMapFi);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", Step__11CDngFreeMapFv);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", Draw__11CDngFreeMapFv);
-INCLUDE_ASM("nonmatchings/game/cdngfreemap", FadeIn__11CDngFreeMapFi);
-INCLUDE_ASM("nonmatchings/game/cdngfreemap", FadeOut__11CDngFreeMapFi);
+struct CDngFreeMapFade {
+    /* 0x000 */ char pad0[0xF0];
+    /* 0x0F0 */ s32 unkF0;
+    /* 0x0F4 */ s32 unkF4;
+    /* 0x0F8 */ f32 unkF8;
+    /* 0x0FC */ s32 unkFC;
+};
+extern "C" void FadeIn__11CDngFreeMapFi(CDngFreeMapFade *objet, s32 arg0) {
+    objet->unkFC = 0;
+    objet->unkF4 = arg0;
+    objet->unkF8 = 128.0f;
+    if (0 < arg0) {
+        objet->unkF8 = 128.0f / (f32) arg0;
+    }
+    objet->unkF0 = 0;
+}
+extern "C" void FadeOut__11CDngFreeMapFi(CDngFreeMapFade *objet, s32 arg0) {
+    objet->unkFC = 1;
+    objet->unkF4 = arg0;
+    objet->unkF8 = -128.0f;
+    if (0 < arg0) {
+        objet->unkF8 = -128.0f / (f32) arg0;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", DeleteTexBlock__11CDngFreeMapFv);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", SetKomaMove__11CDngFreeMapFi);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", LoadDngInfo__11CDngFreeMapFP9mgCMemoryiiii);

@@ -333,7 +333,47 @@ public:
 };
 
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", CheckDngTreeMapFuncType__Fv);
-INCLUDE_ASM("nonmatchings/game/cmenutreemap", MakeDngTreeMapJumpNo__FiiPiPi);
+extern "C" s32 GetMainScene__Fv(void);
+extern "C" u8 _2739[];
+extern "C" u8 _2740[];
+extern "C" u8 _2741[];
+extern "C" u8 _2742_0036DB80[];
+extern "C" char *name_tbl_2728[7];
+extern "C" s32 CheckBitFlagMenu__Fi(s32);
+extern "C" s32 SearchMapNo__FPc(...);
+extern "C" s32 SetNowMapNo__6CSceneFi(void *, s32);
+extern "C" void MakeDngTreeMapJumpNo__FiiPiPi(s32 arg0, s32 arg1, s32 *arg2, s32 *arg3) {
+    s32 scene;
+
+    if (arg0 == 0) {
+        if (arg1 == 8) {
+            *arg2 = 1;
+            *arg3 = SearchMapNo__FPc(_2739);
+        }
+    }
+    if (arg0 == 1) {
+        if (arg1 == 6) {
+            *arg2 = 1;
+            *arg3 = SearchMapNo__FPc(_2740);
+        }
+    }
+    if ((arg0 == 3) && (arg1 == 0x14)) {
+        *arg2 = 1;
+        *arg3 = SearchMapNo__FPc(_2741);
+        if ((CheckBitFlagMenu__Fi(0x1B6) != 0) && (CheckBitFlagMenu__Fi(0x1BC) == 0)) {
+            *arg2 = 2;
+            *arg3 = arg0;
+        }
+    }
+    if (arg1 == 0) {
+        *arg2 = 1;
+        *arg3 = SearchMapNo__FPc(name_tbl_2728[arg0]);
+        if (arg0 == 6) {
+            scene = GetMainScene__Fv();
+            SetNowMapNo__6CSceneFi((void *) scene, SearchMapNo__FPc(_2742_0036DB80));
+        }
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", InitEnd__12CMenuTreeMapFv);
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", MsgInit__12CMenuTreeMapFv);
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", Step__12CMenuTreeMapFv);
@@ -369,7 +409,202 @@ extern "C" s32 FadeInOutMenu__12CMenuTreeMapFv(CMenuTreeMap *objet) {
     return var_s0;
 }
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", DngTreeMapInit__FP9mgCMemoryPiii);
-INCLUDE_ASM("nonmatchings/game/cmenutreemap", Init__6ClsMesFv);
+struct ClsMesTreeView {
+    char pad0[0xBC];
+    s32 uBC;
+    char padC0[0x1C];
+    s32 uDC;
+    s32 uE0;
+    s32 uE4;
+    s32 uE8;
+    s32 uEC;
+    s32 uF0[16];
+    s32 u130;
+    s32 u134;
+    char pad138[0x5C];
+    s32 u194;
+    s32 u198;
+    char pad19C[0x34];
+    f32 u1D0;
+    char pad1D4[0x4];
+    s32 u1D8;
+    char pad1DC[0x8];
+    s32 u1E4;
+    s32 u1E8;
+    s32 u1EC;
+    s32 u1F0;
+    s32 u1F4;
+    char pad1F8[0x1C30];
+    s32 u1E28;
+    s32 u1E2C;
+    s32 u1E30;
+    s32 u1E34;
+    s32 u1E38;
+    s32 u1E3C;
+    s32 u1E40;
+    char pad1E44[0x14];
+    u8 u1E58;
+    s8 u1E59[16][0x32];
+    char pad2179[0x3];
+    s32 u217C[16];
+    s32 u21BC[16];
+    s32 u21FC[16];
+    s32 u223C;
+    s32 u2240;
+    s32 u2244;
+    s32 u2248;
+    s32 u224C;
+    s32 u2250;
+    s32 u2254;
+    s32 u2258;
+    s32 u225C;
+    s32 u2260;
+    s32 u2264;
+    s32 u2268;
+    s32 u226C;
+    s32 u2270;
+    s32 u2274;
+    s32 u2278;
+    s32 u227C;
+    s32 u2280;
+    s32 u2284;
+    s32 u2288;
+    s32 u228C;
+    s32 u2290;
+    s32 u2294;
+    s32 u2298;
+    s32 u229C;
+    s32 u22A0;
+    char pad22A4[0x4];
+    s32 u22A8;
+    s32 u22AC;
+    s32 u22B0;
+    s32 u22B4;
+    s32 u22B8;
+    s32 u22BC[20];
+    s32 u230C[20][2];
+    s32 u23AC[20];
+    s32 u23FC[20];
+    s32 u244C[20];
+    s32 u249C[20];
+    s32 u24EC[20];
+    s32 u253C[20];
+    s32 u258C[20];
+    s32 u25DC[20];
+    s32 u262C[20];
+    s32 u267C[20];
+    s32 u26CC[20];
+    s32 u271C[20];
+    s32 u276C[20];
+    s32 u27BC[20];
+    s32 u280C[20];
+    s32 u285C[20];
+    s32 u28AC[20];
+    s32 u28FC[20];
+};
+extern "C" f32 GetDrawSpeedDef__6ClsMesFv(void *);
+extern "C" s32 InitMesWinTbl__6ClsMesFv(void *);
+extern "C" s32 memset(...);
+extern "C" void Init__6ClsMesFv(ClsMesTreeView *objet) {
+    s32 i;
+    s32 j;
+    s32 k;
+    s32 m;
+    s32 n;
+
+    objet->uBC = 0;
+    objet->uDC = 0;
+    objet->uE0 = 0;
+    objet->uE4 = 0;
+    objet->uE8 = 0;
+    objet->uEC = 0;
+    for (i = 0; i < 16; i++) {
+        objet->uF0[i] = 0;
+    }
+    objet->u130 = 0;
+    objet->u134 = 0;
+    objet->u194 = 0;
+    objet->u198 = 1;
+    objet->u1D0 = GetDrawSpeedDef__6ClsMesFv(objet);
+    objet->u1D8 = 0;
+    objet->u1E4 = 0;
+    objet->u1E8 = 0;
+    objet->u1EC = 0;
+    objet->u1F0 = 0;
+    objet->u1F4 = 0;
+    InitMesWinTbl__6ClsMesFv(objet);
+    objet->u1E2C = objet->u1E28;
+    objet->u1E30 = 0;
+    objet->u1E34 = 0;
+    objet->u1E38 = 0x1E;
+    objet->u1E3C = -1;
+    objet->u1E40 = 0;
+    objet->u1E58 = 0x80;
+    for (j = 0; j < 16; j++) {
+        memset(objet->u1E59[j], 0, 0x32);
+    }
+    for (k = 0; k < 16; k++) {
+        objet->u217C[k] = -1;
+    }
+    for (m = 0; m < 16; m++) {
+        objet->u21BC[m] = 0;
+        objet->u21FC[m] = 0;
+    }
+    objet->u223C = 0;
+    objet->u2240 = 0;
+    objet->u2244 = 1;
+    objet->u2248 = 0;
+    objet->u224C = 0;
+    objet->u2250 = 0;
+    objet->u2254 = -1;
+    objet->u2258 = -1;
+    objet->u225C = -1;
+    objet->u2260 = 0;
+    objet->u2264 = 0;
+    objet->u2268 = 0;
+    objet->u226C = 0;
+    objet->u2270 = 0;
+    objet->u2274 = 0;
+    objet->u2278 = 0;
+    objet->u227C = -1;
+    objet->u2280 = -1;
+    objet->u2284 = -1;
+    objet->u2288 = -1;
+    objet->u228C = 0;
+    objet->u2290 = 0;
+    objet->u2294 = 0;
+    objet->u2298 = 0;
+    objet->u229C = 0;
+    objet->u22A0 = 0;
+    objet->u22A8 = 0;
+    objet->u22AC = 0;
+    objet->u22B4 = 0;
+    objet->u22B0 = 0;
+    objet->u22B8 = 0;
+    for (n = 0; n < 20; n++) {
+        objet->u22BC[n] = 0;
+        objet->u230C[n][0] = 0;
+        objet->u230C[n][1] = 0;
+        objet->u23AC[n] = 0;
+        objet->u23FC[n] = -1;
+        objet->u244C[n] = 0;
+        objet->u249C[n] = 0;
+        objet->u24EC[n] = 0;
+        objet->u253C[n] = 0;
+        objet->u258C[n] = 0;
+        objet->u25DC[n] = -1;
+        objet->u262C[n] = 0;
+        objet->u267C[n] = 0;
+        objet->u26CC[n] = 0;
+        objet->u271C[n] = -1;
+        objet->u276C[n] = -1;
+        objet->u27BC[n] = 0;
+        objet->u280C[n] = 0;
+        objet->u285C[n] = 0;
+        objet->u28AC[n] = 0;
+        objet->u28FC[n] = 0;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", DngTreeMapKey__Fv);
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", DngTreeMapDraw__Fv);
 s32 CBaseMenuClass::IsCreateObject(s32 a, s32 b) {

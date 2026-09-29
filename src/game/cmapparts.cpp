@@ -401,7 +401,33 @@ INCLUDE_ASM("nonmatchings/game/cmapparts", algn16_size__FUi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFAR_CLIP__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapLIGHT_FLAG__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapMOVE_FLAG__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapLOD_START__FP9SPI_STACKi);
+extern "C" u32 mapNowMapParts;
+extern "C" u32 mapStack;
+extern "C" s32 Alloc__9mgCMemoryFi(...);
+extern "C" s32 pGetData__17CList_9CMapParts_Fv(...);
+struct LodDist {
+    f32 d0;
+    f32 d1;
+    f32 d2;
+    f32 d3;
+};
+extern "C" s32 SetLODDist__9CMapPartsFPfi(...);
+extern "C" s32 mapLOD_START__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    CMapParts *parts;
+    LodDist *dist;
+
+    if (mapNowMapParts == NULL) {
+        return 0;
+    }
+    dist = (LodDist *) (Alloc__9mgCMemoryFi(mapStack, 1));
+    parts = (CMapParts *) (pGetData__17CList_9CMapParts_Fv(mapNowMapParts));
+    dist->d0 = 600.0f;
+    dist->d1 = 1000.0f;
+    dist->d2 = 1400.0f;
+    dist->d3 = 1800.0f;
+    SetLODDist__9CMapPartsFPfi(parts, dist, 4);
+    return 1;
+}
 void CMapParts::SetLODDist(f32 * arg0, s32 arg1) {
     this->field_0x1D0 = arg1;
     this->field_0x1D8 = arg0;
@@ -455,9 +481,63 @@ extern "C" s32 mapPIECE_NAME__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     }
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE_POS__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE_ROT__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE_SCALE__FP9SPI_STACKi);
+extern "C" s32 spiGetStackVector__FPfP9SPI_STACK(...);
+/* Classe de la pièce : les virtuelles muettes amènent SetPos, SetRot et
+ * SetScale aux rangs 3, 6 et 9 (0x10, 0x1C, 0x28), l'appel passant par $t9. */
+class CMapPieceVirt {
+public:
+    virtual void v0();
+    virtual void v1();
+    virtual void SetPos(f32 *vec);
+    virtual void v3();
+    virtual void v4();
+    virtual void SetRot(f32 *vec);
+    virtual void v6();
+    virtual void v7();
+    virtual void SetScale(f32 *vec);
+};
+extern "C" s32 mapPIECE_POS__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    f32 sp30[4];
+    CMapPieceVirt *piece;
+    if (mapNowMapPiece == NULL) {
+        return 0;
+    }
+    piece = (CMapPieceVirt *) (pGetData__17CList_9CMapPiece_Fv(mapNowMapPiece));
+    if (piece == NULL) {
+        return 0;
+    }
+    spiGetStackVector__FPfP9SPI_STACK(sp30, arg0);
+    piece->SetPos(sp30);
+    return 1;
+}
+extern "C" s32 mapPIECE_ROT__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    f32 sp30[4];
+    CMapPieceVirt *piece;
+    if (mapNowMapPiece == NULL) {
+        return 0;
+    }
+    piece = (CMapPieceVirt *) (pGetData__17CList_9CMapPiece_Fv(mapNowMapPiece));
+    if (piece == NULL) {
+        return 0;
+    }
+    spiGetStackVector__FPfP9SPI_STACK(sp30, arg0);
+    piece->SetRot(sp30);
+    return 1;
+}
+extern "C" s32 mapPIECE_SCALE__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    f32 sp30[4];
+    CMapPieceVirt *piece;
+    if (mapNowMapPiece == NULL) {
+        return 0;
+    }
+    piece = (CMapPieceVirt *) (pGetData__17CList_9CMapPiece_Fv(mapNowMapPiece));
+    if (piece == NULL) {
+        return 0;
+    }
+    spiGetStackVector__FPfP9SPI_STACK(sp30, arg0);
+    piece->SetScale(sp30);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE_MATERIAL_START__FP9SPI_STACKi);
 void CMapPiece::SetMaterial(PieceMaterial * arg0, s32 arg1) {
     this->field_0x90 = arg0;
@@ -614,7 +694,12 @@ extern "C" s32 mapFIX_CAMERA_END__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     mapCameraInfoIdx += 1;
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapCAMERA_INFO_END__FP9SPI_STACKi);
+extern "C" s32 mapCAMERA_INFO_END__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    if (IsAddMode__Fv() != 0) {
+        return 1;
+    }
+    return 1;
+}
 extern "C" u32 mapFuncPointIdx;
 extern "C" void spiGetStackInt__FP9SPI_STACK(SPI_STACK *arg0);
 extern "C" s32 mapFUNC_POINT__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
@@ -661,8 +746,52 @@ block_5:
 INCLUDE_ASM("nonmatchings/game/cmapparts", LoadMapFile__4CMapFPciP9mgCMemoryi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", SetPieceLoadSkip__4CMapFi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", cfgDRAW_OFF_RECT__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", cfgOCCLUSION_PLANE__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", cfgFUNC_DATA__FP9SPI_STACKi);
+extern "C" s32 CreateOcclusion__4CMapFPA4_f(...);
+extern "C" s32 cfgOCCLUSION_PLANE__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    u8 sp[0x40];
+    s32 i;
+    s32 off;
+    SPI_STACK *stack;
+    u8 *vec;
+
+    stack = arg0;
+    off = 0;
+    i = 0;
+    do {
+        vec = off + sp;
+        spiGetStackVector__FPfP9SPI_STACK(vec, stack);
+        i += 1;
+        *(s32 *) (vec + 0xC) = 0x3F800000;
+        stack = (SPI_STACK *) ((u8 *) stack + 0x18);
+        off += 0x10;
+    } while (i < 4);
+    CreateOcclusion__4CMapFPA4_f(mapMap, (f32 (*)[4]) &sp[0]);
+    return 1;
+}
+extern "C" u32 ReserveFuncFlag;
+extern "C" char _1134_003679E8[];
+extern "C" s32 AddFromReserve__14CFuncPointMngrFi(...);
+extern "C" s32 Reserve__14CFuncPointMngrFiP9mgCMemory(...);
+extern "C" s32 strcmp(...);
+extern "C" s32 cfgFUNC_DATA__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    s32 temp_v0;
+
+    if (ReserveFuncFlag == 0) {
+        Reserve__14CFuncPointMngrFiP9mgCMemory(mapMap + 0xCB0, 0x40, mapStack);
+        ReserveFuncFlag = 1;
+    }
+    temp_v0 = (s32) (spiGetStackString__FP9SPI_STACK(arg0));
+    if (temp_v0 == 0) {
+        return 0;
+    }
+    if (strcmp(temp_v0, _1134_003679E8) == 0) {
+        *(s32 *) (mapMap + 0xCAC) = 1;
+    } else {
+        return 0;
+    }
+    mapNowFuncPoint = AddFromReserve__14CFuncPointMngrFi(mapMap + 0xCB0, 6);
+    return mapNowFuncPoint != 0;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", cfgFUNC_EVENT_DATA__FP9SPI_STACKi);
 s32 cfgFUNC_DATA_END(SPI_STACK * arg0, s32 arg1) {
     mapNowFuncPoint = 0;
@@ -733,8 +862,74 @@ INCLUDE_ASM("nonmatchings/game/cmapparts", mapALL_SCISSOR__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapCHARA_LIGHT_ADJUST__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", LoadMapInfo__8CMapInfoFPciP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__16CMapLightingInfoFv);
-INCLUDE_ASM("nonmatchings/game/cmapparts", amapIMG__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", amapPCP__FP9SPI_STACKi);
+extern "C" u32 MapInfo;
+extern "C" u32 MapInfoStack;
+static inline u32 Align16Blocks(u32 n) {
+    if (n & 0xF) {
+        return (n >> 4) + 1;
+    }
+    return n >> 4;
+}
+extern "C" s32 amapIMG__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    s32 str;
+    s32 *slot;
+    s32 mem;
+    s32 i;
+    s32 off;
+
+    str = (s32) (spiGetStackString__FP9SPI_STACK(arg0));
+    slot = (s32 *) (NULL);
+    if (str == 0) {
+        return 0;
+    }
+    i = 0;
+    off = 0;
+    do {
+        if (*(s32 *) (MapInfo + off + 4) == 0) {
+            slot = (s32 *) (MapInfo + (i * 4) + 4);
+            break;
+        }
+        i += 1;
+        off += 4;
+    } while (i < 0x10);
+    if (slot == NULL) {
+        return 0;
+    }
+    mem = Alloc__9mgCMemoryFi(MapInfoStack, Align16Blocks(strlen(str) + 1));
+    strcpy((void *) mem, str);
+    *slot = mem;
+    return 1;
+}
+extern "C" s32 amapPCP__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    s32 str;
+    s32 *slot;
+    s32 mem;
+    s32 i;
+    s32 off;
+
+    str = (s32) (spiGetStackString__FP9SPI_STACK(arg0));
+    slot = (s32 *) (NULL);
+    if (str == 0) {
+        return 0;
+    }
+    i = 0;
+    off = 0;
+    do {
+        if (*(s32 *) (MapInfo + off + 0x48) == 0) {
+            slot = (s32 *) (MapInfo + (i * 4) + 0x48);
+            break;
+        }
+        i += 1;
+        off += 4;
+    } while (i < 0x10);
+    if (slot == NULL) {
+        return 0;
+    }
+    mem = Alloc__9mgCMemoryFi(MapInfoStack, Align16Blocks(strlen(str) + 1));
+    strcpy((void *) mem, str);
+    *slot = mem;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", AddMapInfo__8CMapInfoFPciP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cmapparts", OutputLightData__8CMapInfoFPc);
 INCLUDE_ASM("nonmatchings/game/cmapparts", Initialize__9CMapPartsFv);
@@ -777,14 +972,71 @@ extern "C" s32 GetBBox__9CMapPartsFP9mgVu0FBOX(CMapParts_infere *objet, mgVu0FBO
     __as__9mgVu0FBOXFR9mgVu0FBOX(arg0, &objet->unk240);
     return objet->unk230;
 }
-INCLUDE_ASM("nonmatchings/game/cmapparts", GetBoundBox__9CMapPartsFP9mgVu0FBOX);
+extern "C" s32 mgApplyMatrix__FPfPfPA4_fPfPf(...);
+extern "C" s32 GetLWMatrix__9CMapPartsFPA4_f(...);
+extern "C" s32 GetBoundBox__9CMapPartsFP9mgVu0FBOX(CMapParts_infere *objet, mgVu0FBOX *arg0) {
+    f32 sp30[4][4];
+    if (objet->unk230 == 0) {
+        return 0;
+    }
+    GetLWMatrix__9CMapPartsFPA4_f(objet, sp30);
+    mgApplyMatrix__FPfPfPA4_fPfPf(arg0, (u8 *) arg0 + 0x10, sp30, &objet->unk240, (u8 *) objet + 0x250);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetBoundSphere__9CMapPartsFPf);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetLWMatrix__9CMapPartsFPA4_f);
-INCLUDE_ASM("nonmatchings/game/cmapparts", InsideScreen__9CMapPartsFv);
+extern "C" s32 mgInsideScreen__FP9mgVu0FBOXPA4_fPfPf(...);
+extern "C" s32 GetLWMatrix__9CMapPartsFPA4_f(...);
+extern "C" s32 InsideScreen__9CMapPartsFv(CMapParts_infere *objet) {
+    u8 sp20[0x40];
+    f32 sp60[4];
+    f32 sp70[4];
+
+    if (objet->unk230 == 0) {
+        return 0;
+    }
+    GetLWMatrix__9CMapPartsFPA4_f(objet, (f32 (*)[4]) &sp20[0]);
+    return mgInsideScreen__FP9mgVu0FBOXPA4_fPfPf(&objet->unk240, (f32 (*)[4]) &sp20[0], sp60, sp70);
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", InsideScreen__9CMapPartsFP10COcclusioni);
 INCLUDE_ASM("nonmatchings/game/cmapparts", InScreenFunc__9CMapPartsFP16InScreenFuncInfo);
 INCLUDE_ASM("nonmatchings/game/cmapparts", DrawScreenFunc__9CMapPartsFP8mgCFrame);
-INCLUDE_ASM("nonmatchings/game/cmapparts", Step__9CMapPartsFv);
+struct CMapPartsStepChamps {
+    char pad0[0xB0];
+    /* 0xB0 */ s32 unkB0;
+    char padB4[0xC];
+    /* 0xC0 */ s32 unkC0;
+    char padC4[0x120];
+    /* 0x1E4 */ s32 unk1E4;
+};
+struct CMapPartsStepNoeud {
+    /* 0x0 */ s32 unk0;
+    char pad4[0x7C];
+    /* 0x80 */ s32 unk80;
+};
+extern "C" s32 DeleteReference__8mgCFrameFv(void *);
+extern "C" s32 SetReference__8mgCFrameFP8mgCFrame(...);
+extern "C" s32 Step__9CMapPieceFv(void *);
+extern "C" void Step__9CMapPartsFv(CMapParts_infere *objet) {
+    struct CMapPartsStepNoeud *var_s0;
+    void *piece;
+    void *temp_s2;
+
+    if (((struct CMapPartsStepChamps *) objet)->unk1E4 == 0) {
+        return;
+    }
+    var_s0 = (struct CMapPartsStepNoeud *) (((struct CMapPartsStepChamps *) objet)->unkB0);
+    if (var_s0 != NULL) do {
+        piece = (u8 *) var_s0 + 0x10;
+        temp_s2 = (void *) (var_s0->unk80);
+        if (temp_s2 != NULL) {
+            SetReference__8mgCFrameFP8mgCFrame(temp_s2, &((struct CMapPartsStepChamps *) objet)->unkC0);
+            Step__9CMapPieceFv(piece);
+            DeleteReference__8mgCFrameFv(temp_s2);
+        }
+        var_s0 = (struct CMapPartsStepNoeud *) (var_s0->unk0);
+    } while (var_s0 != NULL);
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", AnimeStep__9CMapPartsFP15CFuncPointCheckP12CObjAnimeEnv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", StepFuncPoint__9CMapPartsFR15CFuncPointCheck);
 typedef struct CFuncPointCheck {

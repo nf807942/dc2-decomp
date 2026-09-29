@@ -230,8 +230,102 @@ extern "C" s32 CheckAppInstallForTitle__Fv(void) {
     return CheckAppInstall__Fv();
 }
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", CheckHDDInstall__Fv);
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", TitleLangSelInit__FP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", TitleLangSelKey__Fv);
+extern "C" u8 GamePad_003FA5A0[1144];
+extern "C" u8 _2723[22];
+extern "C" u8 _2724[12];
+extern "C" u32 lang_tex;
+extern "C" u32 mgFrameRate;
+extern "C" u32 title_lang_cursor_cnt;
+typedef struct title_lang_curxy_champs {
+    s32 unk0;
+    s32 unk4;
+} title_lang_curxy_champs;
+extern "C" title_lang_curxy_champs title_lang_curxy;
+extern "C" s32 title_lang_fadealpha;
+extern "C" s32 title_lang_phase;
+extern "C" s32 title_lang_select;
+struct mgCEnterIMGInfo;
+struct mgCMemory;
+struct TitleLangSelMemoire {
+    char pad0[0x20];
+    /* 0x20 */ s32 unk20;
+    /* 0x24 */ s32 unk24;
+};
+extern "C" s32 Alloc__9mgCMemoryFi(...);
+extern "C" s32 EnterIMGFile__17mgCTextureManagerFPUciP9mgCMemoryP15mgCEnterIMGInfo(void *, u8 *, s32, mgCMemory *, mgCEnterIMGInfo *);
+extern "C" s32 GetTexture__17mgCTextureManagerFPci(...);
+extern "C" s32 LoadFile2__FPcPvPii(...);
+extern "C" s32 MenuModeOn__8CGamePadFi(void *, s32);
+extern "C" s32 SetAutoRepeat__8CGamePadFiii(void *, s32, s32, s32);
+extern "C" void TitleLangSelInit__FP9mgCMemory(mgCMemory *arg0) {
+    s32 sp3C;
+    s32 var_v0;
+    u8 *temp_s1;
+
+    SetAutoRepeat__8CGamePadFiii(&GamePad_003FA5A0, 0x5000, 0xF, 4);
+    MenuModeOn__8CGamePadFi(&GamePad_003FA5A0, 0x78);
+    title_lang_select = 0;
+    mgFrameRate = 1;
+    temp_s1 = (u8 *) (((struct TitleLangSelMemoire *) arg0)->unk20 + (((struct TitleLangSelMemoire *) arg0)->unk24 * 0x10));
+    LoadFile2__FPcPvPii(&_2723, temp_s1, &sp3C, 0);
+    var_v0 = sp3C >> 4;
+    if (sp3C < 0) {
+        var_v0 = (s32) (sp3C + 0xF) >> 4;
+    }
+    Alloc__9mgCMemoryFi(arg0, var_v0 + 1);
+    EnterIMGFile__17mgCTextureManagerFPUciP9mgCMemoryP15mgCEnterIMGInfo(&mgTexManager, temp_s1, 1, NULL, NULL);
+    lang_tex = GetTexture__17mgCTextureManagerFPci(&mgTexManager, &_2724, -1);
+    title_lang_phase = 0;
+    title_lang_curxy.unk0 = 0x42C80000;
+    title_lang_fadealpha = 0x80;
+    title_lang_curxy.unk4 = 0x42C80000;
+    title_lang_cursor_cnt = 0;
+}
+extern "C" s32 AutoRepeatOff__8CGamePadFv(void *);
+extern "C" s32 DeleteBlock__17mgCTextureManagerFi(void *, s32);
+extern "C" s32 Down__8CGamePadFi(void *, s32);
+extern "C" s32 MenuModeOff__8CGamePadFv(void *);
+extern "C" s32 TitleLangSelKey__Fv(void) {
+    switch (title_lang_phase) {
+    case 0:
+        title_lang_fadealpha -= 6;
+        if (title_lang_fadealpha <= 0) {
+            title_lang_fadealpha = 0;
+            title_lang_phase += 1;
+        }
+        break;
+    case 1:
+        if (Down__8CGamePadFi(&GamePad_003FA5A0, 0x1000) != 0) {
+            title_lang_select -= 1;
+        }
+        if (Down__8CGamePadFi(&GamePad_003FA5A0, 0x4000) != 0) {
+            title_lang_select += 1;
+        }
+        if (title_lang_select < 0) {
+            title_lang_select = 4;
+        }
+        if (title_lang_select > 4) {
+            title_lang_select = 0;
+        }
+        if (Down__8CGamePadFi(&GamePad_003FA5A0, 0x40) != 0) {
+            title_lang_phase += 1;
+        }
+        break;
+    case 2:
+        title_lang_fadealpha += 6;
+        if (title_lang_fadealpha >= 0x80) {
+            title_lang_fadealpha = 0x80;
+            DeleteBlock__17mgCTextureManagerFi(&mgTexManager, 0);
+            mgFrameRate = 2;
+            lang_tex = 0;
+            AutoRepeatOff__8CGamePadFv(&GamePad_003FA5A0);
+            MenuModeOff__8CGamePadFv(&GamePad_003FA5A0);
+            return title_lang_select + 1;
+        }
+        break;
+    }
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", GetSelectLanguageNo__Fv);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", TitleLangSelDraw__Fv);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", InitSoundViewerMain__F13INIT_LOOP_ARG);
@@ -263,10 +357,93 @@ INCLUDE_ASM("nonmatchings/game/ceditinfomngr", GetePartsInfoAtType__13CEditInfoM
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapEDIT_PARTS_NUM__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapEDIT_PARTS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapID__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapPARTS_NAME__FP9SPI_STACKi);
+extern "C" u32 emapNowInfo_0037E114;
+extern "C" u32 emapStack_0037E108;
+struct SPI_STACK_chaine {
+    s32 field_0;
+    s32 field_4;
+};
+extern "C" s32 spiGetStackString__FP9SPI_STACK(SPI_STACK_chaine *);
+extern "C" s32 strcpy(...);
+extern "C" s32 strlen(...);
+static inline u32 Align16Blocks(u32 n) {
+    if (n & 0xF) {
+        return (n >> 4) + 1;
+    }
+    return n >> 4;
+}
+struct emapNowInfo_parts_name {
+    char pad0[0x40];
+    /* 0x40 */ s32 unk40;
+};
+extern "C" s32 emapPARTS_NAME__FP9SPI_STACKi(SPI_STACK_chaine *arg0, s32 arg1) {
+    s32 temp_v0;
+    s32 temp_s1;
+
+    if (emapNowInfo_0037E114 == NULL) {
+        return 0;
+    }
+    temp_v0 = (s32) (spiGetStackString__FP9SPI_STACK(arg0));
+    temp_s1 = Alloc__9mgCMemoryFi(emapStack_0037E108, Align16Blocks(strlen(temp_v0) + 1));
+    if (temp_v0 != 0) {
+        if (temp_s1 != 0) {
+            strcpy(temp_s1, temp_v0);
+            ((struct emapNowInfo_parts_name *) emapNowInfo_0037E114)->unk40 = temp_s1;
+        }
+    }
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapPARTS_ATR__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapPARTS_MATERIAL__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapPARTS_COMMENT__FP9SPI_STACKi);
+extern "C" u32 emapMatID;
+extern "C" u32 emapNowInfo_0037E114;
+extern "C" s32 GetMaterial__14CEditPartsInfoFi(...);
+struct SPI_STACK_ebfb5e;
+typedef struct SPI_STACK_ebfb5e {
+    /* 0x0 */ char pad0[8];
+} SPI_STACK_ebfb5e;
+struct temp_v0_champs_ebfb5e {
+    /* 0x0 */ s32 unk0;
+    /* 0x4 */ s32 unk4;
+};
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(...);
+extern "C" s32 emapPARTS_MATERIAL__FP9SPI_STACKi(SPI_STACK_ebfb5e *arg0, s32 arg1) {
+    s32 temp_a1;
+    struct temp_v0_champs_ebfb5e *temp_v0;
+
+    if ((emapNowInfo_0037E114 == NULL) || (arg1 < 2)) {
+        return 0;
+    }
+    temp_a1 = emapMatID;
+    emapMatID = temp_a1 + 1;
+    temp_v0 = (struct temp_v0_champs_ebfb5e *) (GetMaterial__14CEditPartsInfoFi(emapNowInfo_0037E114, temp_a1));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    temp_v0->unk0 = spiGetStackInt__FP9SPI_STACK(arg0++);
+    temp_v0->unk4 = spiGetStackInt__FP9SPI_STACK(arg0);
+    return 1;
+}
+struct emapNowInfo_parts_comment {
+    char pad0[0x48];
+    /* 0x48 */ s32 unk48;
+};
+extern "C" s32 emapPARTS_COMMENT__FP9SPI_STACKi(SPI_STACK_chaine *arg0, s32 arg1) {
+    s32 temp_v0;
+    s32 temp_s1;
+
+    if (emapNowInfo_0037E114 == NULL) {
+        return 0;
+    }
+    temp_v0 = (s32) (spiGetStackString__FP9SPI_STACK(arg0));
+    temp_s1 = Alloc__9mgCMemoryFi(emapStack_0037E108, Align16Blocks(strlen(temp_v0) + 1));
+    if (temp_v0 != 0) {
+        if (temp_s1 != 0) {
+            strcpy(temp_s1, temp_v0);
+            ((struct emapNowInfo_parts_comment *) emapNowInfo_0037E114)->unk48 = temp_s1;
+        }
+    }
+    return 1;
+}
 extern "C" u32 emapNowInfo_0037E114;
 struct SPI_STACK_94ad22;
 typedef struct SPI_STACK_94ad22 {
@@ -387,7 +564,18 @@ extern "C" s32 emapPARTS_TYPE__FP9SPI_STACKi(SPI_STACK_d30a97 *arg0, s32 arg1) {
     ((struct emapNowInfo_0037E114_champs_d30a97 *) emapNowInfo_0037E114)->unk24 = spiGetStackInt__FP9SPI_STACK(arg0);
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapPLACE_EPS__FP9SPI_STACKi);
+struct emapNowInfo_place_eps {
+    char pad0[0x28];
+    /* 0x28 */ f32 unk28;
+};
+extern "C" f32 spiGetStackFloat__FP9SPI_STACK(SPI_STACK_chaine *);
+extern "C" s32 emapPLACE_EPS__FP9SPI_STACKi(SPI_STACK_chaine *arg0, s32 arg1) {
+    if (emapNowInfo_0037E114 == NULL) {
+        return 0;
+    }
+    ((struct emapNowInfo_place_eps *) emapNowInfo_0037E114)->unk28 = spiGetStackFloat__FP9SPI_STACK(arg0);
+    return 1;
+}
 struct SPI_STACK_2b558e {
     s32 field_0;
     s32 field_4;
@@ -403,7 +591,25 @@ extern "C" s32 emapMAP_NO__FP9SPI_STACKi(SPI_STACK_2b558e *arg0, s32 arg1) {
     ((struct emapNowInfo_0037E114_champs_2b558e *) emapNowInfo_0037E114)->unk2C = spiGetStackInt__FP9SPI_STACK(arg0);
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapPOLYN__FP9SPI_STACKi);
+struct emapNowInfo_polyn {
+    char pad0[0x30];
+    /* 0x30 */ s32 unk30;
+    /* 0x34 */ s32 unk34;
+    /* 0x38 */ s32 unk38;
+};
+extern "C" s32 emapPOLYN__FP9SPI_STACKi(SPI_STACK_ebfb5e *arg0, s32 arg1) {
+    if (emapNowInfo_0037E114 == NULL) {
+        return 0;
+    }
+    ((struct emapNowInfo_polyn *) emapNowInfo_0037E114)->unk30 = spiGetStackInt__FP9SPI_STACK(arg0++);
+    if (arg1 >= 2) {
+        ((struct emapNowInfo_polyn *) emapNowInfo_0037E114)->unk34 = spiGetStackInt__FP9SPI_STACK(arg0++);
+    }
+    if (arg1 >= 3) {
+        ((struct emapNowInfo_polyn *) emapNowInfo_0037E114)->unk38 = spiGetStackInt__FP9SPI_STACK(arg0);
+    }
+    return 1;
+}
 struct SPI_STACK_bc7cb3 {
     s32 field_0;
     s32 field_4;

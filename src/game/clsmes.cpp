@@ -29,7 +29,37 @@ INCLUDE_ASM("nonmatchings/game/clsmes", GetFontColor__6ClsMesFiPi);
 INCLUDE_ASM("nonmatchings/game/clsmes", GetGyouAlpha__6ClsMesFi);
 INCLUDE_ASM("nonmatchings/game/clsmes", DrawFont__6ClsMesFv);
 INCLUDE_ASM("nonmatchings/game/clsmes", SetGoalCursorXY__6ClsMesFv);
-INCLUDE_ASM("nonmatchings/game/clsmes", StepSelectCursor__6ClsMesFi);
+struct ClsMesCursorView {
+    char pad0[0x225C];
+    s32 unk225C;
+    s32 unk2260;
+    s32 unk2264;
+    s32 unk2268;
+    s32 unk226C;
+    char pad2270[8];
+    s32 unk2278;
+};
+extern "C" s32 SetGoalCursorXY__6ClsMesFv(void *);
+extern "C" void StepSelectCursor__6ClsMesFi(ClsMesCursorView *objet, s32 arg0) {
+    s32 i;
+
+    if (objet->unk225C < 0) {
+        objet->unk2278 = 0;
+        return;
+    }
+    SetGoalCursorXY__6ClsMesFv(objet);
+    if (objet->unk2278 <= 0) {
+        objet->unk2268 = objet->unk2260;
+        objet->unk226C = objet->unk2264;
+        objet->unk2278 = 1;
+        return;
+    }
+    for (i = 0; i < arg0; i++) {
+        objet->unk2268 = (objet->unk2268 + objet->unk2260) / 2;
+        objet->unk226C = (objet->unk226C + objet->unk2264) / 2;
+        objet->unk2278 += 1;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/clsmes", DrawSelectCursor__6ClsMesFP11mgCDrawPrim);
 INCLUDE_ASM("nonmatchings/game/clsmes", DrawEquipment__6ClsMesFP11mgCDrawPrim);
 INCLUDE_ASM("nonmatchings/game/clsmes", DrawCross__6ClsMesFP11mgCDrawPrim);
@@ -90,7 +120,26 @@ INCLUDE_ASM("nonmatchings/game/clsmes", DrawMesWin__6ClsMesFv);
 INCLUDE_ASM("nonmatchings/game/clsmes", Parametric__FPfPfPf);
 INCLUDE_ASM("nonmatchings/game/clsmes", Quadratic__FfffPfPf);
 INCLUDE_ASM("nonmatchings/game/clsmes", CalcIntersectionPointSphereAndLine__FPffPfPfPfPf);
-INCLUDE_ASM("nonmatchings/game/clsmes", CheckPosInOutForArea__FPfPfPf);
+extern "C" s32 CheckPosInOutForArea__FPfPfPf(f32 *arg0, f32 *arg1, f32 *arg2) {
+    f32 a;
+    f32 b;
+    f32 low;
+    s32 i;
+
+    for (i = 0; i < 3; i++) {
+        a = arg0[i];
+        b = arg1[i];
+        low = (a < b) ? a : b;
+        if (arg2[i] < low) {
+            return 0;
+        }
+        a = (a > b) ? a : b;
+        if (a < arg2[i]) {
+            return 0;
+        }
+    }
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/clsmes", CalcMoveNextPos__FPfPffPf);
 INCLUDE_ASM("nonmatchings/game/clsmes", InitMovieCC__Fv);
 extern "C" u8 _4574[];

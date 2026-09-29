@@ -27,8 +27,41 @@ extern s32 SysMesCnt;
 extern s32 SysMesNo;
 
 
-INCLUDE_ASM("nonmatchings/game/cfont", CheckKanjiFont__5CFontFi);
-INCLUDE_ASM("nonmatchings/game/cfont", CheckHalfFont__5CFontFi);
+extern "C" u32 LanguageCode;
+extern "C" s32 GetKanjiTopNo__Fv(void);
+extern "C" s32 GetYoyakuTblNum__Fv(void);
+extern "C" s32 CheckKanjiFont__5CFontFi(CFont *objet, s32 arg0) {
+    if (LanguageCode == 6) {
+        return 0;
+    }
+    if (GetKanjiTopNo__Fv() == 0) {
+        return 0;
+    }
+    if (arg0 < GetKanjiTopNo__Fv()) {
+        return 0;
+    }
+    return (arg0 >= GetYoyakuTblNum__Fv()) ^ 1;
+}
+extern "C" s32 GetHalfFontNum__Fv(void);
+extern "C" s32 CheckHalfFont__5CFontFi(CFont *objet, s32 arg0) {
+    if (arg0 == 0xFF02) {
+        return 1;
+    }
+    if (LanguageCode != 1) {
+        if ((arg0 >= 0x5E) && (arg0 < 0x9D)) {
+            return 1;
+        }
+        if ((arg0 >= 0x9D) && (arg0 < 0xB5)) {
+            return 0;
+        }
+        goto block_9;
+    }
+block_9:
+    if (arg0 < 0) {
+        return 0;
+    }
+    return (arg0 >= GetHalfFontNum__Fv()) ^ 1;
+}
 void CFont::SetDrawSize(s32 arg0, s32 arg1) {
     this->field_0xA4 = arg0;
     this->field_0xA8 = arg1;
@@ -47,7 +80,19 @@ INCLUDE_ASM("nonmatchings/game/cfont", SetColor__5CFontFUi);
 void CFont::SetFuchi(s32 arg0) {
     this->field_0x80 = arg0;
 }
-INCLUDE_ASM("nonmatchings/game/cfont", SetStr__5CFontFPc);
+extern "C" u8 _936_003761D0[26];
+extern "C" s32 memset(...);
+extern "C" s32 printf(...);
+extern "C" s32 strcpy(...);
+extern "C" s32 strlen(...);
+extern "C" void SetStr__5CFontFPc(CFont *objet, s8 *arg0) {
+    memset(objet, 0, 0x80);
+    if (strlen(arg0) >= 0x80U) {
+        printf(&_936_003761D0);
+        return;
+    }
+    strcpy(objet, arg0);
+}
 INCLUDE_ASM("nonmatchings/game/cfont", GetGaijiFontNo__FPc);
 INCLUDE_ASM("nonmatchings/game/cfont", GetGaijiLen__FUs);
 INCLUDE_ASM("nonmatchings/game/cfont", GetAlphabeticalFontNo_uc__FUc);
@@ -199,8 +244,64 @@ extern "C" void UpDateWH__FPiPiii(s32 *arg0, s32 *arg1, s32 arg2, s32 arg3) {
 }
 INCLUDE_ASM("nonmatchings/game/cfont", CalcDrawWH__5CFontFPcPiPi);
 INCLUDE_ASM("nonmatchings/game/cfont", DrawDirect__5CFontFPcii);
-INCLUDE_ASM("nonmatchings/game/cfont", Preset__5CFontFi);
-INCLUDE_ASM("nonmatchings/game/cfont", Init__5CFontFv);
+extern "C" s32 SetColor__5CFontFUi(void *, u32);
+extern "C" s32 SetFuchi__5CFontFi(void *, s32);
+extern "C" void Preset__5CFontFi(CFont *objet, s32 arg0) {
+    switch (arg0) {
+    case 0:
+    case 1:
+        SetColor__5CFontFUi(objet, 0x80202020U);
+        SetFuchi__5CFontFi(objet, 2);
+        break;
+    case 2:
+    case 3:
+        SetColor__5CFontFUi(objet, 0x80686A6BU);
+        SetFuchi__5CFontFi(objet, 8);
+        break;
+    case 4:
+        SetColor__5CFontFUi(objet, 0x80686A6BU);
+        SetFuchi__5CFontFi(objet, 5);
+        break;
+    }
+}
+struct objet_champs_5cea16 {
+    char pad0[0x88];
+    /* 0x88 */ u8 unk88;
+    /* 0x89 */ u8 unk89;
+    /* 0x8A */ u8 unk8A;
+    /* 0x8B */ u8 unk8B;
+    char pad8C[0x4];
+    /* 0x90 */ s32 unk90;
+    /* 0x94 */ s32 unk94;
+    /* 0x98 */ s32 unk98;
+    /* 0x9C */ s32 unk9C;
+    /* 0xA0 */ s32 unkA0;
+    /* 0xA4 */ s32 unkA4;
+    /* 0xA8 */ s32 unkA8;
+    /* 0xAC */ s32 unkAC;
+    /* 0xB0 */ s32 unkB0;
+    /* 0xB4 */ s32 unkB4;
+};
+extern "C" s32 memset(...);
+extern "C" s32 SetFuchi__5CFontFi(void *, s32);
+extern "C" void Init__5CFontFv(CFont *objet) {
+    memset(objet, 0, 0x80);
+    SetFuchi__5CFontFi(objet, 3);
+    ((struct objet_champs_5cea16 *) objet)->unk8B = 0x80;
+    ((struct objet_champs_5cea16 *) objet)->unk8A = 0x80;
+    ((struct objet_champs_5cea16 *) objet)->unk89 = 0x80;
+    ((struct objet_champs_5cea16 *) objet)->unk88 = 0x80;
+    ((struct objet_champs_5cea16 *) objet)->unk90 = 0x80;
+    ((struct objet_champs_5cea16 *) objet)->unk98 = 0;
+    ((struct objet_champs_5cea16 *) objet)->unk94 = 0;
+    ((struct objet_champs_5cea16 *) objet)->unk9C = 0xF;
+    ((struct objet_champs_5cea16 *) objet)->unkA0 = 0x18;
+    ((struct objet_champs_5cea16 *) objet)->unkA4 = 0x10;
+    ((struct objet_champs_5cea16 *) objet)->unkA8 = 0x14;
+    ((struct objet_champs_5cea16 *) objet)->unkAC = 0;
+    ((struct objet_champs_5cea16 *) objet)->unkB0 = 0;
+    ((struct objet_champs_5cea16 *) objet)->unkB4 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cfont", Setup__10COcclusionFPA4_f);
 INCLUDE_ASM("nonmatchings/game/cfont", CheckSphere__10COcclusionFPf);
 INCLUDE_ASM("nonmatchings/game/cfont", CalcSelectCursorPos__F4RECTPi);
@@ -258,12 +359,36 @@ void SetHelpMes(s32 arg0, s32 arg1, s32 arg2) {
     EditHelpMesParam = arg1;
     EditHelpMesParam2 = arg2;
 }
-INCLUDE_ASM("nonmatchings/game/cfont", GetUserData__Fv_002DD7A0);
+extern "C" s32 GetSaveData__Fv(void);
+extern "C" s32 GetUserData__Fv_002DD7A0(void) {
+    u8 *p;
+
+    p = (u8 *) GetSaveData__Fv();
+    if (p != 0) {
+        return (s32) (p + 0x1D2A0);
+    }
+    return 0;
+}
 extern "C" f32 ConvColor__Ff(f32 arg0) {
     return arg0 / 128.0f;
 }
 INCLUDE_ASM("nonmatchings/game/cfont", ConvColorV__FPf);
-INCLUDE_ASM("nonmatchings/game/cfont", emSearchColorCode__FPf);
+extern "C" s32 EditPartsCmpColor__FPfPf(f32 *, f32 *);
+extern "C" s32 GetPenkiColor__FiPf(s32, f32 *);
+extern "C" s32 ConvColorV__FPf(f32 *);
+extern "C" s32 emSearchColorCode__FPf(f32 *arg0) {
+    f32 sp30[4];
+    s32 i;
+
+    for (i = 0; i < 8; i++) {
+        GetPenkiColor__FiPf(i, sp30);
+        ConvColorV__FPf(sp30);
+        if (EditPartsCmpColor__FPfPf(arg0, sp30) != 0) {
+            return i;
+        }
+    }
+    return -1;
+}
 extern "C" s32 GetPenkiItemNo__Fi(s32 arg0);
 extern "C" s32 emGetPenkiItemNo__Fi(s32 arg0) {
     if ((arg0 < 0) || (arg0 >= 8)) {
@@ -360,9 +485,76 @@ INCLUDE_ASM("nonmatchings/game/cfont", StackUndoData__FP9UNDO_DATA);
 INCLUDE_ASM("nonmatchings/game/cfont", StartEditPutWall__FPQ210CEditParts8WallInfo);
 INCLUDE_ASM("nonmatchings/game/cfont", PlaceEditParts__FP8CEditMapPfPfP13EP_PLACE_INFO);
 INCLUDE_ASM("nonmatchings/game/cfont", PlaceRiverStart__FP8CEditMapPf);
-INCLUDE_ASM("nonmatchings/game/cfont", PlaceRiverStep__FP8CEditMap);
+extern "C" u8 PlaceRiverPos[16];
+extern "C" u8 _1268_0035B6C0[16];
+extern "C" s32 EditPaintEffect__FP10CEditPartsPfPfi(...);
+extern "C" s32 GetSystemSndID__Fv(void);
+extern "C" s32 mgZeroVector__FPf(f32 *);
+extern "C" s32 sndSePlay__FUiii(u32, s32, s32);
+extern "C" s32 PlaceEditParts__FP8CEditMapPfPfP13EP_PLACE_INFO(...);
+extern "C" s32 PlaceRiverStep__FP8CEditMap(void *arg0) {
+    f32 sp20[4];
+    f32 sp30[4];
+
+    if (PlaceRiverCnt <= 0) {
+        return 0;
+    }
+    PlaceRiverCnt -= 1;
+    if (PlaceRiverCnt >= 0x1E) {
+        CursorLockCnt = 5;
+    }
+    if (PlaceRiverCnt == 0x28) {
+        sndSePlay__FUiii(GetSystemSndID__Fv(), 0x22, 0);
+    }
+    if (PlaceRiverCnt == 0x1E) {
+        mgZeroVector__FPf(sp20);
+        if (PlaceEditParts__FP8CEditMapPfPfP13EP_PLACE_INFO(arg0, &PlaceRiverPos, sp20, NULL) != 0) {
+            *(u128 *) sp30 = *(u128 *) _1268_0035B6C0;
+            EditPaintEffect__FP10CEditPartsPfPfi(NULL, &PlaceRiverPos, sp30, 1);
+        }
+    }
+    if (PlaceRiverCnt <= 0) {
+        PlaceRiverCnt = 0;
+    }
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cfont", NowPlaceRiver__Fv);
 INCLUDE_ASM("nonmatchings/game/cfont", RemoveMtnStart__FP8CEditMapPfPf);
-INCLUDE_ASM("nonmatchings/game/cfont", RemoveMtnStep__FP6CScene);
+extern "C" s32 GetMap__6CSceneFi(void *, s32);
+extern "C" s32 GetePlaceParts__8CEditMapFi(void *, s32);
+extern "C" u8 RemoveMtnPos[16];
+extern "C" u8 eCurPos[16];
+extern "C" u8 RemoveMtnCurPos[16];
+extern "C" s32 EditSetPlaceAnime__FiP9CMapParts(...);
+extern "C" s32 GetePlaceParts__8CEditMapFPf(...);
+extern "C" s32 RemoveEditParts__FP6CSceneiPf(...);
+extern "C" s32 RemoveMtnStep__FP6CScene(void *arg0) {
+    void *temp_s0;
+    s32 temp_v0;
+
+    if (RemoveMtnCnt <= 0) {
+        return 0;
+    }
+    temp_s0 = (void *) GetMap__6CSceneFi(arg0, *(s32 *) ((u8 *) arg0 + 0x2E5C));
+    RemoveMtnCnt -= 1;
+    if (RemoveMtnCnt >= 3) {
+        CursorLockCnt = 3;
+    }
+    *(u128 *) eCurPos = *(u128 *) RemoveMtnCurPos;
+    *(u128 *) eCurPos = *(u128 *) RemoveMtnCurPos;
+    if (RemoveMtnCnt == 3) {
+        temp_v0 = GetePlaceParts__8CEditMapFPf(temp_s0, &RemoveMtnPos);
+        EditSetPlaceAnime__FiP9CMapParts(3, GetePlaceParts__8CEditMapFi(temp_s0, temp_v0));
+        if (RemoveEditParts__FP6CSceneiPf(arg0, temp_v0, &RemoveMtnPos) != 0) {
+            sndSePlay__FUiii(GetSystemSndID__Fv(), 0x17, 0);
+        } else {
+            EditInitPlaceAnime__Fv();
+        }
+    }
+    if (RemoveMtnCnt <= 0) {
+        RemoveMtnCnt = 0;
+    }
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cfont", RemoveEditParts__FP6CSceneiPf);
 INCLUDE_ASM("nonmatchings/game/cfont", DeleteKanketuParts__FP6CSceneP8CEditMapPfi);

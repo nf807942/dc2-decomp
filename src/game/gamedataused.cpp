@@ -46,7 +46,25 @@ extern "C" void AddPoint__11COMMON_GAGEFf(COMMON_GAGE_infere *objet, f32 arg0) {
         objet->unk4 = temp_f1;
     }
 }
-INCLUDE_ASM("nonmatchings/game/gamedataused", AddRate__11COMMON_GAGEFf);
+struct COMMON_GAGE_infere3;
+typedef struct COMMON_GAGE_infere3 {
+    /* 0x0 */ f32 unk0;                             /* inferred */
+    /* 0x4 */ f32 unk4;                             /* inferred */
+} COMMON_GAGE_infere3;                                      /* size >= 0x8 */
+extern "C" void AddRate__11COMMON_GAGEFf(COMMON_GAGE_infere3 *objet, f32 arg0) {
+    f32 temp_f0;
+    f32 temp_f1;
+
+    objet->unk4 += objet->unk0 * arg0;
+    temp_f0 = objet->unk4;
+    if (temp_f0 <= 0.0f) {
+        objet->unk4 = 0.0f;
+    }
+    temp_f1 = (f32) (objet->unk0);
+    if (temp_f1 <= objet->unk4) {
+        objet->unk4 = temp_f1;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/gamedataused", GetCommonGageRate__FP11COMMON_GAGE);
 INCLUDE_ASM("nonmatchings/game/gamedataused", CalcBreedFishParam__FP14BREEDFISH_USED);
 void SetFishingGamePreEquip(CGameDataUsed *data) {
@@ -119,7 +137,56 @@ extern "C" u8 IsActiveSet__13CGameDataUsedFv(CGameDataUsed_infere_3a34f9 *objet)
     }
     return 0U;
 }
-INCLUDE_ASM("nonmatchings/game/gamedataused", SetName__13CGameDataUsedFPc);
+struct CGameDataUsed_infere_919119;
+typedef struct CGameDataUsed_infere_919119 {
+    /* 0x00 */ s16 unk0;                            /* inferred */
+    /* 0x02 */ s16 unk2;                            /* inferred */
+    /* 0x04 */ char pad4[1];
+    /* 0x05 */ s8 unk5;                             /* inferred */
+    /* 0x06 */ char pad6[0xA];                      /* maybe part of unk5[0xB]void */
+    /* 0x10 */ char unk10;                             /* inferred */
+    /* 0x10 */ char pad10[0x20];
+    /* 0x30 */ char unk30;                             /* inferred */
+    /* 0x30 */ char pad30[0xC];
+    /* 0x3C */ char unk3C;                             /* inferred */
+    /* 0x3C */ char pad3C[7];
+    /* 0x43 */ char unk43;                             /* inferred */
+    /* 0x43 */ char pad43[1];
+} CGameDataUsed_infere_919119;                                    /* size >= 0x44 */
+extern "C" s32 GetItemMessage__Fi(s32);
+extern "C" s32 strcmp(...);
+extern "C" s32 strcpy(...);
+extern "C" s32 strlen(...);
+extern "C" void SetName__13CGameDataUsedFPc(CGameDataUsed_infere_919119 *objet, s8 *arg0) {
+    void *var_s0;
+    s16 temp_a0;
+    s32 temp_a0_2;
+
+    temp_a0 = (s16) (objet->unk0);
+    var_s0 = (void *) (NULL);
+    switch (temp_a0) {                              /* irregular */
+    case 3:
+        var_s0 = (void *) ((u8 *) objet + 0x43);
+        break;
+    case 5:
+        var_s0 = (void *) ((u8 *) objet + 0x3C);
+        break;
+    case 6:
+        var_s0 = (void *) ((u8 *) objet + 0x10);
+        break;
+    case 2:
+        var_s0 = (void *) ((u8 *) objet + 0x30);
+        break;
+    }
+    if ((var_s0 != NULL) && (strlen(arg0) < 0x20U)) {
+        strcpy(var_s0, arg0);
+        temp_a0_2 = (s32) (GetItemMessage__Fi((s32) objet->unk2));
+        objet->unk5 = 0;
+        if ((temp_a0_2 != 0) && (strcmp(temp_a0_2, var_s0) != 0)) {
+            objet->unk5 = 1;
+        }
+    }
+}
 INCLUDE_ASM("nonmatchings/game/gamedataused", GetName__13CGameDataUsedFi);
 INCLUDE_ASM("nonmatchings/game/gamedataused", TransToPassword__13CGameDataUsedFPci);
 INCLUDE_ASM("nonmatchings/game/gamedataused", TransToData__13CGameDataUsedFPci);

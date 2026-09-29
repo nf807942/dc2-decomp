@@ -401,8 +401,63 @@ INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", CultureAnalyze__8CEditMapFi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetOnOffParts__8CEditMapFPcPP9CMapPartsPP9CMapPiecei);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", PartsOnOff__8CEditMapFiP9CEditData);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetPartsNumID__9CEditDataFi);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", Analyze__9CEditDataFiiPii);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", Analize__9CEditDataFiPiPi);
+extern "C" s32 GetAnalyzeDataSrc__Fii(s32, s32);
+extern "C" u8 _1131_00373D10[17];
+struct CEditData_analyze {
+    char pad0[0x5050];
+    s8 unk5050[0x40];
+};
+extern "C" s32 printf(...);
+extern "C" s8 Analyze__9CEditDataFiiPii(CEditData_analyze *objet, s32 arg0, s32 arg1, s32 *arg2, s32 arg3) {
+    s32 *src;
+    s8 result;
+    s32 i;
+    s8 idx;
+
+    if (arg3 > 0x40) {
+        printf(&_1131_00373D10);
+        return 0;
+    }
+    src = (s32 *) GetAnalyzeDataSrc__Fii(arg1, arg0);
+    if (src == NULL) {
+        return 0;
+    }
+    result = 0;
+    if (*src == 0) {
+        return 0;
+    }
+    for (i = 0; i < 8; i++) {
+        idx = *((s8 *) src + 8 + i);
+        if (idx < 0) {
+            break;
+        }
+        result = 1;
+        if (arg2[idx] >= 0) {
+            objet->unk5050[idx] = Analyze__9CEditDataFiiPii(objet, arg2[idx], arg1, arg2, arg3 + 1);
+            arg2[idx] = -1;
+        }
+        if (objet->unk5050[idx] == 0) {
+            return 0;
+        }
+    }
+    return result;
+}
+extern "C" void Analize__9CEditDataFiPiPi(CEditData_analyze *objet, s32 arg0, s32 *arg1, s32 *arg2) {
+    s32 i;
+    s32 j;
+
+    for (i = 0; i < 0x40; i++) {
+        if (arg2[i] < 0) {
+            objet->unk5050[i] = (s8) arg1[i];
+        }
+    }
+    for (j = 0; j < 0x40; j++) {
+        if (arg2[j] >= 0) {
+            objet->unk5050[j] = Analyze__9CEditDataFiiPii(objet, arg2[j], arg0, arg2, 0);
+            arg2[j] = -1;
+        }
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetAnalyzeData__9CEditDataFii);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetAnalyzeSrc__9CEditDataFi);
 extern "C" s32 GetAnalyzeDataSrc__Fii(s32, s32);
@@ -599,7 +654,98 @@ extern "C" EditAnalyzeSrc *__ct__14EditAnalyzeSrcFv(EditAnalyzeSrc *objet) {
     return objet;
 }
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", MenuChapterInit__FP9mgCMemoryPiii);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", MenuChapterKey__Fv);
+extern "C" u8 CSnd;
+extern "C" u32 MenuChapterInfo;
+extern "C" u32 MenuChapterMode;
+extern "C" u32 MenuChapterSnd_ID;
+extern "C" u32 MenuMainScene;
+extern "C" s8 init_919;
+extern "C" s8 init_922;
+extern "C" s32 menu_chap_error_check_cnt;
+extern "C" s32 menu_snd_counter;
+extern "C" u32 voiceflag_921;
+extern "C" u32 wait_cnt_918;
+struct MenuChapterInfo_champs_852b18 {
+    char pad0[0x18];
+    /* 0x18 */ s32 unk18;
+};
+extern "C" s32 CalcMenuAdd__FPfff(u32, f32, f32);
+extern "C" s32 FadeCheck__10CFadeInOutFv(...);
+extern "C" s32 FadeOut__10CFadeInOutFifff(u32, s32, f32, f32, f32);
+extern "C" s32 StreamClose__6CSoundFi(void *, s32);
+extern "C" s32 StreamGetState__6CSoundFi(void *, s32);
+extern "C" s32 StreamPlay__6CSoundFi(void *, s32);
+extern "C" s32 StreamSetVol__6CSoundFiii(void *, s32, s32, s32);
+extern "C" s32 StreamStop__6CSoundFi(void *, s32);
+extern "C" s32 sndSePlay__FUiii(u32, s32, s32);
+extern "C" s32 MenuChapterKey__Fv(void) {
+    s32 temp_v0;
+    s32 temp_v0_2;
+    s32 var_s0;
+
+    var_s0 = 0;
+    if (init_919 == 0) {
+        wait_cnt_918 = 0;
+        init_919 = 1;
+    }
+    if (init_922 == 0) {
+        voiceflag_921 = 0;
+        init_922 = 1;
+    }
+    temp_v0 = FadeCheck__10CFadeInOutFv(MenuMainScene + 0x2C70);
+    switch (MenuChapterMode) {
+    case 0:
+        if (temp_v0 != 0) {
+            menu_snd_counter += 1;
+            if (menu_snd_counter == 2) {
+                StreamSetVol__6CSoundFiii(&CSnd, 1, 0x7FFF, 0x7FFF);
+                StreamPlay__6CSoundFi(&CSnd, 1);
+                wait_cnt_918 = 0;
+            }
+            if (CalcMenuAdd__FPfff(MenuChapterInfo + 0x1C, 3.0f, 128.0f) != 0) {
+                MenuChapterMode = 1;
+                ((struct MenuChapterInfo_champs_852b18 *) MenuChapterInfo)->unk18 = 0;
+                menu_snd_counter = 0;
+                menu_chap_error_check_cnt = 0;
+                voiceflag_921 = 0;
+            }
+        }
+        break;
+    case 1:
+        ((struct MenuChapterInfo_champs_852b18 *) MenuChapterInfo)->unk18 = (s32) (((struct MenuChapterInfo_champs_852b18 *) MenuChapterInfo)->unk18 + 1);
+        menu_chap_error_check_cnt += 1;
+        temp_v0_2 = StreamGetState__6CSoundFi(&CSnd, 1);
+        if (temp_v0_2 != 0x8000) {
+            if (menu_chap_error_check_cnt > 0x5DC) {
+                goto block_16;
+            }
+        } else {
+block_16:
+            voiceflag_921 = 1;
+        }
+        if ((voiceflag_921 != 0) && (temp_v0_2 == 0)) {
+            if (menu_snd_counter == 0) {
+                StreamStop__6CSoundFi(&CSnd, 1);
+                StreamClose__6CSoundFi(&CSnd, 1);
+            }
+            menu_snd_counter += 1;
+        }
+        if (menu_snd_counter == 0x24) {
+            sndSePlay__FUiii(MenuChapterSnd_ID, 0, 0);
+        }
+        if ((((struct MenuChapterInfo_champs_852b18 *) MenuChapterInfo)->unk18 > 0x12C) && (menu_snd_counter >= 0x15A)) {
+            FadeOut__10CFadeInOutFifff(MenuMainScene + 0x2C70, 0x3C, 0.0f, 0.0f, 0.0f);
+            MenuChapterMode = 2;
+        }
+        break;
+    case 2:
+        if (temp_v0 != 0) {
+            var_s0 = 1;
+        }
+        break;
+    }
+    return var_s0;
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", MenuChapterDraw__Fv);
 extern "C" u32 NpcBaseDataTotalNum;
 struct SPI_STACK {

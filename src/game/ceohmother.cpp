@@ -191,7 +191,137 @@ extern "C" void SetCamWorldCoordGyaku__FP9mgCCamera(mgCCamera *arg0) {
         SetRef__9mgCCameraFPf(arg0, sp30);
     }
 }
-INCLUDE_ASM("nonmatchings/game/ceohmother", __ct__10CEohMotherFv);
+extern "C" s32 __ct__4CEohFv(void *);
+struct CEoh;
+struct CEohMother;
+typedef struct CEoh {
+    /* 0x00 */ char pad0[0x10];
+    /* 0x10 */ char unk10;                             /* inferred */
+    /* 0x10 */ char pad10[1];
+} CEoh;                                             /* size >= 0x11 */
+typedef struct CEohMother {
+    /* 0x000 */ char pad0[0x200];
+    /* 0x200 */ char unk200;                           /* inferred */
+    /* 0x200 */ char pad200[1];
+} CEohMother;                                       /* size >= 0x201 */
+struct temp_a3_champs_8d9df0 {
+    /* 0x0 */ s32 unk0;
+    /* 0x4 */ s32 unk4;
+    /* 0x8 */ s32 unk8;
+    /* 0xC */ s32 unkC;
+    /* 0x10 */ s32 unk10;
+    /* 0x14 */ s32 unk14;
+    /* 0x18 */ s32 unk18;
+    /* 0x1C */ s32 unk1C;
+    /* 0x20 */ s32 unk20;
+    /* 0x24 */ s32 unk24;
+    /* 0x28 */ s32 unk28;
+    /* 0x2C */ s32 unk2C;
+    /* 0x30 */ s32 unk30;
+    /* 0x34 */ s32 unk34;
+    /* 0x38 */ s32 unk38;
+    /* 0x3C */ s32 unk3C;
+    /* 0x40 */ s32 unk40;
+    /* 0x44 */ s32 unk44;
+    /* 0x48 */ s32 unk48;
+    /* 0x4C */ s32 unk4C;
+    /* 0x50 */ s32 unk50;
+    /* 0x54 */ s32 unk54;
+    /* 0x58 */ s32 unk58;
+    /* 0x5C */ s32 unk5C;
+    /* 0x60 */ s32 unk60;
+    /* 0x64 */ s32 unk64;
+    /* 0x68 */ s32 unk68;
+    /* 0x6C */ s32 unk6C;
+    /* 0x70 */ s32 unk70;
+    /* 0x74 */ s32 unk74;
+    /* 0x78 */ s32 unk78;
+    /* 0x7C */ s32 unk7C;
+};
+extern "C" CEohMother *__ct__10CEohMotherFv(CEohMother *objet) {
+    CEohMother *var_s1;
+    s32 var_a1;
+    s32 var_a2;
+    struct temp_a3_champs_8d9df0 *temp_a3;
+
+    var_s1 = (CEohMother *) (objet);
+    do {
+        __ct__4CEohFv((CEoh *) var_s1);
+        var_s1 = (CEohMother *) ((u8 *) var_s1 + 0x10);
+    } while ((u32) var_s1 < (u32) &objet->unk200);
+    var_a1 = 0;
+    var_a2 = 0;
+    do {
+        temp_a3 = (struct temp_a3_champs_8d9df0 *) ((u8 *) objet + var_a2);
+        var_a1 += 8;
+        temp_a3->unk0 = -1;
+        temp_a3->unk4 = -1;
+        var_a2 += 0x80;
+        temp_a3->unk8 = 1;
+        temp_a3->unkC = 0;
+        temp_a3->unkC = 0;
+        temp_a3->unkC = 0;
+        temp_a3->unkC = 0;
+        temp_a3->unkC = 0;
+        temp_a3->unk10 = -1;
+        temp_a3->unk14 = -1;
+        temp_a3->unk18 = 1;
+        temp_a3->unk1C = 0;
+        temp_a3->unk1C = 0;
+        temp_a3->unk1C = 0;
+        temp_a3->unk1C = 0;
+        temp_a3->unk1C = 0;
+        temp_a3->unk20 = -1;
+        temp_a3->unk24 = -1;
+        temp_a3->unk28 = 1;
+        temp_a3->unk2C = 0;
+        temp_a3->unk2C = 0;
+        temp_a3->unk2C = 0;
+        temp_a3->unk2C = 0;
+        temp_a3->unk2C = 0;
+        temp_a3->unk30 = -1;
+        temp_a3->unk34 = -1;
+        temp_a3->unk38 = 1;
+        temp_a3->unk3C = 0;
+        temp_a3->unk3C = 0;
+        temp_a3->unk3C = 0;
+        temp_a3->unk3C = 0;
+        temp_a3->unk3C = 0;
+        temp_a3->unk40 = -1;
+        temp_a3->unk44 = -1;
+        temp_a3->unk48 = 1;
+        temp_a3->unk4C = 0;
+        temp_a3->unk4C = 0;
+        temp_a3->unk4C = 0;
+        temp_a3->unk4C = 0;
+        temp_a3->unk4C = 0;
+        temp_a3->unk50 = -1;
+        temp_a3->unk54 = -1;
+        temp_a3->unk58 = 1;
+        temp_a3->unk5C = 0;
+        temp_a3->unk5C = 0;
+        temp_a3->unk5C = 0;
+        temp_a3->unk5C = 0;
+        temp_a3->unk5C = 0;
+        temp_a3->unk60 = -1;
+        temp_a3->unk64 = -1;
+        temp_a3->unk68 = 1;
+        temp_a3->unk6C = 0;
+        temp_a3->unk6C = 0;
+        temp_a3->unk6C = 0;
+        temp_a3->unk6C = 0;
+        temp_a3->unk6C = 0;
+        temp_a3->unk70 = -1;
+        temp_a3->unk74 = -1;
+        temp_a3->unk78 = 1;
+        temp_a3->unk7C = 0;
+        temp_a3->unk7C = 0;
+        temp_a3->unk7C = 0;
+        temp_a3->unk7C = 0;
+        temp_a3->unk7C = 0;
+    } while (var_a1 < 0x20);
+    return objet;
+}
 INCLUDE_ASM("nonmatchings/game/ceohmother", Set__10CEohMotherFiiP7CObjecti);
 INCLUDE_ASM("nonmatchings/game/ceohmother", Set__10CEohMotherFiiiP11CCharacter2);
 INCLUDE_ASM("nonmatchings/game/ceohmother", Set__10CEohMotherFiiP13CEventSprite2);
@@ -244,7 +374,23 @@ INCLUDE_ASM("nonmatchings/game/ceohmother", SetStack__FP12RS_STACKDATAf_00262E90
 INCLUDE_ASM("nonmatchings/game/ceohmother", BuildArgData__15CEventScriptArgFPUi);
 INCLUDE_ASM("nonmatchings/game/ceohmother", _DATA__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/ceohmother", _ID_OFFSET__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/ceohmother", GetArgInt__FP8ARG_DATA);
+extern "C" u8 _1333[29];
+struct ARG_DATA_328675 {
+    /* 0x0 */ s32 unk0;
+    /* 0x4 */ s32 unk4;
+};
+extern "C" s32 fptosi(f32);
+extern "C" s32 printf(...);
+extern "C" s32 GetArgInt__FP8ARG_DATA(ARG_DATA_328675 *arg0) {
+    if (arg0 == NULL) {
+        printf(&_1333);
+        return 0;
+    }
+    if (arg0->unk0 == 1) {
+        return fptosi(*(f32 *) &arg0->unk4);
+    }
+    return arg0->unk4;
+}
 INCLUDE_ASM("nonmatchings/game/ceohmother", GetArgFloat__FP8ARG_DATA);
 extern "C" u8 _1357_00371B30[32];
 struct inferred;
@@ -275,7 +421,6 @@ void CRaster::Initialize(void) {
     this->field_0x28 = 0;
 }
 INCLUDE_ASM("nonmatchings/game/ceohmother", SetParam__7CRasterFfff);
-INCLUDE_ASM("nonmatchings/game/ceohmother", StartRaster__7CRasterFfffi);
 typedef struct CRaster_infere {
     /* 0x00 */ s32 unk0;                            /* inferred */
     /* 0x04 */ f32 unk4;                            /* inferred */
@@ -288,6 +433,39 @@ typedef struct CRaster_infere {
     /* 0x24 */ s32 unk24;                           /* inferred */
     /* 0x28 */ s32 unk28;                           /* inferred */
 } CRaster_infere;                                          /* size >= 0x2C */
+extern "C" void StartRaster__7CRasterFfffi(CRaster_infere *objet, f32 arg0, f32 arg1, f32 arg2, s32 arg3) {
+    objet->unk24 = arg3;
+    objet->unk28 = 0;
+    if (objet->unk24 > 1) {
+        objet->unk0 = 1;
+        if (arg0 != -1.0f) {
+            objet->unk8 = (arg0 - objet->unk4) / (f32) objet->unk24;
+        } else {
+            objet->unk8 = 0.0f;
+        }
+        if (arg1 != -1.0f) {
+            objet->unk10 = (arg1 - objet->unkC) / (f32) objet->unk24;
+        } else {
+            objet->unk10 = 0.0f;
+        }
+        if (arg2 != -1.0f) {
+            objet->unk18 = (arg2 - objet->unk14) / (f32) objet->unk24;
+            return;
+        }
+        objet->unk18 = 0.0f;
+        return;
+    }
+    if (arg0 != -1.0f) {
+        objet->unk4 = arg0;
+    }
+    if (arg1 != -1.0f) {
+        objet->unkC = arg1;
+    }
+    if (arg2 != -1.0f) {
+        objet->unk14 = arg2;
+    }
+    objet->unk0 = 2;
+}
 extern "C" void StopRaster__7CRasterFfffi(CRaster_infere *objet, f32 arg0, f32 arg1, f32 arg2, s32 arg3) {
     objet->unk24 = arg3;
     objet->unk28 = 0;
@@ -403,17 +581,150 @@ extern "C" void SetMonoFlashFlag__13CScreenEffectFii(CScreenEffect_infere2 *obje
 }
 INCLUDE_ASM("nonmatchings/game/ceohmother", InitWorldCoord__Fv);
 INCLUDE_ASM("nonmatchings/game/ceohmother", GetLocalFlag__Fi);
-INCLUDE_ASM("nonmatchings/game/ceohmother", SetLocalFlag__Fii);
+extern "C" u8 EventLocalFlag[256];
+extern "C" s32 SetLocalFlag__Fii(s32 arg0, s32 arg1) {
+    s32 var_a2;
+    s32 var_v0;
+    s32 var_v1;
+    s32 temp_a0;
+    s32 *temp_a2;
+
+    var_v1 = arg0 >> 5;
+    if (arg0 < 0) {
+        return 0;
+    }
+    var_v0 = var_v1 < 0x40;
+    if (arg0 < 0) {
+        var_v1 = (s32) (arg0 + 0x1F) >> 5;
+        var_v0 = var_v1 < 0x40;
+    }
+    var_a2 = arg0 & 0x1F;
+    if (var_v0 == 0) {
+        return 0;
+    }
+    if (arg0 < 0) {
+        if (var_a2 != 0) {
+            var_a2 -= 0x20;
+        }
+    }
+    temp_a0 = 1 << var_a2;
+    temp_a2 = (s32 *) (EventLocalFlag + (var_v1 * 4));
+    *temp_a2 &= ~temp_a0;
+    if (arg1 != 0) {
+        *temp_a2 |= temp_a0;
+    }
+    return arg1;
+}
 INCLUDE_ASM("nonmatchings/game/ceohmother", GetLocalCnt__Fi);
 INCLUDE_ASM("nonmatchings/game/ceohmother", SetLocalCnt__Fii);
 INCLUDE_ASM("nonmatchings/game/ceohmother", GetLocalCnt2__Fi);
-INCLUDE_ASM("nonmatchings/game/ceohmother", InitLocalCnt__Fv);
+extern "C" u8 EventLocalCnt[256];
+struct temp_a3_champs_df88bd {
+    /* 0x0 */ s32 unk0;
+    /* 0x4 */ s32 unk4;
+    /* 0x8 */ s32 unk8;
+    /* 0xC */ s32 unkC;
+    /* 0x10 */ s32 unk10;
+    /* 0x14 */ s32 unk14;
+    /* 0x18 */ s32 unk18;
+    /* 0x1C */ s32 unk1C;
+};
+extern "C" void InitLocalCnt__Fv(void) {
+    s32 var_a1;
+    s32 var_a2;
+    struct temp_a3_champs_df88bd *temp_a3;
+
+    var_a1 = 0;
+    var_a2 = 0;
+    do {
+        temp_a3 = (struct temp_a3_champs_df88bd *) (EventLocalCnt + var_a2);
+        var_a1 += 8;
+        temp_a3->unk0 = 0;
+        temp_a3->unk4 = 0;
+        var_a2 += 0x20;
+        temp_a3->unk8 = 0;
+        temp_a3->unkC = 0;
+        temp_a3->unk10 = 0;
+        temp_a3->unk14 = 0;
+        temp_a3->unk18 = 0;
+        temp_a3->unk1C = 0;
+    } while (var_a1 < 0x40);
+}
 INCLUDE_ASM("nonmatchings/game/ceohmother", EdEventInfoCommandInitialize__Fv);
 INCLUDE_ASM("nonmatchings/game/ceohmother", EventSeqInit__Fv);
 INCLUDE_ASM("nonmatchings/game/ceohmother", EdEventInit__Fv);
 INCLUDE_ASM("nonmatchings/game/ceohmother", EventTimeDraw__Fv);
-INCLUDE_ASM("nonmatchings/game/ceohmother", EdEventDraw__Fv);
-INCLUDE_ASM("nonmatchings/game/ceohmother", EdEventFirstDraw__Fv);
+extern "C" u8 EventDngMap[272];
+extern "C" u32 EventEffectScript;
+extern "C" u8 EventRain[44016];
+extern "C" u8 EventScreenEffect[76];
+extern "C" u8 EventSprite2[6144];
+extern "C" u8 HitEffect[480];
+extern "C" u32 SwordEffect;
+extern "C" u8 esMother[1088];
+extern "C" s32 DrawDownLoadAnaunce__Fv(void);
+extern "C" s32 DrawMenuDl__Fi(s32);
+extern "C" s32 Draw__11CDngFreeMapFv(void *);
+extern "C" s32 Draw__15CHitEffectImageFv(void *);
+extern "C" s32 Draw__16CEffectScriptManFv(...);
+extern "C" s32 Draw__16CSWordAfterImageFv(...);
+extern "C" s32 Draw__18CEventSpriteMotherFv(void *);
+extern "C" s32 Draw__5CRainFv(void *);
+extern "C" s32 NormalDraw__13CEventSprite2Fv(void *);
+extern "C" s32 Step__11CDngFreeMapFv(void *);
+extern "C" s32 Step__18CEventSpriteMotherFv(void *);
+extern "C" s32 Step__5CRainFv(void *);
+extern "C" s32 Draw__13CScreenEffectFv(void *);
+extern "C" void EdEventDraw__Fv(void) {
+    s32 var_s0;
+    s32 var_s0_2;
+    s32 var_s1;
+    s32 var_s1_2;
+
+    Step__5CRainFv(&EventRain);
+    Draw__5CRainFv(&EventRain);
+    var_s0 = 0;
+    var_s1 = 0;
+    do {
+        Draw__15CHitEffectImageFv(HitEffect + var_s1);
+        var_s0 += 1;
+        var_s1 += 0x60;
+    } while (var_s0 < 5);
+    if (SwordEffect != NULL) {
+        Draw__16CSWordAfterImageFv(SwordEffect);
+    }
+    if (EventEffectScript != NULL) {
+        Draw__16CEffectScriptManFv(EventEffectScript);
+    }
+    Step__11CDngFreeMapFv(&EventDngMap);
+    Draw__11CDngFreeMapFv(&EventDngMap);
+    Step__18CEventSpriteMotherFv(&esMother);
+    Draw__18CEventSpriteMotherFv(&esMother);
+    var_s0_2 = 0;
+    var_s1_2 = 0;
+    do {
+        NormalDraw__13CEventSprite2Fv(EventSprite2 + var_s1_2);
+        var_s0_2 += 1;
+        var_s1_2 += 0x80;
+    } while (var_s0_2 < 0x30);
+    Draw__13CScreenEffectFv(&EventScreenEffect);
+    DrawMenuDl__Fi(0x80);
+    DrawDownLoadAnaunce__Fv();
+}
+extern "C" u8 EventSprite2[6144];
+extern "C" s32 FirstDraw__13CEventSprite2Fv(void *);
+extern "C" void EdEventFirstDraw__Fv(void) {
+    s32 var_s0;
+    s32 var_s1;
+
+    var_s1 = 0;
+    var_s0 = 0;
+    do {
+        FirstDraw__13CEventSprite2Fv(EventSprite2 + var_s1);
+        var_s0 += 1;
+        var_s1 += 0x80;
+    } while (var_s0 < 0x30);
+}
 INCLUDE_ASM("nonmatchings/game/ceohmother", EdEventFinish__Fv);
 INCLUDE_ASM("nonmatchings/game/ceohmother", EdEventStep__Fv);
 void InitDramaScene(void) {
@@ -487,7 +798,31 @@ extern "C" s32 _GET_PADUP__FP12RS_STACKDATAi_00266300(s32 arg0, s32 arg1) {
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/ceohmother", _GET_APAD__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/ceohmother", CheckLoadedBGFile__FPcPi);
+extern "C" s32 GetReadBGFile__FPc(...);
+struct temp_v0_champs_0fa898 {
+    /* 0x0 */ s32 unk0;
+    char pad4[0x10C];
+    /* 0x110 */ s32 unk110;
+    /* 0x114 */ s32 unk114;
+};
+extern "C" s32 GetCurrentDir__FPc(...);
+extern "C" s32 strcat(...);
+extern "C" s32 CheckLoadedBGFile__FPcPi(s8 *arg0, s32 *arg1) {
+    s8 sp30[0x80];
+    struct temp_v0_champs_0fa898 *temp_v0;
+
+    GetCurrentDir__FPc(sp30);
+    strcat(sp30, arg0);
+    temp_v0 = (struct temp_v0_champs_0fa898 *) (GetReadBGFile__FPc(sp30));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    if (temp_v0->unk0 == 0) {
+        return 0;
+    }
+    *arg1 = temp_v0->unk114;
+    return temp_v0->unk110;
+}
 INCLUDE_ASM("nonmatchings/game/ceohmother", GetLoadBGBuff__FPcPi);
 INCLUDE_ASM("nonmatchings/game/ceohmother", _GOTO_INTERIOR__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/ceohmother", _GOTO_OUTSIDE__FP12RS_STACKDATAi);
@@ -735,7 +1070,22 @@ extern "C" s32 _ASSIGN_STACK__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     AssignStack__6CSceneFi(EventScene, GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/ceohmother", _SET_FLAG__FP12RS_STACKDATAi);
+extern "C" s32 GetSaveData__Fv(void);
+extern "C" s32 SetBitFlag__9CSaveDataFii(void *, s32, s32);
+extern "C" s32 _SET_FLAG__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    void *temp_v0;
+    s32 temp_s0;
+    s32 temp_s1;
+
+    temp_s0 = GetStackInt__FP12RS_STACKDATA_00262DA0(arg0++);
+    temp_s1 = GetStackInt__FP12RS_STACKDATA_00262DA0(arg0);
+    temp_v0 = (void *) GetSaveData__Fv();
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    SetBitFlag__9CSaveDataFii(temp_v0, temp_s0, temp_s1);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceohmother", _GET_FLAG__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/ceohmother", _SET_CNT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/ceohmother", _GET_CNT__FP12RS_STACKDATAi);

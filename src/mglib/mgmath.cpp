@@ -48,10 +48,31 @@ INCLUDE_ASM("nonmatchings/mglib/mgmath", ReloadCLUT__17mgCTextureManagerFP10mgCT
 INCLUDE_ASM("nonmatchings/mglib/mgmath", ReloadCLUT__17mgCTextureManagerFP10mgCTextureP13sceVif1Packet);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", TexAnimeOn__17mgCTextureManagerFiPc);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", TexAnimeOff__17mgCTextureManagerFiPc);
-INCLUDE_ASM("nonmatchings/mglib/mgmath", TexAnimeAllOff__17mgCTextureManagerFi);
+struct mgTexBlockView {
+    char pad0[0xC];
+    void *anime;
+};
+extern "C" mgTexBlockView *GetTextureBlock__17mgCTextureManagerFi(...);
+extern "C" s32 DisableAll__15mgCTextureAnimeFv(...);
+#pragma schedule off
+extern "C" void TexAnimeAllOff__17mgCTextureManagerFi(void *manager, s32 index) {
+    mgTexBlockView *block = GetTextureBlock__17mgCTextureManagerFi(manager, index);
+    if (block != NULL) {
+        void *anime = block->anime;
+        if (anime != NULL) {
+            DisableAll__15mgCTextureAnimeFv(anime);
+        }
+    }
+}
 INCLUDE_ASM("nonmatchings/mglib/mgmath", GetGroupNameList__17mgCTextureManagerFiPi);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", DeleteTexAnimeGroup__17mgCTextureManagerFii);
-INCLUDE_ASM("nonmatchings/mglib/mgmath", DeleteTexAnime__17mgCTextureManagerFi);
+extern "C" void DeleteTexAnime__17mgCTextureManagerFi(void *manager, s32 index) {
+    mgTexBlockView *block = GetTextureBlock__17mgCTextureManagerFi(manager, index);
+    if (block != NULL) {
+        block->anime = NULL;
+    }
+}
+#pragma schedule reset
 INCLUDE_ASM("nonmatchings/mglib/mgmath", GetTexAnime__17mgCTextureManagerFi);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", BlockConv32to8__FPUcPUc);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", PageConv32to8__FiiPUcPUc);
@@ -75,15 +96,147 @@ INCLUDE_ASM("nonmatchings/mglib/mgmath", mgVectorMaxMin__FPfPfPfPfPf);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgVectorMaxMin__FPfPfPfPfPfPf);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgBoxMaxMin__FP9mgVu0FBOXP9mgVu0FBOX);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgPlaneNormal__FPfPfPfPf);
-INCLUDE_ASM("nonmatchings/mglib/mgmath", mgDistPlanePoint__FPfPfPf);
+extern "C" f32 sceVu0InnerProduct(...);
+extern "C" s32 sceVu0SubVector(...);
+extern "C" void mgDistPlanePoint__FPfPfPf(f32 *arg0, f32 *arg1, f32 *arg2) {
+    s32 sp20[4];
+    sceVu0SubVector(&sp20[0], arg2, arg1);
+    sceVu0InnerProduct(arg0, &sp20[0]);
+}
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgDistLinePoint__FPfPfPfPf);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgReflectionPlane__FPfPfPfPf);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgIntersectionSphereLine0__FfPfPfPA4_f);
-INCLUDE_ASM("nonmatchings/mglib/mgmath", mgIntersectionSphereLine__FPfPfPfPA4_f);
-INCLUDE_ASM("nonmatchings/mglib/mgmath", mgIntersectionPoint_line_poly3__FPfPfPfPfPfPfPf);
-INCLUDE_ASM("nonmatchings/mglib/mgmath", mgCheckPointPoly3_XYZ__FPfPfPfPfPf);
+extern "C" s32 mgAddVector__FPfPf(...);
+extern "C" s32 mgIntersectionSphereLine0__FfPfPfPA4_f(f32, f32 *, f32 *, f32 (*)[4]);
+extern "C" s32 mgIntersectionSphereLine__FPfPfPfPA4_f(f32 *arg0, f32 *arg1, f32 *arg2, f32 (*arg3)[4]) {
+    f32 sp70[4];
+    f32 sp80[4];
+    f32 radius;
+    s32 n;
+    s32 i;
+
+    radius = arg0[3];
+    sceVu0SubVector(sp70, arg1, arg0);
+    sceVu0SubVector(sp80, arg2, arg0);
+    n = mgIntersectionSphereLine0__FfPfPfPA4_f(radius, sp70, sp80, arg3);
+    for (i = 0; i < n; i++) {
+        mgAddVector__FPfPf(arg3[i], arg0);
+    }
+    return n;
+}
+extern "C" s32 sceVu0AddVector(...);
+extern "C" void sceVu0ScaleVector(f32 *, f32 *, f32);
+extern "C" s32 mgCheckPointPoly3_XYZ__FPfPfPfPfPf(f32 *, f32 *, f32 *, f32 *, f32 *);
+extern "C" s32 mgIntersectionPoint_line_poly3__FPfPfPfPfPfPfPf(f32 *arg0, f32 *arg1, f32 *arg2, f32 *arg3, f32 *arg4, f32 *arg5, f32 *arg6) {
+    f32 sp80[4];
+    f32 sp90[4];
+    f32 spA0[4];
+    f32 spB0[4];
+    f32 temp_f0;
+    f32 temp_f20;
+
+    sceVu0SubVector(sp80, arg1, arg0);
+    sceVu0SubVector(sp90, arg2, arg0);
+    sceVu0SubVector(spA0, arg3, arg0);
+    sceVu0SubVector(spB0, arg4, arg0);
+    temp_f20 = -sceVu0InnerProduct(arg5, sp90);
+    temp_f0 = sceVu0InnerProduct(arg5, sp80);
+    if (temp_f0 == 0.0f) {
+        return 0;
+    }
+    sceVu0ScaleVector(arg6, sp80, -temp_f20 / temp_f0);
+    sceVu0AddVector(arg6, arg6, arg0);
+    return mgCheckPointPoly3_XYZ__FPfPfPfPfPf(arg6, arg2, arg3, arg4, arg5);
+}
+extern "C" s32 sceVu0OuterProduct(...);
+extern "C" s32 mgCheckPointPoly3_XYZ__FPfPfPfPfPf(f32 *arg0, f32 *arg1, f32 *arg2, f32 *arg3, f32 *arg4) {
+    s32 sp70[4];
+    s32 sp80[4];
+    s32 sp90[4];
+    s32 spA0[4];
+    s32 spB0[4];
+    s32 spC0[4];
+    s32 spD0[4];
+    s32 spE0[4];
+    s32 spF0[4];
+    f32 temp_f0;
+    f32 temp_f20;
+    f32 temp_f21;
+
+    sceVu0SubVector(sp70, arg0, arg1);
+    sceVu0SubVector(sp80, arg0, arg2);
+    sceVu0SubVector(sp90, arg0, arg3);
+    sceVu0SubVector(spA0, arg2, arg1);
+    sceVu0SubVector(spB0, arg3, arg2);
+    sceVu0SubVector(spC0, arg1, arg3);
+    sceVu0OuterProduct(spD0, spA0, sp70);
+    sceVu0OuterProduct(spE0, spB0, sp80);
+    sceVu0OuterProduct(spF0, spC0, sp90);
+    temp_f20 = sceVu0InnerProduct(spD0, arg4);
+    temp_f21 = sceVu0InnerProduct(spE0, arg4);
+    temp_f0 = sceVu0InnerProduct(spF0, arg4);
+    if (!(temp_f20 < 0.0f) && !(temp_f21 < 0.0f) && !(temp_f0 < 0.0f)) {
+        return 1;
+    }
+    if (temp_f20 <= 0.0f) {
+        if (temp_f21 <= 0.0f) {
+            if (temp_f0 <= 0.0f) {
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgCheckPointPoly3_XZ__FPfPfPfPf);
-INCLUDE_ASM("nonmatchings/mglib/mgmath", Check_Point_Poly3__Fffffffff);
+extern "C" s32 Check_Point_Poly3__Fffffffff(f32 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6, f32 arg7) {
+    f32 temp_f1;
+    f32 temp_f4;
+    f32 temp_f6;
+    f32 var_f0;
+    f32 var_f0_2;
+    f32 var_f0_3;
+    f32 var_f0_4;
+
+    var_f0 = (arg2 < arg4) ? ((arg2 < arg6) ? arg2 : arg6) : ((arg4 < arg6) ? arg4 : arg6);
+    if (!(var_f0 <= arg0)) {
+        return 0;
+    }
+    var_f0_2 = (arg2 > arg4) ? ((arg2 > arg6) ? arg2 : arg6) : ((arg4 > arg6) ? arg4 : arg6);
+    if (!(arg0 <= var_f0_2)) {
+        return 0;
+    }
+    var_f0_3 = (arg3 < arg5) ? ((arg3 < arg7) ? arg3 : arg7) : ((arg5 < arg7) ? arg5 : arg7);
+    if (!(var_f0_3 <= arg1)) {
+        return 0;
+    }
+    var_f0_4 = (arg3 > arg5) ? ((arg3 > arg7) ? arg3 : arg7) : ((arg5 > arg7) ? arg5 : arg7);
+    if (!(arg1 <= var_f0_4)) {
+        return 0;
+    }
+    temp_f6 = ((arg4 - arg2) * (arg1 - arg3)) - ((arg5 - arg3) * (arg0 - arg2));
+    temp_f4 = ((arg6 - arg4) * (arg1 - arg5)) - ((arg7 - arg5) * (arg0 - arg4));
+    temp_f1 = ((arg2 - arg6) * (arg1 - arg7)) - ((arg3 - arg7) * (arg0 - arg6));
+    if (temp_f6 == 0.0f) {
+        return 2;
+    }
+    if (temp_f4 == 0.0f) {
+        return 3;
+    }
+    if (temp_f1 == 0.0f) {
+        return 4;
+    }
+    if (!(temp_f6 <= 0.0f) && !(temp_f4 <= 0.0f) && !(temp_f1 <= 0.0f)) {
+        return 1;
+    }
+    if (temp_f6 < 0.0f) {
+        if (temp_f4 < 0.0f) {
+            if (temp_f1 < 0.0f) {
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgDistVector__FPf);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgDistVectorXZ__FPf);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgDistVector2__FPf);
@@ -99,14 +252,31 @@ INCLUDE_ASM("nonmatchings/mglib/mgmath", mgInversMatrix__FPA4_fPA4_f);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgRotMatrixX__FPA4_ff);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgRotMatrixY__FPA4_ff);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgRotMatrixZ__FPA4_ff);
-INCLUDE_ASM("nonmatchings/mglib/mgmath", mgRotMatrixXYZ__FPA4_fPf);
+extern "C" void mgRotMatrixX__FPA4_ff(f32 (*)[4], f32);
+extern "C" void mgRotMatrixY__FPA4_ff(f32 (*)[4], f32);
+extern "C" void mgRotMatrixZ__FPA4_ff(f32 (*)[4], f32);
+extern "C" void MulMatrix3__FPA4_fPA4_fPA4_f(f32 (*)[4], f32 (*)[4], f32 (*)[4]);
+extern "C" void mgRotMatrixXYZ__FPA4_fPf(f32 (*arg0)[4], f32 *arg1) {
+    f32 mx[4][4];
+    f32 my[4][4];
+    mgRotMatrixX__FPA4_ff(mx, arg1[0]);
+    mgRotMatrixY__FPA4_ff(my, arg1[1]);
+    mgRotMatrixZ__FPA4_ff(arg0, arg1[2]);
+    MulMatrix3__FPA4_fPA4_fPA4_f(arg0, my, mx);
+}
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgCreateMatrixPY__FPA4_fPff);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgLookAtMatrixZ__FPA4_fPf);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgShadowMatrix__FPA4_fPfPfPf);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgApplyMatrixN__FPA4_fPA4_fPA4_fi);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgApplyMatrixN_MaxMin__FPA4_fPA4_fPA4_fiPfPf);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgVectorMinMaxN__FPfPfPA4_fi);
-INCLUDE_ASM("nonmatchings/mglib/mgmath", mgApplyMatrix__FPfPfPA4_fPfPf);
+extern "C" s32 mgApplyMatrixN_MaxMin__FPA4_fPA4_fPA4_fiPfPf(...);
+extern "C" s32 mgCreateBox8__FPA4_fPfPf(...);
+extern "C" void mgApplyMatrix__FPfPfPA4_fPfPf(f32 *arg0, f32 *arg1, f32 (*arg2)[4], f32 *arg3, f32 *arg4) {
+    u8 sp40[0x80];
+    mgCreateBox8__FPA4_fPfPf((f32 (*)[4]) &sp40[0], arg3, arg4);
+    mgApplyMatrixN_MaxMin__FPA4_fPA4_fPA4_fiPfPf((f32 (*)[4]) &sp40[0], arg2, (f32 (*)[4]) &sp40[0], 8, arg0, arg1);
+}
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgVectorInterpolate__FPfPfPffi);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgAngleInterpolate__Ffffi);
 extern "C" s32 mgAngleCmp__Ffff(f32 arg0, f32 arg1, f32 arg2) {
@@ -134,4 +304,16 @@ extern "C" s32 mgAngleCmp__Ffff(f32 arg0, f32 arg1, f32 arg2) {
 
     return var_v0;
 }
-INCLUDE_ASM("nonmatchings/mglib/mgmath", mgAngleLimit__Ff);
+extern "C" f32 mgAngleLimit__Ff(f32 x) {
+    if (x < 3.1415927f && x > -3.1415927f) {
+        return x;
+    }
+    x = x - 6.2831855f * (f32) (s32) (x / 6.2831855f);
+    if (x > 3.1415927f) {
+        x -= 6.2831855f;
+    }
+    if (x < -3.1415927f) {
+        x += 6.2831855f;
+    }
+    return x;
+}

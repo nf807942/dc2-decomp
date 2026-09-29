@@ -10,7 +10,67 @@
 
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", MenuItemBrdKey__FiPiPii);
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", MenuDataSwap__FP13CGameDataUsedP13CGameDataUsedi);
-INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", Initialize__12CMenuKeyFuncFv);
+extern "C" s32 Init__13CGameDataUsedFv(void *);
+extern "C" s32 memset(...);
+struct CMenuKeyFuncInitView {
+    s8 unk0;
+    s8 unk1;
+    s8 unk2;
+    char pad3[9];
+    s32 unkC[16];
+    char pad4C[4];
+    s16 unk50;
+    char pad52[2];
+    s32 unk54;
+    s32 unk58;
+    s16 unk5C;
+    s16 unk5E;
+    s32 unk60;
+    s32 unk64;
+    s16 unk68;
+    char pad6A[0x56];
+    u8 unkC0[0x78];
+    s32 unk138;
+    s32 unk13C;
+    s32 unk140;
+    s32 unk144;
+    s32 unk148;
+    s32 unk14C;
+    s32 unk150;
+    s32 unk154;
+    s16 unk158;
+    s16 unk15A;
+};
+extern "C" void Initialize__12CMenuKeyFuncFv(CMenuKeyFuncInitView *objet) {
+    s32 i;
+
+    memset(objet, 0, 0x160);
+    objet->unk1 = 1;
+    objet->unk2 = 0;
+    objet->unk50 = -1;
+    objet->unk54 = -1;
+    objet->unk58 = -1;
+    objet->unk60 = 0;
+    objet->unk64 = 0;
+    objet->unk68 = 0;
+    objet->unk0 = 0;
+    Init__13CGameDataUsedFv(objet->unkC0);
+    objet->unk138 = 0;
+    objet->unk13C = 0;
+    objet->unk140 = 0;
+    objet->unk144 = 0;
+    objet->unk148 = 0;
+    objet->unk14C = 0;
+    objet->unk5C = 0;
+    objet->unk5E = 0;
+    objet->unk150 = 0;
+    objet->unk154 = 0;
+    objet->unk158 = 0;
+    objet->unk15A = 0;
+    for (i = 0; i < 16; i++) {
+        objet->unkC[i] = -1;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", AttachFuncData__12CMenuKeyFuncFv);
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", GetActiveCharaNo__12CMenuKeyFuncFv);
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", MenuPosStep__12CMenuKeyFuncFPiPi);
@@ -20,7 +80,48 @@ INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", MenuPosPlay__12CMenuKeyFuncFv);
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", SetMoveMethod__12CMenuKeyFuncFi);
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", SetWakuMoveMethod__12CMenuKeyFuncFi);
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", GetItemPos__12CMenuKeyFuncFPi);
-INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", SetWakuType__12CMenuKeyFuncFi);
+extern "C" s32 GetPartInfo__16CMenuPosDataFormFPc(...);
+extern "C" u8 _2651[];
+extern "C" s32 sprintf(...);
+struct CMenuWakuPart {
+    char pad0[5];
+    s8 unk5;
+};
+struct CMenuWakuForm {
+    char pad0[1];
+    s8 unk1;
+};
+struct CMenuKeyFuncWakuView {
+    char pad0[0x68];
+    s16 unk68;
+    char pad6A[0xD2];
+    CMenuWakuForm *unk13C;
+};
+extern "C" void SetWakuType__12CMenuKeyFuncFi(CMenuKeyFuncWakuView *objet, s32 arg0) {
+    s8 name[0x20];
+    s32 i;
+    CMenuWakuPart *part;
+
+    objet->unk68 = arg0;
+    if (objet->unk13C != NULL) {
+        i = 0;
+        do {
+            sprintf(name, _2651, i);
+            part = (CMenuWakuPart *) GetPartInfo__16CMenuPosDataFormFPc(objet->unk13C, name);
+            if (part != NULL) {
+                part->unk5 = 0;
+                if (i == objet->unk68) {
+                    part->unk5 = 1;
+                }
+            }
+            i += 1;
+        } while (i < 3);
+        objet->unk13C->unk1 = 1;
+        if (objet->unk68 < 0) {
+            objet->unk13C->unk1 = 0;
+        }
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", SetWakuWH__12CMenuKeyFuncFiii);
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", SetVibeCnt__12CMenuKeyFuncFii);
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", SetVibeR__12CMenuKeyFuncFii);
@@ -51,9 +152,63 @@ extern "C" void SelDataInit__12CMenuKeyFuncFv(CMenuKeyFunc_infere3 *objet) {
     objet->unk7C = objet->unk74;
     objet->unk2 = 0;
 }
-INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", CheckSelectKey__12CMenuKeyFuncFv);
+extern "C" u8 GamePad_003FA5A0[1144];
+extern "C" s32 Down__8CGamePadFi(void *, s32);
+struct CMenuKeyFuncSelectView {
+    char pad0[1];
+    u8 unk1;
+    char pad2[2];
+    s32 unk4;
+};
+extern "C" s32 CheckSelectKey__12CMenuKeyFuncFv(CMenuKeyFuncSelectView *objet) {
+    if (Down__8CGamePadFi(&GamePad_003FA5A0, 0x1000) != 0) {
+        objet->unk4 |= 1;
+    } else if (Down__8CGamePadFi(&GamePad_003FA5A0, 0x4000) != 0) {
+        objet->unk4 |= 2;
+    }
+    if (Down__8CGamePadFi(&GamePad_003FA5A0, 0x8000) != 0) {
+        objet->unk4 |= 4;
+    } else if (Down__8CGamePadFi(&GamePad_003FA5A0, 0x2000) != 0) {
+        objet->unk4 |= 8;
+    }
+    if (objet->unk1 == 0) {
+        objet->unk4 = 0;
+    }
+    return objet->unk4;
+}
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", CheckLRKey__12CMenuKeyFuncFv);
-INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", MenuCheckPushButton__Fv);
+extern "C" u8 GamePad_003FA5A0[1144];
+extern "C" s32 LanguageCode;
+extern "C" u8 padtbl_3359[16];
+extern "C" s32 Down__8CGamePadFi(void *, s32);
+extern "C" s32 MenuCheckPushButton__Fv(void) {
+    s32 pushed;
+    s32 *table;
+
+    pushed = 0;
+    table = (s32 *) padtbl_3359;
+    if (LanguageCode > 0) {
+        table = (s32 *) (padtbl_3359 + 8);
+    }
+    if (Down__8CGamePadFi(&GamePad_003FA5A0, 0x20) != 0) {
+        pushed = table[0];
+    } else if (Down__8CGamePadFi(&GamePad_003FA5A0, 0x40) != 0) {
+        pushed = table[1];
+    } else if (Down__8CGamePadFi(&GamePad_003FA5A0, 0x10) != 0) {
+        pushed = 4;
+    } else if (Down__8CGamePadFi(&GamePad_003FA5A0, 0x80) != 0) {
+        pushed = 8;
+    } else if (Down__8CGamePadFi(&GamePad_003FA5A0, 0x100) != 0) {
+        pushed = 0x20;
+    } else if (Down__8CGamePadFi(&GamePad_003FA5A0, 0x800) != 0) {
+        pushed = 0x10;
+    } else if (Down__8CGamePadFi(&GamePad_003FA5A0, 0x200) != 0) {
+        pushed = 0x80;
+    } else if (Down__8CGamePadFi(&GamePad_003FA5A0, 0x400) != 0) {
+        pushed = 0x40;
+    }
+    return pushed;
+}
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", ConvertCheckPushButton__Fi);
 struct inferred;
 typedef struct CMenuKeyFunc_infere {

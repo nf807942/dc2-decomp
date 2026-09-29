@@ -40,11 +40,91 @@ INCLUDE_ASM("nonmatchings/game/cposdatamanage", TexGetInfoClear__14CPosDataManag
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", ResetTextureBlockNo__14CPosDataManageFPci);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", ResetTextureInfoAll__14CPosDataManageFv);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", EtcTblClear__14CPosDataManageFii);
-INCLUDE_ASM("nonmatchings/game/cposdatamanage", GetEtcTbl__14CPosDataManageFPc);
+struct CEtcTblEntry {
+    s8 *name;
+    s32 pad4[2];
+};
+struct CPosDataManageEtcView {
+    CEtcTblEntry *tbl;
+    u16 count;
+};
+extern "C" s32 strcmp(...);
+extern "C" CEtcTblEntry *GetEtcTbl__14CPosDataManageFPc(CPosDataManageEtcView *objet, s8 *arg0) {
+    CEtcTblEntry *p;
+    u16 n;
+    s32 i;
+
+    if (arg0 == NULL) {
+        return NULL;
+    }
+    n = objet->count;
+    p = objet->tbl;
+    i = 0;
+    if (0 < n) {
+        do {
+            if (p->name != 0 && strcmp(p->name, arg0) == 0) {
+                return p;
+            }
+            i++;
+            p++;
+        } while (i < n);
+    }
+    return NULL;
+}
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", GetEtcTblValue__14CPosDataManageFPcRiRi);
-INCLUDE_ASM("nonmatchings/game/cposdatamanage", GetEtcTbl2__14CPosDataManageFPc);
+struct CEtcTbl2Entry {
+    s8 *name;
+    s32 pad4[4];
+};
+struct CPosDataManageEtc2View {
+    u8 pad0[8];
+    CEtcTbl2Entry *tbl;
+    u16 count;
+};
+extern "C" CEtcTbl2Entry *GetEtcTbl2__14CPosDataManageFPc(CPosDataManageEtc2View *objet, s8 *arg0) {
+    CEtcTbl2Entry *p;
+    u16 n;
+    s32 i;
+
+    if (arg0 == NULL) {
+        return NULL;
+    }
+    n = objet->count;
+    p = objet->tbl;
+    i = 0;
+    if (0 < n) {
+        do {
+            if (p->name != 0 && strcmp(p->name, arg0) == 0) {
+                return p;
+            }
+            i++;
+            p++;
+        } while (i < n);
+    }
+    return NULL;
+}
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", GetEtcTbl2Value__14CPosDataManageFPcPfi);
-INCLUDE_ASM("nonmatchings/game/cposdatamanage", EtcTbl2Clear__14CPosDataManageFii);
+extern "C" void EtcTbl2Clear__14CPosDataManageFii(CPosDataManageEtc2View *objet, s32 arg0, s32 arg1) {
+    CEtcTbl2Entry *p;
+    s32 end;
+    s32 count;
+    s32 i;
+
+    end = arg1;
+    if (objet->count < end) {
+        end = objet->count;
+    }
+    count = end - arg0;
+    i = 0;
+    p = objet->tbl + arg0;
+    if (0 < count) {
+        do {
+            i++;
+            p->name = 0;
+            p++;
+        } while (i < count);
+    }
+}
 extern "C" u8 temp_3925[32];
 extern "C" u8 _3927[];
 extern "C" s32 sprintf(...);
@@ -110,12 +190,36 @@ extern "C" void ClearPos__14CPosDataManageFv(CPosDataManage *objet) {
     TexGetInfoClear__14CPosDataManageFii(objet, 0, (s32) objet->unk14);
     FormInfoClear__14CPosDataManageFii(objet, 0, (s32) objet->unk1C);
 }
-INCLUDE_ASM("nonmatchings/game/cposdatamanage", AttachCommonTexInfo__18CMenuPosDataManageFv);
+extern "C" u8 mgTexManager[540];
+extern "C" u8 _4182[];
+extern "C" u8 _4183[];
+extern "C" u8 _4184[];
+extern "C" u8 _4185_0036FB28[];
+extern "C" u8 _4186_0036FB30[];
+struct CMenuPosDataManageView {
+    char pad0[0x3C];
+    s32 unk3C;
+    s32 unk40;
+    char pad44[8];
+    s32 unk4C;
+    s32 unk50;
+    s32 unk54;
+    s32 unk58;
+};
+extern "C" s32 GetTexture__17mgCTextureManagerFPci(...);
+extern "C" void AttachCommonTexInfo__18CMenuPosDataManageFv(CMenuPosDataManageView *objet) {
+    objet->unk3C = GetTexture__17mgCTextureManagerFPci(&mgTexManager, _4182, -1);
+    objet->unk40 = 0;
+    objet->unk4C = GetTexture__17mgCTextureManagerFPci(&mgTexManager, _4183, -1);
+    objet->unk50 = GetTexture__17mgCTextureManagerFPci(&mgTexManager, _4184, -1);
+    objet->unk54 = GetTexture__17mgCTextureManagerFPci(&mgTexManager, _4185_0036FB28, -1);
+    objet->unk58 = GetTexture__17mgCTextureManagerFPci(&mgTexManager, _4186_0036FB30, -1);
+}
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", StepMainMenuIconMove__18CMenuPosDataManageFPiii);
 #include "gamedataused.hpp"
 struct inferred;
 typedef struct CItemUseTarget {
-    /* 0x0 */ char pad0[4];
+    /* 0x0 */ s32 unk0;
     /* 0x4 */ CGameDataUsed *unk4;                  /* inferred */
 } CItemUseTarget;                                   /* size >= 0x8 */
 extern "C" s32 CheckBuildUp__FP13CGameDataUsedPiPiPi(CGameDataUsed *, s32 *, s32 *, s32 *);
@@ -134,7 +238,34 @@ extern "C" s32 CheckItemUseVariable__FP13CGameDataUsedP14CItemUseTarget(CGameDat
     }
     return var_v0;
 }
-INCLUDE_ASM("nonmatchings/game/cposdatamanage", Func_MenuItemBrdPrepare__FP18MENUFORMPARTS_TYPEP13CGameDataUsedP13CGameDataUsedi);
+struct MENUFORMPARTS_TYPE {
+    char pad0[0x45];
+    s8 unk45;
+    char pad46[2];
+};
+extern "C" s32 GetNowBagMax__Fi(s32);
+extern "C" s32 SetPtr__14CItemUseTargetFiPv(CItemUseTarget *, s32, CGameDataUsed *);
+extern "C" void Func_MenuItemBrdPrepare__FP18MENUFORMPARTS_TYPEP13CGameDataUsedP13CGameDataUsedi(MENUFORMPARTS_TYPE *arg0, CGameDataUsed *arg1, CGameDataUsed *arg2, s32 arg3) {
+    CItemUseTarget target;
+    CGameDataUsed *item;
+    s32 n;
+    s32 i;
+
+    if (arg0 != NULL) {
+        target.unk0 = -1;
+        n = GetNowBagMax__Fi(1);
+        i = 0;
+        if (0 < n) {
+            do {
+                item = (CGameDataUsed *) ((u8 *) arg1 + i * 0x6C);
+                SetPtr__14CItemUseTargetFiPv(&target, arg3, item);
+                arg0->unk45 = CheckItemUseVariable__FP13CGameDataUsedP14CItemUseTarget(arg2, &target);
+                i++;
+                arg0++;
+            } while (i < n);
+        }
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Func_MenuItemBrdPrepare2__FP18MENUFORMPARTS_TYPEP13CGameDataUsedP13CGameDataUsed);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", NowUseNeedItemCheck__FP16CUserDataManager);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Func_MenuIconDrawPrepare__FP18MENUFORMPARTS_TYPEP13CGameDataUsedi);
@@ -162,7 +293,38 @@ void CRepairEffect::Initialize(void) {
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Generate__13CRepairEffectFP9mgCMemoryi);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Step__13CRepairEffectFv);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Draw__13CRepairEffectFv);
-INCLUDE_ASM("nonmatchings/game/cposdatamanage", Initialize__14CRepairManagerFv);
+struct CRepairSlot {
+    u8 body[0x30];
+};
+struct CRepairManagerView {
+    u8 pad0;
+    s8 unk1;
+    s16 unk2;
+    s32 flag[8];
+    CRepairSlot slot[8];
+    s32 unk1A4;
+    s32 unk1A8;
+    s32 unk1AC;
+    s32 unk1B0;
+    u8 pad1B4[0x34];
+    s8 unk1E8;
+};
+extern "C" s32 stSetBuffer__9mgCMemoryFP1i(...);
+extern "C" void Initialize__14CRepairManagerFv(CRepairManagerView *objet) {
+    s32 i;
+
+    objet->unk1 = 0;
+    objet->unk2 = -1;
+    objet->unk1A4 = 0;
+    objet->unk1A8 = 0;
+    objet->unk1B0 = 0;
+    objet->unk1AC = 0;
+    for (i = 0; i < 8; i++) {
+        objet->flag[i] = 0;
+        stSetBuffer__9mgCMemoryFP1i(&objet->slot[i], 0, 0);
+    }
+    objet->unk1E8 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", SetStack__14CRepairManagerFP9mgCMemoryi);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Clear__14CRepairManagerFv);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", LoadDataBG__14CRepairManagerFP9mgCMemory);
@@ -200,7 +362,22 @@ INCLUDE_ASM("nonmatchings/game/cposdatamanage", SetRepairData__14CRepairManagerF
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", GeneratePoly__14CRepairManagerFPfi);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Generate__14CRepairManagerFii);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", IsRunModel__14CRepairManagerFv);
-INCLUDE_ASM("nonmatchings/game/cposdatamanage", IsRun__14CRepairManagerFv);
+extern "C" s32 IsRunModel__14CRepairManagerFv(void *);
+extern "C" s32 IsRun__14CRepairManagerFv(CRepairManager *objet) {
+    s32 i;
+    s32 running;
+
+    running = 0;
+    for (i = 0; i < 8; i++) {
+        if (*(s32 *) ((u8 *) objet + i * 4 + 4) != 0) {
+            running = 1;
+        }
+    }
+    if (IsRunModel__14CRepairManagerFv(objet) != 0) {
+        running = 1;
+    }
+    return running;
+}
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Step__14CRepairManagerFv);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Draw__14CRepairManagerFv);
 void CLevelUpEffect::Initialize(void) {
@@ -346,10 +523,38 @@ u8 CLevelUpEffect::IsRun(void) {
 }
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Step__14CLevelUpEffectFv);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Draw__14CLevelUpEffectFv);
-INCLUDE_ASM("nonmatchings/game/cposdatamanage", Initialize__21CLevelUpEffectManagerFv);
+struct CLevelUpEffectSlot {
+    u8 body[0x30];
+};
+struct CLevelUpEffectManagerView {
+    s32 field_0;
+    void *texture;
+    u8 pad8[8];
+    CLevelUpEffectSlot slot[8];
+};
+extern "C" s32 Initialize__14CLevelUpEffectFv(void *);
+extern "C" void Initialize__21CLevelUpEffectManagerFv(CLevelUpEffectManagerView *objet) {
+    s32 i;
+
+    for (i = 0; i < 8; i++) {
+        Initialize__14CLevelUpEffectFv(&objet->slot[i]);
+    }
+    objet->field_0 = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", IsRun__21CLevelUpEffectManagerFv);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Generate__21CLevelUpEffectManagerFiii);
-INCLUDE_ASM("nonmatchings/game/cposdatamanage", Generate__21CLevelUpEffectManagerFiP11CCharacter2);
+extern "C" s32 Generate__14CLevelUpEffectFP10mgCTextureiP11CCharacter2(void *, void *, s32, void *);
+extern "C" s32 IsRun__14CLevelUpEffectFv(void *);
+extern "C" void Generate__21CLevelUpEffectManagerFiP11CCharacter2(CLevelUpEffectManagerView *objet, s32 arg0, void *arg1) {
+    s32 i;
+
+    for (i = 0; i < 8; i++) {
+        if (IsRun__14CLevelUpEffectFv(&objet->slot[i]) == 0) {
+            Generate__14CLevelUpEffectFP10mgCTextureiP11CCharacter2(&objet->slot[i], objet->texture, arg0, arg1);
+            break;
+        }
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Step__21CLevelUpEffectManagerFv);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Draw__21CLevelUpEffectManagerFv);
 struct inferred;

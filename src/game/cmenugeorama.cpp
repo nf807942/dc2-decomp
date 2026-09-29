@@ -243,7 +243,29 @@ extern "C" s32 ReturnSelectMode__12CMenuGeoramaFi(CMenuGeorama *objet, s32 arg0)
     }
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/cmenugeorama", GetNowViewModeMax__12CMenuGeoramaFi);
+extern "C" s16 MenuEditAnalyzeDataSrcListLimmitNum;
+struct CMenuGeorama_infere2 {
+    char pad0[0xBBB8];
+    s32 unkBBB8;
+    char padBBBC[0x5400];
+    s32 unk10FBC;
+    char pad10FC0[0x5400];
+    s32 unk163C0;
+};
+extern "C" s32 GetNowViewModeMax__12CMenuGeoramaFi(CMenuGeorama_infere2 *objet, s32 arg0) {
+    switch (arg0) {
+    case 1:
+        return objet->unkBBB8;
+    case 0:
+        return objet->unk10FBC;
+    case 4:
+        return objet->unk163C0;
+    case 5:
+        return MenuEditAnalyzeDataSrcListLimmitNum - 1;
+    default:
+        return 0;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", LRCheck__12CMenuGeoramaFv);
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", MakeMsgPartsItemInfo__FP7CDC2MesP14CEditPartsInfoP21MENUFORM_MAKEBRD_INFO);
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", IsMakeObject__12CMenuGeoramaFii);

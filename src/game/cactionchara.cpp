@@ -170,8 +170,55 @@ extern "C" s32 GetList__8CMdsListFPc(CMdsList *objet, s8 *arg0) {
 }
 INCLUDE_ASM("nonmatchings/game/cactionchara", LoadIMGFile__8CIMGListFPcP15mgCEnterIMGInfoP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cactionchara", pcpMDS__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cactionchara", pcpTYPE__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cactionchara", pcpFAR_CLIP__FP9SPI_STACKi);
+extern "C" u32 pcpNowMdsInfo;
+struct SPI_STACK {
+    s32 field_0;
+    s32 field_4;
+};
+struct pcpNowMdsInfo_champs_295117 {
+    char pad0[0x4];
+    /* 0x4 */ s32 unk4;
+};
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(SPI_STACK *);
+extern "C" s32 pcpTYPE__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    s32 var_v0;
+
+    if (pcpNowMdsInfo == NULL) {
+        return 0;
+    }
+    var_v0 = (s32) (spiGetStackInt__FP9SPI_STACK(arg0));
+    switch (var_v0) {
+    case 0:
+        var_v0 = 0;
+        break;
+    case 1:
+        var_v0 = 1;
+        break;
+    case 2:
+        var_v0 = 3;
+        break;
+    case 3:
+    case 4:
+        var_v0 = 4;
+        break;
+    }
+    ((struct pcpNowMdsInfo_champs_295117 *) pcpNowMdsInfo)->unk4 = var_v0;
+    return 1;
+}
+extern "C" f32 spiGetStackFloat__FP9SPI_STACK(SPI_STACK *);
+struct pcpNowMdsInfo_champs_d7e46a {
+    char pad0[0x10];
+    /* 0x10 */ f32 unk10;
+    /* 0x14 */ s32 unk14;
+};
+extern "C" s32 pcpFAR_CLIP__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    if (pcpNowMdsInfo == NULL) {
+        return 0;
+    }
+    ((struct pcpNowMdsInfo_champs_d7e46a *) pcpNowMdsInfo)->unk10 = spiGetStackFloat__FP9SPI_STACK(arg0++);
+    ((struct pcpNowMdsInfo_champs_d7e46a *) pcpNowMdsInfo)->unk14 = spiGetStackInt__FP9SPI_STACK(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cactionchara", pcpMDS_END__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cactionchara", LoadPCPFile__8CMdsListFPcPUiP9mgCMemoryi);
 INCLUDE_ASM("nonmatchings/game/cactionchara", __ct__8CMdsInfoFv);
@@ -184,9 +231,44 @@ INCLUDE_ASM("nonmatchings/game/cactionchara", DrawStep__7CObjectFv);
 INCLUDE_ASM("nonmatchings/game/cactionchara", GetAlpha__7CObjectFv);
 INCLUDE_ASM("nonmatchings/game/cactionchara", PreDraw__7CObjectFv);
 INCLUDE_ASM("nonmatchings/game/cactionchara", Initialize__7CObjectFv);
-INCLUDE_ASM("nonmatchings/game/cactionchara", UpDatePosition__12CObjectFrameFv);
+/* Le noeud pointé par le champ 0x70 : les virtuelles muettes amènent les trois
+ * méthodes appelées aux rangs 3, 6 et 9 (0x10, 0x1C, 0x28), par $t9. */
+class CObjectFrameNode {
+public:
+    virtual void v0();
+    virtual void v1();
+    virtual void GetPosition(f32 *vec);
+    virtual void v3();
+    virtual void v4();
+    virtual void GetRotation(f32 *vec);
+    virtual void v6();
+    virtual void v7();
+    virtual void GetScale(f32 *vec);
+};
+struct CObjectFrame_1a71a8 {
+    char pad0[0x10];
+    f32 unk10[4];
+    f32 unk20[4];
+    f32 unk30[4];
+    char pad40[0x30];
+    CObjectFrameNode *unk70;
+};
+extern "C" void UpDatePosition__12CObjectFrameFv(CObjectFrame_1a71a8 *objet) {
+    if (objet->unk70 != NULL) {
+        objet->unk70->GetPosition(objet->unk10);
+        objet->unk70->GetRotation(objet->unk20);
+        objet->unk70->GetScale(objet->unk30);
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cactionchara", DrawStep__12CObjectFrameFv);
-INCLUDE_ASM("nonmatchings/game/cactionchara", GetCameraDist__12CObjectFrameFv);
+extern "C" s32 GetWorldPosition0__8mgCFrameFPf(void *, f32 *);
+extern "C" s32 mgGetDistFromCamera__FPf(f32 *);
+extern "C" void GetCameraDist__12CObjectFrameFv(void *objet) {
+    f32 sp10[4];
+
+    GetWorldPosition0__8mgCFrameFPf(*(void **) ((u8 *) objet + 0x70), sp10);
+    mgGetDistFromCamera__FPf(sp10);
+}
 INCLUDE_ASM("nonmatchings/game/cactionchara", PreDraw__12CObjectFrameFv);
 #include "gen/mgCFrame.hpp"
 typedef struct CObjectFrame {
@@ -383,7 +465,35 @@ extern "C" void Show__12CActionCharaFii(CActionChara_infere7 *objet, s32 arg0, s
         } while (var_a0 != NULL);
     }
 }
-INCLUDE_ASM("nonmatchings/game/cactionchara", GetShow__12CActionCharaFPc);
+struct CActionChara_getshow {
+    /* 0x000 */ char pad0[0x64];
+    /* 0x064 */ s32 unk64;
+    /* 0x068 */ char pad68[0x88];
+    /* 0x0F0 */ char unkF0;
+    /* 0x0F1 */ char padF1[0x587];
+    /* 0x678 */ CActionChara_getshow *unk678;
+};
+extern "C" s32 strcmp(...);
+extern "C" s32 GetShow__12CActionCharaFPc(CActionChara_getshow *objet, s8 *arg0) {
+    CActionChara_getshow *p;
+    s32 r;
+
+    r = 0;
+    p = objet;
+    if (arg0 != NULL) {
+        if (objet != NULL) {
+            do {
+                if (strcmp(&p->unkF0, arg0) == 0) {
+                    return p->unk64;
+                }
+                p = p->unk678;
+            } while (p != NULL);
+        }
+    } else {
+        r = objet->unk64;
+    }
+    return r;
+}
 INCLUDE_ASM("nonmatchings/game/cactionchara", CheckKeri__12CActionCharaFPci);
 INCLUDE_ASM("nonmatchings/game/cactionchara", CheckEnemyCatch__12CActionCharaFPc);
 INCLUDE_ASM("nonmatchings/game/cactionchara", ThrowItemObject__12CActionCharaFv);
@@ -430,10 +540,91 @@ extern "C" void RemoveThrowItem__12CActionCharaFv(CActionChara_infere4 *objet) {
         }
     }
 }
-INCLUDE_ASM("nonmatchings/game/cactionchara", GetNowFrameWait__12CActionCharaFPc);
-INCLUDE_ASM("nonmatchings/game/cactionchara", GetNowFrame__12CActionCharaFPc);
+struct CActionChara_nfw {
+    /* 0x000 */ char pad0[0xF0];
+    /* 0x0F0 */ char unkF0;
+    /* 0x0F1 */ char padF1[0x29B];
+    /* 0x38C */ f32 unk38C;
+    char pad_after[0x2E8];
+    /* 0x678 */ CActionChara_nfw *unk678;
+};
+extern "C" f32 GetNowFrameWait__12CActionCharaFPc(CActionChara_nfw *objet, s8 *arg0) {
+    CActionChara_nfw *p;
+    f32 r;
+
+    r = 0.0f;
+    p = objet;
+    if (arg0 != NULL) {
+        if (objet != NULL) {
+            do {
+                if (strcmp(&p->unkF0, arg0) == 0) {
+                    return p->unk38C;
+                }
+                p = p->unk678;
+            } while (p != NULL);
+        }
+    } else {
+        r = objet->unk38C;
+    }
+    return r;
+}
+struct CActionChara_nf {
+    /* 0x000 */ char pad0[0xF0];
+    /* 0x0F0 */ char unkF0;
+    /* 0x0F1 */ char padF1[0x297];
+    /* 0x388 */ f32 unk388;
+    char pad_after[0x2EC];
+    /* 0x678 */ CActionChara_nf *unk678;
+};
+extern "C" f32 GetNowFrame__12CActionCharaFPc(CActionChara_nf *objet, s8 *arg0) {
+    CActionChara_nf *p;
+    f32 r;
+
+    r = 0.0f;
+    p = objet;
+    if (arg0 != NULL) {
+        if (objet != NULL) {
+            do {
+                if (strcmp(&p->unkF0, arg0) == 0) {
+                    return p->unk388;
+                }
+                p = p->unk678;
+            } while (p != NULL);
+        }
+    } else {
+        r = objet->unk388;
+    }
+    return r;
+}
 INCLUDE_ASM("nonmatchings/game/cactionchara", CheckMotionEnd__12CActionCharaFPc);
-INCLUDE_ASM("nonmatchings/game/cactionchara", GetMotionStatus__12CActionCharaFPc);
+struct CActionChara_ms {
+    /* 0x000 */ char pad0[0xF0];
+    /* 0x0F0 */ char unkF0;
+    /* 0x0F1 */ char padF1[0x293];
+    /* 0x384 */ s32 unk384;
+    char pad_after[0x2F0];
+    /* 0x678 */ CActionChara_ms *unk678;
+};
+extern "C" s32 GetMotionStatus__12CActionCharaFPc(CActionChara_ms *objet, s8 *arg0) {
+    CActionChara_ms *p;
+    s32 r;
+
+    r = 0;
+    p = objet;
+    if (arg0 != NULL) {
+        if (objet != NULL) {
+            do {
+                if (strcmp(&p->unkF0, arg0) == 0) {
+                    return p->unk384;
+                }
+                p = p->unk678;
+            } while (p != NULL);
+        }
+    } else {
+        r = objet->unk384;
+    }
+    return r;
+}
 INCLUDE_ASM("nonmatchings/game/cactionchara", GetWaitToFrame__12CActionCharaFPcfPc);
 struct inferred;
 typedef struct CActionChara_infere3 {

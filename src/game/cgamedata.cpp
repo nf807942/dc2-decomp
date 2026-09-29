@@ -227,7 +227,38 @@ s32 TimeLimitCheck(void) {
 }
 INCLUDE_ASM("nonmatchings/game/cgamedata", InitPauseMenu__Fi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", PauseMenu__Fv);
-INCLUDE_ASM("nonmatchings/game/cgamedata", LoadGameConfig__FPc);
+extern "C" char _1296_003695B8[];
+extern "C" char _1856[];
+extern "C" s32 __ct__18CScriptInterpreterFv(void *);
+extern "C" u8 tag_00339760[184];
+struct SPI_TAG_PARAM;
+extern "C" s32 LoadFile2__FPcPvPii(...);
+extern "C" s32 Run__18CScriptInterpreterFv(void *);
+extern "C" s32 SetCurrentDir__FPc(...);
+extern "C" s32 SetScript__18CScriptInterpreterFPci(...);
+extern "C" s32 SetTag__18CScriptInterpreterFP13SPI_TAG_PARAM(...);
+extern "C" void LoadGameConfig__FPc(s8 *arg0) {
+    u8 sp10[0x4000];
+    u8 sp4010[0xEDC];
+    s32 sp4EEC;
+
+    if (arg0 == NULL) {
+        SetCurrentDir__FPc(_1296_003695B8);
+        if (LoadFile2__FPcPvPii(_1856, sp10, &sp4EEC, 0) == 0) {
+            SetCurrentDir__FPc(NULL);
+            return;
+        }
+        SetCurrentDir__FPc(NULL);
+        goto block_5;
+    }
+    if (LoadFile2__FPcPvPii(arg0, sp10, &sp4EEC, 0) != 0) {
+block_5:
+        __ct__18CScriptInterpreterFv(&sp4010);
+        SetTag__18CScriptInterpreterFP13SPI_TAG_PARAM(&sp4010, &tag_00339760);
+        SetScript__18CScriptInterpreterFPci(&sp4010, (char *) sp10, sp4EEC);
+        Run__18CScriptInterpreterFv(&sp4010);
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcMAP_NO__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcPROGRESS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcBIT_FLAG_ON__FP9SPI_STACKi);
@@ -251,7 +282,25 @@ INCLUDE_ASM("nonmatchings/game/cgamedata", gcITEM_SET__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcGET_ITEM__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcGET_N_ITEM__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcEQUIP__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cgamedata", gcDEFENSE__FP9SPI_STACKi);
+extern "C" s32 GetCharaDataPtr__16CUserDataManagerFi(...);
+struct GcDefenseChara {
+    char pad0[0xA];
+    /* 0xA */ s16 unkA;
+};
+extern "C" s32 GetSaveData__Fv(void);
+extern "C" s32 gcDEFENSE__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    s32 temp_s0;
+    s32 temp_s1;
+    struct GcDefenseChara *temp_v0;
+
+    temp_s0 = (s32) (spiGetStackInt__FP9SPI_STACK(arg0++));
+    temp_s1 = (s32) (spiGetStackInt__FP9SPI_STACK(arg0));
+    temp_v0 = (struct GcDefenseChara *) (GetCharaDataPtr__16CUserDataManagerFi((u8 *) GetSaveData__Fv() + 0x1D2A0, temp_s0));
+    if (temp_v0 != NULL) {
+        temp_v0->unkA = (s16) temp_s1;
+    }
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcHP__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcALL_GEO_PARTS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcPARAM_DRAW__FP9SPI_STACKi);
@@ -317,7 +366,42 @@ INCLUDE_ASM("nonmatchings/game/cgamedata", __ct__14CDataBreedFishFv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", Initialize__9CGameDataFv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", _DATACOMINIT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", _DATACOM__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cgamedata", _MES_SYS__FP9SPI_STACKi);
+extern "C" s32 GetCommonData__9CGameDataFi(void *, s32);
+extern "C" u32 gamedata_build_stack;
+extern "C" s32 spiGetStackString__FP9SPI_STACK(...);
+struct MesSysDonnees {
+    char pad0[0x28];
+    /* 0x28 */ s32 unk28;
+};
+extern "C" s32 ConvertFontCode__FPcPc(...);
+extern "C" s32 memset(...);
+extern "C" s32 mgCopyString__FPcP9mgCMemory(...);
+struct MesSysPile {
+    s32 field_0;
+    s32 field_4;
+};
+extern "C" s32 _MES_SYS__FP9SPI_STACKi(MesSysPile *arg0, s32 arg1) {
+    u8 sp30[0x100];
+    s32 temp_s0;
+    s32 var_v0;
+    s8 *temp_s0_2;
+    struct MesSysDonnees *temp_v0;
+
+    temp_s0 = (s32) (spiGetStackInt__FP9SPI_STACK((SPI_STACK *) arg0++));
+    temp_s0_2 = (s8 *) (spiGetStackString__FP9SPI_STACK(arg0));
+    temp_v0 = (struct MesSysDonnees *) (GetCommonData__9CGameDataFi(&GameItemDataManage, temp_s0));
+    if (temp_v0 != NULL) {
+        if (((s32) LanguageCode >= 2) && ((s32) LanguageCode < 6)) {
+            memset(sp30, 0, 0x100);
+            ConvertFontCode__FPcPc(temp_s0_2, sp30);
+            var_v0 = mgCopyString__FPcP9mgCMemory(sp30, gamedata_build_stack);
+        } else {
+            var_v0 = (s32) (mgCopyString__FPcP9mgCMemory(temp_s0_2, gamedata_build_stack));
+        }
+        temp_v0->unk28 = var_v0;
+    }
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cgamedata", _MES_SYS_SPECTOL__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", _DATAWEPNUM__FP9SPI_STACKi);
 extern "C" u32 SpiWeaponPt;
@@ -372,9 +456,79 @@ extern "C" s32 _DATAWEP_ST_L__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     ((struct SpiWeapon_champs *) SpiWeaponPt)->unkA = spiGetStackInt__FP9SPI_STACK(suivant);
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/cgamedata", _DATAWEP2_ST__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cgamedata", _DATAWEP2_ST_L__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cgamedata", _DATAWEP_SPE__FP9SPI_STACKi);
+struct SpiWeapon2__DATAWEP2_ST {
+    char pad0[0xC];
+    /* 0xC */ s16 unkC;
+};
+extern "C" s32 _DATAWEP2_ST__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    s32 var_s1;
+    s32 var_s2;
+
+    if (SpiWeaponPt == 0) {
+        return 0;
+    }
+    var_s1 = 0;
+    var_s2 = 0;
+    do {
+        ((struct SpiWeapon2__DATAWEP2_ST *) (SpiWeaponPt + var_s2))->unkC = spiGetStackInt__FP9SPI_STACK(arg0++);
+        var_s1 += 1;
+        var_s2 += 2;
+    } while (var_s1 < 8);
+    return 1;
+}
+struct SpiWeapon2__DATAWEP2_ST_L {
+    char pad0[0x1C];
+    /* 0x1C */ s16 unk1C;
+};
+extern "C" s32 _DATAWEP2_ST_L__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    s32 var_s1;
+    s32 var_s2;
+
+    if (SpiWeaponPt == 0) {
+        return 0;
+    }
+    var_s1 = 0;
+    var_s2 = 0;
+    do {
+        ((struct SpiWeapon2__DATAWEP2_ST_L *) (SpiWeaponPt + var_s2))->unk1C = spiGetStackInt__FP9SPI_STACK(arg0++);
+        var_s1 += 1;
+        var_s2 += 2;
+    } while (var_s1 < 8);
+    return 1;
+}
+struct SpiWeaponSpe {
+    char pad0[0x2C];
+    /* 0x2C */ s32 unk2C;
+    char pad30[0x8];
+    /* 0x38 */ s8 unk38;
+    /* 0x39 */ s8 unk39;
+    char pad3A[0xC];
+    /* 0x46 */ s8 unk46;
+    /* 0x47 */ s8 unk47;
+    /* 0x48 */ s8 unk48;
+    /* 0x49 */ s8 unk49;
+};
+extern "C" s32 fptoui(f32);
+extern "C" f32 spiGetStackFloat__FP9SPI_STACK(SPI_STACK *);
+extern "C" s32 _DATAWEP_SPE__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    if (SpiWeaponPt == NULL) {
+        return 0;
+    }
+    ((struct SpiWeaponSpe *) SpiWeaponPt)->unk38 = fptoui(spiGetStackFloat__FP9SPI_STACK(arg0++));
+    ((struct SpiWeaponSpe *) SpiWeaponPt)->unk46 = spiGetStackInt__FP9SPI_STACK(arg0++);
+    ((struct SpiWeaponSpe *) SpiWeaponPt)->unk47 = spiGetStackInt__FP9SPI_STACK(arg0++);
+    ((struct SpiWeaponSpe *) SpiWeaponPt)->unk39 = spiGetStackInt__FP9SPI_STACK(arg0++);
+    ((struct SpiWeaponSpe *) SpiWeaponPt)->unk2C = spiGetStackInt__FP9SPI_STACK(arg0++);
+    ((struct SpiWeaponSpe *) SpiWeaponPt)->unk48 = 0;
+    if (arg1 >= 6) {
+        ((struct SpiWeaponSpe *) SpiWeaponPt)->unk48 = spiGetStackInt__FP9SPI_STACK(arg0++);
+    }
+    ((struct SpiWeaponSpe *) SpiWeaponPt)->unk49 = 0;
+    if (arg1 >= 7) {
+        ((struct SpiWeaponSpe *) SpiWeaponPt)->unk49 = spiGetStackInt__FP9SPI_STACK(arg0);
+    }
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cgamedata", _DATAWEP_BUILDUP__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", _DATAITEMINIT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", _DATAITEM__FP9SPI_STACKi);

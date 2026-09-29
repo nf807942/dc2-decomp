@@ -255,7 +255,33 @@ INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Step__13CRandomCircleFv);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", DrawSymbol__13CRandomCircleFP14CMiniMapSymbol);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", CheckArea__13CRandomCircleFPff);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", GetPosition__13CRandomCircleFPfi);
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", CheckEvent__13CRandomCircleFPf);
+struct RandomCircleEvt {
+    char pad0[0x3C];
+    s32 unk3C;
+};
+extern "C" f32 mgDistVector__FPfPf(...);
+extern "C" s32 CheckEvent__13CRandomCircleFPf(RandomCircleEvt *objet, f32 *arg0) {
+    s32 var_s0;
+    s32 var_s1;
+    s32 var_s2;
+
+    var_s2 = 0;
+    var_s1 = 0;
+    var_s0 = 0;
+loop_1:
+    if ((*(s32 *) ((u8 *) objet + var_s1 + 0x30) != 0) && (mgDistVector__FPfPf(((u8 *) objet + var_s2), arg0) <= 20.0f)) {
+        objet->unk3C = var_s0;
+        return var_s0;
+    }
+    var_s0 += 1;
+    var_s1 += 4;
+    var_s2 += 0x10;
+    if (var_s0 >= 3) {
+        objet->unk3C = -1;
+        return -1;
+    }
+    goto loop_1;
+}
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", SetCircle__13CRandomCircleFPf);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Clear__13CRandomCircleFv);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Initialize__13CRandomCircleFv);
@@ -280,9 +306,74 @@ extern "C" void SetCollisionModel__19CTreasureBoxManagerFPUiP9mgCMemory(CTreasur
     objet->unkA98 = LoadCollisionFile__FP10MDS_HEADERP9mgCMemory(GetPackFile__FPUiPcPi(arg0, &_1279_00372D88, NULL), arg1);
 }
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", PutTreasureBox__19CTreasureBoxManagerFiPffiiiii);
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", CheckArea__19CTreasureBoxManagerFPff);
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", DrawMiniMapSymbol__19CTreasureBoxManagerFP14CMiniMapSymbol);
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Draw__19CTreasureBoxManagerFPf);
+struct TboxObj {
+    virtual void v0();
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4(f32 *out);
+    char pad[0x50];
+    s8 state;
+};
+extern "C" s32 CheckArea__19CTreasureBoxManagerFPff(CTreasureBoxManager *objet, f32 *arg0, f32 arg1) {
+    f32 sp60[4];
+    s32 var_s0;
+    s32 var_s1;
+    TboxObj *temp_v0;
+
+    var_s1 = 0;
+    var_s0 = 0;
+loop_1:
+    temp_v0 = (TboxObj *) ((u8 *) objet + var_s1 + 0x10);
+    if (temp_v0->state != 0) {
+        temp_v0->v4(sp60);
+        if (mgDistVector__FPfPf(sp60, arg0) < arg1) {
+            return 0;
+        }
+    }
+    var_s0 += 1;
+    var_s1 += 0x70;
+    if (var_s0 >= 0x18) {
+        return 1;
+    }
+    goto loop_1;
+}
+extern "C" s32 DrawSymbol__14CMiniMapSymbolFPfi(void *, f32 *, s32);
+extern "C" void DrawMiniMapSymbol__19CTreasureBoxManagerFP14CMiniMapSymbol(CTreasureBoxManager *objet, void *arg0) {
+    f32 sp50[4];
+    s32 var_s0;
+    s32 var_s1;
+    TboxObj *temp_a1;
+
+    var_s1 = 0;
+    var_s0 = 0;
+    do {
+        temp_a1 = (TboxObj *) ((u8 *) objet + var_s1 + 0x10);
+        if (temp_a1->state == 1) {
+            temp_a1->v4(sp50);
+            DrawSymbol__14CMiniMapSymbolFPfi(arg0, sp50, 1);
+        }
+        var_s0 += 1;
+        var_s1 += 0x70;
+    } while (var_s0 < 0x18);
+}
+extern "C" s32 Draw__12CTreasureBoxFPf(void *, f32 *);
+extern "C" void Draw__19CTreasureBoxManagerFPf(CTreasureBoxManager *objet, f32 *arg0) {
+    s32 var_s0;
+    s32 var_s1;
+    TboxObj *temp_v1;
+
+    var_s1 = 0;
+    var_s0 = 0;
+    do {
+        temp_v1 = (TboxObj *) ((u8 *) objet + var_s1 + 0x10);
+        if (temp_v1->state != 0) {
+            Draw__12CTreasureBoxFPf(temp_v1, arg0);
+        }
+        var_s0 += 1;
+        var_s1 += 0x70;
+    } while (var_s0 < 0x18);
+}
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", DrawShadow__19CTreasureBoxManagerFPf);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", PickupCollision__19CTreasureBoxManagerFPfP6CCPoly9mgVu0FBOXi);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", MimicCount__19CTreasureBoxManagerFv);
@@ -300,8 +391,52 @@ extern "C" void BattleSoundManager__Fv(void) {
 }
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", StatusWarningSnd__Fv);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", BattleAreaBGMCtrl__Fv);
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", ScriptDebugCommand__Fi);
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", XChgMapLighting__Fv);
+extern "C" s32 GetBattleCharaInfo__Fv(void);
+extern "C" s32 AddHp_Point__16CBattleCharaInfoFff(void *, f32, f32);
+extern "C" s32 ForceSet__16CBattleCharaInfoFv(void *);
+extern "C" void ScriptDebugCommand__Fi(s32 arg0) {
+    void *temp_s0;
+
+    temp_s0 = (void *) (GetBattleCharaInfo__Fv());
+    switch (arg0) {
+    case 0:
+        AddHp_Point__16CBattleCharaInfoFff(temp_s0, 512.0f, -1.0f);
+        ForceSet__16CBattleCharaInfoFv(temp_s0);
+        break;
+    }
+}
+struct DngMainScene_pointe;
+extern "C" DngMainScene_pointe *DngMainScene;
+extern "C" s32 GetMap__6CSceneFi(void *, s32);
+struct XChgMapLightingMap {
+    char pad0[0x9C];
+    s32 unk9C;
+    s32 unkA0;
+};
+extern "C" s32 memcpy(...);
+extern "C" s32 memset(...);
+extern "C" void XChgMapLighting__Fv(void) {
+    s32 sp40[0x74];
+    void *temp_a0;
+    s32 var_s0;
+    struct XChgMapLightingMap *temp_v0;
+    s32 var_s2;
+
+    temp_v0 = (struct XChgMapLightingMap *) (GetMap__6CSceneFi(DngMainScene, *(s32 *) ((u8 *) DngMainScene + 0x2E5C)));
+    if ((temp_v0 != NULL) && (temp_v0 != NULL) && (temp_v0->unk9C >= 0x10)) {
+        memset(sp40, 0, 0x1D0);
+        var_s0 = 0;
+        var_s2 = 0;
+        do {
+            memcpy(sp40, temp_v0->unkA0 + var_s2, 0x1D0);
+            temp_a0 = (void *) (temp_v0->unkA0 + var_s2);
+            memcpy(temp_a0, ((u8 *) temp_a0) + 0xE80, 0x1D0);
+            memcpy(temp_v0->unkA0 + var_s2 + 0xE80, sp40, 0x1D0);
+            var_s0 += 1;
+            var_s2 += 0x1D0;
+        } while (var_s0 < 8);
+    }
+}
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", XChgMapRotation__Fi);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", SearchMapEventParts__FiPP9CMapPartsPfi);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", SearchMapFlatPosition__FPfP11CAutoMapGen);
@@ -345,7 +480,20 @@ s32 _FLE(SPI_STACK * arg0, s32 arg1) {
     FLS_FLOOR_ID = -1;
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", CreatMonsterFloorInfo__FPci);
+extern "C" s32 __ct__18CScriptInterpreterFv(void *);
+extern "C" u8 tag2[32];
+struct SPI_TAG_PARAM;
+extern "C" s32 Run__18CScriptInterpreterFv(void *);
+extern "C" s32 SetScript__18CScriptInterpreterFPci(...);
+extern "C" s32 SetTag__18CScriptInterpreterFP13SPI_TAG_PARAM(...);
+extern "C" void CreatMonsterFloorInfo__FPci(s8 *arg0, s32 arg1) {
+    u8 sp30[0xED0];
+    FLS_FLOOR_ID = -1;
+    __ct__18CScriptInterpreterFv(&sp30);
+    SetTag__18CScriptInterpreterFP13SPI_TAG_PARAM(&sp30, &tag2);
+    SetScript__18CScriptInterpreterFPci(&sp30, arg0, arg1);
+    Run__18CScriptInterpreterFv(&sp30);
+}
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", AutoSetMonster__Fv);
 extern "C" u32 ActiveMonster;
 typedef struct DngMainScene_pointe {
