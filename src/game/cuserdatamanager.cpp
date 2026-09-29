@@ -27,8 +27,31 @@ INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetMonsterBaseInfo__Fi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetMonsterHengeParam__Fi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetAttackVol__16MOS_CHANGE_PARAMFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetDefenceVol__16MOS_CHANGE_PARAMFi);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", CheckClassChange__16MOS_CHANGE_PARAMFv);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetDegreeLevel__16MOS_CHANGE_PARAMFv);
+struct inferred;
+struct MOS_CHANGE_PARAM;
+typedef struct MOS_CHANGE_PARAM {
+    /* 0x0 */ char pad0[2];
+    /* 0x2 */ s16 unk2;                             /* inferred */
+    /* 0x4 */ s16 unk4;                             /* inferred */
+} MOS_CHANGE_PARAM;                                 /* size >= 0x6 */
+extern "C" s32 CheckClassChange__16MOS_CHANGE_PARAMFv(MOS_CHANGE_PARAM *objet) {
+    s16 temp_a1;
+
+    temp_a1 = objet->unk4;
+    if (temp_a1 >= 3) {
+        return 0;
+    }
+    return temp_a1 < objet->unk2 / 25;
+}
+extern "C" s32 GetDegreeLevel__16MOS_CHANGE_PARAMFv(MOS_CHANGE_PARAM *objet) {
+    s32 var_v0;
+
+    var_v0 = objet->unk2 / 6;
+    if (var_v0 > 0xF) {
+        var_v0 = 0xF;
+    }
+    return var_v0;
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", LevelUp__16MOS_CHANGE_PARAMFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", Initialize__11CMonsterBoxFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetMonsterBajjiData__11CMonsterBoxFi);
@@ -52,9 +75,43 @@ void CFishingTournament::ResetRecord(void) {
     memset(&this->field_0x20, 0, 80);
 }
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", EntryFish__18CFishingTournamentFiii);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", EntryRemain__18CFishingTournamentFv);
+struct calcul0_champs_46e4c1 {
+    char pad0[0x20];
+    /* 0x20 */ s16 unk20;
+};
+extern "C" s32 EntryRemain__18CFishingTournamentFv(CFishingTournament *objet) {
+    s32 var_v1;
+    s32 var_a1;
+    s32 var_a2;
+
+    var_v1 = 0;
+    var_a1 = 0;
+    var_a2 = 0;
+    do {
+        if (((struct calcul0_champs_46e4c1 *) ((u8 *) objet + var_a2))->unk20 > 0) {
+            var_v1 += 1;
+        }
+        var_a1 += 1;
+        var_a2 += 8;
+    } while (var_a1 < 0xA);
+    return 0xA - var_v1;
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetRecord__18CFishingTournamentFi);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SetRank__18CFishingTournamentFi);
+struct inferred;
+struct CFishingTournament_infere_7649ec;
+typedef struct CFishingTournament_infere_7649ec {
+    /* 0x0 */ char pad0[4];
+    /* 0x4 */ s16 unk4;                             /* inferred */
+} CFishingTournament_infere_7649ec;                               /* size >= 0x6 */
+extern "C" void SetRank__18CFishingTournamentFi(CFishingTournament_infere_7649ec *objet, s32 arg0) {
+    if (arg0 < 0) {
+        arg0 = 0;
+    }
+    if (arg0 > 0x64) {
+        arg0 = 0x64;
+    }
+    objet->unk4 = (s16) arg0;
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SortRecord__18CFishingTournamentFv);
 typedef struct CFishingTournament_infere {
     /* 0x00 */ char pad0[0x24];
@@ -191,7 +248,24 @@ extern "C" s32 CheckRoboVoiceFlag__16CUserDataManagerFv(CUserDataManager_infere6
     }
     return var_v0 & 0xFF;
 }
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AddRoboAbs__16CUserDataManagerFf);
+struct CUserDataManager_3e774a;
+typedef struct CUserDataManager_3e774a {
+    /* 0x0000 */ char pad0[0x468C];
+    /* 0x468C */ f32 unk468C;                       /* inferred */
+} CUserDataManager_3e774a;                                 /* size >= 0x4690 */
+extern "C" f32 AddRoboAbs__16CUserDataManagerFf(CUserDataManager_3e774a *objet, f32 arg0) {
+    f32 temp_f0;
+
+    temp_f0 = (f32) (objet->unk468C + arg0);
+    objet->unk468C = temp_f0;
+    if (temp_f0 < 0.0f) {
+        objet->unk468C = 0.0f;
+    }
+    if (99999.0f < objet->unk468C) {
+        objet->unk468C = 99999.0f;
+    }
+    return objet->unk468C;
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetRoboAbs__16CUserDataManagerFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", CheckCapacity__16CUserDataManagerFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", CheckRobotCore__16CUserDataManagerFv);
@@ -276,7 +350,26 @@ extern "C" s32 SetChrEquip__16CUserDataManagerFii(CUserDataManager *objet, s32 a
     SetChrEquip__16CUserDataManagerFiP13CGameDataUsed(objet, arg0, temp_v0);
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SetChrEquipDirect__16CUserDataManagerFii);
+extern "C" s32 __ct__13CGameDataUsedFv(void *);
+extern "C" s32 CopyGameData__16CUserDataManagerFP13CGameDataUsedi(CUserDataManager *, CGameDataUsed *, s32);
+extern "C" s32 SetChrEquipDirect__16CUserDataManagerFii(CUserDataManager *objet, s32 arg0, s32 arg1) {
+    /* Le cadre du commerce réserve 0x70 octets à l'objet, là où l'en-tête n'en décrit que 0x3C. */
+    struct { CGameDataUsed data; u8 rest[0x34]; } sp40;
+
+    if (arg1 <= 0) {
+        return 0;
+    }
+    if ((arg0 < 0) || (arg0 > 2)) {
+        return 0;
+    }
+    if (SearchEquip__16CUserDataManagerFii(objet, arg0, arg1) != 0) {
+        return 0;
+    }
+    __ct__13CGameDataUsedFv(&sp40.data);
+    CopyGameData__16CUserDataManagerFP13CGameDataUsedi(objet, &sp40.data, arg1);
+    SetChrEquip__16CUserDataManagerFiP13CGameDataUsed(objet, arg0, &sp40.data);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SearchEquip__16CUserDataManagerFii);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetCharaEquipDataPath__16CUserDataManagerFii);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AddFusionPoint__16CUserDataManagerFiii);
@@ -284,9 +377,69 @@ INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SearchSpaceUsedData__16CUserDa
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SearchSpaceUsedData__16CUserDataManagerFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SearchSpaceUsedDataPtr__16CUserDataManagerFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SearchSpaceUsedDataPtr__16CUserDataManagerFi);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SearchActiveItemTableSpace__16CUserDataManagerFii);
+struct calcul0_champs_14ed4c {
+    char pad0[0x2E];
+    /* 0x2E */ s16 unk2E;
+};
+extern "C" s32 CheckStackRemain__13CGameDataUsedFv(void *);
+extern "C" s32 GetCharaDataPtr__16CUserDataManagerFi(void *, s32);
+struct CGameDataUsed_infere_14ed4c {
+    char pad0[0x2];
+    s16 unk2;
+};
+extern "C" s32 SearchActiveItemTableSpace__16CUserDataManagerFii(CUserDataManager *objet, s32 arg0, s32 arg1) {
+    s32 temp_v0;
+    s32 var_s1;
+    s32 var_s2;
+    s32 var_v0;
+    s32 var_a0;
+    struct CGameDataUsed_infere_14ed4c *temp_v0_2;
+
+    temp_v0 = (s32) (GetCharaDataPtr__16CUserDataManagerFi(objet, arg0));
+    var_s1 = 0;
+    if (temp_v0 == 0) {
+        return -1;
+    }
+    var_s2 = 0;
+    for (; var_s1 < 3; var_s1++) {
+        temp_v0_2 = (struct CGameDataUsed_infere_14ed4c *) (temp_v0 + var_s2 + 0x2C);
+        if ((temp_v0_2->unk2 == arg1) && (CheckStackRemain__13CGameDataUsedFv(temp_v0_2) > 0)) {
+            return var_s1;
+        }
+        var_s2 += 0x6C;
+    }
+    var_v0 = 0;
+    var_a0 = 0;
+    for (; var_v0 < 3; var_v0++) {
+        if (((struct calcul0_champs_14ed4c *) (temp_v0 + var_a0))->unk2E <= 0) {
+            return var_v0;
+        }
+        var_a0 += 0x6C;
+    }
+    return -1;
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SearchItemOnItemBrd__16CUserDataManagerFii);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetNumStackOverBoard__16CUserDataManagerFv);
+extern "C" s32 GetUsedDataPtr__16CUserDataManagerFi(void *, s32);
+struct var_s1_champs_c79195 {
+    char pad0[0x2];
+    /* 0x2 */ s16 unk2;
+};
+extern "C" s32 GetNowBagMax__Fi(s32);
+extern "C" s32 GetItemBoardOverNum__16CUserDataManagerFv(void *);
+extern "C" s32 GetNumStackOverBoard__16CUserDataManagerFv(CUserDataManager *objet) {
+    s32 var_s0;
+    u8 *var_s1;
+    s32 var_s2;
+
+    var_s0 = 0;
+    var_s1 = (u8 *) (GetUsedDataPtr__16CUserDataManagerFi(objet, GetNowBagMax__Fi(0)));
+    for (var_s2 = 0; var_s2 < GetItemBoardOverNum__16CUserDataManagerFv(objet); var_s2++, var_s1 += 0x6C) {
+        if (((struct var_s1_champs_c79195 *) var_s1)->unk2 > 1) {
+            var_s0 += 1;
+        }
+    }
+    return var_s0;
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SearchAllHaveItem__16CUserDataManagerFi);
 struct CFishAquarium {
     s16 field_0;
@@ -331,11 +484,70 @@ INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetOverItem__16CUserDataManage
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", CheckItemLimmitOver__16CUserDataManagerFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", DeleteItem_Local__FP13CGameDataUsedii);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", DeleteItem__16CUserDataManagerFii);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", CopyGameData__16CUserDataManagerFP13CGameDataUsedi);
+extern "C" s32 GetCommonItemData__Fi(s32);
+extern "C" s32 ConvertUsedItemType__Fi(s32);
+extern "C" s32 CopyDataAttach__13CGameDataUsedFi(CGameDataUsed *, s32);
+extern "C" s32 CopyDataFish__13CGameDataUsedFi(CGameDataUsed *, s32);
+extern "C" s32 CopyDataGiftBox__13CGameDataUsedFi(CGameDataUsed *, s32);
+extern "C" s32 CopyDataItem__13CGameDataUsedFi(CGameDataUsed *, s32);
+extern "C" s32 CopyDataRoboPart__13CGameDataUsedFi(CGameDataUsed *, s32);
+extern "C" s32 CopyDataWeapon__13CGameDataUsedFi(CGameDataUsed *, s32);
+extern "C" s32 CopyGameData__16CUserDataManagerFP13CGameDataUsedi(CUserDataManager *objet, CGameDataUsed *arg0, s32 arg1) {
+    u32 temp_v0_2;
+    u8 *temp_v0;
+
+    if (arg0 == NULL) {
+        return 0;
+    }
+    temp_v0 = (u8 *) (GetCommonItemData__Fi(arg1));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    temp_v0_2 = (u32) (ConvertUsedItemType__Fi((s32) *temp_v0));
+    switch (temp_v0_2) {
+    case 1:
+    case 4:
+        CopyDataItem__13CGameDataUsedFi(arg0, arg1);
+        break;
+    case 2:
+        CopyDataAttach__13CGameDataUsedFi(arg0, arg1);
+        break;
+    case 3:
+        CopyDataWeapon__13CGameDataUsedFi(arg0, arg1);
+        break;
+    case 5:
+        CopyDataRoboPart__13CGameDataUsedFi(arg0, arg1);
+        break;
+    case 7:
+        CopyDataGiftBox__13CGameDataUsedFi(arg0, arg1);
+        break;
+    case 6:
+        CopyDataFish__13CGameDataUsedFi(arg0, arg1);
+        break;
+    }
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AddMoney__16CUserDataManagerFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SetCostumeBit__16CUserDataManagerFUl);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetCostumeBit__16CUserDataManagerFv);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetCostume__16CUserDataManagerFi);
+extern "C" s32 GetCosInfo__Fi(s32);
+struct CUserDataManager_infere8;
+typedef struct CUserDataManager_infere8 {
+    /* 0x00000 */ char pad0[0x45598];
+    /* 0x45598 */ s64 unk45598;                     /* inferred */
+} CUserDataManager_infere8;                                 /* size >= 0x455A0 */
+struct temp_v0_champs_60b981 {
+    char pad0[0x2];
+    /* 0x2 */ s8 unk2;
+};
+extern "C" void GetCostume__16CUserDataManagerFi(CUserDataManager_infere8 *objet, s32 arg0) {
+    struct temp_v0_champs_60b981 *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs_60b981 *) (GetCosInfo__Fi(arg0));
+    if (temp_v0 != NULL) {
+        objet->unk45598 |= (s64) 1 << temp_v0->unk2;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", CountFish__16CUserDataManagerFv);
 extern "C" s32 GetUserDataMan__Fv(void);
 extern "C" s32 DisableCharaChange__16CUserDataManagerFi(void *, s32);
@@ -360,7 +572,19 @@ INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetCharaDefaultWeapon__FiPi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", LanguageEquipChange__Fv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", CheckEquipChange__Fi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", Initialize__16CBattleCharaInfoFv);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetEquipTablePtr__16CBattleCharaInfoFi);
+struct CBattleCharaInfo_infere_777866;
+typedef struct CBattleCharaInfo_infere_777866 {
+    /* 0x00 */ char pad0[8];
+    /* 0x08 */ void *unk8;                          /* inferred */
+    /* 0x0C */ char padC[0x24];
+    /* 0x30 */ s32 unk30;                           /* inferred */
+} CBattleCharaInfo_infere_777866;                                 /* size >= 0x34 */
+extern "C" s32 GetEquipTablePtr__16CBattleCharaInfoFi(CBattleCharaInfo_infere_777866 *objet, s32 arg0) {
+    if ((arg0 < 0) || (arg0 > 3)) {
+        return 0;
+    }
+    return objet->unk30 + (arg0 * 0x6C);
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SetChrNo__16CBattleCharaInfoFi);
 struct temp_v0_champs {
     char pad0[0x44D98];
@@ -394,7 +618,38 @@ extern "C" s32 GetActiveItemInfo__16CBattleCharaInfoFi(CBattleCharaInfo_infere3 
     }
     return var_v0;
 }
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", UseActiveItem__16CBattleCharaInfoFP13CGameDataUsed);
+struct CItemUseTarget {
+    s32 field_0;
+};
+struct CGameDataUsed_infere;
+typedef struct CGameDataUsed_infere {
+    /* 0x0 */ char pad0[2];
+    /* 0x2 */ s16 unk2;                             /* inferred */
+} CGameDataUsed_infere;                                    /* size >= 0x4 */
+struct arg0_champs_003804 {
+    char pad0[0x2];
+    /* 0x2 */ s16 unk2;
+};
+extern "C" s32 MenuUseItemCheckFunc__FP13CGameDataUsedP14CItemUseTargeti(CGameDataUsed_infere *, CItemUseTarget *, s32);
+extern "C" s32 SetPtr__14CItemUseTargetFiPv(...);
+extern "C" s32 UseActiveItem__16CBattleCharaInfoFP13CGameDataUsed(CBattleCharaInfo_infere_777866 *objet, CGameDataUsed_infere *arg0) {
+    s32 sp48[2];
+    s32 temp_s0;
+
+    if (arg0 == NULL) {
+        return 0;
+    }
+    temp_s0 = ((struct arg0_champs_003804 *) arg0)->unk2;
+    sp48[0] = -1;
+    SetPtr__14CItemUseTargetFiPv((CItemUseTarget *) sp48, 0, objet->unk8);
+    if (temp_s0 == 0x126) {
+        SetPtr__14CItemUseTargetFiPv((CItemUseTarget *) sp48, 1, GetEquipTablePtr__16CBattleCharaInfoFi(objet, 0));
+    }
+    if ((temp_s0 == 0x12A) || (temp_s0 == 0x160)) {
+        SetPtr__14CItemUseTargetFiPv((CItemUseTarget *) sp48, 1, GetEquipTablePtr__16CBattleCharaInfoFi(objet, 1));
+    }
+    return MenuUseItemCheckFunc__FP13CGameDataUsedP14CItemUseTargeti(arg0, (CItemUseTarget *) sp48, 1);
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetSpecialStatus__16CBattleCharaInfoFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetPalletNo__16CBattleCharaInfoFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", RefreshParamater__16CBattleCharaInfoFv);
@@ -432,7 +687,53 @@ extern "C" s16 GetMagicSwordCounterNow__16CBattleCharaInfoFv(CBattleCharaInfo_in
     }
     return objet->unk1A;
 }
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetMagicSwordCounterMax__16CBattleCharaInfoFv);
+struct CBattleCharaInfo_infere_334560;
+typedef struct CBattleCharaInfo_infere_334560 {
+    /* 0x00 */ s16 unk0;                            /* inferred */
+    /* 0x02 */ char pad2[0x2E];                     /* maybe part of unk0[0x18]void */
+    /* 0x30 */ void *unk30;                         /* inferred */
+} CBattleCharaInfo_infere_334560;                                 /* size >= 0x34 */
+struct objet_champs_334560 {
+    /* 0x0 */ s32 unk0;
+    char pad4[0x2C];
+    /* 0x30 */ s32 unk30;
+};
+struct temp_a1_champs_334560 {
+    char pad0[0x24];
+    /* 0x24 */ s32 unk24;
+};
+extern "C" s32 GetMagicSwordCounterMax__16CBattleCharaInfoFv(CBattleCharaInfo_infere_334560 *objet) {
+    s16 temp_v0;
+    s32 temp_v1;
+    s32 var_v0;
+    s32 var_v0_2;
+    struct temp_a1_champs_334560 *temp_a1;
+
+    temp_a1 = (struct temp_a1_champs_334560 *) (((struct objet_champs_334560 *) objet)->unk30);
+    if (temp_a1 == NULL) {
+        return 0;
+    }
+    if (objet->unk0 != 1) {
+        return 0;
+    }
+    if (temp_a1 == NULL) {
+        return 0;
+    }
+    temp_v0 = (s16) (temp_a1->unk24);
+    temp_v1 = temp_v0 - 0x20;
+    if (temp_v0 < 0x20) {
+        return 0;
+    }
+    var_v0_2 = temp_v1 >> 4;
+    if (temp_v1 < 0) {
+        var_v0_2 = (s32) (temp_v1 + 0xF) >> 4;
+    }
+    var_v0 = var_v0_2 + 3;
+    if (var_v0 > 7) {
+        var_v0 = 7;
+    }
+    return var_v0;
+}
 void CBattleCharaInfo::ClearMagicSwordPow(void) {
     this->field_0x18 = -1;
     this->field_0x1A = 0;

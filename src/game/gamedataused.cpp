@@ -55,7 +55,28 @@ void SetFishingGamePreEquip(CGameDataUsed *data) {
 INCLUDE_ASM("nonmatchings/game/gamedataused", ReEquipFishingGameWeapon__Fv);
 INCLUDE_ASM("nonmatchings/game/gamedataused", CheckFishingWeapon__FP13CGameDataUsed);
 INCLUDE_ASM("nonmatchings/game/gamedataused", GameDataSwap__FP13CGameDataUsedP13CGameDataUsedi);
-INCLUDE_ASM("nonmatchings/game/gamedataused", CheckNowRoboUseCapacity__FP9ROBO_DATAPi);
+struct ROBO_DATA;
+extern "C" s32 GetUserDataMan__Fv(void);
+extern "C" s32 CheckCapacity__16CUserDataManagerFv(...);
+extern "C" s32 GetUseCapacity__13CGameDataUsedFv(void *);
+extern "C" s32 CheckNowRoboUseCapacity__FP9ROBO_DATAPi(ROBO_DATA *arg0, s32 *arg1) {
+    s32 var_s0;
+    s32 var_s1;
+    s32 var_s2;
+
+    var_s2 = 0;
+    var_s1 = 0;
+    var_s0 = 0;
+    do {
+        var_s0 += GetUseCapacity__13CGameDataUsedFv((u8 *) arg0 + var_s2 + 0x30);
+        var_s1 += 1;
+        var_s2 += 0x6C;
+    } while (var_s1 < 4);
+    if (arg1 != NULL) {
+        *arg1 = CheckCapacity__16CUserDataManagerFv(GetUserDataMan__Fv());
+    }
+    return var_s0;
+}
 extern "C" s32 Init__13CGameDataUsedFv(void *);
 extern "C" CGameDataUsed *__ct__13CGameDataUsedFv(CGameDataUsed *objet) {
     Init__13CGameDataUsedFv(objet);

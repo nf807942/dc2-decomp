@@ -446,7 +446,12 @@ void CSWordAfterEffect::Clear(void) {
 }
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Initialize__17CSWordAfterEffectFP9mgCMemoryii);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Copy__17CSWordAfterEffectFR17CSWordAfterEffectP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", InitSV_CONFIG_OPTION__FP16SV_CONFIG_OPTION);
+extern "C" void InitSV_CONFIG_OPTION__FP16SV_CONFIG_OPTION(void *option) {
+    if (option != NULL) {
+        memset(option, 0, 0x40);
+        ((s32 *) option)[5] = 1;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Initialize__9CSaveDataFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", CheckBitFlagNo__9CSaveDataFi);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", SetBitFlag__9CSaveDataFii);

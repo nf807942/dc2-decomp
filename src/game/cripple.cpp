@@ -282,10 +282,35 @@ extern "C" s32 _CLEAR_RND_STONE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1)
 }
 INCLUDE_ASM("nonmatchings/game/cripple", _GET_FLOOR_STATUS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cripple", _SET_FLOOR_STATUS__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/cripple", _AMG_GET_ATTR_STATUS__FP12RS_STACKDATAi);
+extern "C" s32 GetAttrStatus__11CAutoMapGenFPf(void *, f32 *);
+extern "C" s32 GetStackVector__FPfP12RS_STACKDATA_00262E10(f32 *, RS_STACKDATA *);
+extern "C" s32 SetStack__FP12RS_STACKDATAi_00262E70(...);
+extern "C" s32 _AMG_GET_ATTR_STATUS__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    f32 sp20[4];
+
+    if (arg1 != 4) {
+        return 0;
+    }
+    GetStackVector__FPfP12RS_STACKDATA_00262E10(sp20, arg0);
+    arg0 = (RS_STACKDATA *) ((u8 *) arg0 + 0x18);
+    SetStack__FP12RS_STACKDATAi_00262E70(arg0, GetAttrStatus__11CAutoMapGenFPf(&AutoMapGen, sp20));
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cripple", _SET_NEAR_DIST__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cripple", _SET_KEEP_TIME__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/cripple", _GET_KEEP_TIME__FP12RS_STACKDATAi);
+struct EdEventInfo_keep {
+    char pad0[0x1290];
+    f32 keepTime;
+    char pad1294[12];
+};
+extern "C" EdEventInfo_keep EdEventInfo;
+extern "C" s32 SetStack__FP12RS_STACKDATAf_00262E90(RS_STACKDATA *, f32);
+extern "C" s32 _GET_KEEP_TIME__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    if (arg1 != 1) {
+        return 0;
+    }
+    return SetStack__FP12RS_STACKDATAf_00262E90(arg0, EdEventInfo.keepTime);
+}
 INCLUDE_ASM("nonmatchings/game/cripple", _GET_DOOR_PARTS_ID__FP12RS_STACKDATAi);
 extern "C" s32 CheckEquipChange__Fi(s32);
 extern "C" s32 _CHECK_EQUEP_CHANGE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
@@ -294,7 +319,58 @@ extern "C" s32 _CHECK_EQUEP_CHANGE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 ar
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/cripple", _ADD_HP_RATE2__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/cripple", _DNG_EFFECT_ALL_CLEAR__FP12RS_STACKDATAi);
+extern "C" u32 FxScriptMan;
+extern "C" u8 LaserGun[4864];
+struct MachineGunData {
+    char pad0[0x380];
+    s16 count;
+    char pad382[0x10E];
+};
+extern "C" MachineGunData MachineGun;
+extern "C" u8 RocketLauncher[9600];
+struct MachineGunSlot {
+    char pad0[0x300];
+    s16 idle[8];
+    char pad310[0x10];
+    s16 none[8];
+};
+extern "C" s32 AllClearEffSpt__16CEffectScriptManFv(...);
+extern "C" s32 Clear__12CLaserGunManFv(void *);
+extern "C" s32 Clear__18CRocketLauncherManFv(void *);
+extern "C" s32 _DNG_EFFECT_ALL_CLEAR__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    s32 var_a1;
+    s32 var_a2;
+    MachineGunSlot *slot;
+
+    Clear__18CRocketLauncherManFv(&RocketLauncher);
+    var_a1 = 0;
+    var_a2 = 0;
+    do {
+        slot = (MachineGunSlot *) ((u8 *) &MachineGun + var_a2);
+        var_a1 += 8;
+        slot->idle[0] = 0;
+        slot->none[0] = -1;
+        var_a2 += 0x10;
+        slot->idle[1] = 0;
+        slot->none[1] = -1;
+        slot->idle[2] = 0;
+        slot->none[2] = -1;
+        slot->idle[3] = 0;
+        slot->none[3] = -1;
+        slot->idle[4] = 0;
+        slot->none[4] = -1;
+        slot->idle[5] = 0;
+        slot->none[5] = -1;
+        slot->idle[6] = 0;
+        slot->none[6] = -1;
+        slot->idle[7] = 0;
+        slot->none[7] = -1;
+    } while (var_a1 < 0x10);
+    MachineGun.count = 0;
+    Clear__12CLaserGunManFv(&LaserGun);
+    AllClearEffSpt__16CEffectScriptManFv(FxScriptMan);
+    return 1;
+}
 extern "C" s32 AutoChangeBGMVol__6CSceneFi(void *, s32);
 extern "C" s32 _AUTO_CHENGE_BGM_VOL__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     AutoChangeBGMVol__6CSceneFi(EventScene, GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
@@ -345,12 +421,34 @@ INCLUDE_ASM("nonmatchings/game/cripple", InitEventEdit__FiP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cripple", ChkEventEditStart__Fv);
 INCLUDE_ASM("nonmatchings/game/cripple", EventEdit__FP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cripple", DrawEventEdit__Fv);
-INCLUDE_ASM("nonmatchings/game/cripple", f_rand__Fff);
-INCLUDE_ASM("nonmatchings/game/cripple", i_rand__Fii);
+extern "C" s32 rand(void);
+extern "C" s32 fptosi(f32);
+extern "C" f32 f_rand__Fff(f32 arg0, f32 arg1) {
+    return arg0 + (((arg1 - arg0) * (f32) rand()) / 2147483648.0f);
+}
+extern "C" s32 i_rand__Fii(s32 arg0, s32 arg1) {
+    return fptosi(f_rand__Fff((f32) arg0, (f32) arg1));
+}
 INCLUDE_ASM("nonmatchings/game/cripple", InitVector__FPf);
 INCLUDE_ASM("nonmatchings/game/cripple", RandXYinViewArea__FfffPfPf);
 INCLUDE_ASM("nonmatchings/game/cripple", Birth__7CRippleFPf);
-INCLUDE_ASM("nonmatchings/game/cripple", Step__7CRippleFv);
+struct CRipple_step {
+    s32 unk0;
+    char pad4[0x20];
+    s32 unk24;
+    s32 unk28;
+};
+extern "C" s32 Step__7CRippleFv(CRipple_step *objet) {
+    if (objet->unk0 == 0) {
+        return 0;
+    }
+    objet->unk24 += 1;
+    if (objet->unk24 >= objet->unk28) {
+        objet->unk0 = 0;
+        return -1;
+    }
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cripple", Draw__7CRippleFv);
 extern "C" s32 InitVector__FPf(f32 *);
 typedef struct CRipple {
@@ -427,4 +525,33 @@ extern "C" void Init__9CParticleFv(CParticle_infere *objet) {
 INCLUDE_ASM("nonmatchings/game/cripple", Birth__9CRainDropFi);
 INCLUDE_ASM("nonmatchings/game/cripple", Step__9CRainDropFv);
 INCLUDE_ASM("nonmatchings/game/cripple", Draw__9CRainDropFv);
-INCLUDE_ASM("nonmatchings/game/cripple", Init__9CRainDropFv);
+struct CRainDrop_init {
+    s32 unk0;
+    s32 unk4;
+    char pad8[0x88];
+    f32 unk90;
+    char pad94[0xC];
+    s32 unkA0;
+    s32 unkA4;
+    s32 unkA8;
+    s32 unkAC;
+};
+extern "C" void Init__9CRainDropFv(CRainDrop_init *objet) {
+    s32 var_s0;
+    s32 var_s1;
+
+    var_s1 = 0;
+    objet->unk0 = 0;
+    var_s0 = 0;
+    objet->unk4 = 0;
+    do {
+        InitVector__FPf((f32 *) ((u8 *) objet + var_s1 + 0x10));
+        var_s0 += 1;
+        var_s1 += 0x10;
+    } while (var_s0 < 8);
+    InitVector__FPf(&objet->unk90);
+    objet->unkA0 = 0x80;
+    objet->unkA4 = 0x80;
+    objet->unkA8 = 0x80;
+    objet->unkAC = 0x80;
+}

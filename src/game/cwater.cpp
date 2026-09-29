@@ -145,7 +145,23 @@ INCLUDE_ASM("nonmatchings/game/cwater", _SKYB_ANIME__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cwater", Step__11CFireRasterFv);
 INCLUDE_ASM("nonmatchings/game/cwater", SetTexture__11CFireRasterFP10mgCTexture);
 INCLUDE_ASM("nonmatchings/game/cwater", Draw__11CFireRasterFPfPf);
-INCLUDE_ASM("nonmatchings/game/cwater", Initialize__11CFireRasterFv);
+struct CFireRaster {
+    char pad_0[0x70];
+    char field_70[0x28 * 0x20];
+};
+extern "C" s32 memset(...);
+extern "C" void Initialize__11CFireRasterFv(CFireRaster *objet) {
+    s32 var_s0;
+    s32 var_s1;
+
+    var_s1 = 0;
+    var_s0 = 0;
+    do {
+        memset((u8 *) objet + var_s1 + 0x70, 0, 0x20);
+        var_s0 += 1;
+        var_s1 += 0x20;
+    } while (var_s0 < 0x14);
+}
 void CThunderEffect::Init(void) {
     this->field_0x0 = 0;
     this->field_0x90 = 0;
@@ -224,7 +240,15 @@ void dbgCJISFont::Initialize(void) {
     this->field_0x8A8 = 64;
     this->field_0x8AC = 0;
 }
-INCLUDE_ASM("nonmatchings/game/cwater", InitTexture__11dbgCJISFontFiPciPciPc);
+extern "C" s32 strcpy(...);
+extern "C" void InitTexture__11dbgCJISFontFiPciPciPc(dbgCJISFont *objet, s32 arg0, s8 *arg1, s32 arg2, s8 *arg3, s32 arg4, s8 *arg5) {
+    objet->field_0x0 = arg0;
+    objet->field_0x4 = arg2;
+    objet->field_0x8 = arg4;
+    strcpy(&objet->field_0x10, arg1);
+    strcpy(&objet->field_0x30, arg3);
+    strcpy(&objet->field_0x50, arg5);
+}
 void dbgCJISFont::Clear(void) {
     this->field_0x88 = 0;
 }

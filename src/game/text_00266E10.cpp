@@ -83,7 +83,29 @@ INCLUDE_ASM("nonmatchings/game/text_00266E10", _INIT_LOCAL_CNT__FP12RS_STACKDATA
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_CROSSFADE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_ADJUST_POLYGON_SCALE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_TIME__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_ACTIVE_LIGHT__FP12RS_STACKDATAi);
+struct CMap_champs_98 {
+    char pad0[0x98];
+    s32 unk98;
+    s32 unk9C;
+};
+extern "C" s32 GetActiveMap__6CSceneFPP4CMapi(void *, CMap_champs_98 **, s32);
+extern "C" s32 _SET_ACTIVE_LIGHT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    /* 0x20 octets de pile : le commerce place le pointeur en 0x20(sp) et le cadre
+     * en 0x40, là où un simple pointeur donne 0x2C et 0x30. */
+    CMap_champs_98 *sp20[8];
+    s32 temp_s0;
+
+    temp_s0 = (s32) (GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
+    if (GetActiveMap__6CSceneFPP4CMapi(EventScene, sp20, 8) <= 0) {
+        return 0;
+    }
+    if (temp_s0 >= 0) {
+        if (temp_s0 < sp20[0]->unk9C) {
+            sp20[0]->unk98 = temp_s0;
+        }
+    }
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_PAKU_ANIM__FP12RS_STACKDATAi);
 extern "C" u32 PakuAnimEohNo;
 extern "C" u8 PakuAnimName[64];
@@ -234,10 +256,38 @@ INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_START_BUTTON__FP12RS_STACKDA
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _MOVE_INTERIOR__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_MONSTER_TALK_DATA__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _FUNC_POINT_SHOW__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_NOW_MAP_NO__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_NOW_SUBMAP_NO__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_OLD_MAP_NO__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_OLD_SUBMAP_NO__FP12RS_STACKDATAi);
+struct EventScene_champs_a {
+    char pad0[0x2E60];
+    /* 0x2E60 */ s32 unk2E60;
+};
+extern "C" s32 _GET_NOW_MAP_NO__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    SetStack__FP12RS_STACKDATAi_00262E70(arg0, ((struct EventScene_champs_a *) EventScene)->unk2E60);
+    return 1;
+}
+struct EventScene_champs_b {
+    char pad0[0x2E64];
+    /* 0x2E64 */ s32 unk2E64;
+};
+extern "C" s32 _GET_NOW_SUBMAP_NO__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    SetStack__FP12RS_STACKDATAi_00262E70(arg0, ((struct EventScene_champs_b *) EventScene)->unk2E64);
+    return 1;
+}
+struct EventScene_champs_c {
+    char pad0[0x2E68];
+    /* 0x2E68 */ s32 unk2E68;
+};
+extern "C" s32 _GET_OLD_MAP_NO__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    SetStack__FP12RS_STACKDATAi_00262E70(arg0, ((struct EventScene_champs_c *) EventScene)->unk2E68);
+    return 1;
+}
+struct EventScene_champs_d {
+    char pad0[0x2E6C];
+    /* 0x2E6C */ s32 unk2E6C;
+};
+extern "C" s32 _GET_OLD_SUBMAP_NO__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    SetStack__FP12RS_STACKDATAi_00262E70(arg0, ((struct EventScene_champs_d *) EventScene)->unk2E6C);
+    return 1;
+}
 extern "C" s32 SetCharNo__5CRainFi(void *, s32);
 extern "C" s32 _SET_RAIN_CHARA_NO__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     SetCharNo__5CRainFi(&EventRain, GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
@@ -248,11 +298,26 @@ s32 _GET_CONTENTS_POS(RS_STACKDATA *stack, int argc) {
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_BPOT_POS__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_BPOT_STATUS__FP12RS_STACKDATAi);
+struct BTsuboData {
+    s32 field_0;
+    u8 pad[124];
+};
+extern "C" BTsuboData BTsubo;
+extern "C" s32 _GET_BPOT_STATUS__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    SetStack__FP12RS_STACKDATAi_00262E70(arg0, BTsubo.field_0);
+    return 1;
+}
 s32 _GET_PERSON_STATUS(RS_STACKDATA *stack, int argc) {
     return 0;
 }
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_CONTROL_CHRID__FP12RS_STACKDATAi);
+struct EventScene_champs_e {
+    char pad0[0x2E50];
+    /* 0x2E50 */ s32 unk2E50;
+};
+extern "C" s32 _GET_CONTROL_CHRID__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    SetStack__FP12RS_STACKDATAi_00262E70(arg0, ((struct EventScene_champs_e *) EventScene)->unk2E50);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_CAMERA_NEXT_REF__FP12RS_STACKDATAi_0026B110);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _GOTO_MENU__FP12RS_STACKDATAi);
 s32 _GET_MENU_STATUS(RS_STACKDATA *stack, int argc) {
@@ -470,9 +535,42 @@ extern "C" s32 _SET_CAMERA_CTRL__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1)
     }
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_FCAMERA_ANGLE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_FCAMERA_HEIGHT__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_FCAMERA_DIST__FP12RS_STACKDATAi);
+extern "C" f32 GetAngle__15mgCCameraFollowFv(void *);
+extern "C" s32 SetStack__FP12RS_STACKDATAf_00262E90(RS_STACKDATA *, f32);
+extern "C" s32 _GET_FCAMERA_ANGLE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    mgCCameraFollow *temp_v0;
+
+    temp_v0 = (mgCCameraFollow *) (GetCamera__6CSceneFi(EventScene, EventScene->unk2E54));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    SetStack__FP12RS_STACKDATAf_00262E90(arg0, GetAngle__15mgCCameraFollowFv(temp_v0));
+    return 1;
+}
+extern "C" f32 GetHeight__15mgCCameraFollowFv(void *);
+extern "C" s32 SetStack__FP12RS_STACKDATAf_00262E90(RS_STACKDATA *, f32);
+extern "C" s32 _GET_FCAMERA_HEIGHT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    mgCCameraFollow *temp_v0;
+
+    temp_v0 = (mgCCameraFollow *) (GetCamera__6CSceneFi(EventScene, EventScene->unk2E54));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    SetStack__FP12RS_STACKDATAf_00262E90(arg0, GetHeight__15mgCCameraFollowFv(temp_v0));
+    return 1;
+}
+extern "C" f32 GetDistance__15mgCCameraFollowFv(void *);
+extern "C" s32 SetStack__FP12RS_STACKDATAf_00262E90(RS_STACKDATA *, f32);
+extern "C" s32 _GET_FCAMERA_DIST__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    mgCCameraFollow *temp_v0;
+
+    temp_v0 = (mgCCameraFollow *) (GetCamera__6CSceneFi(EventScene, EventScene->unk2E54));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    SetStack__FP12RS_STACKDATAf_00262E90(arg0, GetDistance__15mgCCameraFollowFv(temp_v0));
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_INVENTION_ID__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _FUNCTION_MAP_JUMP__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _FUNCTION_DOOR_MODE__FP12RS_STACKDATAi);
@@ -519,4 +617,8 @@ extern "C" s32 _ADD_MONEY__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
 
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_ITEM_NUM__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _CHECK_BUTTON__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_LANGUAGE__FP12RS_STACKDATAi);
+extern "C" u32 LanguageCode;
+extern "C" s32 _GET_LANGUAGE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    SetStack__FP12RS_STACKDATAi_00262E70(arg0, LanguageCode);
+    return 1;
+}

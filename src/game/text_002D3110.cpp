@@ -7,12 +7,52 @@
  */
 
 #include "common.h"
+#include "runscript.hpp"
 struct mgCMemory;
 
+/* `action_info` pèse 0x10 octets et se lit par `lw` : c'est une table de
+ * pointeurs vers l'acteur, non l'acteur lui-même. */
+struct CActionChara_scr {
+    char pad0[0x6A8];
+    s32 unk6A8;
+    char pad6AC[0x6C];
+    s32 unk718;
+    s16 unk71C;
+    char pad71E[0xBE];
+    void *unk7DC;
+    char pad7E0[0x410];
+    s32 unkBF0;
+};
+extern "C" CActionChara_scr *action_info[4];
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_002D27A0(RS_STACKDATA *);
 
-INCLUDE_ASM("nonmatchings/game/text_002D3110", _RUN_MAIN_MOVE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002D3110", _RUN_SHROW_MOVE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002D3110", _RUN_TAME_MOVE__FP12RS_STACKDATAi);
+
+extern "C" s32 HumanMoveIF__12CActionCharaFv(void *);
+extern "C" s32 MonsterMoveIF__12CActionCharaFv(void *);
+extern "C" s32 _RUN_MAIN_MOVE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    s32 temp_v1;
+
+    temp_v1 = action_info[0]->unk6A8;
+    switch (temp_v1) {
+    case 0:
+        HumanMoveIF__12CActionCharaFv(action_info[0]);
+        break;
+    case 3:
+        MonsterMoveIF__12CActionCharaFv(action_info[0]);
+        break;
+    }
+    return 1;
+}
+extern "C" s32 HumanShrowMoveIF__12CActionCharaFv(void *);
+extern "C" s32 _RUN_SHROW_MOVE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    HumanShrowMoveIF__12CActionCharaFv(action_info[0]);
+    return 1;
+}
+extern "C" s32 HumanTameMoveIF__12CActionCharaFv(void *);
+extern "C" s32 _RUN_TAME_MOVE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    HumanTameMoveIF__12CActionCharaFv(action_info[0]);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _RUN_HOLD_MOVE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _RUN_ROBO_MOVE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _SET_MENU_FLAG__FP12RS_STACKDATAi);
@@ -34,11 +74,25 @@ INCLUDE_ASM("nonmatchings/game/text_002D3110", _GET_MONSTER_NOWSTS__FP12RS_STACK
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _SET_MURDEROUS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _GET_TRG_DISTANCE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _SET_TRG_ANGLE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002D3110", _SET_GUARD_FLAG__FP12RS_STACKDATAi);
+extern "C" s32 _SET_GUARD_FLAG__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    if (arg1 != 1) {
+        return 0;
+    }
+    action_info[0]->unkBF0 = GetStackInt__FP12RS_STACKDATA_002D27A0(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _SET_MUTEKI__FP12RS_STACKDATAi_002D42F0);
-INCLUDE_ASM("nonmatchings/game/text_002D3110", _CHECK_HAND_OBJ__FP12RS_STACKDATAi);
+extern "C" s32 SetStack__FP12RS_STACKDATAi_002D2820(...);
+extern "C" s32 _CHECK_HAND_OBJ__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    SetStack__FP12RS_STACKDATAi_002D2820(arg0, action_info[0]->unk71C);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _SET_ITEM_USED__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002D3110", _THROW_HAND_OBJECT__FP12RS_STACKDATAi);
+extern "C" s32 ThrowItemObject__12CActionCharaFv(void *);
+extern "C" s32 _THROW_HAND_OBJECT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    ThrowItemObject__12CActionCharaFv(action_info[0]);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _CHECK_CATCH__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _RELEASE_OBJ__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", ShotMonicaMagic__FPfPff);
@@ -65,13 +119,50 @@ INCLUDE_ASM("nonmatchings/game/text_002D3110", _SET_XCHG_STEP__FP12RS_STACKDATAi
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _SET_MOS_STEP__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _TRG_ON_MOS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _RESET_MOS__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002D3110", _SET_DEFAULT_MOS__FP12RS_STACKDATAi);
+extern "C" s32 GetStackString__FP12RS_STACKDATA_002D2810(RS_STACKDATA *);
+extern "C" s32 _SET_DEFAULT_MOS__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    if (arg1 != 1) {
+        return 0;
+    }
+    action_info[0]->unk718 = GetStackString__FP12RS_STACKDATA_002D2810(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _SET_NEBA2__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _ESM_CREATE__FP12RS_STACKDATAi_002D6670);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _ESM_SET_VECT1__FP12RS_STACKDATAi_002D6730);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _ESM_SET_VECT2__FP12RS_STACKDATAi_002D67F0);
-INCLUDE_ASM("nonmatchings/game/text_002D3110", _ESM_FINISH__FP12RS_STACKDATAi_002D68B0);
-INCLUDE_ASM("nonmatchings/game/text_002D3110", _ESM_DELETE__FP12RS_STACKDATAi_002D6910);
+extern "C" s32 SetScriptProgNo__16CEffectScriptManFiii(void *, s32, s32, s32);
+extern "C" s32 _ESM_FINISH__FP12RS_STACKDATAi_002D68B0(RS_STACKDATA *arg0, s32 arg1) {
+    void *temp_a0;
+    s32 temp_v0;
+
+    temp_v0 = GetStackInt__FP12RS_STACKDATA_002D27A0(arg0);
+    if (temp_v0 < 0) {
+        return 0;
+    }
+    temp_a0 = action_info[0]->unk7DC;
+    if (temp_a0 == NULL) {
+        return 0;
+    }
+    SetScriptProgNo__16CEffectScriptManFiii(temp_a0, 0x12C, 0, temp_v0);
+    return 1;
+}
+extern "C" s32 DeleteEffSpt__16CEffectScriptManFii(void *, s32, s32);
+extern "C" s32 _ESM_DELETE__FP12RS_STACKDATAi_002D6910(RS_STACKDATA *arg0, s32 arg1) {
+    void *temp_a0;
+    s32 temp_v0;
+
+    temp_v0 = GetStackInt__FP12RS_STACKDATA_002D27A0(arg0);
+    if (temp_v0 < 0) {
+        return 0;
+    }
+    temp_a0 = action_info[0]->unk7DC;
+    if (temp_a0 == NULL) {
+        return 0;
+    }
+    DeleteEffSpt__16CEffectScriptManFii(temp_a0, 0, temp_v0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _ESM_SET_VALUE__FP12RS_STACKDATAi_002D6960);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", SetActionScript__FP10CRunScriptPcP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", SetActionExtendTable__Fv);

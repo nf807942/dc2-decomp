@@ -150,9 +150,68 @@ void InitEventSelect(void) {
     hdd_sel = 0;
 }
 INCLUDE_ASM("nonmatchings/game/cgamedata", EventSelect__Fv);
-INCLUDE_ASM("nonmatchings/game/cgamedata", GetFontTexture__Fi);
+extern "C" u32 FontTex;
+extern "C" s32 GetFontTexture__Fi(s32 arg0) {
+    if ((arg0 < 0) || (arg0 > 0)) {
+        return 0;
+    }
+    return *(&FontTex + arg0);
+}
 INCLUDE_ASM("nonmatchings/game/cgamedata", LoadFontTexture__Fv);
-INCLUDE_ASM("nonmatchings/game/cgamedata", ReLoadFontTexture__Fi);
+extern "C" u32 FontDataAdr;
+extern "C" u8 _1654_003699F0[15];
+extern "C" u8 _1655_00369A00[16];
+extern "C" u8 _1656_00369A10[16];
+struct TM2_head {
+    s64 field_0;
+    s64 field_8;
+    char pad_10[0x8];
+    s32 field_18;
+    u16 field_1C;
+    char pad_1E[0x3];
+    u8 field_21;
+    char pad_22[0x1];
+    u8 field_23;
+    u16 field_24;
+    u16 field_26;
+    s32 field_28;
+    s32 field_2C;
+    s64 field_30;
+    s64 field_38;
+    char pad_40[0x10];
+    s32 field_50;
+};
+extern "C" s32 EnterTexture__17mgCTextureManagerFiPcP8TM2_headii(...);
+extern "C" s32 sprintf(...);
+extern "C" void ReLoadFontTexture__Fi(s32 arg0) {
+    s8 sp50[0x20];
+    s32 var_s0;
+    s32 var_s1;
+    TM2_head **temp_s2;
+
+    var_s1 = 0;
+    var_s0 = 0;
+    do {
+        temp_s2 = (TM2_head **) ((u8 *) &FontDataAdr + var_s1);
+        if (*temp_s2 != NULL) {
+            if (LanguageCode == 0) {
+                sprintf(sp50, &_1654_003699F0, var_s0);
+            } else if (LanguageCode == 1) {
+                if (var_s0 == 0) {
+                    sprintf(sp50, &_1655_00369A00, var_s0);
+                }
+            } else if (var_s0 == 0) {
+                sprintf(sp50, &_1656_00369A10);
+            }
+            if (mgTexManager == NULL) {
+                return;
+            }
+            *(u32 *) ((u8 *) &FontTex + var_s1) = EnterTexture__17mgCTextureManagerFiPcP8TM2_headii(mgTexManager, arg0, sp50, *temp_s2, 0, 0);
+        }
+        var_s0 += 1;
+        var_s1 += 4;
+    } while (var_s0 <= 0);
+}
 void demQuit(void) {
 }
 void demoQuitTimeOut(void) {
@@ -203,7 +262,44 @@ INCLUDE_ASM("nonmatchings/game/cgamedata", gcMONSTER__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcPARTY__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcACTIVE_CHARA__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", __ct__16CUserDataManagerFv);
-INCLUDE_ASM("nonmatchings/game/cgamedata", __ct__9CEditDataFv);
+typedef struct CEditData {
+    char pad0[0xC];
+    char unkC;
+    char padC[0x2A2F];
+    char unk2A3C;
+    char pad2A3C[3];
+    char unk2A40;
+    char pad2A40[0x1FF];
+    char unk2C40;
+    char pad2C40[0x23FF];
+    char unk5040;
+    char pad5040[0xCF];
+} CEditData;
+extern "C" s32 Initialize__9CEditDataFv(void *);
+extern "C" s32 memset(...);
+extern "C" CEditData *__ct__9CEditDataFv(CEditData *objet) {
+    char *var_a0;
+    char *var_a0_2;
+    char *var_s0;
+    char *var_s0_2;
+    var_s0 = &objet->unkC;
+    var_a0 = var_s0;
+    do {
+        memset(var_a0, 0, 0x24);
+        var_s0 += 0x24;
+        var_a0 = var_s0;
+    } while ((u32) var_s0 < (u32) &objet->unk2A3C);
+    var_s0_2 = &objet->unk2A40;
+    var_a0_2 = var_s0_2;
+    do {
+        memset(var_a0_2, 0, 0x10);
+        var_s0_2 += 0x10;
+        var_a0_2 = var_s0_2;
+    } while ((u32) var_s0_2 < (u32) &objet->unk2C40);
+    memset(&objet->unk5040, 0, 0xD0);
+    Initialize__9CEditDataFv(objet);
+    return objet;
+}
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetGameDataPt__Fv);
 CDataItem::CDataItem(void) {
     this->field_0x4 = 0;
@@ -312,7 +408,36 @@ INCLUDE_ASM("nonmatchings/game/cgamedata", GetCommonData__9CGameDataFi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetWeaponData__9CGameDataFi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetItemData__9CGameDataFi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetAttachData__9CGameDataFi);
-INCLUDE_ASM("nonmatchings/game/cgamedata", GetRoboData__9CGameDataFi);
+extern "C" s32 GetCommonData__9CGameDataFi(void *, s32);
+struct CGameData_3f0e62 {
+    char pad0[0x18];
+    s32 unk18;
+    char pad1C[0x10];
+    u16 unk2C;
+};
+struct temp_v0_champs_3f0e62 {
+    char pad0[0x4];
+    s32 unk4;
+};
+extern "C" s32 GetRoboData__9CGameDataFi(CGameData_3f0e62 *objet, s32 arg0) {
+    s16 temp_v1;
+    s32 temp_a0;
+    struct temp_v0_champs_3f0e62 *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs_3f0e62 *) (GetCommonData__9CGameDataFi(objet, arg0));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    temp_v1 = (s16) (temp_v0->unk4);
+    if ((s32) objet->unk2C <= temp_v1) {
+        return 0;
+    }
+    temp_a0 = (s32) (objet->unk18);
+    if (temp_a0 != 0) {
+        return temp_a0 + (temp_v1 * 0x24);
+    }
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetFishData__9CGameDataFi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetGuardData__9CGameDataFi);
 extern "C" s32 GetCommonData__9CGameDataFi(void *, s32);

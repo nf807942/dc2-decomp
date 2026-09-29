@@ -17,9 +17,83 @@ INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", Init__Q26CScene8BGM_INFOFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", InitSnd__6CSceneFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", InitBGM__6CSceneFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", InitSeSrc__6CSceneFv);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", InitSeEnv__6CSceneFv);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", InitSeBattle__6CSceneFv);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", InitSeBas__6CSceneFv);
+struct CScene_d4a978 {
+    char pad0[0xA040];
+    /* 0xA040 */ s32 unkA040;
+    /* 0xA044 */ s32 unkA044;
+    char padA048[0x8];
+    /* 0xA050 */ s32 unkA050;
+    char padA054[0x3FC];
+    /* 0xA450 */ s32 unkA450;
+    char padA454[0x2C];
+    /* 0xA480 */ s32 unkA480;
+    /* 0xA484 */ s32 unkA484;
+    /* 0xA488 */ s32 unkA488;
+    /* 0xA48C */ s32 unkA48C;
+    /* 0xA490 */ s32 unkA490;
+    /* 0xA494 */ s32 unkA494;
+};
+extern "C" s32 sndDeletePort__Fi(s32);
+extern "C" s32 sndInitPort__Fi(s32);
+extern "C" s32 sndSeAllStop__Fi(s32);
+extern "C" s32 stSetBuffer__9mgCMemoryFP1i(...);
+extern "C" s32 InitSeSrc__6CSceneFv(void *);
+extern "C" s32 StopEnvBGM__6CSceneFv(void *);
+extern "C" void InitSeEnv__6CSceneFv(void *arg0) {
+    CScene_d4a978 *objet = (CScene_d4a978 *) arg0;
+    StopEnvBGM__6CSceneFv(objet);
+    sndSeAllStop__Fi(2);
+    sndDeletePort__Fi(2);
+    InitSeSrc__6CSceneFv(objet);
+    objet->unkA040 = -1;
+    objet->unkA044 = -1;
+    stSetBuffer__9mgCMemoryFP1i(&objet->unkA450, &objet->unkA050, 0x40);
+    sndInitPort__Fi(2);
+    objet->unkA488 = 0;
+    objet->unkA480 = 0;
+    objet->unkA48C = 0x3F800000;
+    objet->unkA484 = -1;
+    objet->unkA490 = 0;
+    objet->unkA494 = 0;
+    InitSeSrc__6CSceneFv(objet);
+}
+struct CSceneBattleFields {
+    char pad0[0xC4D0];
+    /* 0xC4D0 */ s32 unkC4D0;
+    /* 0xC4D4 */ s32 unkC4D4;
+    char padC4D8[0x8];
+    /* 0xC4E0 */ s32 unkC4E0;
+    char padC4E4[0x1FFC];
+    /* 0xE4E0 */ s32 unkE4E0;
+};
+extern "C" void InitSeBattle__6CSceneFv(void *arg0) {
+    CSceneBattleFields *objet = (CSceneBattleFields *) arg0;
+    sndSeAllStop__Fi(9);
+    sndDeletePort__Fi(9);
+    objet->unkC4D0 = -1;
+    objet->unkC4D4 = -1;
+    stSetBuffer__9mgCMemoryFP1i(&objet->unkE4E0, &objet->unkC4E0, 0x200);
+    sndInitPort__Fi(9);
+    InitSeEnv__6CSceneFv(objet);
+}
+struct CSceneBasFields {
+    char pad0[0xA498];
+    /* 0xA498 */ s32 unkA498;
+    /* 0xA49C */ s32 unkA49C;
+    /* 0xA4A0 */ s32 unkA4A0;
+    char padA4A4[0x1FFC];
+    /* 0xC4A0 */ s32 unkC4A0;
+};
+extern "C" void InitSeBas__6CSceneFv(void *arg0) {
+    CSceneBasFields *objet = (CSceneBasFields *) arg0;
+    sndSeAllStop__Fi(3);
+    objet->unkA498 = -1;
+    objet->unkA49C = -1;
+    stSetBuffer__9mgCMemoryFP1i(&objet->unkC4A0, &objet->unkA4A0, 0x200);
+    sndDeletePort__Fi(3);
+    sndInitPort__Fi(3);
+    InitSeBattle__6CSceneFv(objet);
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", SeAllStop__6CSceneFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", SoundAllStop__6CSceneFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", InitLooSeMngr__6CSceneFv);
@@ -44,7 +118,38 @@ INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetEnvBGMVol__6CSceneFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", StopEnvBGM__6CSceneFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", AutoChangeEnvBGM__6CSceneFi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", AutoChangeEnvOffset__6CSceneFi);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", PlayEnvBgm__6CSceneFv);
+extern "C" s32 SearchSndDataID__6CSceneFi(void *, s32);
+struct PlayEnvBgmScene {
+    char pad0[0x9068];
+    /* 0x9068 */ s32 unk9068;
+    char pad906C[0x141C];
+    /* 0xA488 */ s32 unkA488;
+};
+struct PlayEnvBgmData {
+    char pad0[0xA];
+    /* 0xA */ s16 unkA;
+    /* 0xC */ s16 unkC;
+};
+extern "C" s32 AutoChangeEnvBGM__6CSceneFi(void *, s32);
+extern "C" s32 PlayEnvBGM__6CSceneFif(void *, s32, f32);
+extern "C" s32 SetEnvBGMVol__6CSceneFf(void *, f32);
+extern "C" void PlayEnvBgm__6CSceneFv(void *arg0) {
+    PlayEnvBgmData *temp_v0;
+    PlayEnvBgmScene *objet = (PlayEnvBgmScene *) arg0;
+    s16 temp_a1;
+
+    temp_v0 = (PlayEnvBgmData *) (SearchSndDataID__6CSceneFi(objet, objet->unk9068));
+    if (temp_v0 != NULL) {
+        temp_a1 = (s16) (temp_v0->unkA);
+        if (temp_a1 >= 0) {
+            PlayEnvBGM__6CSceneFif(objet, (s32) temp_a1, 1.0f);
+            return;
+        }
+        AutoChangeEnvBGM__6CSceneFi(objet, 1);
+        objet->unkA488 = 0xBF800000;
+        SetEnvBGMVol__6CSceneFf(objet, (f32) temp_v0->unkC / 127.0f);
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetSeSrcID__6CSceneFi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetNumber3__FPci);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetBgmFile__6CSceneFPci);
@@ -102,7 +207,126 @@ extern "C" s32 CheckLoadSeBase__6CSceneFi(CScene_infere3 *objet, s32 arg0) {
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", SearchSndDataID__6CSceneFi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetDefBgmNo__6CSceneFi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetDefEventSeFile__6CSceneFiPc);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", LoadSound__6CSceneFiP1);
+extern "C" s32 SearchSndDataID__6CSceneFi(void *, s32);
+extern "C" u8 _1194[15];
+extern "C" u8 _1195[14];
+struct CScene_9cdf83;
+typedef struct CScene_9cdf83 {
+    /* 0x0000 */ char pad0[0x9068];
+    /* 0x9068 */ s32 unk9068;                       /* inferred */
+    /* 0x906C */ char pad906C[4];
+    /* 0x9070 */ s32 unk9070;                       /* inferred */
+} CScene_9cdf83;                                           /* size >= 0x9074 */
+struct calcul0_champs_9cdf83 {
+    char pad0[0xE];
+    /* 0xE */ s16 unkE;
+};
+struct calcul1_champs_9cdf83 {
+    char pad0[0x9984];
+    /* 0x9984 */ s32 unk9984;
+};
+struct calcul2_champs_9cdf83 {
+    char pad0[0xE];
+    /* 0xE */ s16 unkE;
+};
+struct temp_v0_champs_9cdf83 {
+    char pad0[0x4];
+    /* 0x4 */ s16 unk4;
+    /* 0x6 */ s16 unk6;
+    /* 0x8 */ s32 unk8;
+    char padC[0x2];
+    /* 0xE */ s16 unkE;
+    char pad10[0x12];
+    /* 0x22 */ u8 unk22;
+    /* 0x23 */ u8 unk23;
+};
+extern "C" s32 printf(...);
+extern "C" s32 sndSetReverb__Fiii(s32, s32, s32);
+extern "C" s32 LoadSeBase__6CSceneFiP1(...);
+extern "C" s32 LoadSeBattle__6CSceneFiP1(...);
+extern "C" s32 LoadSeEnv__6CSceneFiP1(...);
+extern "C" s32 LoadSeSrc__6CSceneFiP1(...);
+extern "C" s32 LoadSound__6CSceneFiP1(CScene_9cdf83 *arg0, s32 arg1, s32 arg2) {
+    struct temp_v0_champs_9cdf83 *temp_v0;
+    s16 temp_a1;
+    s16 temp_a1_2;
+    s16 temp_a1_3;
+    s16 temp_a1_4;
+    s16 temp_v1;
+    s16 temp_v1_2;
+    s32 var_a0;
+    s32 var_a1;
+    s32 var_a2;
+    s32 var_a3;
+    s32 var_s1;
+    s32 var_s2;
+
+    if (arg0->unk9070 != 0) {
+        arg0->unk9070 = 0;
+        return 0;
+    }
+    printf(&_1194);
+    temp_v0 = (struct temp_v0_champs_9cdf83 *) (SearchSndDataID__6CSceneFi(arg0, arg1));
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    temp_a1 = (s16) (temp_v0->unk4);
+    if (temp_a1 < 0) {
+        InitSeBas__6CSceneFv(arg0);
+    } else if (temp_a1 != 0x270F) {
+        LoadSeBase__6CSceneFiP1(arg0, temp_a1, arg2);
+    }
+    temp_a1_2 = (s16) (temp_v0->unk6);
+    if (temp_a1_2 < 0) {
+        InitSeBattle__6CSceneFv(arg0);
+    } else if (temp_a1_2 != 0x270F) {
+        LoadSeBattle__6CSceneFiP1(arg0, temp_a1_2, arg2);
+    }
+    temp_a1_3 = (s16) (temp_v0->unk8);
+    if (temp_a1_3 < 0) {
+        InitSeEnv__6CSceneFv(arg0);
+    } else if (temp_a1_3 != 0x270F) {
+        LoadSeEnv__6CSceneFiP1(arg0, temp_a1_3, arg2);
+    }
+    temp_v1 = (s16) (temp_v0->unkE);
+    if (temp_v1 != 0x270F) {
+        if (temp_v1 < 0) {
+            InitSeSrc__6CSceneFv(arg0);
+        } else {
+            var_a0 = 0;
+            var_a1 = 0;
+            var_a2 = 0;
+            var_a3 = 0;
+            do {
+                temp_v1_2 = (s16) (((struct calcul0_champs_9cdf83 *) (((struct temp_v0_champs_9cdf83 *) ((u8 *) temp_v0 + var_a2))))->unkE);
+                if ((temp_v1_2 >= 0) && (temp_v1_2 != ((struct calcul1_champs_9cdf83 *) (((CScene_9cdf83 *) ((u8 *) arg0 + var_a3))))->unk9984)) {
+                    var_a0 = 1;
+                }
+                var_a1 += 1;
+                var_a2 += 2;
+                var_a3 += 4;
+            } while (var_a1 < 8);
+            if (var_a0 != 0) {
+                InitSeSrc__6CSceneFv(arg0);
+                var_s1 = 0;
+                var_s2 = 0;
+                do {
+                    temp_a1_4 = (s16) (((struct calcul2_champs_9cdf83 *) (((struct temp_v0_champs_9cdf83 *) ((u8 *) temp_v0 + var_s2))))->unkE);
+                    if (temp_a1_4 >= 0) {
+                        LoadSeSrc__6CSceneFiP1(arg0, temp_a1_4, arg2);
+                    }
+                    var_s1 += 1;
+                    var_s2 += 2;
+                } while (var_s1 < 8);
+            }
+        }
+    }
+    sndSetReverb__Fiii(1, (s32) temp_v0->unk22, (s32) temp_v0->unk23);
+    printf(&_1195, temp_v0->unk22, temp_v0->unk23);
+    arg0->unk9068 = arg1;
+    PlayEnvBgm__6CSceneFv(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", LoadBGM__6CSceneFiP1);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", LoadSeSrc__6CSceneFiP1);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", LoadSeEnv__6CSceneFiP1);
@@ -181,7 +405,34 @@ INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", Analyze__9CEditDataFiiPii);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", Analize__9CEditDataFiPiPi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetAnalyzeData__9CEditDataFii);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetAnalyzeSrc__9CEditDataFi);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetAnalyzePercent__9CEditDataFi);
+extern "C" s32 GetAnalyzeDataSrc__Fii(s32, s32);
+struct AnalyzeSrcEntry {
+    s32 unk0;
+    s16 unk4;
+};
+struct CEditData;
+extern "C" s32 GetAnalyzeFlag__9CEditDataFii(CEditData *, s32, s32);
+extern "C" s32 GetAnalyzePercent__9CEditDataFi(CEditData *objet, s32 arg0) {
+    s32 var_s2;
+    s32 var_s3;
+    struct AnalyzeSrcEntry *temp_v0;
+
+    var_s3 = 0;
+    var_s2 = 0;
+loop_1:
+    temp_v0 = (struct AnalyzeSrcEntry *) (GetAnalyzeDataSrc__Fii(arg0, var_s3));
+    if (temp_v0 == NULL) {
+        return var_s2;
+    }
+    if ((temp_v0->unk0 != 0) && (GetAnalyzeFlag__9CEditDataFii(objet, arg0, var_s3) != 0)) {
+        var_s2 += temp_v0->unk4;
+    }
+    var_s3 += 1;
+    if (var_s3 >= 0x10) {
+        return var_s2;
+    }
+    goto loop_1;
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetAnalyzeFlag__9CEditDataFiiPiPi);
 struct CEditData {
     s32 field_0;
@@ -196,7 +447,7 @@ struct CEditData {
     s32 field_5040;
 };
 extern "C" s32 GetAnalyzeFlag__9CEditDataFiiPiPi(void *, s32, s32, s32 *, s32 *);
-extern "C" void GetAnalyzeFlag__9CEditDataFii(CEditData *objet, s32 arg0, s32 arg1) {
+extern "C" s32 GetAnalyzeFlag__9CEditDataFii(CEditData *objet, s32 arg0, s32 arg1) {
     /* Les emplacements de pile portent la taille que le commerce leur donne,
      * lue sur l'ecart entre deux adresses prises, et ils sont declares dans
      * l'ordre croissant de leur decalage : MWCC attribue la pile dans l'ordre
@@ -205,13 +456,65 @@ extern "C" void GetAnalyzeFlag__9CEditDataFii(CEditData *objet, s32 arg0, s32 ar
      * echangeait. */
     s32 sp10[8];
     s32 sp30[8];
-    GetAnalyzeFlag__9CEditDataFiiPiPi(objet, arg0, arg1, sp10, sp30);
+    return GetAnalyzeFlag__9CEditDataFiiPiPi(objet, arg0, arg1, sp10, sp30);
 }
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", dbgSetContintionFlag__9CEditDataFiii);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", dbgSetAnalyzeFlag__9CEditDataFiii);
+extern "C" s32 GetAnalyzeData__9CEditDataFii(void *, s32, s32);
+struct AnalyzeDataCond {
+    char pad0[0x8];
+    /* 0x8 */ s32 unk8;
+};
+extern "C" s32 dbgSetContintionFlag__9CEditDataFiii(void *, s32, s32, s32);
+extern "C" void dbgSetAnalyzeFlag__9CEditDataFiii(CEditData *objet, s32 arg0, s32 arg1, s32 arg2) {
+    u8 *data;
+    s32 i;
+
+    data = (u8 *) GetAnalyzeData__9CEditDataFii(objet, arg0, arg1);
+    if (data == NULL) {
+        return;
+    }
+    for (i = 0; i < 8; i++) {
+        s8 flag = (s8) data[8 + i];
+        if (flag < 0) {
+            break;
+        }
+        dbgSetContintionFlag__9CEditDataFiii(objet, arg0, flag, arg2);
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", dbgSetAllContintionFlag__9CEditDataFii);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", dbgGetContintionFlag__9CEditDataFiiPc);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", LoadEditAnalyzeData__FiP1);
+typedef struct Stack_1272_champs {
+    char pad0[36];
+    s32 unk24;
+    s32 unk28;
+    char pad2C[4];
+} Stack_1272_champs;
+extern "C" Stack_1272_champs Stack_1272;
+extern "C" u8 _1281_00373D28[10];
+extern "C" u8 _1282_00373D40[26];
+extern "C" s8 init_1273;
+extern "C" u8 buff_1271[12288];
+extern "C" s32 Init__9mgCMemoryFv(void *);
+extern "C" s32 LoadFile2__FPcPvPii(...);
+extern "C" s32 printf(...);
+extern "C" s32 sprintf(...);
+extern "C" s32 stSetBuffer__9mgCMemoryFP1i(...);
+extern "C" s32 LoadEditAnalyzeData__FPciP9mgCMemory(...);
+extern "C" void LoadEditAnalyzeData__FiP1(s32 arg0, s8 *arg1) {
+    s8 sp30[0x4C];
+    s32 sp7C;
+
+    if (init_1273 == 0) {
+        Init__9mgCMemoryFv(&Stack_1272);
+        init_1273 = 1;
+    }
+    stSetBuffer__9mgCMemoryFP1i(&Stack_1272, &buff_1271, 0x300);
+    sprintf(sp30, &_1281_00373D28, arg0);
+    if (LoadFile2__FPcPvPii(sp30, arg1, &sp7C, 0) != 0) {
+        LoadEditAnalyzeData__FPciP9mgCMemory(arg1, sp7C, &Stack_1272);
+    }
+    printf(&_1282_00373D40, ((Stack_1272.unk28 - Stack_1272.unk24) * 16) / 1024);
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", LoadEditAnalyzeData__FPciP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", eaGEO_ANALYZE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", eaCONDITION__FP9SPI_STACKi);
@@ -219,7 +522,18 @@ INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", eaANALYZE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", eaCON_NO__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", eaON_PARTS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", eaOFF_PARTS__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", eaPERCENT__FP9SPI_STACKi);
+struct eaAnaData_champs {
+    char pad0[0x4];
+    /* 0x4 */ s16 unk4;
+};
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(SPI_STACK *arg0);
+extern "C" s32 eaPERCENT__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    if (eaAnaData == NULL) {
+        return 0;
+    }
+    ((struct eaAnaData_champs *) eaAnaData)->unk4 = spiGetStackInt__FP9SPI_STACK(arg0);
+    return 1;
+}
 s32 eaEND_ANALYZE(SPI_STACK * arg0, s32 arg1) {
     eaAnaData = 0;
     return 1;

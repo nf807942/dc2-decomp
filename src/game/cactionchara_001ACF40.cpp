@@ -286,7 +286,75 @@ extern "C" void editLoadSound__Fi(s32 arg0) {
 INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", EditMapJump__Fi);
 INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", EditGotoInterior__Fii);
 INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", EditExitInterior__Fi);
-INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", EditDataSave__Fv);
+typedef struct DebugInfo_champs {
+    char pad0[8];
+    s32 unk8;
+    char padC[8];
+} DebugInfo_champs;
+extern "C" DebugInfo_champs DebugInfo;
+extern "C" s32 GetMap__6CSceneFi(void *, s32);
+extern "C" s32 GetSaveData__Fv(void);
+extern "C" u32 MapNo;
+extern "C" u8 _2747[9];
+extern "C" s32 GetEditData__9CSaveDataFi(...);
+struct CEditData;
+struct CEditMap;
+struct CScene_infere2;
+typedef struct CEditData {
+    /* 0x0 */ s32 unk0;                             /* inferred */
+    /* 0x4 */ s32 unk4;                             /* inferred */
+} CEditData;                                        /* size >= 0x8 */
+struct CEditMapPad { char pad0[0xD00]; };
+struct CEditMap : CEditMapPad {
+    virtual void v0(); virtual void v1(); virtual void v2(); virtual void v3();
+    virtual void v4(); virtual void v5(); virtual void v6(); virtual void v7();
+    virtual void v8(); virtual void v9(); virtual void v10(); virtual void v11();
+    virtual void v12(); virtual void v13(); virtual void v14(); virtual void v15();
+    virtual void v16(); virtual char *v17();
+};
+typedef struct CScene_infere2 {
+    /* 0x0000 */ char pad0[0x2E5C];
+    /* 0x2E5C */ s32 unk2E5C;                       /* inferred */
+} CScene_infere2;                                           /* size >= 0x2E60 */
+struct MainScene_0037D328_champs_dedef6 {
+    char pad0[0x2E5C];
+    /* 0x2E5C */ s32 unk2E5C;
+};
+struct unkD00_champs_dedef6 {
+    char pad0[0x4C];
+    /* 0x4C */ s32 (*unk4C)(...);
+};
+extern "C" s32 AnalyzeEditMap__FiP8CEditMap(s32, CEditMap *);
+extern "C" s32 CultureAnalyze__8CEditMapFi(void *, s32);
+extern "C" s32 GetBitFlag__9CSaveDataFi(...);
+extern "C" s32 GetMapType__Fi(s32);
+extern "C" s32 GroundBalance__8CEditMapFi(void *, s32);
+extern "C" s32 InInterior__Fv(void);
+extern "C" s32 SaveData__8CEditMapFP9CEditData(void *, CEditData *);
+extern "C" s32 UpdateHouse__8CEditMapFv(void *);
+extern "C" s32 strcmp(...);
+extern "C" void EditDataSave__Fv(void) {
+    CEditData *temp_v0;
+    CEditMap *temp_v0_2;
+
+    if (InInterior__Fv() == 0) {
+        temp_v0 = (CEditData *) (GetEditData__9CSaveDataFi(GetSaveData__Fv(), MapNo));
+        if (temp_v0 != NULL) {
+            temp_v0_2 = (CEditMap *) (GetMap__6CSceneFi(MainScene_0037D328, ((struct MainScene_0037D328_champs_dedef6 *) MainScene_0037D328)->unk2E5C));
+            if ((temp_v0_2 != NULL) && (strcmp(temp_v0_2->v17(), &_2747) == 0) && (temp_v0_2 != NULL)) {
+                SaveData__8CEditMapFP9CEditData(temp_v0_2, temp_v0);
+                GetBitFlag__9CSaveDataFi(GetSaveData__Fv(), 0x208);
+                temp_v0->unk4 = CultureAnalyze__8CEditMapFi(temp_v0_2, 0);
+                temp_v0->unk0 += 1;
+                GroundBalance__8CEditMapFi(temp_v0_2, 0);
+                UpdateHouse__8CEditMapFv(temp_v0_2);
+                if ((DebugInfo.unk8 == 0) && (GetMapType__Fi(MapNo) == 1)) {
+                    AnalyzeEditMap__FiP8CEditMap(MapNo, temp_v0_2);
+                }
+            }
+        }
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", EditDataLoad__Fv);
 INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", KeepEditAnalyze__Fv);
 INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", EditAnalyzeChanged__Fv);

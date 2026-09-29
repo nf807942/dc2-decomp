@@ -51,7 +51,18 @@ extern "C" s32 TakeBomb__Fv(void) {
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", ThrowBomb__FPf);
-INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", BombBomb__Fv);
+extern "C" u32 BombCount;
+extern "C" u8 BombVelo[16];
+extern "C" s32 mgZeroVector__FPf(...);
+extern "C" s32 BombBomb__Fv(void) {
+    if (BombStatus == 6) {
+        mgZeroVector__FPf(&BombVelo);
+        BombCount = 0;
+        BombHitObj = 1;
+        return 1;
+    }
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", NowPutBomb__Fv);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", BombControl__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", BombCheck__FP6CScene);
@@ -160,8 +171,51 @@ extern "C" void AnalyzeEditMap__FiP8CEditMap(s32 arg0, CEditMap *arg1) {
         }
     }
 }
-INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", CountPartsType__FiP8CEditMapPii);
-INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", CountPartsInfoID__FiP8CEditMapPii);
+extern "C" s32 GetePlaceParts__8CEditMapFi(void *, s32);
+extern "C" s32 GetPartsType__10CEditPartsFv(void *);
+extern "C" s32 CountPartsType__FiP8CEditMapPii(s32 arg0, CEditMap *arg1, s32 *arg2, s32 arg3) {
+    void *temp_v0;
+    s32 var_s0;
+    s32 var_s1;
+    s32 var_s2;
+
+    var_s1 = 0;
+    var_s0 = 0;
+    if (0 < arg3) {
+        var_s2 = 0;
+        do {
+            temp_v0 = (void *) (GetePlaceParts__8CEditMapFi(arg1, *(((s32 *) ((u8 *) arg2 + var_s2)))));
+            if ((temp_v0 != NULL) && (arg0 == GetPartsType__10CEditPartsFv(temp_v0))) {
+                var_s0 += 1;
+            }
+            var_s1 += 1;
+            var_s2 += 4;
+        } while (var_s1 < arg3);
+    }
+    return var_s0;
+}
+extern "C" s32 GetInfoID__10CEditPartsFv(void *);
+extern "C" s32 CountPartsInfoID__FiP8CEditMapPii(s32 arg0, CEditMap *arg1, s32 *arg2, s32 arg3) {
+    void *temp_v0;
+    s32 var_s0;
+    s32 var_s1;
+    s32 var_s2;
+
+    var_s1 = 0;
+    var_s0 = 0;
+    if (0 < arg3) {
+        var_s2 = 0;
+        do {
+            temp_v0 = (void *) (GetePlaceParts__8CEditMapFi(arg1, *(((s32 *) ((u8 *) arg2 + var_s2)))));
+            if ((temp_v0 != NULL) && (arg0 == GetInfoID__10CEditPartsFv(temp_v0))) {
+                var_s0 += 1;
+            }
+            var_s1 += 1;
+            var_s2 += 4;
+        } while (var_s1 < arg3);
+    }
+    return var_s0;
+}
 struct CEditParts;
 extern "C" s32 GetePlaceParts__8CEditMapFi(void *, s32);
 extern "C" s32 GetPartsType__10CEditPartsFv(void *);
@@ -174,7 +228,19 @@ extern "C" s32 CheckSaku__FP8CEditMapi(CEditMap *arg0, s32 arg1) {
     }
     return GetPartsType__10CEditPartsFv(temp_v0) == 8;
 }
-INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", GetTreeNum__FP8CEditMap);
+extern "C" s32 GetePlacePartsAtInfoID__8CEditMapFiPii(void *, s32, s32 *, s32);
+extern "C" s32 GetTreeNum__FP8CEditMap(CEditMap *arg0) {
+    s32 n;
+
+    n = GetePlacePartsAtInfoID__8CEditMapFiPii(arg0, 7, NULL, 0);
+    n += GetePlacePartsAtInfoID__8CEditMapFiPii(arg0, 0x13, NULL, 0);
+    n += GetePlacePartsAtInfoID__8CEditMapFiPii(arg0, 0x1D, NULL, 0);
+    n += GetePlacePartsAtInfoID__8CEditMapFiPii(arg0, 0x23, NULL, 0);
+    n += GetePlacePartsAtInfoID__8CEditMapFiPii(arg0, 0x28, NULL, 0);
+    n += GetePlacePartsAtInfoID__8CEditMapFiPii(arg0, 0x29, NULL, 0);
+    n += GetePlacePartsAtInfoID__8CEditMapFiPii(arg0, 0x2A, NULL, 0);
+    return n;
+}
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", GetHouseParts__FP8CEditMapPii);
 extern "C" s32 GetePlaceParts__8CEditMapFi(void *, s32);
 struct CEditParts {
@@ -218,7 +284,29 @@ INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", AnalyzeHeim__FP9CEditDataP8C
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", AnalyzeMoonFlower__FP9CEditDataP8CEditMap);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", CheckLiveChara__FiP8CEditMapii);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", EditMapInitEvent__FiP8CEditMap);
-INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", LoadHelpMes__FP1);
+extern "C" u8 HelpMesBuff[4096];
+extern "C" u32 InitFlag_0037E9CC;
+extern "C" u8 _799_00378F50[15];
+extern "C" u8 _800_00378F60[30];
+extern "C" u32 LanguageCode;
+extern "C" s32 LoadFile2__FPcPvPii(...);
+extern "C" s32 memcpy(...);
+extern "C" s32 printf(...);
+extern "C" s32 sprintf(...);
+extern "C" void LoadHelpMes__FP1(void *arg0) {
+    char sp20[0x4C];
+    s32 sp6C;
+
+    sprintf(sp20, &_799_00378F50, LanguageCode);
+    if (LoadFile2__FPcPvPii(sp20, arg0, &sp6C, 0) != 0) {
+        if (sp6C > 0x1000) {
+            printf(&_800_00378F60, sp6C, 0x1000);
+            return;
+        }
+        memcpy(&HelpMesBuff, arg0, sp6C);
+        InitFlag_0037E9CC = 1;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", GetHepMesInfo__Fv);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", CreateHelpMes__Fi);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", StepHelpMes__Fv);
@@ -284,7 +372,24 @@ s32 vpiNPC_PLACE_END(SPI_STACK * arg0, s32 arg1) {
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", vpiPLACE_POS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", vpiMOVE_TO__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", vpiWAIT__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", vpiMOTION__FP9SPI_STACKi);
+extern "C" u8 _450_003790A8[];
+extern "C" char *spiGetStackString__FP9SPI_STACK(SPI_STACK *);
+extern "C" s32 strcmp(...);
+extern "C" s32 vpiMOTION__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    char *name;
+
+    if (vpiInfo == 0) {
+        return 0;
+    }
+    name = spiGetStackString__FP9SPI_STACK(arg0);
+    if (name == NULL) {
+        return 1;
+    }
+    if (strcmp(name, &_450_003790A8) == 0) {
+        *(s32 *) (vpiInfo + 0x24) = 4;
+    }
+    return 1;
+}
 struct SPI_STACK {
     s32 field_0;
     s32 field_4;
@@ -297,9 +402,36 @@ extern "C" s32 vpiTALK_OFFSET__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     spiGetStackVector__FPfP9SPI_STACK(vpiInfo + 0x10, arg0);
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", vpiMOVE_MOTION__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", vpiMOVE_SPEED__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", vpiSHADOW__FP9SPI_STACKi);
+extern "C" s32 vpiGetMotionID__FPc(...);
+extern "C" s32 vpiMOVE_MOTION__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    char *name;
+
+    if (vpiInfo == 0) {
+        return 0;
+    }
+    name = spiGetStackString__FP9SPI_STACK(arg0);
+    if (name == NULL) {
+        return 1;
+    }
+    *(s32 *) (vpiInfo + 0x28) = vpiGetMotionID__FPc(name);
+    return 1;
+}
+extern "C" f32 spiGetStackFloat__FP9SPI_STACK(SPI_STACK *);
+extern "C" s32 vpiMOVE_SPEED__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    if (vpiInfo == 0) {
+        return 0;
+    }
+    *(f32 *) (vpiInfo + 0x2C) = spiGetStackFloat__FP9SPI_STACK(arg0);
+    return 1;
+}
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(SPI_STACK *);
+extern "C" s32 vpiSHADOW__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    if (vpiInfo == 0) {
+        return 0;
+    }
+    *(s32 *) (vpiInfo + 0x30) = (s32) (((spiGetStackInt__FP9SPI_STACK(arg0) != 0) ^ 1) & 0xFF);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", vpiGetMotionID__FPc);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", giPROG_INFO__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", LoadGameInfo__FP9mgCMemory);

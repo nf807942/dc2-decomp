@@ -18,8 +18,25 @@ extern "C" void CreateSystemMes__Fv(void) {
     CreateSystemMes__Fii(2, 0);
 }
 INCLUDE_ASM("nonmatchings/game/text_00197BF0", CreateSystemMes__Fii);
-INCLUDE_ASM("nonmatchings/game/text_00197BF0", GetUserDataMan__Fv);
-INCLUDE_ASM("nonmatchings/game/text_00197BF0", GetFishTournament__Fv);
+extern "C" s32 GetSaveData__Fv(void);
+extern "C" s32 GetUserDataMan__Fv(void) {
+    u8 *p;
+
+    p = (u8 *)GetSaveData__Fv();
+    if (p != 0) {
+        return (s32)(p + 0x1D2A0);
+    }
+    return 0;
+}
+extern "C" s32 GetFishTournament__Fv(void) {
+    u8 *p;
+
+    p = (u8 *)GetUserDataMan__Fv();
+    if (p != 0) {
+        return (s32)(p + 0x451E8);
+    }
+    return 0;
+}
 extern "C" s32 GetUserDataMan__Fv(void);
 extern "C" s32 GetAquariumData__Fv(void) {
     s32 temp_v0;

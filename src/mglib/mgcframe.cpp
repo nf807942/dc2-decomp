@@ -321,10 +321,33 @@ extern "C" mgCFrameAttr *__ct__12mgCFrameAttrFv(mgCFrameAttr *objet) {
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", QuatToMat__FPfPA4_f);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", test1__FPA4_fPA4_fPA4_fPfPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", test2__FPfPf);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgInsideScreen__FP9mgVu0FBOX);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgInsideScreen__FP9mgVu0FBOXPA4_f);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgInsideScreen__FP9mgVu0FBOXPA4_fPfPf);
+struct mgVu0FBOX {
+    f32 unk0;
+    u8 pad4[0xC];
+    f32 unk10;
+};
+extern "C" s32 mgCreateBox8__FPA4_fPfPf(...);
 extern "C" s32 mgInsideScreen__FPA4_fPA4_fPfPf(...);
+extern "C" s32 mgUnitMatrix__FPA4_f(...);
+extern "C" void mgInsideScreen__FPA4_fPA4_f(f32 (*)[4], f32 (*)[4]);
+extern "C" void mgInsideScreen__FP9mgVu0FBOX(mgVu0FBOX *arg0) {
+    f32 sp20[16];
+    f32 sp60[32];
+    mgUnitMatrix__FPA4_f((f32 (*)[4]) sp20);
+    mgCreateBox8__FPA4_fPfPf((f32 (*)[4]) sp60, &arg0->unk0, &arg0->unk10);
+    mgInsideScreen__FPA4_fPA4_f((f32 (*)[4]) sp60, (f32 (*)[4]) sp20);
+}
+extern "C" void mgInsideScreen__FP9mgVu0FBOXPA4_f(mgVu0FBOX *arg0, f32 (*arg1)[4]) {
+    f32 sp20[32];
+    mgCreateBox8__FPA4_fPfPf((f32 (*)[4]) sp20, &arg0->unk0, &arg0->unk10);
+    mgInsideScreen__FPA4_fPA4_f((f32 (*)[4]) sp20, arg1);
+}
+extern "C" void mgInsideScreen__FP9mgVu0FBOXPA4_fPfPf(mgVu0FBOX *arg0, f32 (*arg1)[4], f32 *arg2, f32 *arg3) {
+    f32 sp40[32];
+    mgCreateBox8__FPA4_fPfPf((f32 (*)[4]) sp40, &arg0->unk0, &arg0->unk10);
+    mgInsideScreen__FPA4_fPA4_fPfPf((f32 (*)[4]) sp40, arg1, arg2, arg3);
+}
+
 extern "C" void mgInsideScreen__FPA4_fPA4_f(f32 (*arg0)[4], f32 (*arg1)[4]) {
     /* Les emplacements de pile portent la taille que le commerce leur donne,
      * lue sur l'ecart entre deux adresses prises, et ils sont declares dans
@@ -511,7 +534,14 @@ INCLUDE_ASM("nonmatchings/mglib/mgcframe", StrCmp__FPcPc);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgFrameNameComp__FPcPc);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SearchFrame__8mgCFrameFPc);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SearchFrameID__8mgCFrameFPc);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetWorldPosition__8mgCFrameFPfPf);
+extern "C" s32 sceVu0ApplyMatrix(...);
+extern "C" s32 GetLWMatrix__8mgCFrameFPA4_f(...);
+extern "C" void GetWorldPosition__8mgCFrameFPfPf(mgCFrame *objet, f32 *arg0, f32 *arg1) {
+    f32 sp30[16];
+    *(s32 *) ((u8 *) arg1 + 0xC) = 0x3F800000;
+    GetLWMatrix__8mgCFrameFPA4_f(objet, (f32 (*)[4]) sp30);
+    sceVu0ApplyMatrix(arg0, sp30, arg1);
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetWorldPosition0__8mgCFrameFPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetWorldDir__8mgCFrameFPfPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetRotation__8mgCFrameFPf);
@@ -528,7 +558,32 @@ extern "C" void SetRotType__8mgCFrameFi(mgCFrame_infere4 *objet, s32 arg0) {
 }
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetAttrParam__8mgCFrameFR12mgCFrameAttrii);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetAttrParamObjAlpha__8mgCFrameFfi);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetAttrParamDraw__8mgCFrameFii);
+struct mgCFrame_infere5 {
+    /* 0x00 */ char pad0[0x58];
+    /* 0x58 */ mgCFrame_infere5 *unk58;
+    /* 0x5C */ mgCFrame_infere5 *unk5C;
+    /* 0x60 */ char pad60[0x94];
+    /* 0xF4 */ void *unkF4;
+};
+struct temp_v1_champs_41162d {
+    char pad0[0x18];
+    /* 0x18 */ s32 unk18;
+};
+extern "C" void SetAttrParamDraw__8mgCFrameFii(mgCFrame_infere5 *objet, s32 arg0, s32 arg1) {
+    mgCFrame_infere5 *var_s0;
+    struct temp_v1_champs_41162d *temp_v1;
+
+    temp_v1 = (struct temp_v1_champs_41162d *) (objet->unkF4);
+    if (temp_v1 != NULL) {
+        temp_v1->unk18 = arg0;
+    }
+    if (arg1 == 0) {
+        return;
+    }
+    for (var_s0 = objet->unk58; var_s0 != NULL; var_s0 = var_s0->unk5C) {
+        SetAttrParamDraw__8mgCFrameFii(var_s0, arg0, 1);
+    }
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Draw__8mgCFrameFPUi);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetDrawRect__8mgCFrameFP9mgVu0FBOXP14mgCDrawManager);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", __as__8mgCFrameFR8mgCFrame);

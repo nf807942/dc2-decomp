@@ -12,8 +12,58 @@
 
 INCLUDE_ASM("nonmatchings/game/cweaponelement", Initialize__14CWeaponElementFv);
 INCLUDE_ASM("nonmatchings/game/cweaponelement", Set__14CWeaponElementFPA4_fPffif);
-INCLUDE_ASM("nonmatchings/game/cweaponelement", Step__14CWeaponElementFv);
-INCLUDE_ASM("nonmatchings/game/cweaponelement", Draw__14CWeaponElementFv);
+extern "C" s32 Step_Cold__14CWeaponElementFv(void *);
+extern "C" s32 Step_Fire__14CWeaponElementFv(void *);
+extern "C" s32 Step_Thunder__14CWeaponElementFv(void *);
+extern "C" s32 Step_Wind__14CWeaponElementFv(void *);
+extern "C" void Step__14CWeaponElementFv(void *objet) {
+    s16 temp_v1;
+
+    if (*(s16 *) ((u8 *) objet + 0x5AC) != 0) {
+        temp_v1 = *(s16 *) ((u8 *) objet + 0x5A4);
+        switch (temp_v1) {
+        case 1:
+        default:
+            Step_Cold__14CWeaponElementFv(objet);
+            return;
+        case 3:
+            Step_Wind__14CWeaponElementFv(objet);
+            return;
+        case 0:
+            Step_Fire__14CWeaponElementFv(objet);
+            return;
+        case 2:
+            Step_Thunder__14CWeaponElementFv(objet);
+            break;
+        }
+    }
+}
+extern "C" s32 Draw_Cold__14CWeaponElementFv(void *);
+extern "C" s32 Draw_Fire__14CWeaponElementFv(void *);
+extern "C" s32 Draw_Thunder__14CWeaponElementFv(void *);
+extern "C" s32 Draw_Wind__14CWeaponElementFv(void *);
+extern "C" void Draw__14CWeaponElementFv(void *objet) {
+    s16 temp_v1;
+
+    if (*(s16 *) ((u8 *) objet + 0x5AC) != 0) {
+        temp_v1 = *(s16 *) ((u8 *) objet + 0x5A4);
+        switch (temp_v1) {
+        case 1:
+        default:
+            Draw_Cold__14CWeaponElementFv(objet);
+            return;
+        case 3:
+            Draw_Wind__14CWeaponElementFv(objet);
+            return;
+        case 0:
+            Draw_Fire__14CWeaponElementFv(objet);
+            return;
+        case 2:
+            Draw_Thunder__14CWeaponElementFv(objet);
+            break;
+        }
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cweaponelement", Init_Cold__14CWeaponElementFPf);
 INCLUDE_ASM("nonmatchings/game/cweaponelement", Step_Cold__14CWeaponElementFv);
 INCLUDE_ASM("nonmatchings/game/cweaponelement", Draw_Cold__14CWeaponElementFv);
@@ -28,7 +78,10 @@ INCLUDE_ASM("nonmatchings/game/cweaponelement", Step_Thunder__14CWeaponElementFv
 INCLUDE_ASM("nonmatchings/game/cweaponelement", Draw_Thunder__14CWeaponElementFv);
 INCLUDE_ASM("nonmatchings/game/cweaponelement", CreatSmoothPass__FPA4_fPA4_fiiii);
 INCLUDE_ASM("nonmatchings/game/cweaponelement", unitRotation__FP8mgCFrameff);
-INCLUDE_ASM("nonmatchings/game/cweaponelement", iRand__Fi);
+extern "C" s32 rand(...);
+extern "C" s32 iRand__Fi(s32 arg0) {
+    return (s32) (((f32) arg0 * (f32) rand()) / 2.1474836e9f);
+}
 extern "C" s32 rand(...);
 extern "C" f32 fRand__Ff(f32 arg0) {
     return (arg0 * (f32) rand()) / 2.1474836e9f;
@@ -114,7 +167,16 @@ void CGiftMark::Initialize(void) {
     this->field_0x10 = 0;
 }
 INCLUDE_ASM("nonmatchings/game/cweaponelement", Draw__13CEnemyGekirinFP10CPreSpriteii);
-INCLUDE_ASM("nonmatchings/game/cweaponelement", Step__13CEnemyGekirinFv);
+extern "C" u8 gekirin_anim[64];
+extern "C" void Step__13CEnemyGekirinFv(void *objet) {
+    s8 *p = (s8 *) objet;
+    if (p[0] == 1) {
+        p[1] += 1;
+        if (*(s32 *) (gekirin_anim + p[1] * 4) == 0) {
+            p[0] = 2;
+        }
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cweaponelement", SetView__14CEnemyLifeGageFi);
 INCLUDE_ASM("nonmatchings/game/cweaponelement", Set__14CEnemyLifeGageFPfiiii);
 INCLUDE_ASM("nonmatchings/game/cweaponelement", Draw__14CEnemyLifeGageFi);
