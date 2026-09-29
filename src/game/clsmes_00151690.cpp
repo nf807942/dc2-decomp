@@ -9,6 +9,20 @@
 #include "common.h"
 #include "gen/ClsMes.hpp"
 
+extern "C" s32 __ct__11mgCDrawPrimFv(void *);
+extern "C" s32 AlphaBlendEnable__11mgCDrawPrimFi(void *, s32);
+extern "C" s32 AlphaBlend__11mgCDrawPrimFi(void *, s32);
+extern "C" s32 AlphaTestEnable__11mgCDrawPrimFi(void *, s32);
+extern "C" s32 AlphaTest__11mgCDrawPrimFii(void *, s32, s32);
+extern "C" s32 Begin__11mgCDrawPrimFi(void *, s32);
+extern "C" s32 Bilinear__11mgCDrawPrimFi(void *, s32);
+extern "C" s32 Color__11mgCDrawPrimFiiii(void *, s32, s32, s32, s32);
+extern "C" s32 DepthTestEnable__11mgCDrawPrimFi(void *, s32);
+extern "C" s32 End__11mgCDrawPrimFv(void *);
+extern "C" s32 Initialize__11mgCDrawPrimFP9mgCMemoryP13sceVif1Packet(void *, void *, void *);
+extern "C" s32 TextureMapEnable__11mgCDrawPrimFi(void *, s32);
+extern "C" s32 Vertex__11mgCDrawPrimFiii(void *, s32, s32, s32);
+extern "C" s32 ZMask__11mgCDrawPrimFi(void *, s32);
 extern "C" s32 CheckPosInOutFor2P__Fffffff(f32 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5) {
     f32 var_f0;
     f32 var_f14;
@@ -61,7 +75,26 @@ INCLUDE_ASM("nonmatchings/game/clsmes_00151690", MySetPrim__FP11mgCDrawPrimii);
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", set2DSpriteEasy__FP11mgCDrawPrim9mgRect_i_9mgRect_i_P10RGBAQ_TYPE);
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", _set2DSprite__FPcP11mgCDrawPrim9mgRect_i_9mgRect_i_P10RGBAQ_TYPE);
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", set2DSprite__FP11mgCDrawPrim9mgRect_i_9mgRect_i_P10RGBAQ_TYPE);
-INCLUDE_ASM("nonmatchings/game/clsmes_00151690", FillRect__Fiiiiiiii);
+extern "C" void FillRect__Fiiiiiiii(s32 arg0, s32 arg1, s32 arg2, s32 arg3, s32 arg4, s32 arg5, s32 arg6, s32 arg7) {
+    /* 0x120 : le cadre du commerce fait 0x1b0, soit 0x110 de plus que le tampon
+     * de 0x10 que m2c avait inféré. */
+    u8 sp90[0x120];
+    __ct__11mgCDrawPrimFv(&sp90);
+    Initialize__11mgCDrawPrimFP9mgCMemoryP13sceVif1Packet(&sp90, NULL, NULL);
+    AlphaBlendEnable__11mgCDrawPrimFi(&sp90, 1);
+    AlphaBlend__11mgCDrawPrimFi(&sp90, 1);
+    AlphaTestEnable__11mgCDrawPrimFi(&sp90, 1);
+    AlphaTest__11mgCDrawPrimFii(&sp90, 1, 0);
+    DepthTestEnable__11mgCDrawPrimFi(&sp90, 0);
+    ZMask__11mgCDrawPrimFi(&sp90, -1);
+    Bilinear__11mgCDrawPrimFi(&sp90, 0);
+    TextureMapEnable__11mgCDrawPrimFi(&sp90, 0);
+    Begin__11mgCDrawPrimFi(&sp90, 6);
+    Color__11mgCDrawPrimFiiii(&sp90, arg4, arg5, arg6, arg7);
+    Vertex__11mgCDrawPrimFiii(&sp90, arg0, arg1, 0);
+    Vertex__11mgCDrawPrimFiii(&sp90, arg0 + arg2, arg1 + arg3, 0);
+    End__11mgCDrawPrimFv(&sp90);
+}
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", DrawFukidashi_sub__6ClsMesFP11mgCDrawPrimiii);
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", DrawFukidashi__6ClsMesFiii);
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", SetDrawSpeed__6ClsMesFv);
