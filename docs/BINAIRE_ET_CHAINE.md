@@ -704,9 +704,17 @@ disent GCC 2.x, le compilateur de Sony pour l'Emotion Engine.
   d'options (`-O2 -G0`, `-O2 -G8`, `-O2 -G128`, `-O1 -G0`, `-O3 -G0`) et rend le
   `match_percent` d'objdiff contre la référence : c'est la méthode qui a départagé les 21
   versions de MWCC, appliquée aux GCC.
-- **Première mesure** : `sceGifPkInit` (quatre instructions) est à 100 % sous toutes les
-  versions de 2.9-991111a à 2.96 en `-O2` et `-O3`, à 96,75 % en `-O1` : trop courte pour
-  départager. Il faut des fonctions plus longues.
+- **Mesure sur newlib 1.9.0** (sources publiques, `scripts/build/newlib_source.py` les
+  aplatit) : `copysign`, `copysignf`, `finite`, `isnan` et `__kernel_cosf` rendent **100 %**
+  avec les `ee-gcc` **2.9-ee** (990721, 991111, 991111-01, 991111a, indistinguables entre
+  eux) en `-O2`, `-G0`, `-G8` ou `-G128` ; `floor` **99,75 %**, `rint` 95,8 %, `scalbn`
+  94,1 %, `__kernel_sinf` 90,8 %, `__kernel_tanf` 91,4 %. Les 2.95.x de SN Systems et
+  la 2.96 donnent 74–79 % sur `floor` : elles sauvent les registres par `sq`, le jeu par
+  `sd`. La libm et la libc C du jeu viennent donc d'`ee-gcc` 2.9-ee, comme le SDK de
+  `rac1-decomp`. Les 75–99 % restent à expliquer (source de newlib d'une autre version,
+  ou modifiée par Sony).
+- **`sceGifPkInit`** (quatre instructions) est à 100 % sous presque toutes les versions :
+  trop courte pour départager.
 - **Tout n'est pas du C compilé.** Le `strlen` du jeu est de l'assembleur MMI écrit à la
   main (`lq`, `psubb`, `pnor`, `pcpyud`) : aucun compilateur ne le rendra depuis le `strlen`
   de newlib (57,9 % sous toutes les versions). Une fonction de ce genre reste de
