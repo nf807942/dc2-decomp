@@ -124,6 +124,15 @@ def cherche(symbole: str, tag: str) -> list[tuple[str, str]]:
         re.M)
     alias = re.compile(rf"^\s*#\s*define\s+(\w+)\s+{sym}\b", re.M)
     noms = set(candidats_de_fichier(symbole))
+    # Les alias de newlib vont dans les deux sens : `#define Balloc _Balloc` (mprec.h) fait
+    # définir `_Balloc` sous le nom `Balloc`, `#define fREe _free_r` (mallocr.c) l'inverse.
+    # On cherche donc aussi la définition de chaque nom que le symbole porte en alias.
+    alias_de = re.compile(rf"^\s*#\s*define\s+(\w+)\s+{sym}", re.M)
+    autres = {m.group(1) for f in base.rglob("*.h") for m in
+              alias_de.finditer(f.read_text(encoding="latin-1"))}
+    definitions_autres = [re.compile(
+        rf"(?:_DEFUN\s*\(\s*{re.escape(n)}|^[A-Za-z_][\w 	\*]*{re.escape(n)}\s*\(|^{re.escape(n)}\s*\()",
+        re.M) for n in autres]
     for f in sorted(base.rglob("*.c")):
         texte = f.read_text(encoding="latin-1")
         rel = f.relative_to(base).as_posix()
@@ -131,6 +140,8 @@ def cherche(symbole: str, tag: str) -> list[tuple[str, str]]:
             trouves.append((rel, "définition"))
         elif (m := alias.search(texte)):
             trouves.append((rel, f"alias du préprocesseur : {m.group(1)}"))
+        elif any(d.search(texte) for d in definitions_autres):
+            trouves.append((rel, "définie sous un alias d'en-tête : " + ", ".join(sorted(autres)[:2])))
         elif f.stem in noms:
             trouves.append((rel, "nom de fichier"))
     return trouves
