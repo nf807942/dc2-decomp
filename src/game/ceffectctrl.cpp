@@ -181,7 +181,13 @@ INCLUDE_ASM("nonmatchings/game/ceffectctrl", LensFlare__FPiPfiPcPc);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", UniformityRand__Fff);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", RegularityRand__Fffi);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", InitEffectParam__FP12EFFECT_PARAM);
-INCLUDE_ASM("nonmatchings/game/ceffectctrl", __ct__7CEffectFv);
+struct CEffect;
+extern "C" void Initialize__7CEffectFv(struct CEffect *objet);
+extern "C" struct CEffect *__ct__7CEffectFv(struct CEffect *objet) {
+    Initialize__7CEffectFv(objet);
+    return objet;
+}
+
 struct EFFECT_PARAM {
     s32 field_0;
     s32 field_4;

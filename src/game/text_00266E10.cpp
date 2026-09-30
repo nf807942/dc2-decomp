@@ -125,7 +125,14 @@ s32 _GOTO_SELECT_PARTY(RS_STACKDATA * arg0, s32 arg1) {
 }
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_LOADBG_FILE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_LOADBG_FILE_MONS_TALK__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _CHECK_LOADBG_FILE__FP12RS_STACKDATAi);
+extern "C" s32 ReadBGSync__Fv(void);
+extern "C" s32 SetStack__FP12RS_STACKDATAi_00262E70(RS_STACKDATA *, s32);
+extern "C" s32 _CHECK_LOADBG_FILE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    arg1 = ReadBGSync__Fv();
+    SetStack__FP12RS_STACKDATAi_00262E70(arg0, arg1);
+    return 1;
+}
+
 s32 _GET_TB_ITEMNO(RS_STACKDATA *stack, int argc) {
     return 0;
 }
@@ -162,7 +169,12 @@ INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_ITEM_SPACE__FP12RS_STACKDATA
 INCLUDE_ASM("nonmatchings/game/text_00266E10", GetConfigCaptionOff__Fv);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", LoadMovie__FPcP9mgCMemoryb);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _LOAD_MOVIE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _INIT_LOCAL_CNT__FP12RS_STACKDATAi);
+extern "C" void InitLocalCnt__Fv(void);
+extern "C" s32 _INIT_LOCAL_CNT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    InitLocalCnt__Fv();
+    return 1;
+}
+
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_CROSSFADE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_ADJUST_POLYGON_SCALE__FP12RS_STACKDATAi);
 extern "C" f32 GetStackFloat__FP12RS_STACKDATA_00262DE0(RS_STACKDATA *);
@@ -427,11 +439,27 @@ INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_LOCAL_CNT__FP12RS_STACKDATAi
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_LOCAL_CNT2__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_TRAIN_NPC_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _GOTO_DRAW_CHAPTER__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_PROJECTION__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_PROJECTION__FP12RS_STACKDATAi);
+struct EdEventInfo;
+extern "C" s32 _SET_PROJECTION__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    EdEventInfo.projection = GetStackFloat__FP12RS_STACKDATA_00262DE0(arg0);
+    return 1;
+}
+
+struct EdEventInfo;
+extern "C" s32 _GET_PROJECTION__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    SetStack__FP12RS_STACKDATAf_00262E90(arg0, EdEventInfo.projection);
+    return 1;
+}
+
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_FADE_IN__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_FADE_OUT__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _DNG_DEBUG_COMMAND__FP12RS_STACKDATAi);
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(...);
+extern "C" void ScriptDebugCommand__Fi(s32);
+extern "C" s32 _DNG_DEBUG_COMMAND__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    ScriptDebugCommand__Fi(GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
+    return 1;
+}
+
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _CD_SEEK__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_ROT_LOOK_POS__FP12RS_STACKDATAi);
 struct EventScene_champs_4533e0 {
@@ -530,7 +558,12 @@ extern "C" s32 _SET_TIME_STEP_ENABLE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 
 s32 _SET_DOOR_MATERIAL(RS_STACKDATA *stack, int argc) {
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _INIT_DRAMA_SCENE__FP12RS_STACKDATAi);
+extern "C" void InitDramaScene__Fv(void);
+extern "C" s32 _INIT_DRAMA_SCENE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    InitDramaScene__Fv();
+    return 1;
+}
+
 struct EventScene_champs_d3dc51 {
     char pad0[0x2E54];
     /* 0x2E54 */ s32 unk2E54;
@@ -560,7 +593,11 @@ extern "C" s32 _DNGMAP_MOVE_PIECE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg
     SetKomaMove__11CDngFreeMapFi(&EventDngMap, GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _DNGMAP_ONOFF__FP12RS_STACKDATAi);
+extern "C" s32 _DNGMAP_ONOFF__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    EventDngMap[8] = (u8) (GetStackInt__FP12RS_STACKDATA_00262DA0(arg0) != 0);
+    return 1;
+}
+
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _DNGMAP_SET_FADE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_BEFORE_CAMERA_NEXT_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_BEFORE_CAMERA_NEXT_REF__FP12RS_STACKDATAi);

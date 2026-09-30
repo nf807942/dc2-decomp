@@ -113,7 +113,8 @@ void CAquaFishEff::Initialize(void) {
     this->field_0x8 = 0;
     this->field_0xC = 0;
 }
-INCLUDE_ASM("nonmatchings/game/caquames", StartFishEffect__12CAquaFishEffFi);
+extern int max_tbl_1484[];
+extern "C" void StartFishEffect__12CAquaFishEffFi(CAquaFishEff *p, int v) { p->field_0x8=(s16)v; p->field_0xC=max_tbl_1484[(u16)p->field_0x8]; }
 struct inferred;
 typedef struct CAquaFishEff_infere {
     /* 0x00 */ s32 unk0;                            /* inferred */

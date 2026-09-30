@@ -147,7 +147,8 @@ INCLUDE_ASM("nonmatchings/game/clsmes_00153980", SetAndGetNameRegistTbl__Fi);
 INCLUDE_ASM("nonmatchings/game/clsmes_00153980", MakeMesWinTbl_value__6ClsMesFPiPi);
 INCLUDE_ASM("nonmatchings/game/clsmes_00153980", MakeMesWinTbl_value__6ClsMesFiPiPi);
 INCLUDE_ASM("nonmatchings/game/clsmes_00153980", MakeMesWinTbl_str__6ClsMesFPcPiPi);
-INCLUDE_ASM("nonmatchings/game/clsmes_00153980", MakeMesWinTbl_str__6ClsMesFiPiPi);
+extern "C" void MakeMesWinTbl_str__6ClsMesFPcPiPi(void *, char *, int *, int *);
+extern "C" void MakeMesWinTbl_str__6ClsMesFiPiPi(void *self, int i, int *a2, int *a3) { MakeMesWinTbl_str__6ClsMesFPcPiPi(self, (char*)self + i*50 + 0x1E59, a2, a3); }
 INCLUDE_ASM("nonmatchings/game/clsmes_00153980", MakeMesWinTbl_item__6ClsMesFiPiPi);
 INCLUDE_ASM("nonmatchings/game/clsmes_00153980", GetMesWidth_system__6ClsMesFi);
 INCLUDE_ASM("nonmatchings/game/clsmes_00153980", GetTextLineDataTop__6ClsMesFi);

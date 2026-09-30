@@ -61,7 +61,11 @@ void PauseCancel(void) {
 }
 INCLUDE_ASM("nonmatchings/game/nowloadinginfo", PauseEnd__Fv);
 INCLUDE_ASM("nonmatchings/game/nowloadinginfo", PauseLoop__Fv);
-INCLUDE_ASM("nonmatchings/game/nowloadinginfo", PauseCount__Fv);
+extern "C" int PauseCancelCnt;
+extern "C" void PauseCount__Fv(void) {
+    PauseCancelCnt -= 1;
+    if (PauseCancelCnt < 0) PauseCancelCnt = 0;
+}
 INCLUDE_ASM("nonmatchings/game/nowloadinginfo", SCElogoFade__FiP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/nowloadinginfo", SetEventKeyword__FPcPci);
 INCLUDE_ASM("nonmatchings/game/nowloadinginfo", CheckDeleteNameRegisteItem__FP13CGameDataUsed);

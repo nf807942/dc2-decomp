@@ -311,7 +311,6 @@ extern "C" s32 _AMG_GET_ATTR_STATUS__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 a
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/cripple", _SET_NEAR_DIST__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/cripple", _SET_KEEP_TIME__FP12RS_STACKDATAi);
 struct EdEventInfo_keep {
     char pad0[0x20];
     f32 f20;
@@ -320,6 +319,12 @@ struct EdEventInfo_keep {
     char pad1294[12];
 };
 extern "C" EdEventInfo_keep EdEventInfo;
+extern "C" f32 GetStackFloat__FP12RS_STACKDATA_00262DE0(RS_STACKDATA *);
+extern "C" s32 _SET_KEEP_TIME__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    EdEventInfo.keepTime = GetStackFloat__FP12RS_STACKDATA_00262DE0(arg0);
+    return 1;
+}
+
 extern "C" s32 SetStack__FP12RS_STACKDATAf_00262E90(RS_STACKDATA *, f32);
 extern "C" s32 _GET_KEEP_TIME__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     if (arg1 != 1) {

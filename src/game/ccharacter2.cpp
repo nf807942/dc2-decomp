@@ -295,7 +295,9 @@ INCLUDE_ASM("nonmatchings/game/ccharacter2", SetOldVertex__13CDynamicAnimeFiPf);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", pGetFixVertex__13CDynamicAnimeFi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", SetDrawFrame__13CDynamicAnimeFii);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", GetDrawFrame__13CDynamicAnimeFi);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", pGetBindVertex__13CDynamicAnimeFi);
+struct DynAnime { char pad[0x38]; int count; void *vertices; };
+extern "C" int pGetBindVertex__13CDynamicAnimeFi(void *self,int i) { DynAnime *p=(DynAnime*)self; if(i<0 || i>=p->count) return 0; int base=(int)p->vertices; int off=i<<4; base+=off; return base; }
+
 INCLUDE_ASM("nonmatchings/game/ccharacter2", pGetBoundingBox__13CDynamicAnimeFi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", SetCollision__13CDynamicAnimeFiP12CDACollision);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", DrawSub__13CDynamicAnimeFi);
@@ -315,7 +317,7 @@ extern "C" u32 dynTopFrame;
 extern "C" s32 SearchFrame__8mgCFrameFPc(...);
 #include "gen/mgCFrame.hpp"
 extern "C" s32 printf(...);
-extern "C" s32 SetFrame__13CDynamicAnimeFiP8mgCFrame(...);
+extern "C" void SetFrame__13CDynamicAnimeFiP8mgCFrame(u32, s32, mgCFrame *);
 extern "C" s32 dynFRAME__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     s32 temp_a1;
     s8 *temp_v0;

@@ -207,7 +207,11 @@ s32 GetSubMapNo(void) {
 void ClearSubMapNo(void) {
     NowSubMapNo = -1;
 }
-INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", __ct__14MapJumpMapInfoFv);
+extern "C" void *memset(void *, int, unsigned);
+extern "C" MapJumpMapInfo *__ct__14MapJumpMapInfoFv(MapJumpMapInfo *objet) {
+    memset(objet, 0, 0x18);
+    return objet;
+}
 void SetMainMapInfo(MapJumpMapInfo * arg0) {
     MainMapInfo_01F582A0.field_0x0 = arg0->field_0x0;
     MainMapInfo_01F582A0.field_0x4 = arg0->field_0x4;
@@ -237,7 +241,11 @@ INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", MapJump__FP6CSceneP17SCN_LOADMAP
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", GetLoadMapInfo__FP17SCN_LOADMAP_INFO2i);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", LoadSubMap__FP6CSceneii);
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", LoadMapScript__FPc);
-INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", ReloadMapScript__Fv);
+extern "C" signed char now_script_file[64];
+extern "C" int LoadScript__FPc(char *);
+extern "C" void ReloadMapScript__Fv(void) {
+    if (now_script_file[0] != 0) LoadScript__FPc((char *)now_script_file);
+}
 INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", LoadScript__FPc);
 extern "C" u32 OldInteriorMapNo;
 extern "C" s32 InInterior__Fv(void);
@@ -247,7 +255,15 @@ extern "C" s32 GetOldInteriorMapNo__Fv(void) {
     }
     return OldInteriorMapNo;
 }
-INCLUDE_ASM("nonmatchings/game/mapjumpmapinfo", InitInterior__Fv);
+extern "C" unsigned char old_mapname[0x10000];
+extern "C" unsigned char PrevInterior[0x10000];
+extern "C" unsigned char NowInterior[0x10000];
+extern "C" void InitInterior__Fv(void) {
+    old_mapname[0] = 0;
+    InteriorFlag = 0;
+    PrevInterior[0] = 0;
+    NowInterior[0] = 0;
+}
 s32 InInterior(void) {
     return InteriorFlag;
 }

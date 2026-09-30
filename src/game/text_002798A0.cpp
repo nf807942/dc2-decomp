@@ -162,7 +162,14 @@ extern "C" s32 _SPHIDA_SET_STATUS_FLAG__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s3
     ((struct Sphida_champs_255774 *) Sphida)->unk34 = temp_v0;
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_RESET_POWGAGE__FP12RS_STACKDATAi);
+struct Sphida;
+struct Sphida_fields { char pad0[0xC]; s32 unkC; char pad10[4]; s32 unk14; s32 unk18; s32 unk1C; s32 unk20; };
+extern "C" s32 _SPHIDA_RESET_POWGAGE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    if (Sphida == 0) return 0;
+    Sphida_fields *p = (Sphida_fields *)Sphida;
+    p->unk1C = -1; p->unk20 = 0; p->unk18 = 0; p->unkC = 0; p->unk14 = -10;
+    return 1;
+}
 struct Sphida_champs_c93686 {
     char pad0[0x1C];
     /* 0x1C */ s32 unk1C;
@@ -322,7 +329,16 @@ INCLUDE_ASM("nonmatchings/game/text_002798A0", _DIST_VECTOR2__FP12RS_STACKDATAi_
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SQRT__FP12RS_STACKDATAi_0027A910);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _ATAN2F__FP12RS_STACKDATAi_0027A960);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _ANGLE_CMP__FP12RS_STACKDATAi_0027A9B0);
-INCLUDE_ASM("nonmatchings/game/text_002798A0", _ANGLE_LIMIT__FP12RS_STACKDATAi_0027AA10);
+struct RS_STACKDATA;
+struct angle_fields { char pad[4]; f32 unk4; };
+struct stack_fields { char pad[4]; s32 unk4; };
+extern "C" s32 SetStack__FP12RS_STACKDATAf_00262E90(RS_STACKDATA *, f32);
+extern "C" f32 mgAngleLimit__Ff(f32);
+extern "C" s32 _ANGLE_LIMIT__FP12RS_STACKDATAi_0027AA10(void *arg0, s32 arg1) {
+    angle_fields *data = (angle_fields *) ((stack_fields *) arg0)->unk4;
+    SetStack__FP12RS_STACKDATAf_00262E90((RS_STACKDATA *) arg0, mgAngleLimit__Ff(data->unk4));
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _GET_RAND__FP12RS_STACKDATAi_0027AA50);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _LINE_POINT_DIST__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _CREATE_SWORD_EFFECT__FP12RS_STACKDATAi);
@@ -371,7 +387,14 @@ extern "C" s32 _POST_TREASURE_BOX__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _GET_PARTS_ORIGIN__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002798A0", _CTRLC_STEP__FP12RS_STACKDATAi);
+extern "C" s32 GetCamera__Fv(void);
+struct CTRLC_Base { char pad[0x60]; };
+struct CTRLC_Object : CTRLC_Base { virtual s32 fn(s32); };
+extern "C" s32 _CTRLC_STEP__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    CTRLC_Object *p = (CTRLC_Object *)GetCamera__Fv();
+    p->fn(1);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _CTRLC_SET_ROTATE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _CTRLC_ROT_BACK__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _CTRLC_MOVE_CAMERA__FP12RS_STACKDATAi);
@@ -514,7 +537,9 @@ INCLUDE_ASM("nonmatchings/game/text_002798A0", _SET_PULL_ITEM__FP12RS_STACKDATAi
 typedef struct EdEventInfo_champs {
     char pad0[208];
     s32 unkD0;
-    char padD4[4556];
+    char padD4[0x124];
+    s32 mapDraw;
+    char pad1FC[0x10A4];
 } EdEventInfo_champs;
 extern "C" EdEventInfo_champs EdEventInfo;
 typedef struct MenuArg_champs {
@@ -536,7 +561,12 @@ extern "C" s32 _CANCEL_DRAMA_SCENE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 ar
     CancelDramaScene__Fv();
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/text_002798A0", _GET_RNDC_MOT_NOWT__FP12RS_STACKDATAi);
+struct RandomCircle;
+extern "C" s32 _GET_RNDC_MOT_NOWT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    f32 weight = RandomCircle.motNowt;
+    SetStack__FP12RS_STACKDATAf_00262E90(arg0, weight);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _SET_CHARA_MOT_NOWT__FP12RS_STACKDATAi);
 extern "C" s32 GetCharacter__Fi(s32);
 struct temp_v0_champs_6e3565 {
@@ -672,7 +702,11 @@ extern "C" s32 _DNG_COLLISION_ALL_CLR__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32
     Initialize__11CColPrimManFP6CScene(&ColPrimMan, DngMainScene);
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/text_002798A0", _SET_MAP_DRAW__FP12RS_STACKDATAi);
+struct EdEventInfo;
+extern "C" s32 _SET_MAP_DRAW__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    EdEventInfo.mapDraw = GetStackInt__FP12RS_STACKDATA_00262DA0(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _CHECK_MC_LOAD__FP12RS_STACKDATAi);
 extern "C" s32 SetNowMapNo__6CSceneFi(...);
 extern "C" s32 _SET_NOW_MAP_NO__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
@@ -775,7 +809,12 @@ extern "C" s32 _GET_TIME__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _CHECK_GET_ITEM_LIMIT__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002798A0", _CHECK_ITEM_OVER__FP12RS_STACKDATAi);
+extern "C" s32 CheckItemOver__Fv(void);
+extern "C" s32 _CHECK_ITEM_OVER__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    arg1 = CheckItemOver__Fv();
+    SetStack__FP12RS_STACKDATAi_00262E70(arg0, arg1);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _GET_NOW_LOOP_NO__FP12RS_STACKDATAi);
 extern "C" u32 EventScene;
 #include "dngfloormanager.hpp"
@@ -888,7 +927,10 @@ extern "C" s32 _ADD_FUSION_POINT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1
     AddFusionPoint__16CUserDataManagerFiii(var_s3, temp_s0, temp_s1_2, temp_s2);
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/text_002798A0", _GET_DEBUG_FLAG__FP12RS_STACKDATAi);
+extern "C" s32 _GET_DEBUG_FLAG__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    if (arg1 != 1) return 0;
+    return SetStack__FP12RS_STACKDATAi_00262E70(arg0, DebugFlag);
+}
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _MINIMAP_DOOR_ENABLE__FP12RS_STACKDATAi);
 struct temp_v0_champs_afc0bc {
     char pad0[0x58];

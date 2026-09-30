@@ -363,11 +363,25 @@ extern "C" void SetCoord__8CColPrimFP8mgCFrameP8mgCFramef(CColPrim_infere3 *obje
 }
 INCLUDE_ASM("nonmatchings/game/cpullitem", IsHit__8CColPrimFP6CScenei);
 INCLUDE_ASM("nonmatchings/game/cpullitem", IsReversVec__8CColPrimFP8CColPrim);
-INCLUDE_ASM("nonmatchings/game/cpullitem", GetReversVec__8CColPrimFPf);
+struct col_vec_l1c { char pad[8]; s32 unk8; s32 unkC; char pad10[0x30]; f32 unk40[4]; char pad50[0x10]; f32 unk60[4]; };
+extern "C" void sceVu0SubVector(...);
+extern "C" void GetReversVec__8CColPrimFPf(col_vec_l1c *objet, f32 *arg0) {
+    if ((objet->unkC != 0) && (objet->unk8 != 0))
+        sceVu0SubVector(arg0, objet->unk60, objet->unk40, objet);
+}
 void CColPrim::DebugDraw(void) {
 }
 INCLUDE_ASM("nonmatchings/game/cpullitem", Step__8CColPrimFv);
-INCLUDE_ASM("nonmatchings/game/cpullitem", Delete__8CColPrimFi);
+struct CColPrim_local7 { char pad[12]; s32 unkC; s32 unk10; };
+extern "C" void Delete__8CColPrimFi(CColPrim_local7 *objet, s32 arg0) {
+    if (objet->unkC != 0) {
+        if (arg0 == -1) {
+            objet->unkC = 0;
+        } else if (objet->unk10 == arg0) {
+            objet->unkC = 0;
+        }
+    }
+}
 void CColPrim::Initialize(void) {
     this->field_0xC = 0;
     this->field_0x10 = -1;

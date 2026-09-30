@@ -199,7 +199,31 @@ extern "C" s32 EditPlaceAnimeEndCheck__Fv(void) {
 }
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", __ct__11CStarEffectFv);
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", GetFishParam__Fi);
-INCLUDE_ASM("nonmatchings/game/cdngfloormanager", EsaInit__Fv);
+extern "C" void *Lure;
+extern "C" unsigned int EsaChara;
+extern "C" unsigned int LureFrame;
+extern "C" unsigned int EsaNo;
+extern "C" unsigned int LocalEsaNo;
+extern "C" unsigned int FavoredEsa;
+extern "C" unsigned int LureNo;
+struct LureClass {
+virtual void D0();
+virtual void D1();
+virtual void D2();
+virtual void D3();
+virtual void D4();
+virtual void D5();
+virtual void D6();
+virtual void D7();
+virtual void D8();
+virtual void D9();
+virtual void D10();
+virtual void D11();
+virtual void D12();
+virtual void Init();
+};
+extern "C" void EsaInit__Fv(void) { void *o=Lure; EsaChara=0; LureFrame=0; EsaNo=0xFFFFFFFF; LocalEsaNo=0xFFFFFFFF; FavoredEsa=0xFFFFFFFF; LureNo=0xFFFFFFFF; ((LureClass*)o)->Init(); }
+
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", ReplayPrevBGM__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", LoadExMotionBG__FP11SubGameInfoP1);
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", LoadExMotionStep__FP11SubGameInfoP9mgCMemory);

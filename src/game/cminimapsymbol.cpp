@@ -51,7 +51,13 @@ extern "C" CChillAfterHit *__ct__14CChillAfterHitFv(CChillAfterHit *objet) {
     Initialize__14CChillAfterHitFv(objet);
     return objet;
 }
-INCLUDE_ASM("nonmatchings/game/cminimapsymbol", __ct__8CThunderFv);
+extern "C" void __ct__8mgCFrameFv(void *);
+extern "C" void *__ct__12mgCFrameAttrFv(void *);
+extern "C" void *__ct__8CThunderFv(void *objet) {
+    __ct__8mgCFrameFv(objet);
+    __ct__12mgCFrameAttrFv((char *)objet + 0x110);
+    return objet;
+}
 CAfterWire::CAfterWire(void) {
     this->field_0x0 = 0;
 }
@@ -122,7 +128,11 @@ extern "C" s32 _ROOM_FIXED__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", _GRID_SIZE__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cminimapsymbol", _ROOM_ID__FP9SPI_STACKi);
+extern "C" int spiGetStackInt__FP9SPI_STACK(SPI_STACK *);
+extern "C" int _ROOM_ID__FP9SPI_STACKi(SPI_STACK *arg0, int arg1) {
+    *(int *)nowPriset = spiGetStackInt__FP9SPI_STACK(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", _ROOM_SIZE__FP9SPI_STACKi);
 struct nowPriset_champs_f0d9ee {
     char pad0[0x10];

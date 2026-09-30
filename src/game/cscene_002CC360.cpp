@@ -58,7 +58,11 @@ extern "C" s32 SearchCharaTexb__6CSceneFi(CScene *objet, s32 arg0) {
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", PreLoadVillager__6CSceneFiP1);
 extern "C" void DeleteFileCache__Fv(void);
 extern "C" void PreLoadVillagerEnd__6CSceneFv(void *) { DeleteFileCache__Fv(); }
-INCLUDE_ASM("nonmatchings/game/cscene_002CC360", DeleteVillager__6CSceneFi);
+extern "C" void DeleteCharaID__13CVillagerMngrFi(void *, s32);
+extern "C" s32 DeleteVillager__6CSceneFi(void *objet, s32 arg0) {
+    DeleteCharaID__13CVillagerMngrFi((u8 *)objet + 0x3050, arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", DeleteSubVillager__6CSceneFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", DeleteVillager__6CSceneFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", SearchCharaID__6CSceneFi);
@@ -277,7 +281,11 @@ extern "C" void Init__4CPotFi(CPot *objet, s32 arg0) {
     }
     objet->unk70 = 0;
 }
-INCLUDE_ASM("nonmatchings/game/cscene_002CC360", Init__Q214CVillagerPlace12ProgressInfoFv);
+struct ProgressInfoFields { s32 f0; s32 f4; s32 f8; s32 fC; s32 f10; s32 f14; s32 f18; s32 f1C; s32 f20; s32 f24; };
+extern "C" void Init__Q214CVillagerPlace12ProgressInfoFv(ProgressInfoFields *objet) {
+    objet->f0 = 0; objet->fC = 0; objet->f8 = 0; objet->f14 = 0; objet->f10 = 0;
+    objet->f1C = 0; objet->f18 = 0; objet->f24 = 0; objet->f20 = 0;
+}
 typedef struct CVillagerData {
     /* 0x00 */ s32 unk0;                            /* inferred */
     /* 0x04 */ s32 unk4;                            /* inferred */

@@ -55,7 +55,14 @@ extern "C" s32 _RUN_TAME_MOVE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
 }
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _RUN_HOLD_MOVE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _RUN_ROBO_MOVE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002D3110", _SET_MENU_FLAG__FP12RS_STACKDATAi);
+struct action_info_fields { char pad[0x76C]; s8 unk76C; };
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_002D27A0(RS_STACKDATA *);
+extern "C" s32 _SET_MENU_FLAG__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    if (arg1 != 1) return 0;
+    ((action_info_fields *) action_info[0])->unk76C = (s8) GetStackInt__FP12RS_STACKDATA_002D27A0(arg0);
+    return 1;
+}
+
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _GET_POS__FP12RS_STACKDATAi_002D32F0);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _GET_ROT__FP12RS_STACKDATAi_002D3370);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _CHECK_FRONT_KEY__FP12RS_STACKDATAi);
@@ -81,13 +88,25 @@ extern "C" s32 _SET_GUARD_FLAG__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) 
     action_info[0]->unkBF0 = GetStackInt__FP12RS_STACKDATA_002D27A0(arg0);
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/text_002D3110", _SET_MUTEKI__FP12RS_STACKDATAi_002D42F0);
+struct mute_field { char pad[0x768]; s32 value; };
+extern "C" s32 _SET_MUTEKI__FP12RS_STACKDATAi_002D42F0(RS_STACKDATA *arg0, s32 arg1) {
+    if (arg1 != 1) return 0;
+    ((mute_field *) action_info[0])->value = GetStackInt__FP12RS_STACKDATA_002D27A0(arg0);
+    return 1;
+}
+
 extern "C" s32 SetStack__FP12RS_STACKDATAi_002D2820(...);
 extern "C" s32 _CHECK_HAND_OBJ__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     SetStack__FP12RS_STACKDATAi_002D2820(arg0, action_info[0]->unk71C);
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/text_002D3110", _SET_ITEM_USED__FP12RS_STACKDATAi);
+extern "C" s32 UsedItemAction__12CActionCharaFv(void *);
+extern "C" s32 SetStack__FP12RS_STACKDATAi_002D2820(...);
+extern "C" s32 _SET_ITEM_USED__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    SetStack__FP12RS_STACKDATAi_002D2820(arg0, UsedItemAction__12CActionCharaFv(action_info[0]));
+    return 1;
+}
+
 extern "C" s32 ThrowItemObject__12CActionCharaFv(void *);
 extern "C" s32 _THROW_HAND_OBJECT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     ThrowItemObject__12CActionCharaFv(action_info[0]);
@@ -110,7 +129,14 @@ extern "C" s32 _SET_DIR_GUN__FP12RS_STACKDATAi(void *arg0, s32 arg1) {
 }
 
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _GET_NOW_HP_RATE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002D3110", _SET_BOMB__FP12RS_STACKDATAi);
+extern "C" s32 GetBattleCharaInfo__Fv(void);
+#include "runscript.hpp"
+extern "C" void SetHpRate__16CBattleCharaInfoFf(void *, f32);
+extern "C" s32 _SET_BOMB__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    SetHpRate__16CBattleCharaInfoFf((void *)GetBattleCharaInfo__Fv(), 0.05f);
+    return 1;
+}
+
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _GET_ACTION_CODE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _GET_ATTK_POINT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _GET_RING_COLOR__FP12RS_STACKDATAi);

@@ -79,7 +79,16 @@ extern "C" s32 GetNotUsedTexb__16CEffectScriptManFv(CEffectScriptMan_infere2 *ob
     }
     return objet->unk10 + temp_v1;
 }
-INCLUDE_ASM("nonmatchings/game/ceffectscriptman", AddTexb__16CEffectScriptManFv);
+struct effect_manager_l1c { char pad[0xC]; s32 unkC; char pad10[4]; s32 unk14; s32 unk18; };
+struct effect_item_l1c { char pad[0x1C]; s32 unk1C; };
+extern "C" void AddTexb__16CEffectScriptManFv(effect_manager_l1c *objet) {
+    s32 count = objet->unk18;
+    if (count < objet->unk14) {
+        objet->unk18 = count + 1;
+        effect_item_l1c *item = (effect_item_l1c *) ((objet->unkC << 2) + (s32) objet);
+        item->unk1C = item->unk1C + 1;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", BuildBase__16CEffectScriptManFiP1iP1iP9mgCMemoryi);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", BuildBase__16CEffectScriptManFPcP1iP1iP9mgCMemoryi);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", BuildPack__16CEffectScriptManFiPUiP9mgCMemoryi);
@@ -220,8 +229,26 @@ INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _GET_ORIGIN__FP12RS_STACKDATAi
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _AUTO_SET_OFFSET__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _GET_WORK_VECT1__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _GET_WORK_VECT2__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _GET_TARGET_ID__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _GET_USER_ID__FP12RS_STACKDATAi);
+#include "runscript.hpp"
+extern "C" u32 now_script;
+struct target_script_l1c { char pad[0x110]; s32 unk110; };
+struct arg0_champs_aef12e;
+extern "C" void SetStack__FP12RS_STACKDATAi_002E8350(arg0_champs_aef12e *, s32);
+extern "C" s32 _GET_TARGET_ID__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    if (arg1 != 1) return 0;
+    SetStack__FP12RS_STACKDATAi_002E8350((arg0_champs_aef12e *) arg0, ((target_script_l1c *) now_script)->unk110);
+    return 1;
+}
+#include "runscript.hpp"
+extern "C" u32 now_script;
+struct user_script_l1c { char pad[0xA8]; s32 unkA8; };
+struct arg0_champs_aef12e;
+extern "C" void SetStack__FP12RS_STACKDATAi_002E8350(arg0_champs_aef12e *, s32);
+extern "C" s32 _GET_USER_ID__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    if (arg1 != 1) return 0;
+    SetStack__FP12RS_STACKDATAi_002E8350((arg0_champs_aef12e *) arg0, ((user_script_l1c *) now_script)->unkA8);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _GET_VALUE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _SET_VALUE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _CHR_SET_SHOW__FP12RS_STACKDATAi);
@@ -266,7 +293,7 @@ struct now_script_champs_52d9e2 {
     /* 0x28 */ s32 unk28;
     /* 0x2C */ s32 unk2C;
 };
-extern "C" s32 DeleteSprite__16CEffectScriptManFP10_ES_SPRITE(...);
+extern "C" void DeleteSprite__16CEffectScriptManFP10_ES_SPRITE(u32, _ES_SPRITE *);
 extern "C" s32 _SPT_DELETE_SPRITE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     _ES_SPRITE *temp_a1;
 

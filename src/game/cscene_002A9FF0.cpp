@@ -13,7 +13,9 @@ extern s32 eaAnaSrc;
 struct SPI_STACK;
 
 
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", Init__Q26CScene8BGM_INFOFv);
+struct BgmInit { int pad0; int a; int b; float c; char pad10[8]; float d; int pad1c; int pad20; int pad24; };
+extern "C" void Init__Q26CScene8BGM_INFOFv(BgmInit *p) { p->a=-1; p->b=-1; p->pad1c=0; p->c=1.0f; p->pad24=0; p->d=1.0f; }
+
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", InitSnd__6CSceneFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", InitBGM__6CSceneFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", InitSeSrc__6CSceneFv);
@@ -99,17 +101,39 @@ INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", SoundAllStop__6CSceneFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", InitLooSeMngr__6CSceneFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetActiveBgmInfo__6CSceneFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", PlayBGM__6CSceneFiif);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", PauseBGM__6CSceneFv);
+extern "C" int GetActiveBgmInfo__6CSceneFv(void *);
+extern "C" s32 sndSePause__FUii(u32, s32);
+extern "C" void PauseBGM__6CSceneFv(void *self) {
+    void *info = (void *)GetActiveBgmInfo__6CSceneFv(self);
+    s32 status = *(s32 *)((char *)info + 0x20);
+    if (status >= 0) sndSePause__FUii(*(u32 *)((char *)info + 4), status);
+}
+
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", RePlayBGM__6CSceneFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", StopBGM__6CSceneFi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", SetVolBGM__6CSceneFi);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetVolBGM__6CSceneFv);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetBGMState__6CSceneFv);
+extern "C" int GetActiveBgmInfo__6CSceneFv(void *);
+extern "C" int GetVolBGM__6CSceneFv(void *self) {
+    return *(int *)((char *)GetActiveBgmInfo__6CSceneFv(self) + 0x10);
+}
+
+extern "C" int GetActiveBgmInfo__6CSceneFv(void *);
+extern "C" int sndGetSeStatus__FUii(unsigned int, int);
+extern "C" int GetBGMState__6CSceneFv(void *self) { void *p=(void *)GetActiveBgmInfo__6CSceneFv(self); return sndGetSeStatus__FUii(*(unsigned int *)((char *)p+4),*(int *)((char *)p+0x20)); }
+
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", SetVolfBGM__6CSceneFf);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetVolfBGM__6CSceneFv);
+extern "C" int GetActiveBgmInfo__6CSceneFv(void *);
+extern "C" float GetVolfBGM__6CSceneFv(void *self) {
+    return *(float *)((char *)GetActiveBgmInfo__6CSceneFv(self) + 0x14);
+}
+
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", FadeOutBGM__6CSceneFi);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", FadeInBGM__6CSceneFi);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", AutoChangeBGMVol__6CSceneFi);
+extern "C" int GetActiveBgmInfo__6CSceneFv(void *);
+extern "C" void AutoChangeBGMVol__6CSceneFi(void *self, int arg0) {
+    *(int *)((char *)GetActiveBgmInfo__6CSceneFv(self) + 0x24) = arg0;
+}
+
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetActiveBgmStatus__6CSceneFPQ26CScene10BGM_STATUS);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", SetActiveBgmStatus__6CSceneFPQ26CScene10BGM_STATUS);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", PlayEnvBGM__6CSceneFif);
@@ -217,7 +241,9 @@ extern "C" s32 CheckLoadSeBase__6CSceneFi(CScene_infere3 *objet, s32 arg0) {
     return objet->unkA49C != arg0;
 }
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", SearchSndDataID__6CSceneFi);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetDefBgmNo__6CSceneFi);
+extern "C" int SearchSndDataID__6CSceneFi(void *, int);
+extern "C" int GetDefBgmNo__6CSceneFi(void *self, int id) { short *p=(short *)SearchSndDataID__6CSceneFi(self,id); if(p!=0) return p[1]; return -1; }
+
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetDefEventSeFile__6CSceneFiPc);
 extern "C" s32 SearchSndDataID__6CSceneFi(void *, s32);
 extern "C" u8 _1194[15];
@@ -542,7 +568,9 @@ extern "C" s32 GetAnalyzeFlag__9CEditDataFii(CEditData *objet, s32 arg0, s32 arg
     s32 sp30[8];
     return GetAnalyzeFlag__9CEditDataFiiPiPi(objet, arg0, arg1, sp10, sp30);
 }
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", dbgSetContintionFlag__9CEditDataFiii);
+extern "C" int dbgSetContintionFlag__9CEditDataFiii(void *, int, int, int);
+extern "C" int dbgSetContintionFlag__9CEditDataFiii(void *p, int a1, int index, int value) { if(index<0 || index>=0x40) return; *(unsigned char *)(index+(int)p+0x5050)=(unsigned char)value; }
+
 extern "C" s32 GetAnalyzeData__9CEditDataFii(void *, s32, s32);
 struct AnalyzeDataCond {
     char pad0[0x8];

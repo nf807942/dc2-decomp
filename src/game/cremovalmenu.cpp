@@ -57,7 +57,12 @@ INCLUDE_ASM("nonmatchings/game/cremovalmenu", PictureSeiton__FP17USER_PICTURE_IN
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", AttachPictTex__FiPP10mgCTextureP17USER_PICTURE_INFOi);
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", CheckPhotoDataNoNeed__FP17USER_PICTURE_INFOiPi);
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", IsTakePhoto__Fv);
-INCLUDE_ASM("nonmatchings/game/cremovalmenu", Initialize__13CDC2AlbumDataFv);
+extern "C" void *memset(void *, int, unsigned);
+extern "C" s32 RelateAlbumPicData__13CDC2AlbumDataFv(void *);
+extern "C" void Initialize__13CDC2AlbumDataFv(void *objet) {
+    memset(objet, 0, 0x64CB0);
+    RelateAlbumPicData__13CDC2AlbumDataFv(objet);
+}
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", RelateAlbumPicData__13CDC2AlbumDataFv);
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", DeletePhotoData__13CDC2AlbumDataFi);
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", GetAlbumPhotoInfo__13CDC2AlbumDataFi);

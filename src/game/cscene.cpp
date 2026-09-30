@@ -355,7 +355,12 @@ INCLUDE_ASM("nonmatchings/game/cscene", GetCamera__6CSceneFi);
 INCLUDE_ASM("nonmatchings/game/cscene", AssignMessage__6CSceneFiP6ClsMesPc);
 INCLUDE_ASM("nonmatchings/game/cscene", GetMessage__6CSceneFi);
 INCLUDE_ASM("nonmatchings/game/cscene", AssignChara__6CSceneFiP11CCharacter2Pc);
-INCLUDE_ASM("nonmatchings/game/cscene", SetCharaNo__6CSceneFii);
+extern "C" s32 GetSceneCharacter__6CSceneFi(void *, s32);
+struct SceneCharacter_fields { char pad[0x3C]; s32 charaNo; };
+extern "C" void SetCharaNo__6CSceneFii(void *objet, s32 index, s32 value) {
+    SceneCharacter_fields *p = (SceneCharacter_fields *)GetSceneCharacter__6CSceneFi(objet, index);
+    if (p != 0) p->charaNo = value;
+}
 struct CScene;
 extern "C" s32 GetSceneCharacter__6CSceneFi(void *, s32);
 struct temp_v0_champs {
@@ -426,7 +431,12 @@ extern "C" void DeleteEffect__6CSceneFi(CScene *objet, s32 arg0) {
         Initialize__12CSceneEffectFv(temp_v0);
     }
 }
-INCLUDE_ASM("nonmatchings/game/cscene", GetEffect__6CSceneFi);
+extern "C" int GetSceneEffect__6CSceneFi(void *, int);
+extern "C" int GetEffect__6CSceneFi(void *self, int arg0) {
+    void *p = (void *)GetSceneEffect__6CSceneFi(self, arg0);
+    if (p != 0) return *(int *)((char *)p + 0x34);
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cscene", StepEffectScript__6CSceneFi);
 INCLUDE_ASM("nonmatchings/game/cscene", DrawEffectScript__6CSceneFi);
 struct CScene;
@@ -481,8 +491,19 @@ extern "C" s32 GetStatus__6CSceneFii(CScene *objet, s32 arg0, s32 arg1) {
     }
     return 0;
 }
-INCLUDE_ASM("nonmatchings/game/cscene", SetType__6CSceneFiii);
-INCLUDE_ASM("nonmatchings/game/cscene", GetType__6CSceneFii);
+extern "C" s32 GetData__6CSceneFii(void *, s32, s32);
+struct SceneType_fields { s32 pad; s32 type; };
+extern "C" void SetType__6CSceneFiii(void *objet, s32 arg0, s32 arg1, s32 value) {
+    SceneType_fields *p = (SceneType_fields *)GetData__6CSceneFii(objet, arg0, arg1);
+    if (p != 0) p->type = value;
+}
+extern "C" s32 GetData__6CSceneFii(void *, s32, s32);
+struct GetType_fields { char pad[4]; s32 value; };
+extern "C" s32 GetType__6CSceneFii(void *objet, s32 arg0, s32 arg1) {
+    GetType_fields *p = (GetType_fields *)GetData__6CSceneFii(objet, arg0, arg1);
+    if (p != 0) return p->value;
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cscene", GetActiveMap__6CSceneFPP4CMapi);
 extern "C" s32 GetSceneCharacter__6CSceneFi(void *, s32);
 struct inferred;
@@ -516,7 +537,12 @@ extern "C" s32 GetCharaTexb__6CSceneFi(CScene_infere *objet, s32 arg0) {
     }
     return (objet->unk2E74 + arg0) - 8;
 }
-INCLUDE_ASM("nonmatchings/game/cscene", SetCharaTexb__6CSceneFii);
+extern "C" s32 GetSceneCharacter__6CSceneFi(void *, s32);
+struct SceneTexb_fields { char pad[0x38]; s32 texb; };
+extern "C" void SetCharaTexb__6CSceneFii(void *objet, s32 index, s32 value) {
+    SceneTexb_fields *p = (SceneTexb_fields *)GetSceneCharacter__6CSceneFi(objet, index);
+    if (p != 0) p->texb = value;
+}
 INCLUDE_ASM("nonmatchings/game/cscene", SetTime__6CSceneFf);
 extern "C" void SetTime__6CSceneFf(void *, f32);
 extern "C" void AddTime__6CSceneFf(void *objet, f32 arg0) {

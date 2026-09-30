@@ -23,7 +23,13 @@ extern "C" s32 videoDecEndPut__FP8VideoDeci(void *self, s32 a) {
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", cpy2area__FPUciPUciPUciPUci);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", audioDecBeginPut__FP8AudioDecPPUcPiPPUcPi);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", audioDecEndPut__FP8AudioDeci);
-INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", isAudioOK__Fv);
+extern "C" unsigned char isWithAudio;
+struct AudioDec_local { int f0; char pad4[0x28]; int f2C; char pad30[4]; int f34,f38,f3C,f40,f44,f48,f4C,f50,f54,f58; };
+extern "C" AudioDec_local audioDec;
+extern "C" int audioDecIsPreset__FP8AudioDec(AudioDec_local *);
+extern "C" int isAudioOK__Fv(void) {
+    return isWithAudio != 0 ? audioDecIsPreset__FP8AudioDec(&audioDec) : 1;
+}
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", DrawFireEffect__8CEditMapFi);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", DrawFireRaster__8CEditMapFv);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", DrawEffect__8CEditMapFv);

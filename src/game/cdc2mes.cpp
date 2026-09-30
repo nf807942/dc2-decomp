@@ -15,7 +15,8 @@ INCLUDE_ASM("nonmatchings/game/cdc2mes", DrawSubGameListFix__FP10mgCTextureiiii)
 INCLUDE_ASM("nonmatchings/game/cdc2mes", DrawSubGameScrlList__FP10mgCTexturePiPi);
 INCLUDE_ASM("nonmatchings/game/cdc2mes", DrawSubGameUnderLine__FP10mgCTextureiii);
 INCLUDE_ASM("nonmatchings/game/cdc2mes", GetHatena__Fv);
-INCLUDE_ASM("nonmatchings/game/cdc2mes", GetMenuBigNum__Fi);
+extern int MenuBigNum[];
+extern "C" int GetMenuBigNum__Fi(int id) { return MenuBigNum[id % 10]; }
 INCLUDE_ASM("nonmatchings/game/cdc2mes", SetMenuBigNum2__FPci);
 INCLUDE_ASM("nonmatchings/game/cdc2mes", SetMenuBigNum__FPci);
 #include "gen/CFont.hpp"

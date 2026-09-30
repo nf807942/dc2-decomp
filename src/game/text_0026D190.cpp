@@ -10,7 +10,15 @@
 
 #include "runscript.hpp"
 
-INCLUDE_ASM("nonmatchings/game/text_0026D190", _CHECK_INVENT_ITEM__FP12RS_STACKDATAi);
+struct RS_STACKDATA_pair { int a; int b; };
+extern "C" int GetStackInt__FP12RS_STACKDATA_00262DA0(...);
+extern "C" int CheckInventItem__Fi(int);
+extern "C" void SetStack__FP12RS_STACKDATAi_00262E70(int, int);
+extern "C" int _CHECK_INVENT_ITEM__FP12RS_STACKDATAi(RS_STACKDATA_pair *arg0, int arg1) {
+    int value = CheckInventItem__Fi(GetStackInt__FP12RS_STACKDATA_00262DA0(arg0++));
+    SetStack__FP12RS_STACKDATAi_00262E70((int)arg0, value);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_0026D190", _SET_AI__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026D190", _CHECK_INVENT_PHOTO__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026D190", _GET_PHOTO_NUM__FP12RS_STACKDATAi);

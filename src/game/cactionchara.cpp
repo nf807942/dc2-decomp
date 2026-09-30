@@ -341,7 +341,12 @@ extern "C" s32 CheckRunEvent__12CActionCharaFv(void *self) {
     return b;
 }
 
-INCLUDE_ASM("nonmatchings/game/cactionchara", SetMaskFlag__12CActionCharaFii);
+struct mask_fields { char pad[0x6A0]; s32 unk6A0; };
+extern "C" void SetMaskFlag__12CActionCharaFii(mask_fields *objet, s32 arg0, s32 arg1) {
+    if (arg1 != 0) objet->unk6A0 = objet->unk6A0 | arg0;
+    else objet->unk6A0 = objet->unk6A0 & ~arg0;
+}
+
 INCLUDE_ASM("nonmatchings/game/cactionchara", EntryObject__12CActionCharaFPci);
 struct CActionChara_infere_2070c5;
 typedef struct CActionChara_infere_2070c5 {

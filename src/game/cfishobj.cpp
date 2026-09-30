@@ -138,7 +138,10 @@ extern "C" s32 CheckRodActionChance__FiPi(s32 arg0, s32 *arg1) {
     return 0;
 }
 INCLUDE_ASM("nonmatchings/game/cfishobj", FishBattle__FP6CSceneP6CCPolyi);
-INCLUDE_ASM("nonmatchings/game/cfishobj", GetFishPosVelo__FPfPf);
+typedef unsigned __int128 u128;
+extern "C" unsigned char FishPoint[];
+extern "C" void GetFishPosVelo__FPfPf(float *a0, float *a1) { u128 v=*(volatile u128 *)(FishPoint); *(u128*)a0=v; *(u128*)a1=*(volatile u128 *)(FishPoint+0x20); }
+
 INCLUDE_ASM("nonmatchings/game/cfishobj", BindFishObj__Fv);
 INCLUDE_ASM("nonmatchings/game/cfishobj", RodStep__FP6CSceneP1);
 INCLUDE_ASM("nonmatchings/game/cfishobj", BindPosition__FPfPfff_00317600);

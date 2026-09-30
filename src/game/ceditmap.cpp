@@ -162,7 +162,8 @@ extern "C" void sceVu0InversMatrix(...);
 extern "C" void GetInversMatrix__8CEditMapFPA4_fPA4_f(void *self, f32 (*a)[4], f32 (*b)[4]) {
     sceVu0InversMatrix(a, b);
 }
-INCLUDE_ASM("nonmatchings/game/ceditmap", ConvertParts__8CEditMapFP10CEditParts);
+struct MapParts { char pad[0xD44]; int value; };
+extern "C" int ConvertParts__8CEditMapFP10CEditParts(MapParts *self, void *parts) { return ((int)parts-self->value)/816; }
 INCLUDE_ASM("nonmatchings/game/ceditmap", GetSameParts__8CEditMapFi);
 extern "C" s32 GetePartsInfoAtID__8CEditMapFi(void *, s32);
 struct temp_v0_champs {
@@ -305,7 +306,18 @@ loop_1:
     goto loop_1;
 }
 
-INCLUDE_ASM("nonmatchings/game/ceditmap", Initialize__10CEditPartsFv);
+struct CEditParts_l1a { char pad0[0xB0]; s32 a; char pB4[0x23C]; s32 b; char p2F4[0x1C]; s32 c; s32 d; char p318[0xC]; s32 e; s32 f; };
+extern "C" s32 Initialize__9CMapPartsFv(void *);
+extern "C" s32 Initialize__10CEditPartsFv(CEditParts_l1a *objet) {
+    objet->a = 0;
+    objet->b = 0;
+    objet->e = 0;
+    objet->c = 0;
+    objet->f = 0;
+    objet->d = 0;
+    *(s32 *)((u8 *)objet + 0x318) = 0;
+    return Initialize__9CMapPartsFv(objet);
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap", StandardPos__Ff);
 INCLUDE_ASM("nonmatchings/game/ceditmap", SetPosition__10CEditPartsFPf);
 INCLUDE_ASM("nonmatchings/game/ceditmap", SetPosition__10CEditPartsFfff);
@@ -407,7 +419,14 @@ extern "C" s32 GetWallGroupNum__10CEditPartsFv(CEditParts_infere3 *objet) {
     }
     return 0;
 }
-INCLUDE_ASM("nonmatchings/game/ceditmap", GetPartsType__10CEditPartsFv);
+struct CEditPartsInfo;
+extern "C" s32 GetPartsType__14CEditPartsInfoFv(CEditPartsInfo *);
+struct GetPartsType_fields { char pad[0x324]; void *info; };
+extern "C" s32 GetPartsType__10CEditPartsFv(GetPartsType_fields *objet) {
+    void *p = objet->info;
+    if (p != 0) return GetPartsType__14CEditPartsInfoFv((CEditPartsInfo *)p);
+    return -1;
+}
 extern "C" void Copy__9CMapPartsFR9CMapPartsP9mgCMemory(...);
 extern "C" void Copy__10CEditPartsFR9CMapPartsP9mgCMemory(void *a, void *b, void *c) {
     Copy__9CMapPartsFR9CMapPartsP9mgCMemory(a, b, c);

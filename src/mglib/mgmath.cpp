@@ -10,10 +10,24 @@
 
 INCLUDE_ASM("nonmatchings/mglib/mgmath", GetZBufVram__FPi);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", CheckCopyToZBufVram__FP10mgCTexturePi);
-INCLUDE_ASM("nonmatchings/mglib/mgmath", __ct__10mgCTextureFv);
+extern "C" void Initialize__10mgCTextureFv(void *);
+struct mgCTexture;
+#pragma schedule off
+extern "C" mgCTexture *__ct__10mgCTextureFv(mgCTexture *objet) {
+    Initialize__10mgCTextureFv(objet);
+    return objet;
+}
+#pragma schedule reset
 INCLUDE_ASM("nonmatchings/mglib/mgmath", Initialize__10mgCTextureFv);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", Bilinear__10mgCTextureFi);
-INCLUDE_ASM("nonmatchings/mglib/mgmath", __ct__15mgCTextureBlockFv);
+struct mgCTextureBlock;
+extern "C" void Initialize__15mgCTextureBlockFv(u32 *objet);
+#pragma schedule off
+extern "C" mgCTextureBlock *__ct__15mgCTextureBlockFv(mgCTextureBlock *objet) {
+    Initialize__15mgCTextureBlockFv((u32 *) objet);
+    return objet;
+}
+#pragma schedule reset
 #pragma schedule off
 extern "C" void Initialize__15mgCTextureBlockFv(u32 *objet) {
     objet[1] = 0;
@@ -136,7 +150,18 @@ extern "C" void mgVectorMin__FPfPfPf(float *d, float *a, float *b) {
         sqc2 vf18, 0(d)
     }
 }
-INCLUDE_ASM("nonmatchings/mglib/mgmath", mgVectorMin__FPfPfPfPfPf);
+extern "C" void mgVectorMin__FPfPfPfPfPf(f32 *out, f32 *a, f32 *b, f32 *c, f32 *d) {
+    asm {
+        lqc2 vf15, 0(a)
+        lqc2 vf16, 0(b)
+        lqc2 vf17, 0(c)
+        lqc2 vf18, 0(d)
+        vmini.xyzw vf20, vf15, vf16
+        vmini.xyzw vf20, vf20, vf17
+        vmini.xyzw vf20, vf20, vf18
+        sqc2 vf20, 0(out)
+    }
+}
 extern "C" void mgVectorMaxMin__FPfPfPfPf(float *mx, float *mn, float *a, float *b) {
     asm {
         lqc2 vf15, 0(a)
@@ -147,10 +172,33 @@ extern "C" void mgVectorMaxMin__FPfPfPfPf(float *mx, float *mn, float *a, float 
         sqc2 vf20, 0(mn)
     }
 }
-INCLUDE_ASM("nonmatchings/mglib/mgmath", mgVectorMaxMin__FPfPfPfPfPf);
+extern "C" void mgVectorMaxMin__FPfPfPfPfPf(f32 *mx, f32 *mn, f32 *a, f32 *b, f32 *c) {
+    asm {
+        lqc2 vf15, 0(a)
+        lqc2 vf16, 0(b)
+        lqc2 vf17, 0(c)
+        vmax.xyzw vf18, vf15, vf16
+        vmini.xyzw vf20, vf15, vf16
+        vmax.xyzw vf19, vf18, vf17
+        vmini.xyzw vf21, vf20, vf17
+        sqc2 vf19, 0(mx)
+        sqc2 vf21, 0(mn)
+    }
+}
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgVectorMaxMin__FPfPfPfPfPfPf);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgBoxMaxMin__FP9mgVu0FBOXP9mgVu0FBOX);
-INCLUDE_ASM("nonmatchings/mglib/mgmath", mgPlaneNormal__FPfPfPfPf);
+extern "C" void mgPlaneNormal__FPfPfPfPf(f32 *out, f32 *a, f32 *b, f32 *c) {
+    asm {
+        lqc2 vf15, 0(a)
+        lqc2 vf16, 0(b)
+        lqc2 vf17, 0(c)
+        vsub.xyzw vf10, vf16, vf15
+        vsub.xyzw vf11, vf17, vf15
+        vopmula.xyz ACC, vf10, vf11
+        vopmsub.xyz vf12, vf11, vf10
+        sqc2 vf12, 0(out)
+    }
+}
 extern "C" f32 sceVu0InnerProduct(...);
 extern "C" s32 sceVu0SubVector(...);
 extern "C" void mgDistPlanePoint__FPfPfPf(f32 *arg0, f32 *arg1, f32 *arg2) {
@@ -241,7 +289,10 @@ extern "C" s32 mgCheckPointPoly3_XYZ__FPfPfPfPfPf(f32 *arg0, f32 *arg1, f32 *arg
     }
     return 0;
 }
-INCLUDE_ASM("nonmatchings/mglib/mgmath", mgCheckPointPoly3_XZ__FPfPfPfPf);
+extern "C" s32 Check_Point_Poly3__Fffffffff(f32, f32, f32, f32, f32, f32, f32, f32);
+extern "C" s32 mgCheckPointPoly3_XZ__FPfPfPfPf(f32 *a, f32 *b, f32 *c, f32 *d) {
+    return Check_Point_Poly3__Fffffffff(a[0], a[2], b[0], b[2], c[0], c[2], d[0], d[2]);
+}
 extern "C" s32 Check_Point_Poly3__Fffffffff(f32 arg0, f32 arg1, f32 arg2, f32 arg3, f32 arg4, f32 arg5, f32 arg6, f32 arg7) {
     f32 temp_f1;
     f32 temp_f4;
@@ -292,13 +343,66 @@ extern "C" s32 Check_Point_Poly3__Fffffffff(f32 arg0, f32 arg1, f32 arg2, f32 ar
     return 0;
 }
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgDistVector__FPf);
-INCLUDE_ASM("nonmatchings/mglib/mgmath", mgDistVectorXZ__FPf);
-INCLUDE_ASM("nonmatchings/mglib/mgmath", mgDistVector2__FPf);
+extern "C" f32 mgDistVectorXZ__FPf(f32 *v) {
+    asm {
+        lqc2 vf4, 0(v)
+        vmul.xyz vf4, vf4, vf4
+        vmr32.xy vf5, vf4
+        vmr32.x vf6, vf5
+        vadd.x vf7, vf4, vf6
+        vsqrt Q, vf7x
+        vwaitq
+        cfc2.ni v0, vi22
+        mtc1 v0, f0
+        jr ra
+        nop
+        nop
+    }
+}
+extern "C" f32 mgDistVector2__FPf(f32 *v) {
+    asm {
+        lqc2 vf4, 0(v)
+        vmul.xyz vf4, vf4, vf4
+        vmr32.xy vf5, vf4
+        vmr32.x vf6, vf5
+        vadd.x vf7, vf4, vf5
+        vadd.x vf5, vf6, vf7
+        qmfc2.ni v0, vf5
+        mtc1 v0, f0
+        jr ra
+        nop
+    }
+}
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgDistVector__FPfPf);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgDistVectorXZ__FPfPf);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgDistVector2__FPfPf);
-INCLUDE_ASM("nonmatchings/mglib/mgmath", mgDistVectorXZ2__FPfPf);
-INCLUDE_ASM("nonmatchings/mglib/mgmath", mgUnitMatrix__FPA4_f);
+extern "C" f32 mgDistVectorXZ2__FPfPf(f32 *a, f32 *b) {
+    asm {
+        lqc2 vf2, 0(a)
+        lqc2 vf3, 0(b)
+        vsub.xyz vf4, vf3, vf2
+        vmul.xyz vf4, vf4, vf4
+        vmr32.xy vf5, vf4
+        vmr32.x vf6, vf5
+        vadd.x vf7, vf4, vf6
+        qmfc2.ni v0, vf7
+        mtc1 v0, f0
+        jr ra
+        nop
+        nop
+    }
+}
+extern "C" void mgUnitMatrix__FPA4_f(f32 (*arg0)[4]) {
+    asm {
+        vmr32.xyzw vf1, vf0
+        vmr32.xyzw vf2, vf1
+        vmr32.xyzw vf3, vf2
+        sqc2 vf0, 0x30(arg0)
+        sqc2 vf1, 0x20(arg0)
+        sqc2 vf2, 0x10(arg0)
+        sqc2 vf3, 0x0(arg0)
+    }
+}
 extern "C" void mgZeroMatrix__FPA4_f(float (*m)[4]) {
     asm {
         vsub.xyzw vf1, vf1, vf1

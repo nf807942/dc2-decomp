@@ -29,7 +29,15 @@ INCLUDE_ASM("nonmatchings/game/cmenugeorama", MenuPlacedHouseMessMake__FP14CEdit
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", MenuPlacedHousePosLinkMes__Fv);
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", MenuMapPartsDraw__FRi);
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", MenuGeoramaMessageMake__Fi);
-INCLUDE_ASM("nonmatchings/game/cmenugeorama", CheckGekkaViewMode__Fi);
+extern "C" s32 CheckBitFlagMenu__Fi(s32);
+extern "C" s32 CheckGekkaViewMode__Fi(s32 arg0) {
+    if (arg0 != 4) goto block_4;
+    if (CheckBitFlagMenu__Fi(0x2BE) == 0) goto block_4;
+    return 1;
+block_4:
+    return 0;
+}
+
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", InitEnd__12CMenuGeoramaFv);
 extern "C" u32 GeoRequestFlag;
 typedef struct MenuGeoramaSystemData_pointe {
@@ -229,7 +237,9 @@ INCLUDE_ASM("nonmatchings/game/cmenugeorama", GetNowSelectEditPartsInfo__12CMenu
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", LoadGeoramaPart__12CMenuGeoramaFii);
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", UpdateGeoramaPartColor__12CMenuGeoramaFi);
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", AttachFormInfo__12CMenuGeoramaFv);
-INCLUDE_ASM("nonmatchings/game/cmenugeorama", SetGeoListInfo__12CMenuGeoramaFiii);
+struct Entry { int a,b; }; struct Geo { char pad[0x1B7F4]; Entry data[1]; };
+extern "C" void SetGeoListInfo__12CMenuGeoramaFiii(Geo *a0, int a1, int a2, int a3) { a0->data[a1].a=a2; a0->data[a1].b=a3; }
+
 extern "C" u8 _3181[15];
 extern "C" u8 _3182[16];
 #include "menu.hpp"

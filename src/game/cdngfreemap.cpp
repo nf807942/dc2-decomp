@@ -12,7 +12,14 @@
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", _CHECK_PAUSE__FP12RS_STACKDATAi_001E8790);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", _GET_BIT_FLAG__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", _SET_BIT_FLAG__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/cdngfreemap", _GET_ATT_TYPE__FP12RS_STACKDATAi);
+struct nowMonster_pointe;
+extern "C" struct nowMonster_pointe *nowMonster;
+extern "C" void SetStack__FP12RS_STACKDATAi_001E1BE0(s32 *, s32);
+extern "C" s32 _GET_ATT_TYPE__FP12RS_STACKDATAi(s32 *arg0, s32 arg1) {
+    if (arg1 != 1) return 0;
+    SetStack__FP12RS_STACKDATAi_001E1BE0(arg0, *(s16 *)((u8 *)nowMonster + 0x12A4));
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", _GET_USER_ATTR__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", _TRANS_RESERV_IMG__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", _GET_STS_ATTR__FP12RS_STACKDATAi);
@@ -40,16 +47,40 @@ extern "C" s32 _SET_PIYORI_MARK__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1)
     Set__7CPiyoriFP9mgCObjects(&nowMonster->unk1270, nowMonster, nowMonster->unk1338);
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/cdngfreemap", _CHECK_PIYORI__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/cdngfreemap", _GET_BASE_ATTACK__FP12RS_STACKDATAi);
+extern "C" void SetStack__FP12RS_STACKDATAi_001E1BE0(s32 *, s32);
+extern "C" s32 _CHECK_PIYORI__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    if (arg1 != 1) return 0;
+    SetStack__FP12RS_STACKDATAi_001E1BE0((s32 *)arg0, nowMonster->unk1338);
+    return 1;
+}
+extern "C" struct nowMonster_pointe *nowMonster;
+extern "C" void SetStack__FP12RS_STACKDATAi_001E1BE0(s32 *, s32);
+extern "C" s32 _GET_BASE_ATTACK__FP12RS_STACKDATAi(s32 *arg0, s32 arg1) {
+    SetStack__FP12RS_STACKDATAi_001E1BE0(arg0, *(u16 *)((u8 *)nowMonster + 0x1318));
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", _GET_NEAR_MONS_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", _SET_INDEXOBJ_SIZE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", _GET_INDEXOBJ_SIZE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/cdngfreemap", _SET_MOTION_BLUR__FP12RS_STACKDATAi_001E8CF0);
+struct nowScene_0037D4E4_pointe;
+extern "C" nowScene_0037D4E4_pointe *nowScene_0037D4E4;
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_001E1B60(s32 *arg0);
+extern "C" s32 _SET_MOTION_BLUR__FP12RS_STACKDATAi_001E8CF0(s32 *arg0, s32 arg1) {
+    if (arg1 != 1) return 0;
+    *(s32 *)((u8 *)nowScene_0037D4E4 + 0x2C9C) = GetStackInt__FP12RS_STACKDATA_001E1B60(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", _MONS_SE_PLAY__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", _MONS_SE_STOP__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", _MONS_SE_LOOP__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/cdngfreemap", _MONS_VOL_CTRL__FP12RS_STACKDATAi);
+struct nowMonster_pointe;
+extern "C" struct nowMonster_pointe *nowMonster;
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_001E1B60(s32 *arg0);
+extern "C" s32 _MONS_VOL_CTRL__FP12RS_STACKDATAi(s32 *arg0, s32 arg1) {
+    if (arg1 != 1) return 0;
+    *(s32 *)((u8 *)nowMonster + 0x590) = GetStackInt__FP12RS_STACKDATA_001E1B60(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", _SET_MAPOBJ_SHOW__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", SetMonsterScript__FP10CRunScriptPcP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", SetMonsterExtendTable__Fv);
@@ -222,7 +253,13 @@ extern "C" s32 GetNextGlid__11CDngFreeMapFP9GLID_INFOPi(CDngFreeMap_infere2 *obj
     }
     return GetNextGlid__16CDngFloorManagerFP9GLID_INFOPi(temp_a0, arg0, arg1);
 }
-INCLUDE_ASM("nonmatchings/game/cdngfreemap", GetRoomGlid__11CDngFreeMapFi);
+extern "C" s32 GetDngMapFloorGlidInfo__16CDngFloorManagerFi(void *, s32);
+struct DngFreeMap_fields { s32 pad; void *manager; };
+extern "C" s32 GetRoomGlid__11CDngFreeMapFi(void *objet, s32 room) {
+    DngFreeMap_fields *p = (DngFreeMap_fields *)objet;
+    if (p->manager != 0) return GetDngMapFloorGlidInfo__16CDngFloorManagerFi(p->manager, room);
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", GetEntranceRoomGlid__11CDngFreeMapFv);
 extern "C" u8 mgTexManager[540];
 extern "C" char _1018_0036D9A0[];
@@ -339,6 +376,17 @@ extern "C" void FadeOut__11CDngFreeMapFi(CDngFreeMapFade *objet, s32 arg0) {
         objet->unkF8 = -128.0f / (f32) arg0;
     }
 }
-INCLUDE_ASM("nonmatchings/game/cdngfreemap", DeleteTexBlock__11CDngFreeMapFv);
-INCLUDE_ASM("nonmatchings/game/cdngfreemap", SetKomaMove__11CDngFreeMapFi);
+extern "C" int DeleteBlock__17mgCTextureManagerFi(void *, int);
+struct CDngFreeMap_local { char pad[0xD0]; short block; };
+extern "C" void DeleteTexBlock__11CDngFreeMapFv(CDngFreeMap_local *objet) {
+    short id = objet->block;
+    void *manager = &mgTexManager;
+    if (id >= 0) DeleteBlock__17mgCTextureManagerFi(manager, id);
+}
+struct KomaMove_fields { char pad[0xE4]; s32 link; s32 next; s16 move; };
+extern "C" void SetKomaMove__11CDngFreeMapFi(KomaMove_fields *objet, s32 value) {
+    objet->move = (s16)value;
+    objet->next = objet->link;
+    if (objet->next != 0) objet->next = *(s32 *)(objet->next + 8);
+}
 INCLUDE_ASM("nonmatchings/game/cdngfreemap", LoadDngInfo__11CDngFreeMapFP9mgCMemoryiiii);

@@ -396,20 +396,32 @@ void dbgCJISFont::Clear(void) {
 }
 INCLUDE_ASM("nonmatchings/game/cwater", __putc__11dbgCJISFontFUl);
 INCLUDE_ASM("nonmatchings/game/cwater", PrintDirect__11dbgCJISFontFiiPce);
-INCLUDE_ASM("nonmatchings/game/cwater", runerror__FPCc);
-extern "C" void runerror__FPCc(...);
+struct runerror_impure_global { u32 ptr; char pad[12]; };
+extern "C" runerror_impure_global _impure_ptr;
+extern "C" u8 _168[19];
+struct runerror_impure_ptr {
+    char pad0[0xC];
+    s32 stream;
+};
+extern "C" s32 exit(...);
+extern "C" s32 fprintf(...);
+extern "C" void runerror__FPCc(const char *arg0) {
+    fprintf(((runerror_impure_ptr *)_impure_ptr.ptr)->stream, &_168, arg0);
+    exit(-1);
+}
+extern "C" void runerror__FPCc(const char *);
 extern char _173[];
 extern "C" s32 stkoverflow__Fv(void) {
     runerror__FPCc(_173);
 }
 INCLUDE_ASM("nonmatchings/game/cwater", chk_int__F12RS_STACKDATAP8funcdata);
 INCLUDE_ASM("nonmatchings/game/cwater", is_true__F12RS_STACKDATA);
-extern "C" void runerror__FPCc(...);
+extern "C" void runerror__FPCc(const char *);
 extern char _197[];
 extern "C" void divby0error__Fv(void) {
     runerror__FPCc(_197);
 }
-extern "C" void runerror__FPCc(...);
+extern "C" void runerror__FPCc(const char *);
 extern char _202[];
 extern "C" void modby0error__Fv(void) {
     runerror__FPCc(_202);

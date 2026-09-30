@@ -383,9 +383,25 @@ extern "C" void SetColor__9mgCSpriteFiiii(void *objet, s32 r, s32 g, s32 b, s32 
 }
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", CreatePacket__9mgCSpriteFP14mgCDrawManager);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Draw__9mgCSpriteFPUiPA4_fP14mgCDrawManager);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Draw__9mgCSpriteFPA4_fP14mgCDrawManager);
+struct sprite_base2 { char pad[0x1C]; };
+struct sprite_dispatch2 : sprite_base2 {
+    virtual void d0(); virtual void d1(); virtual void d2(); virtual void d3();
+    virtual void d4(); virtual void d5(); virtual void d6(); virtual void d7(); virtual void d8();
+    virtual void Draw(s32, f32 (*)[4], void *);
+};
+extern "C" void Draw__9mgCSpriteFPA4_fP14mgCDrawManager(sprite_dispatch2 *objet, f32 (*matrix)[4], void *manager) {
+    objet->Draw(0, matrix, manager);
+}
 extern "C" s32 Iam__13mgCVisualPrimFv(void *) { return 7; }
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Draw__11mgC3DSpriteFPA4_fP14mgCDrawManager);
+struct sprite_base { char pad[0x1C]; };
+struct sprite_dispatch : sprite_base {
+    virtual void d0(); virtual void d1(); virtual void d2(); virtual void d3();
+    virtual void d4(); virtual void d5(); virtual void d6(); virtual void d7(); virtual void d8();
+    virtual void Draw(s32, f32 (*)[4], void *);
+};
+extern "C" void Draw__11mgC3DSpriteFPA4_fP14mgCDrawManager(sprite_dispatch *objet, f32 (*matrix)[4], void *manager) {
+    objet->Draw(0, matrix, manager);
+}
 void mgC3DSprite::Initialize(void) {
     this->field_0x20 = 0;
     this->field_0x0 = 0;
@@ -423,9 +439,24 @@ INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", texTEX_ANIME_DATA__FP9SPI_STACKi)
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", texSRC_TEX__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", texDEST_TEX__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", texSCROLL__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", texCLUT_COPY__FP9SPI_STACKi);
+struct SPI_STACK;
+extern "C" char nowTexData[0x10000];
+extern "C" int spiGetStackInt__FP9SPI_STACK(SPI_STACK *);
+#pragma schedule off
+extern "C" int texCLUT_COPY__FP9SPI_STACKi(SPI_STACK *arg0, int arg1) {
+    nowTexData[3] = spiGetStackInt__FP9SPI_STACK(arg0);
+    return 1;
+}
+#pragma schedule reset
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", texCOLOR__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", texALPHA_BLEND__FP9SPI_STACKi);
+struct SPI_STACK;
+extern "C" int spiGetStackInt__FP9SPI_STACK(SPI_STACK *);
+#pragma schedule off
+extern "C" s32 texALPHA_BLEND__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    if (arg1 > 0) nowTexData[0x2D] = (char) spiGetStackInt__FP9SPI_STACK(arg0);
+    return 1;
+}
+#pragma schedule reset
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", texALPHA_TEST__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", texWAIT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", texTEX_ANIME_DATA_END__FP9SPI_STACKi);

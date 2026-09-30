@@ -128,8 +128,18 @@ extern "C" void SetCameraInfoTable__4CMapFP11CCameraInfoi(u8 *self, void *a, s32
 }
 INCLUDE_ASM("nonmatchings/game/cmap", GetCameraInfo__4CMapFi);
 INCLUDE_ASM("nonmatchings/game/cmap", NewPlaceParts__4CMapFv);
-INCLUDE_ASM("nonmatchings/game/cmap", SearchMDS__4CMapFPc);
-INCLUDE_ASM("nonmatchings/game/cmap", CreateEffect__4CMapFPUiiP9mgCMemory);
+extern "C" s32 SearchMDS__11CMdsListSetFPc(void *, char *);
+struct CMapMdsList_fields { char pad[0x100]; void *list; };
+extern "C" s32 SearchMDS__4CMapFPc(void *objet, char *name) {
+    CMapMdsList_fields *p = (CMapMdsList_fields *)objet;
+    if (p->list != 0) return SearchMDS__11CMdsListSetFPc(p->list, name);
+    return 0;
+}
+extern "C" char _574_003675F8[];
+extern "C" void LoadEFPFile__11CEffectListFPcPUiiP9mgCMemory(void *, char *, u32 *, s32, void *);
+extern "C" void CreateEffect__4CMapFPUiiP9mgCMemory(void *objet, u32 *arg0, s32 arg1, void *arg2) {
+    LoadEFPFile__11CEffectListFPcPUiiP9mgCMemory((u8 *)objet + 0x310, _574_003675F8, arg0, arg1, arg2);
+}
 extern "C" s32 SaerchEffectIndex__11CEffectListFPc(void *, char *);
 extern "C" s32 SaerchEffectIndex__4CMapFPc(void *self, char *a) {
     return SaerchEffectIndex__11CEffectListFPc((u8 *) self + 0x310, a);
@@ -168,7 +178,11 @@ extern "C" s32 GetBBox__4CMapFP9mgVu0FBOX(CMap_infere *objet, mgVu0FBOX *arg0) {
 INCLUDE_ASM("nonmatchings/game/cmap", PreDraw__4CMapFPf);
 INCLUDE_ASM("nonmatchings/game/cmap", GetCharaLight__4CMapFP9mgCObjectP10CFuncPointii);
 INCLUDE_ASM("nonmatchings/game/cmap", SetFuncPLight__4CMapFPfP15CFuncPointCheck);
-INCLUDE_ASM("nonmatchings/game/cmap", __ct__10CFuncPointFv);
+extern "C" void __ct__8mgCFrameFv(void *);
+extern "C" u8 *__ct__10CFuncPointFv(u8 *objet) {
+    __ct__8mgCFrameFv(objet + 0x70);
+    return objet;
+}
 INCLUDE_ASM("nonmatchings/game/cmap", ResetFuncPLight__4CMapFi);
 INCLUDE_ASM("nonmatchings/game/cmap", DrawSub__4CMapFi);
 extern "C" void DrawSub__9CMapPartsFi(...);
@@ -188,8 +202,28 @@ extern "C" s32 GetShow__7CObjectFv(void *objet) {
     return *(s32 *) ((u8 *) objet + 0x64);
 }
 INCLUDE_ASM("nonmatchings/game/cmap", GetPoly__4CMapFiP6CCPolyR9mgVu0FBOXi);
-INCLUDE_ASM("nonmatchings/game/cmap", GetColPoly__4CMapFP6CCPolyR9mgVu0FBOXi);
-INCLUDE_ASM("nonmatchings/game/cmap", GetCameraPoly__4CMapFP6CCPolyR9mgVu0FBOXi);
+struct CCPoly;
+struct mgVu0FBOX;
+struct ColPolyBase { char pad[0xD00]; };
+struct ColPolyVTable : ColPolyBase {
+    virtual void a0(); virtual void a1(); virtual void a2(); virtual void a3();
+    virtual void a4(); virtual void a5(); virtual void a6(); virtual void a7();
+    virtual void Call(s32, CCPoly *, mgVu0FBOX &, s32);
+};
+extern "C" void GetColPoly__4CMapFP6CCPolyR9mgVu0FBOXi(ColPolyBase *objet, CCPoly *poly, mgVu0FBOX &box, s32 index) {
+    ((ColPolyVTable *)objet)->Call(1, poly, box, index);
+}
+struct CCPoly;
+struct mgVu0FBOX;
+struct CameraPolyBase { char pad[0xD00]; };
+struct CameraPolyVTable : CameraPolyBase {
+    virtual void a0(); virtual void a1(); virtual void a2(); virtual void a3();
+    virtual void a4(); virtual void a5(); virtual void a6(); virtual void a7();
+    virtual void Call(s32, CCPoly *, mgVu0FBOX &, s32);
+};
+extern "C" void GetCameraPoly__4CMapFP6CCPolyR9mgVu0FBOXi(CameraPolyBase *objet, CCPoly *poly, mgVu0FBOX &box, s32 index) {
+    ((CameraPolyVTable *)objet)->Call(3, poly, box, index);
+}
 INCLUDE_ASM("nonmatchings/game/cmap", GetTrBoxColPoly__4CMapFP6CCPolyPfi);
 INCLUDE_ASM("nonmatchings/game/cmap", GetFixCameraPos__4CMapFPfPf);
 INCLUDE_ASM("nonmatchings/game/cmap", FixCameraPartsOnOff__4CMapFPf);

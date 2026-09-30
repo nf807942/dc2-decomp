@@ -21,7 +21,10 @@ INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetAquariumFishNum__13CFishAqu
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", CheckHaigouTankSex__13CFishAquariumFP13CGameDataUsed);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", RefreshParam__13CFishAquariumFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetShiledKitLimmit__Fi);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AddPoint__9ROBO_DATAFf);
+extern "C" void AddPoint__11COMMON_GAGEFf(void *, float);
+extern "C" float GetRate__11COMMON_GAGEFv(void *);
+struct RoboGauge { char pad[0x20]; char gauge; };
+extern "C" float AddPoint__9ROBO_DATAFf(RoboGauge *self, float x) { AddPoint__11COMMON_GAGEFf(&self->gauge,x); return GetRate__11COMMON_GAGEFv(&self->gauge); }
 extern "C" s32 GetDefenceVol__9ROBO_DATAFv(void *objet) {
     return *(s16 *) ((u8 *) objet + 0xD0) + (*(u16 *) ((u8 *) objet + 0x1E8) << 2);
 }
@@ -62,12 +65,16 @@ INCLUDE_ASM("nonmatchings/game/cuserdatamanager", Initialize__11CMonsterBoxFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetMonsterBajjiData__11CMonsterBoxFi);
 struct CMonsterBox;
 extern "C" s32 get_gajji_id_from_monster_progress_table__FiPi(s32 arg0, s32 *arg1);
-extern "C" void GetMonsterBajjiData__11CMonsterBoxFi(CMonsterBox *objet, s32 arg0);
+extern "C" u8 *GetMonsterBajjiData__11CMonsterBoxFi(CMonsterBox *objet, s32 arg0);
 extern "C" void GetMonsterBajjiDataByMonsterID__11CMonsterBoxFi(CMonsterBox *objet, s32 arg0) {
     GetMonsterBajjiData__11CMonsterBoxFi(objet, get_gajji_id_from_monster_progress_table__FiPi(arg0, NULL) + 1);
 }
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", EnableChange__11CMonsterBoxFi);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", IsChange__11CMonsterBoxFi);
+extern "C" s32 IsChange__11CMonsterBoxFi(CMonsterBox *objet, s32 arg0) {
+    u8 *p = GetMonsterBajjiData__11CMonsterBoxFi(objet, arg0);
+    if (p != 0) return p[0xA];
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AllCure__11CMonsterBoxFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetConvertIndexFromFishNo__Fi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", __ct__14CFishingRecordFv);
@@ -134,7 +141,8 @@ extern "C" s32 CalcTopWeight__18CFishingTournamentFv(CFishingTournament_infere *
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", Initialize__16CUserDataManagerFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", RefreshParam__16CUserDataManagerFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetUsedDataPtr__16CUserDataManagerFi);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetCharaDataPtr__16CUserDataManagerFi);
+extern "C" int GetCharaDataPtr__16CUserDataManagerFi(void *, int);
+extern "C" int GetCharaDataPtr__16CUserDataManagerFi(void *p, int id) { if(id==0 || id==1) { int v=id*0x38C; v=(int)p+v; v+=0x3F48; return v; } return 0; }
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetCharaHpGage__16CUserDataManagerFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AddHp__16CUserDataManagerFii);
 struct COMMON_GAGE_hp { char pad0[4]; f32 unk4; };
@@ -191,8 +199,9 @@ INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetEnableCharaChangeFlag__16CU
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetCharaStatusAttirbutePtr__16CUserDataManagerFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SetCharaStatusAttirbute__16CUserDataManagerFiUii);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SetCharaStatusAttirbuteVol__16CUserDataManagerFiUii);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetCharaStatusAttirbute__16CUserDataManagerFi);
-extern "C" void GetMonsterBajjiData__11CMonsterBoxFi(CMonsterBox *objet, s32 arg0);
+extern "C" unsigned short *GetCharaStatusAttirbutePtr__16CUserDataManagerFi(void *, int);
+extern "C" int GetCharaStatusAttirbute__16CUserDataManagerFi(void *self, int i) { unsigned short *p=GetCharaStatusAttirbutePtr__16CUserDataManagerFi(self,i); if(p!=0) return *p; return 0; }
+extern "C" u8 *GetMonsterBajjiData__11CMonsterBoxFi(CMonsterBox *objet, s32 arg0);
 extern "C" void GetMonsterBajjiDataPtr__16CUserDataManagerFi(u8 *self, s32 id) {
     GetMonsterBajjiData__11CMonsterBoxFi((CMonsterBox *) (self + 0x4EB0), id);
 }
@@ -350,12 +359,20 @@ extern "C" s32 NowFishingStyle__16CUserDataManagerFv(CUserDataManager_2a7d53 *ob
     return 0;
 }
 struct CUserDataManager;
-extern "C" void GetActiveEsa__16CUserDataManagerFi(CUserDataManager *objet, s32 arg0);
+extern "C" u8 *GetActiveEsa__16CUserDataManagerFi(CUserDataManager *objet, s32 arg0);
 extern "C" s32 GetFishingRodNo__16CUserDataManagerFv(CUserDataManager *objet);
 extern "C" void GetActiveEsa__16CUserDataManagerFv(CUserDataManager *objet) {
     GetActiveEsa__16CUserDataManagerFi(objet, GetFishingRodNo__16CUserDataManagerFv(objet));
 }
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetActiveEsa__16CUserDataManagerFi);
+extern "C" u8 *GetActiveEsa__16CUserDataManagerFi(CUserDataManager *self, s32 id) {
+    if (id == 0x12E) {
+        return (u8 *)self + 0x4880;
+    }
+    if (id == 0x12F) {
+        return (u8 *)self + 0x48EC;
+    }
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetFishBait__16CUserDataManagerFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", DeleteBait__16CUserDataManagerFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetFishInAquarium__16CUserDataManagerFiff);
@@ -715,7 +732,14 @@ INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetNowAccessWHp__16CBattleChar
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetNowAccessAbs__16CBattleCharaInfoFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AddWhp__16CBattleCharaInfoFif);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetNowWhp__16CBattleCharaInfoFiPi);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetWhpNowVol__16CBattleCharaInfoFi);
+struct temp_v0_champs_2fdd3a { char pad0[4]; f32 unk4; };
+extern "C" s32 GetNowAccessWHp__16CBattleCharaInfoFi(void *, s32);
+extern "C" s32 GetDispVolumeForFloat__Ff(f32);
+extern "C" s32 GetWhpNowVol__16CBattleCharaInfoFi(void *objet, s32 arg0) {
+    temp_v0_champs_2fdd3a *p = (temp_v0_champs_2fdd3a *) GetNowAccessWHp__16CBattleCharaInfoFi(objet, arg0);
+    if (p != 0) return GetDispVolumeForFloat__Ff(p->unk4);
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SetMagicSwordPow__16CBattleCharaInfoFii);
 typedef struct CBattleCharaInfo_infere6 {
     /* 0x00 */ s16 unk0;                            /* inferred */
@@ -863,7 +887,19 @@ extern "C" s32 GetAttr__16CBattleCharaInfoFv(CBattleCharaInfo_infere2 *objet) {
     }
     return 0;
 }
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", ForceSet__16CBattleCharaInfoFv);
+struct Force_nested { char pad[4]; f32 unk4; };
+struct Force_fields { char pad0[0x74]; Force_nested *unk74; char pad78[4]; s32 unk7C; char pad80[4]; f32 unk84; char pad88[4]; s32 unk8C; };
+extern "C" void ForceSet__16CBattleCharaInfoFv(Force_fields *objet) {
+    Force_nested *p = objet->unk74;
+    if (p != 0) {
+        f32 v = p->unk4;
+        if (objet->unk84 != v) {
+            objet->unk84 = v;
+            objet->unk8C = (s32)0xBF800000;
+            objet->unk7C = 0;
+        }
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetRandomCircleTrapID__Fi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SetRandamCircleStatus__FiRf);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", StatusParamStep__16CBattleCharaInfoFPi);

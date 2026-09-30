@@ -174,14 +174,81 @@ s32 _ND_TEST(RS_STACKDATA *stack, int argc) {
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/cmonsterman", _GET_TARGET_ROT__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/cmonsterman", _GET_MONSTER_INDEX__FP12RS_STACKDATAi);
+struct nowMonster_l2c;
+struct nowMonster_index_local { char pad[0x1156]; short index; };
+extern "C" nowMonster_l2c *nowMonster;
+extern "C" int _GET_MONSTER_INDEX__FP12RS_STACKDATAi(RS_STACKDATA *arg0, int arg1) {
+    SetStack__FP12RS_STACKDATAi_001E1BE0((int *)arg0, ((nowMonster_index_local *)nowMonster)->index);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmonsterman", _SET_MONSTER_LIFE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/cmonsterman", _GET_USERID__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/cmonsterman", _GET_MONSTER_ID__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/cmonsterman", _RESET_MOTION__FP12RS_STACKDATAi);
+struct nowMonster_userid_local { char pad[0x670]; int userId; };
+extern "C" int _GET_USERID__FP12RS_STACKDATAi(RS_STACKDATA *arg0, int arg1) {
+    SetStack__FP12RS_STACKDATAi_001E1BE0((int *)arg0, ((nowMonster_userid_local *)nowMonster)->userId);
+    return 1;
+}
+struct nowMonster_l2c { char pad[0x1154]; short id; };
+extern "C" nowMonster_l2c *nowMonster;
+extern "C" int _GET_MONSTER_ID__FP12RS_STACKDATAi(RS_STACKDATA *arg0, int arg1) {
+    SetStack__FP12RS_STACKDATAi_001E1BE0((int *)arg0, ((nowMonster_l2c *)nowMonster)->id);
+    return 1;
+}
+struct MonsterV {
+virtual void D0();
+virtual void D1();
+virtual void D2();
+virtual void D3();
+virtual void D4();
+virtual void D5();
+virtual void D6();
+virtual void D7();
+virtual void D8();
+virtual void D9();
+virtual void D10();
+virtual void D11();
+virtual void D12();
+virtual void D13();
+virtual void D14();
+virtual void D15();
+virtual void D16();
+virtual void D17();
+virtual void D18();
+virtual void D19();
+virtual void D20();
+virtual void D21();
+virtual void D22();
+virtual void D23();
+virtual void D24();
+virtual void D25();
+virtual void D26();
+virtual void D27();
+virtual void D28();
+virtual void D29();
+virtual void D30();
+virtual void D31();
+virtual void D32();
+virtual void D33();
+virtual void D34();
+virtual void D35();
+virtual void D36();
+virtual void D37();
+virtual void D38();
+virtual void D39();
+virtual void D40();
+virtual void D41();
+virtual void D42();
+virtual void Reset();
+};
+extern "C" int _RESET_MOTION__FP12RS_STACKDATAi(void *, int) { MonsterV *o=(MonsterV *)nowMonster; o->Reset(); return 1; }
 INCLUDE_ASM("nonmatchings/game/cmonsterman", _GET_INDEX_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cmonsterman", _SET_CAMERA_NEXT_REF__FP12RS_STACKDATAi_001E2070);
-INCLUDE_ASM("nonmatchings/game/cmonsterman", _SET_ALPHA__FP12RS_STACKDATAi);
+extern "C" float GetStackFloat__FP12RS_STACKDATA_001E1BA0(void *);
+struct nowMonster_alpha { char pad[0x100]; float alpha; };
+extern "C" int _SET_ALPHA__FP12RS_STACKDATAi(RS_STACKDATA *arg0, int arg1) {
+    float value = GetStackFloat__FP12RS_STACKDATA_001E1BA0(arg0);
+    ((nowMonster_alpha *)nowMonster)->alpha = value;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmonsterman", _SET_INDEX_ALPHA__FP12RS_STACKDATAi);
 typedef struct nowScene_0037D4E4_pointe {
     char pad0[11860];

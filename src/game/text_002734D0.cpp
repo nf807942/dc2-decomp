@@ -362,7 +362,9 @@ typedef struct EdEventInfo_champs {
     char pad13C[196];
     s32 unk200;
     char pad204[4208];
-    u8 unk1274[44];
+    u8 unk1274[4];
+    s32 bgmStatusNowNo;
+    u8 pad127C[36];
 } EdEventInfo_champs;
 extern "C" EdEventInfo_champs EdEventInfo;
 extern "C" s32 StreamClose__6CSoundFi(void *, s32);
@@ -387,7 +389,12 @@ extern "C" s32 _STREAM_STANDBY__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) 
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _STREAM_GET_STATUS__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _GET_SYS_SND_ID__FP12RS_STACKDATAi);
+extern "C" s32 GetSystemSndID__Fv(void);
+extern "C" s32 _GET_SYS_SND_ID__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    arg1 = GetSystemSndID__Fv();
+    SetStack__FP12RS_STACKDATAi_00262E70(arg0, arg1);
+    return 1;
+}
 extern "C" u8 CSnd;
 extern "C" s32 SetStack__FP12RS_STACKDATAi_00262E70(...);
 extern "C" s32 StreamOpenState__6CSoundFv(void *);
@@ -633,8 +640,17 @@ extern "C" s32 _GET_ACTIVE_BGM_STATUS__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32
     GetActiveBgmStatus__6CSceneFPQ26CScene10BGM_STATUS(EventScene, EdEventInfo.unk1274);
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _SET_ACTIVE_BGM_STATUS__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _GET_BGM_STATUS_NOW_NO__FP12RS_STACKDATAi);
+extern "C" int SetActiveBgmStatus__6CSceneFPQ26CScene10BGM_STATUS(void *, void *);
+extern "C" int _SET_ACTIVE_BGM_STATUS__FP12RS_STACKDATAi(RS_STACKDATA *arg0, int arg1) {
+    SetActiveBgmStatus__6CSceneFPQ26CScene10BGM_STATUS((void *)EventScene, EdEventInfo.unk1274);
+    return 1;
+}
+extern "C" s32 _GET_BGM_STATUS_NOW_NO__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    if (arg1 != 1) {
+        return 0;
+    }
+    return SetStack__FP12RS_STACKDATAi_00262E70(arg0, EdEventInfo.bgmStatusNowNo);
+}
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _GET_SE_STATUS__FP12RS_STACKDATAi);
 extern "C" s32 SeAllStop__6CSceneFv(...);
 extern "C" s32 _SE_ALL_STOP__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {

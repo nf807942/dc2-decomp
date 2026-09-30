@@ -10,7 +10,9 @@
  * déclarer une virtuelle ferait émettre une table que le disque
  * porte déjà. */
 struct EdEventInfoData {
-    u8 pad_0x0[0xCC];
+    u8 pad_0x0[0x20];
+    f32 projection;
+    u8 pad_0x24[0xA8];
     s32 field_0xCC;
     s32 field_0xD0;
     s32 field_0xD4;

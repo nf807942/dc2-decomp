@@ -116,7 +116,13 @@ extern "C" void Initialize__18mgCVisualMotionMDTFv(mgCVisualMotionMDT_infere *ob
 }
 
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", CreateVertexWeight__18mgCVisualMotionMDTFPUiiP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", __ct__14mgVertexWeightFv);
+struct mgVertexWeight;
+extern "C" s32 memset(...);
+extern "C" mgVertexWeight *__ct__14mgVertexWeightFv(mgVertexWeight *objet) {
+    memset(objet, 0, 0x20);
+    return objet;
+}
+
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", ChangeWeight__18mgCVisualMotionMDTFPP8mgCFramePA4_A4_fi);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", DataAssignMotionMDT__18mgCVisualMotionMDTFP10MDT_HEADERP14mgCVMotionDataP9mgCMemoryP9mgCMemoryP17mgCTextureManager);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", SetData0__FiiPPiP1P1P1P1P1P14mgVertexWeight);
@@ -141,7 +147,14 @@ extern "C" void CreateRenderInfoPacket__18mgCVisualMotionMDTFPUiPA4_fP13mgRENDER
     arg2->unk1010 = 0;
 }
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", CreateExtRenderInfoPacket__18mgCVisualMotionMDTFPUiPA4_fP13mgRENDER_INFO);
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", SetBaseBox__18mgCVisualMotionMDTFPfPf);
+struct mgCVisualMotionMDT_l1a;
+extern "C" void SetBaseBox__18mgCVisualMotionMDTFPfPf(mgCVisualMotionMDT_l1a *objet, f32 *arg0, f32 *arg1) {
+    *(u128 *)((u8 *)objet + 0x60) = *(u128 *)arg0;
+    arg0[3] = 1.0f;
+    *(u128 *)((u8 *)objet + 0x70) = *(u128 *)arg1;
+    arg1[3] = 1.0f;
+}
+
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", CreateBBox__18mgCVisualMotionMDTFPfPfPA4_f);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Copy__18mgCVisualMotionMDTFP9mgCMemory);
 s32 mgCVisualMotionMDT::Iam(void) {
@@ -254,7 +267,14 @@ INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", DrawMiniMapSymbol__9CGeoSton
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", SetFlag__9CGeoStoneFi);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", GeoStep__9CGeoStoneFv);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", CheckEvent__9CGeoStoneFPf);
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Initialize__9CGeoStoneFv);
+struct CCharacter2;
+extern "C" s32 Initialize__11CCharacter2Fv(CCharacter2 *);
+struct GeoStone_fields { char pad[0x660]; s32 value; };
+extern "C" void Initialize__9CGeoStoneFv(GeoStone_fields *objet) {
+    Initialize__11CCharacter2Fv((CCharacter2 *)objet);
+    objet->value = 0;
+}
+
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Draw__13CRandomCircleFPf);
 struct CRC_v {
     virtual void v0() = 0;
@@ -540,7 +560,13 @@ INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", PickupRandomItemCheckMax__FP
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", PickupRandomItem__FP22TRESURE_BOX_FLOOR_INFOii);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", CheckObjectPutArea__FPf);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", ScanEyePoint__FPf);
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", AutoSetTreasureBox__FiPff);
+extern "C" s32 PutTreasureBox__19CTreasureBoxManagerFiPffiiiii(void *, s32, f32 *, f32, s32, s32, s32, s32, s32);
+struct DngTreasure_fields { char pad[0x300C]; void *manager; };
+extern "C" void AutoSetTreasureBox__FiPff(s32 id, f32 *position, f32 power) {
+    DngTreasure_fields *p = (DngTreasure_fields *)DngMainScene;
+    PutTreasureBox__19CTreasureBoxManagerFiPffiiiii(p->manager, -1, position, power, 0x41, id, 1, -1, 0);
+}
+
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", AutoSetTreasureBox__Fv);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", _FLS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", _FL__FP9SPI_STACKi);

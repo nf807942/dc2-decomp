@@ -24,7 +24,13 @@ extern "C" f32 mgCosf__Ff(f32 x) {
 }
 
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Step__9mgCCameraFi);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", Stay__9mgCCameraFv);
+extern "C" void sceVu0CopyVector(f32 *, f32 *);
+struct CameraFields { char pad0[0x10]; f32 field10[4]; f32 field20[4]; f32 field30[4]; };
+extern "C" void Stay__9mgCCameraFv(CameraFields *objet) {
+    sceVu0CopyVector(objet->field20, (f32 *)objet);
+    sceVu0CopyVector(objet->field30, objet->field10);
+}
+
 typedef struct mgCCamera {
     /* 0x00 */ f32 unk0;                            /* inferred */
     /* 0x04 */ f32 unk4;                            /* inferred */
@@ -329,7 +335,16 @@ INCLUDE_ASM("nonmatchings/mglib/mgcframe", EndData__13mgCMDTBuilderFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", BeginFaces__13mgCMDTBuilderFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", EndFaces__13mgCMDTBuilderFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", BeginPrim__13mgCMDTBuilderFii);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", AddFace__13mgCMDTBuilderFi);
+struct mgCMDTBuilder_l1a { char pad0[0x1C]; s32 count; char pad20[4]; s32 *next; };
+#pragma schedule off
+extern "C" void AddFace__13mgCMDTBuilderFi(mgCMDTBuilder_l1a *objet, s32 arg0) {
+    s32 *p = objet->next;
+    objet->next = (s32 *)((u8 *)p + 4);
+    *p = arg0;
+    objet->count += 1;
+}
+#pragma schedule reset
+
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", EndPrim__13mgCMDTBuilderFv);
 #pragma schedule off
 extern "C" s32 Iam__12mgCVisualMDTFv(void *objet) {
@@ -460,7 +475,17 @@ extern "C" void Vertex__11mgCDrawPrimFiii(void *objet, s32 a, s32 b) {
     Vertex4__11mgCDrawPrimFiii(objet, a << 4, b << 4);
 }
 
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", Vertex__11mgCDrawPrimFfff);
+extern "C" void Vertex__11mgCDrawPrimFPf(void *, float *);
+extern "C" char _369_00396EE0[];
+extern "C" void Vertex__11mgCDrawPrimFfff(void *objet, f32 arg0, f32 arg1, f32 arg2) {
+    f32 vector[4];
+    *(s128 *) vector = *(s128 *) _369_00396EE0;
+    vector[0] = arg0;
+    vector[1] = arg1;
+    vector[2] = arg2;
+    Vertex__11mgCDrawPrimFPf(objet, vector);
+}
+
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Vertex__11mgCDrawPrimFPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Vertex4__11mgCDrawPrimFiii);
 extern "C" void Vertex4__11mgCDrawPrimFPi(void *objet, s32 *v) {
@@ -483,7 +508,17 @@ extern "C" void Direct__11mgCDrawPrimFUlUl(void *objet, u64 a, u64 b) {
 }
 
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Texture__11mgCDrawPrimFP10mgCTexture);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", AlphaBlendEnable__11mgCDrawPrimFi);
+struct mgCDrawPrim_infere2;
+typedef struct mgCDrawPrim_infere2 {
+    char pad0[0x50];
+    u8 low:6;
+    u8 alphaBlend:1;
+    u8 high:1;
+} mgCDrawPrim_infere2;
+extern "C" void AlphaBlendEnable__11mgCDrawPrimFi(mgCDrawPrim_infere2 *objet, s32 arg0) {
+    objet->alphaBlend = arg0;
+}
+
 extern "C" void SetAlpha__10mgCDrawEnvFi(void *, s32);
 void mgCDrawPrim::AlphaBlend(s32 arg0) {
     SetAlpha__10mgCDrawEnvFi((u8 *) this + 0x10, arg0);
@@ -504,13 +539,29 @@ INCLUDE_ASM("nonmatchings/mglib/mgcframe", DepthTest__11mgCDrawPrimFi);
 void mgCDrawPrim::ZMask(s32 arg0) {
     this->field_0xCC = arg0;
 }
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", TextureMapEnable__11mgCDrawPrimFi);
+struct mgCDrawPrim_texture2 { char pad0[0x50]; u8 low:4; u8 textureMap:1; u8 high:3; };
+extern "C" void TextureMapEnable__11mgCDrawPrimFi(mgCDrawPrim_texture2 *objet, s32 arg0) {
+    objet->textureMap = arg0;
+}
+
 void mgCDrawPrim::Bilinear(s32 arg0) {
     this->field_0xC8 = arg0;
 }
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", Shading__11mgCDrawPrimFi);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", AntiAliasing__11mgCDrawPrimFi);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", FogEnable__11mgCDrawPrimFi);
+struct mgCDrawPrim_shading2 { char pad0[0x50]; u8 low:3; u8 shading:1; u8 high:4; };
+extern "C" void Shading__11mgCDrawPrimFi(mgCDrawPrim_shading2 *objet, s32 arg0) {
+    objet->shading = arg0;
+}
+
+struct mgCDrawPrim_anti2 { char pad0[0x50]; u8 low:7; u8 antiAliasing:1; };
+extern "C" void AntiAliasing__11mgCDrawPrimFi(mgCDrawPrim_anti2 *objet, s32 arg0) {
+    objet->antiAliasing = arg0;
+}
+
+struct mgCDrawPrim_fog2 { char pad0[0x50]; u8 low:5; u8 fogEnable:1; u8 high:2; };
+extern "C" void FogEnable__11mgCDrawPrimFi(mgCDrawPrim_fog2 *objet, s32 arg0) {
+    objet->fogEnable = arg0;
+}
+
 void mgCDrawPrim::Coord(s32 arg0) {
     this->field_0xFC = arg0;
 }
@@ -624,7 +675,17 @@ extern "C" void mgInsideScreen__FPA4_fPA4_f(f32 (*arg0)[4], f32 (*arg1)[4]) {
 }
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgInsideScreen__FPA4_fPA4_fPfPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetPosition__9mgCObjectFPf);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetPosition__9mgCObjectFfff);
+extern "C" void SetPosition__9mgCObjectFPf(void *, float *);
+extern "C" char _307_00338230[];
+extern "C" void SetPosition__9mgCObjectFfff(void *objet, f32 arg0, f32 arg1, f32 arg2) {
+    f32 vector[4];
+    *(s128 *) vector = *(s128 *) _307_00338230;
+    vector[0] = arg0;
+    vector[1] = arg1;
+    vector[2] = arg2;
+    SetPosition__9mgCObjectFPf(objet, vector);
+}
+
 typedef struct mgCObject_position {
     char pad0[0x10];
     f32 position[4];
@@ -635,12 +696,32 @@ extern "C" void GetPosition__9mgCObjectFPf(mgCObject_position *objet, f32 *arg0)
     sceVu0CopyVector(arg0, objet->position);
 }
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetRotation__9mgCObjectFPf);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetRotation__9mgCObjectFfff);
+extern "C" void SetRotation__9mgCObjectFPf(...);
+extern "C" char _324_00396EF0[];
+extern "C" void SetRotation__9mgCObjectFfff(void *objet, f32 arg0, f32 arg1, f32 arg2) {
+    f32 vector[4];
+    *(s128 *) vector = *(s128 *) _324_00396EF0;
+    vector[0] = arg0;
+    vector[1] = arg1;
+    vector[2] = arg2;
+    SetRotation__9mgCObjectFPf(objet, vector);
+}
+
 extern "C" void GetRotation__9mgCObjectFPf(mgCObject_position *objet, f32 *arg0) {
     sceVu0CopyVector(arg0, objet->rotation);
 }
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetScale__9mgCObjectFPf);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetScale__9mgCObjectFfff);
+extern "C" void SetScale__9mgCObjectFPf(...);
+extern "C" char _341_00396F00[];
+extern "C" void SetScale__9mgCObjectFfff(void *objet, f32 arg0, f32 arg1, f32 arg2) {
+    f32 vector[4];
+    *(s128 *) vector = *(s128 *) _341_00396F00;
+    vector[0] = arg0;
+    vector[1] = arg1;
+    vector[2] = arg2;
+    SetScale__9mgCObjectFPf(objet, vector);
+}
+
 extern "C" void GetScale__9mgCObjectFPf(mgCObject_position *objet, f32 *arg0) {
     sceVu0CopyVector(arg0, objet->scale);
 }

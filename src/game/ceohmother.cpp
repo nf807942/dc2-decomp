@@ -396,7 +396,14 @@ extern "C" void SetStack__FP12RS_STACKDATAf_00262E90(s32 arg0, f32 arg1) {
 }
 INCLUDE_ASM("nonmatchings/game/ceohmother", BuildArgData__15CEventScriptArgFPUi);
 INCLUDE_ASM("nonmatchings/game/ceohmother", _DATA__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/ceohmother", _ID_OFFSET__FP12RS_STACKDATAi);
+extern "C" s32 *nowScriptArg;
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(void *arg0);
+extern "C" s32 _ID_OFFSET__FP12RS_STACKDATAi(void *arg0, s32 arg1) {
+    if (nowScriptArg == 0) return 0;
+    *nowScriptArg = GetStackInt__FP12RS_STACKDATA_00262DA0(arg0);
+    return 1;
+}
+
 extern "C" u8 _1333[29];
 struct ARG_DATA_328675 {
     /* 0x0 */ s32 unk0;

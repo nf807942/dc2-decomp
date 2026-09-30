@@ -110,7 +110,11 @@ INCLUDE_ASM("nonmatchings/game/text_002717C0", _IMG_SET_NAME__FP12RS_STACKDATAi)
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _IMG_SET_MOVE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _IMG_SET_FADE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _IMG_SET_COLOR__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002717C0", GetEventSprite__Fi);
+extern "C" u8 EventSprite2[6144];
+extern "C" s32 GetEventSprite__Fi(s32 index) {
+    if (index < 0 || index >= 0x30) return 0;
+    return (s32)(EventSprite2 + index * 0x80);
+}
 extern "C" s32 GetEventSprite__Fi(s32);
 #include "gen/CEventSprite2.hpp"
 extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(RS_STACKDATA *);
@@ -155,9 +159,24 @@ extern "C" s32 _CMRS_AHDDELAY__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     AHDDelay__12CSceneCmrSeqFi(&CameraSeq, GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/text_002717C0", _CMRS_SET_ANGLE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002717C0", _CMRS_SET_HEIGHT__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002717C0", _CMRS_SET_DIST__FP12RS_STACKDATAi);
+extern "C" float GetStackFloat__FP12RS_STACKDATA_00262DE0(RS_STACKDATA *);
+extern "C" int SetAngle__12CSceneCmrSeqFf(void *, float);
+extern "C" int _CMRS_SET_ANGLE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, int arg1) {
+    SetAngle__12CSceneCmrSeqFf(&CameraSeq, GetStackFloat__FP12RS_STACKDATA_00262DE0(arg0));
+    return 1;
+}
+extern "C" float GetStackFloat__FP12RS_STACKDATA_00262DE0(RS_STACKDATA *);
+extern "C" int SetHeight__12CSceneCmrSeqFf(void *, float);
+extern "C" int _CMRS_SET_HEIGHT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, int arg1) {
+    SetHeight__12CSceneCmrSeqFf(&CameraSeq, GetStackFloat__FP12RS_STACKDATA_00262DE0(arg0));
+    return 1;
+}
+extern "C" float GetStackFloat__FP12RS_STACKDATA_00262DE0(RS_STACKDATA *);
+extern "C" int SetDist__12CSceneCmrSeqFf(void *, float);
+extern "C" int _CMRS_SET_DIST__FP12RS_STACKDATAi(RS_STACKDATA *arg0, int arg1) {
+    SetDist__12CSceneCmrSeqFf(&CameraSeq, GetStackFloat__FP12RS_STACKDATA_00262DE0(arg0));
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _CMRS_SET_AHD__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _CMRS_MOVE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _CMRS_MOVE2__FP12RS_STACKDATAi);

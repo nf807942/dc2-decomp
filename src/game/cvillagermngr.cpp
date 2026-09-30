@@ -61,8 +61,17 @@ extern "C" f32 GetStackFloat__FP12RS_STACKDATA_002D27E0(void *arg0) {
 extern "C" s32 GetStackString__FP12RS_STACKDATA_002D2810(void *arg0) {
     return *(s32 *) ((u8 *) arg0 + 4);
 }
-INCLUDE_ASM("nonmatchings/game/cvillagermngr", SetStack__FP12RS_STACKDATAi_002D2820);
-INCLUDE_ASM("nonmatchings/game/cvillagermngr", SetStack__FP12RS_STACKDATAf_002D2840);
+struct SetStackInt_data { s32 kind; u32 value; };
+extern "C" s32 SetStack__FP12RS_STACKDATAi_002D2820(void *arg0, s32 arg1) {
+    SetStackInt_data *p = (SetStackInt_data *)arg0;
+    if (p->kind == 3) {
+        *(s32 *)((u8 *)p->value + 4) = arg1;
+    }
+}
+struct SetStack_data { int unk0; int unk4; };
+extern "C" void SetStack__FP12RS_STACKDATAf_002D2840(SetStack_data *arg0, float arg1) {
+    if (arg0->unk0 == 3) *(float *)((unsigned char *)(unsigned int)arg0->unk4 + 4) = arg1;
+}
 extern "C" u32 action_info[4];
 extern "C" s32 ResetScript__12CActionCharaFv(void *);
 extern "C" s32 _INIT_SCRIPT__FP12RS_STACKDATAi(void *arg0, s32 arg1) {
@@ -80,7 +89,7 @@ extern "C" s32 _PROG_SET__FP12RS_STACKDATAi(void *arg0, s32 arg1) {
     ((struct action_info_champs_a4512e *) action_info[0])->unk712 = GetStackInt__FP12RS_STACKDATA_002D27A0(arg0);
     return 1;
 }
-extern "C" s32 SetStack__FP12RS_STACKDATAi_002D2820(...);
+extern "C" s32 SetStack__FP12RS_STACKDATAi_002D2820(void *, s32);
 extern "C" s32 _PROG_GET__FP12RS_STACKDATAi(void *arg0, s32 arg1) {
     if (arg1 != 1) {
         return 0;
@@ -139,12 +148,12 @@ INCLUDE_ASM("nonmatchings/game/cvillagermngr", _GET_FRONT_VEC__FP12RS_STACKDATAi
 extern "C" u8 GamePad_003FA5A0[1144];
 #include "runscript.hpp"
 extern "C" s32 GetPadOn__8CGamePadFv(void *);
-extern "C" s32 SetStack__FP12RS_STACKDATAi_002D2820(...);
+extern "C" s32 SetStack__FP12RS_STACKDATAi_002D2820(void *, s32);
 extern "C" s32 _GET_PADON__FP12RS_STACKDATAi_002D2F20(s32 arg0, s32 arg1) {
     if (arg1 <= 0) {
         return 0;
     }
-    SetStack__FP12RS_STACKDATAi_002D2820(arg0, GetPadOn__8CGamePadFv(&GamePad_003FA5A0));
+    SetStack__FP12RS_STACKDATAi_002D2820((void *)arg0, GetPadOn__8CGamePadFv(&GamePad_003FA5A0));
     return 1;
 }
 extern "C" s32 GetPadDown__8CGamePadFv(void *);
@@ -152,7 +161,7 @@ extern "C" s32 _GET_PADDOWN__FP12RS_STACKDATAi_002D2F70(s32 arg0, s32 arg1) {
     if (arg1 <= 0) {
         return 0;
     }
-    SetStack__FP12RS_STACKDATAi_002D2820(arg0, GetPadDown__8CGamePadFv(&GamePad_003FA5A0));
+    SetStack__FP12RS_STACKDATAi_002D2820((void *)arg0, GetPadDown__8CGamePadFv(&GamePad_003FA5A0));
     return 1;
 }
 extern "C" s32 GetPadUp__8CGamePadFv(void *);
@@ -160,7 +169,7 @@ extern "C" s32 _GET_PADUP__FP12RS_STACKDATAi_002D2FC0(s32 arg0, s32 arg1) {
     if (arg1 <= 0) {
         return 0;
     }
-    SetStack__FP12RS_STACKDATAi_002D2820(arg0, GetPadUp__8CGamePadFv(&GamePad_003FA5A0));
+    SetStack__FP12RS_STACKDATAi_002D2820((void *)arg0, GetPadUp__8CGamePadFv(&GamePad_003FA5A0));
     return 1;
 }
 extern "C" u8 PadCtrl[1296];

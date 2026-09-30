@@ -631,7 +631,12 @@ INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", __ct__12CSubGameDataFv);
 void CSubGameData::Initialize(void) {
     memset(this, 0, 21616);
 }
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", PlayEnable__12CSubGameDataFii);
+struct CSubGameData_infere { char pad0[8]; s32 unk8; };
+extern "C" void PlayEnable__12CSubGameDataFii(CSubGameData_infere *objet, s32 arg0, s32 arg1) {
+    if (arg1 == 1) { objet->unk8 |= arg0; return; }
+    objet->unk8 &= ~arg0;
+}
+
 void * CSubGameData::GetSphidaData(void) {
     return &this->field_0x100;
 }

@@ -109,7 +109,12 @@ INCLUDE_ASM("nonmatchings/game/cdc2mes_0021F2B0", MakeMsg__7CDC2MesFP13CGameData
 INCLUDE_ASM("nonmatchings/game/cdc2mes_0021F2B0", MakeMsg__7CDC2MesFP13CGameDataUsedP13CGameDataUsed);
 INCLUDE_ASM("nonmatchings/game/cdc2mes_0021F2B0", StepMsg__7CDC2MesFv);
 INCLUDE_ASM("nonmatchings/game/cdc2mes_0021F2B0", DrawMsg__7CDC2MesFv);
-INCLUDE_ASM("nonmatchings/game/cdc2mes_0021F2B0", SetMsgAlpha__7CDC2MesFi);
+struct CDC2Mes_infere3 { char pad0[0x1E58]; unsigned char unk1E58; };
+extern "C" void SetMsgAlpha__7CDC2MesFi(CDC2Mes_infere3 *objet, int arg0) {
+    objet->unk1E58 = arg0;
+    if (arg0 < 0) objet->unk1E58 = 0;
+    if (0x80 < arg0) objet->unk1E58 = 0x80;
+}
 INCLUDE_ASM("nonmatchings/game/cdc2mes_0021F2B0", Initialize__13CMenuMoveItemFv);
 INCLUDE_ASM("nonmatchings/game/cdc2mes_0021F2B0", AttachForm__13CMenuMoveItemFv);
 INCLUDE_ASM("nonmatchings/game/cdc2mes_0021F2B0", CheckMove__13CMenuMoveItemFv);

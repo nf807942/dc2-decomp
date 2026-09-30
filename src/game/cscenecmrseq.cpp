@@ -85,7 +85,13 @@ extern "C" s32 scsInitPas__FP12_SEN_CMR_SEQP12CSceneCmrSeq(_SEN_CMR_SEQ_f5ef6a *
     Initialize__10CCameraPasFv(&((struct arg1_champs_f5ef6a *) arg1)->unk1C0);
     return 0;
 }
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsSetPasFrm__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
+extern "C" s32 SetFrame__10CCameraPasFi(void *, s32);
+struct SeqFrameFields { char pad[0x30]; s32 frame; };
+extern "C" s32 scsSetPasFrm__FP12_SEN_CMR_SEQP12CSceneCmrSeq(void *seq, void *scene) {
+    SetFrame__10CCameraPasFi((u8 *)scene + 0x1C0, ((SeqFrameFields *)seq)->frame);
+    return 0;
+}
+
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsAddPas__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsStartPas__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsPRSlowing__FP12_SEN_CMR_SEQP12CSceneCmrSeq);
@@ -167,7 +173,14 @@ s32 scsDummy(_SEN_CMR_SEQ *sequence, CSceneCmrSeq *owner) {
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", InitSceneCmrSeq__FP12_SEN_CMR_SEQ);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", __ct__12CSceneCmrSeqFv);
+extern "C" u8 *__ct__10CCameraPasFv(u8 *objet);
+extern "C" s32 ZeroInitialize__12CSceneCmrSeqFv(void *);
+extern "C" u8 *__ct__12CSceneCmrSeqFv(u8 *objet) {
+    __ct__10CCameraPasFv(objet + 0x1C0);
+    ZeroInitialize__12CSceneCmrSeqFv(objet);
+    return objet;
+}
+
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", ZeroInitialize__12CSceneCmrSeqFv);
 struct inferred;
 typedef struct CSceneCmrSeq_infere2 {
@@ -581,8 +594,21 @@ extern "C" s32 scsInitPas__FP12_SEN_OBJ_SEQP12CSceneObjSeq(_SEN_OBJ_SEQ_630ed8 *
     Initialize__9CCharaPasFv(&((struct arg1_champs_630ed8 *) arg1)->unk140);
     return 0;
 }
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsSetPasFrm__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsAddPas__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
+struct seq_frame_field { char pad[0x20]; s32 frame; };
+extern "C" s32 SetFrame__9CCharaPasFi(void *, s32);
+extern "C" s32 scsSetPasFrm__FP12_SEN_OBJ_SEQP12CSceneObjSeq(void *arg0, void *arg1) {
+    SetFrame__9CCharaPasFi((u8 *) arg1 + 0x140, ((seq_frame_field *) arg0)->frame);
+    return 0;
+}
+
+extern "C" s32 AddCharaPas__9CCharaPasFPf(void *, f32 *);
+struct AddPasSeqFields { char pad[0x10]; f32 points[4]; };
+struct AddPasSceneFields { char pad[0x140]; u8 charaPas[0x80]; };
+extern "C" s32 scsAddPas__FP12_SEN_OBJ_SEQP12CSceneObjSeq(AddPasSeqFields *seq, AddPasSceneFields *sceneObj) {
+    AddCharaPas__9CCharaPasFPf(&sceneObj->charaPas[0], seq->points);
+    return 0;
+}
+
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", scsStartPas__FP12_SEN_OBJ_SEQP12CSceneObjSeq);
 struct inferred;
 typedef struct CSceneObjSeq_infere2 {
@@ -886,7 +912,15 @@ s32 scsDummy(_SEN_OBJ_SEQ *sequence, CSceneObjSeq *owner) {
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", InitSceneObjSeq__FP12_SEN_OBJ_SEQ);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", __ct__12CSceneObjSeqFv);
+struct CCharaPas_infere;
+extern "C" CCharaPas_infere *__ct__9CCharaPasFv(CCharaPas_infere *objet);
+extern "C" s32 ZeroInitialize__12CSceneObjSeqFv(void *arg0);
+extern "C" u8 *__ct__12CSceneObjSeqFv(u8 *objet) {
+    __ct__9CCharaPasFv((CCharaPas_infere *)(objet + 0x140));
+    ZeroInitialize__12CSceneObjSeqFv(objet);
+    return objet;
+}
+
 extern "C" s32 Initialize__12CSceneObjSeqFP12_SEN_OBJ_SEQi(...);
 extern "C" s32 ZeroInitialize__12CSceneObjSeqFv(void *arg0) {
     *(s32 *) arg0 = 0;
@@ -1659,9 +1693,49 @@ extern "C" s32 Set__4CEohFiP7CObjecti(CEoh_infere *objet, s32 arg0, CObject *arg
     objet->unk8 = arg2;
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Set__4CEohFiiP11CCharacter2);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Set__4CEohFiP13CEventSprite2);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Set__4CEohFiP8mgCFrame);
+#include "sphida.hpp"
+struct CEoh_set3 { int unk0; int unk4; char pad8[4]; CCharacter2 *unkC; };
+extern "C" int Set__4CEohFiiP11CCharacter2(CEoh_set3 *objet, int arg0, int arg1, CCharacter2 *arg2) {
+    if (arg2 == 0) return 0;
+    objet->unk0 = arg0;
+    switch (objet->unk0) {
+    case 0:
+        objet->unk4 = arg1;
+        objet->unkC = arg2;
+        return 1;
+    default:
+        return 0;
+    }
+}
+
+#include "gen/CEventSprite2.hpp"
+struct CEoh_set1 { int unk0; char pad4[8]; CEventSprite2 *unkC; };
+extern "C" int Set__4CEohFiP13CEventSprite2(CEoh_set1 *objet, int arg0, CEventSprite2 *arg1) {
+    if (arg1 == 0) return 0;
+    objet->unk0 = arg0;
+    switch (objet->unk0) {
+    case 2:
+        objet->unkC = arg1;
+        return 1;
+    default:
+        return 0;
+    }
+}
+
+#include "gen/mgCFrame.hpp"
+struct CEoh_set2 { int unk0; char pad4[8]; mgCFrame *unkC; };
+extern "C" int Set__4CEohFiP8mgCFrame(CEoh_set2 *objet, int arg0, mgCFrame *arg1) {
+    if (arg1 == 0) return 0;
+    objet->unk0 = arg0;
+    switch (objet->unk0) {
+    case 3:
+        objet->unkC = arg1;
+        return 1;
+    default:
+        return 0;
+    }
+}
+
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Set__4CEohFiP10CFuncPoint);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", VectMatMul__FPfPfPA4_f_00260A70);
 extern "C" u8 EdEventInfo[4768];

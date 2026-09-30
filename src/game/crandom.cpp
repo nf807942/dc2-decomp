@@ -11,7 +11,12 @@
 struct i;
 
 
-INCLUDE_ASM("nonmatchings/game/crandom", __ct__14CVillagerPlaceFv);
+struct CVillagerPlace;
+extern "C" s32 memset(...);
+extern "C" CVillagerPlace *__ct__14CVillagerPlaceFv(CVillagerPlace *objet) {
+    memset(objet, 0, 8);
+    return objet;
+}
 extern "C" s32 GetSaveData__Fv(void);
 extern "C" s32 GetQuestData__Fv(void) {
     s32 temp_v0;
@@ -72,7 +77,8 @@ extern "C" s32 Initialize__10CQuestDataFv(void *self) {
 }
 INCLUDE_ASM("nonmatchings/game/crandom", SetQuestFlag__10CQuestDataFii);
 INCLUDE_ASM("nonmatchings/game/crandom", QuestClear__10CQuestDataFi);
-INCLUDE_ASM("nonmatchings/game/crandom", GetPlayQuestData__10CQuestDataFi);
+extern "C" int GetPlayQuestData__10CQuestDataFi(void *, int);
+extern "C" int GetPlayQuestData__10CQuestDataFi(void *p, int i) { if(i<0 || i>=0x40) return 0; return (int)p+(i<<4); }
 extern "C" s32 GetQuestData__Fv(void);
 struct CQuestData;
 extern "C" s32 SetQuestFlag__10CQuestDataFii(void *, s32, s32);
@@ -187,7 +193,10 @@ INCLUDE_ASM("nonmatchings/game/crandom", DecodeBinData__FPUciPUci);
 INCLUDE_ASM("nonmatchings/game/crandom", EncodePassword__FPUciPUciPci);
 INCLUDE_ASM("nonmatchings/game/crandom", DecodePassword__FPcPUciPUci);
 INCLUDE_ASM("nonmatchings/game/crandom", nget__7CRandomFv);
-INCLUDE_ASM("nonmatchings/game/crandom", abs__Ff);
+extern "C" float abs__Ff(float arg0) {
+    if (arg0 < 0.0f) return -arg0;
+    return arg0;
+}
 INCLUDE_ASM("nonmatchings/game/crandom", grGyoRaceSimulate__FP11grRACE_INFO);
 INCLUDE_ASM("nonmatchings/game/crandom", grGetFishProgress__FP11grRACE_INFOifP15grRACE_PROGRESS);
 struct inferred;

@@ -50,7 +50,11 @@ INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgInit__Fii);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgInitVif1Packet__FP1P1i);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetPacketBuffer__FP9mgCMemoryP9mgCMemory);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetDataBuffer__FP9mgCMemoryP9mgCMemoryi);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetDataBuffer__Fv);
+extern "C" s32 mgDataID;
+extern "C" char data_buf_00398620[];
+extern "C" void *mgGetDataBuffer__Fv(void) {
+    return &data_buf_00398620[0] + mgDataID * 48;
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetTopVRAMAddress__Fv);
 extern s32 mgFrameRate;
 extern "C" f32 mgGetNowFrameRate__Fv(void) {
@@ -58,7 +62,15 @@ extern "C" f32 mgGetNowFrameRate__Fv(void) {
 }
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgBeginFrame__FP14mgCDrawManager);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgBeginPacket__FP14mgCDrawManager);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgBeginDraw__FP9mgCMemoryPiP14mgCDrawManager);
+extern "C" u8 mgDrawManager[128];
+#include "menu.hpp"
+struct mgCDrawManager_l1a { s32 field0; };
+extern "C" s32 BeginDraw__14mgCDrawManagerFP9mgCMemoryPi(void *, mgCMemory *, s32 *);
+extern "C" void mgBeginDraw__FP9mgCMemoryPiP14mgCDrawManager(mgCMemory *arg0, s32 *arg1, mgCDrawManager_l1a *arg2) {
+    mgCDrawManager_l1a *mgr = arg2;
+    if (mgr == NULL) mgr = (mgCDrawManager_l1a *)&mgDrawManager;
+    BeginDraw__14mgCDrawManagerFP9mgCMemoryPi(mgr, arg0, arg1);
+}
 struct mgCDrawManager;
 extern "C" u32 mgVif1Packet;
 extern "C" u8 mgDrawManager[128];
@@ -76,8 +88,20 @@ extern "C" void mgPreEndDraw__FP14mgCDrawManager(mgCDrawManager *arg0) {
     }
     PreEndDraw__14mgCDrawManagerFv(arg0);
 }
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgEndDrawReloadTexture__FiP14mgCDrawManager);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgEndDraw__FiP14mgCDrawManager);
+extern "C" u8 mgDrawManager[128];
+extern "C" u32 mgVif1Packet;
+extern "C" s32 ReloadTexture__14mgCDrawManagerFiP13sceVif1Packet(...);
+extern "C" s32 mgEndDrawReloadTexture__FiP14mgCDrawManager(s32 texture, void *manager) {
+    if (manager == NULL) manager = mgDrawManager;
+    return ReloadTexture__14mgCDrawManagerFiP13sceVif1Packet(manager, texture, mgVif1Packet);
+}
+extern "C" u8 mgDrawManager[128];
+extern "C" u32 mgVif1Packet;
+extern "C" s32 Draw__14mgCDrawManagerFiP13sceVif1Packet(...);
+extern "C" s32 mgEndDraw__FiP14mgCDrawManager(s32 mode, void *manager) {
+    if (manager == NULL) manager = mgDrawManager;
+    return Draw__14mgCDrawManagerFiP13sceVif1Packet(manager, mode, mgVif1Packet);
+}
 extern "C" void mgStoreFrameImage__Fv(void) {
     StoreImage__Fi(0);
 }
@@ -115,7 +139,16 @@ extern "C" void mgEndPacket__FP14mgCDrawManager(mgCDrawManager_ddd6cf *arg0) {
     sceVif1PkTerminate(mgVif1Packet);
 }
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgWaitFrame__Fv);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgDraw__FP8mgCFrame);
+struct virtual_frame {
+    virtual void a0(); virtual void a1(); virtual void a2(); virtual void a3();
+    virtual void a4(); virtual void a5(); virtual void a6(); virtual void a7();
+    virtual void a8(); virtual void a9(); virtual void a10();
+    virtual s32 Draw();
+};
+extern "C" s32 mgDraw__FP8mgCFrame(virtual_frame *arg0) {
+    if (arg0 != NULL) return arg0->Draw();
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgDrawDirect__FP8mgCFrame);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgDrawDirect__FP9mgCVisualPA4_f);
 extern "C" u32 ddraw_size;
@@ -126,7 +159,10 @@ extern "C" void mgDrawDirectStart__Fv(void) {
     ddraw_size = 0;
 }
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgDrawDirect2__FP8mgCFrame);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgDrawDirectEnd__Fv);
+extern "C" s32 sceVif1PkReserve(...);
+extern "C" void mgDrawDirectEnd__Fv(void) {
+    if ((s32) ddraw_size > 0) sceVif1PkReserve(mgVif1Packet, ddraw_size * 4);
+}
 struct mgCDrawManager {
     s32 field_0;
     char pad_4[0x4];

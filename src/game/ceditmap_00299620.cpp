@@ -60,7 +60,12 @@ INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", GetRiverNum__8CEditMapFif);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", DrawRiverMask__8CEditMapFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", DrawRiver__8CEditMapFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", Create__9CEditGridFiiP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", __ct__9CGridDataFv);
+struct CGridData;
+extern "C" s32 memset(...);
+extern "C" CGridData *__ct__9CGridDataFv(CGridData *objet) {
+    memset(objet, 0, 0x14);
+    return objet;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", Clear__9CEditGridFv);
 extern "C" void mgZeroVector__FPf(...);
 struct CEditGrid_i { int f0, f4, f8, fC, f10; };
@@ -246,7 +251,14 @@ INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", stepMain__FPv);
 s32 mpegError(sceMpeg *mpeg, sceMpegCbDataError *error, void *user) {
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", mpegNodata__FP7sceMpegP13sceMpegCbDataPv);
+extern "C" u8 videoDec[184];
+extern "C" s32 switchThread__Fv(void);
+extern "C" s32 viBufAddDMA__FP5ViBuf(...);
+extern "C" s32 mpegNodata__FP7sceMpegP13sceMpegCbDataPv(sceMpeg *arg0, sceMpegCbData *arg1, void *arg2) {
+    switchThread__Fv();
+    viBufAddDMA__FP5ViBuf(&videoDec[0x48]);
+    return 1;
+}
 extern "C" u8 videoDec[184];
 struct sceMpegCbData;
 extern "C" s32 viBufStopDMA__FP5ViBuf(...);
@@ -280,7 +292,10 @@ extern "C" s32 voBufIsEmpty__FP5VoBuf(VoBuf *b) {
     return b->field_0x10 == 0;
 }
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", voBufGetTag__FP5VoBuf);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", voBufDecCount__FP5VoBuf);
+struct VoBuf_l1a { char pad0[0x10]; volatile s32 count; };
+extern "C" void voBufDecCount__FP5VoBuf(VoBuf_l1a *arg0) {
+    if (arg0->count > 0) arg0->count = arg0->count - 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", getFIFOindex__FP5ViBufPv);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", setD3_CHCR__FUi);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", setD4_CHCR__FUi);

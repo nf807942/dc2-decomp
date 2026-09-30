@@ -74,7 +74,14 @@ extern "C" void FadeInMenu__14CBaseMenuClassFif(CBaseMenuClass *objet, s32 arg0,
     FadeIn__10CFadeInOutFi(MenuMainScene + 0x2C70, arg0);
     FadeStep__10CFadeInOutFv(MenuMainScene + 0x2C70);
 }
-INCLUDE_ASM("nonmatchings/game/cbasemenuclass", FadeOutMenu__14CBaseMenuClassFif);
+extern "C" u32 MenuMainScene;
+struct fade_obj_l1c;
+extern "C" void FadeOut__10CFadeInOutFifff(fade_obj_l1c *, s32, f32, f32, f32);
+extern "C" s32 FadeStep__10CFadeInOutFv(...);
+extern "C" void FadeOutMenu__14CBaseMenuClassFif(CBaseMenuClass *objet, s32 arg0, f32 arg1) {
+    FadeOut__10CFadeInOutFifff((fade_obj_l1c *) (MenuMainScene + 0x2C70), arg0, 0.0f, 0.0f, 0.0f);
+    FadeStep__10CFadeInOutFv((fade_obj_l1c *) (MenuMainScene + 0x2C70));
+}
 extern "C" s32 FadeCheck__10CFadeInOutFv(...);
 extern "C" s32 FadeCheckMenu__14CBaseMenuClassFv(void) {
     return FadeCheck__10CFadeInOutFv(MenuMainScene + 0x2C70);

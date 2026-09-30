@@ -36,7 +36,15 @@ INCLUDE_ASM("nonmatchings/game/fish_place_map", UkiWaitLoop__FP6CSceneP11CPadCon
 INCLUDE_ASM("nonmatchings/game/fish_place_map", InitBattle__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", BattleLoop__FP6CSceneP11CPadControl);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", GetFishDist__FP6CScene);
-INCLUDE_ASM("nonmatchings/game/fish_place_map", DeleteEsa__Fv);
+extern "C" s32 GetSaveData__Fv(void);
+extern "C" s32 EsaInit__Fv(void);
+extern "C" void DeleteBait__16CUserDataManagerFv(void *);
+extern "C" u32 EsaChara;
+struct SavedDataOffset { char pad[0x1D2A0]; s32 field; };
+extern "C" void DeleteEsa__Fv(void) {
+    s32 saved = GetSaveData__Fv(); EsaInit__Fv(); EsaChara = 0;
+    DeleteBait__16CUserDataManagerFv(&((SavedDataOffset *)saved)->field);
+}
 INCLUDE_ASM("nonmatchings/game/fish_place_map", InitFalse__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", FalseLoop__FP6CSceneP11CPadControl);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", InitSuccess__FP6CScene);
@@ -84,7 +92,9 @@ extern "C" u8 GameInfo[48];
 extern "C" void *GetNowSubGameInfo__Fv(void) {
     return GameInfo;
 }
-INCLUDE_ASM("nonmatchings/game/fish_place_map", sgMenuOpenEnable__Fv);
+extern "C" int sgMenuOpenEnable__Fv(void) {
+    return SubGameRunning__Fv() != 0 ? MenuOpenFlag : 1;
+}
 void sgSetMenuOpenEnableFlag(s32 value) {
     MenuOpenFlag = value;
 }
@@ -258,5 +268,11 @@ void sgCPlayVoice::Play(void) {
     this->field_0x8 = 1;
 }
 INCLUDE_ASM("nonmatchings/game/fish_place_map", Step__12sgCPlayVoiceFv);
-INCLUDE_ASM("nonmatchings/game/fish_place_map", Close__12sgCPlayVoiceFv);
+extern "C" void sndStreamClose__Fv(void);
+extern "C" s32 Close__12sgCPlayVoiceFv(void *self) {
+    if (*(s32 *)self > 0) {
+        sndStreamClose__Fv();
+        *(s32 *)self = 0;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/fish_place_map", sgInitGyoRace__FP11SubGameInfo);

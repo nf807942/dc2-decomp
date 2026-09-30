@@ -127,7 +127,14 @@ INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", DrawDirect__11CCharacter2
 INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", DrawShadowDirect__11CCharacter2Fv);
 INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", UpdatePosition__11CCharacter2Fv);
 INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", ResetDAPosition__11CCharacter2Fv);
-INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", GetDefaultStep__11CCharacter2Fv);
+struct CCharacter2_l1a;
+struct step_l1a { char pad[0x2C]; f32 step; };
+extern "C" f32 GetDefaultStep__11CCharacter2Fv(CCharacter2_l1a *objet) {
+    step_l1a *p = (step_l1a *) *(void **)((u8 *)objet + 0x374);
+    if (p != NULL) return p->step;
+    return 0.0f;
+}
+
 extern "C" void SetStep__11CCharacter2Ff(void *objet, f32 arg0) {
     *(f32 *) ((u8 *) objet + 0x390) = arg0;
 }
@@ -186,7 +193,12 @@ extern "C" void SetMotion__11CCharacter2FPci(void *o, char *n, int i) { SetMotio
 
 INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", SetNowFrameWeight__11CCharacter2Ff);
 INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", SetMotionPara__11CCharacter2FPcii);
-INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", SetDAnimeEnable__11CCharacter2Fi);
+struct danime_fields { char pad[0x120]; s16 unk120; };
+extern "C" void SetDAnimeEnable__11CCharacter2Fi(danime_fields *objet, s32 arg0) {
+    if (arg0 != 0) objet->unk120 = objet->unk120 & ~1;
+    else objet->unk120 = objet->unk120 | 1;
+}
+
 INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", GetSoundInfoCopy__11CCharacter2FP9mgCMemory);
 typedef struct CCharacter2_infere3 {
     /* 0x000 */ char pad0[0x580];

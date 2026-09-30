@@ -54,7 +54,8 @@ extern "C" s32 MenuItemSelectKey__Fv(void) {
 }
 INCLUDE_ASM("nonmatchings/game/citemselect", MenuItemSelectDraw__Fv);
 INCLUDE_ASM("nonmatchings/game/citemselect", GetRandI__Fi);
-INCLUDE_ASM("nonmatchings/game/citemselect", GetRandF__Ff);
+extern "C" float mgRnd__Fv(void);
+extern "C" float GetRandF__Ff(float arg0) { return arg0 * mgRnd__Fv(); }
 INCLUDE_ASM("nonmatchings/game/citemselect", ReCalcBox__FP9mgVu0FBOX9mgVu0FBOX);
 INCLUDE_ASM("nonmatchings/game/citemselect", MenuAdjustPolygonScale__FP8mgCFramef);
 INCLUDE_ASM("nonmatchings/game/citemselect", MenuAdjustPolygonScale__F9mgVu0FBOXf);
@@ -67,7 +68,10 @@ extern "C" void MenuSePlay__Fi(s32 arg0) {
         MenuSePlay__FUii(SystemSND_ID, arg0);
     }
 }
-INCLUDE_ASM("nonmatchings/game/citemselect", MenuSePlay__FUii);
+extern "C" int sndSePlay__FUiii(unsigned int, int, int);
+extern "C" int MenuSePlay__FUii(unsigned int arg0, int arg1) {
+    if (arg1 >= 0) sndSePlay__FUiii(arg0, arg1, 0);
+}
 INCLUDE_ASM("nonmatchings/game/citemselect", MenuSePlay__FiPUiP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/citemselect", StopEnvSoundMenu__Fi);
 INCLUDE_ASM("nonmatchings/game/citemselect", ReStartEnvSoundMenu__Fv);
@@ -98,7 +102,15 @@ INCLUDE_ASM("nonmatchings/game/citemselect", MenuCommonReadData__FP9mgCMemoryPPc
 INCLUDE_ASM("nonmatchings/game/citemselect", MenuDeleteTextureBlock__FPi);
 INCLUDE_ASM("nonmatchings/game/citemselect", MenuWorkTextureEnter__FiPciii);
 INCLUDE_ASM("nonmatchings/game/citemselect", MenuEnterIMG__FiPUcPc);
-INCLUDE_ASM("nonmatchings/game/citemselect", GetReadBGInfo__FPc);
+extern "C" int GetCurrentDir__FPc(char *);
+extern "C" int GetReadBGFile__FPc(char *);
+extern "C" char *strcat(char *, const char *);
+extern "C" void GetReadBGInfo__FPc(signed char *arg0) {
+    signed char sp20[0x80];
+    GetCurrentDir__FPc((char *)sp20);
+    strcat((char *)sp20, (char *)arg0);
+    GetReadBGFile__FPc((char *)sp20);
+}
 INCLUDE_ASM("nonmatchings/game/citemselect", CalcMenu1__FfPfffi);
 INCLUDE_ASM("nonmatchings/game/citemselect", CalcMenu1__FiPiiii);
 INCLUDE_ASM("nonmatchings/game/citemselect", CalcMenuAdd__FPiii);

@@ -410,7 +410,10 @@ s32 CMapInfo::GetActiveLightNo(void) {
     return this->field_0x98;
 }
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetLightInfo__4CMapFP16CMapLightingInfoPfi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", mgAbs__Ff);
+extern "C" float mgAbs__Ff(float arg0) {
+    if (arg0 < 0.0f) return -arg0;
+    return arg0;
+}
 s32 mapDummy(SPI_STACK *stack, int argc) {
     return 1;
 }
@@ -746,7 +749,7 @@ extern "C" s32 mapCAMERA_INFO_END__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     return 1;
 }
 extern "C" u32 mapFuncPointIdx;
-extern "C" void spiGetStackInt__FP9SPI_STACK(SPI_STACK *arg0);
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(SPI_STACK *arg0);
 extern "C" s32 mapFUNC_POINT__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     spiGetStackInt__FP9SPI_STACK(arg0);
     mapFuncPointIdx = 0;
@@ -907,7 +910,15 @@ extern "C" s32 GetAddMapFile__8CMapInfoFPi(u8 *self, s32 *out) {
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetLightingInfo__8CMapInfoFi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapIMG__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPCP__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapACTIVE_LIGHT_SET__FP9SPI_STACKi);
+struct SPI_STACK;
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(SPI_STACK *);
+extern "C" u32 MapInfo;
+struct active_light_field { char pad[0x98]; s32 value; };
+extern "C" s32 mapACTIVE_LIGHT_SET__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    s32 value = spiGetStackInt__FP9SPI_STACK(arg0);
+    ((active_light_field *) MapInfo)->value = value;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapLIGHT_SET__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFOV__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapBGCOLOR__FP9SPI_STACKi);
@@ -915,7 +926,16 @@ INCLUDE_ASM("nonmatchings/game/cmapparts", mapBGCOLOR2__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapAMBIENT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapLIGHT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPLIGHT__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapFOG_ENABLE__FP9SPI_STACKi);
+struct SPI_STACK;
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(SPI_STACK *);
+extern s32 LightingInfo;
+struct fog_field { char pad[0x190]; s32 value; };
+extern "C" s32 mapFOG_ENABLE__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    if (LightingInfo == 0) return 0;
+    s32 value = spiGetStackInt__FP9SPI_STACK(arg0);
+    ((fog_field *) LightingInfo)->value = value;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFOG__FP9SPI_STACKi);
 s32 mapLIGHT_SET_END(SPI_STACK * arg0, s32 arg1) {
     LightingInfo = 0;
@@ -933,15 +953,60 @@ extern "C" s32 mapCHARA_POS__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapTIME_FLAG__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapTIME_LIGHT_NUM__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapDEF_FOOT__FP9SPI_STACKi);
+struct SPI_STACK;
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(SPI_STACK *);
+extern "C" u32 MapInfo;
+struct time_light_field { char pad[0xD0]; s32 value; };
+extern "C" s32 mapTIME_LIGHT_NUM__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    s32 value = spiGetStackInt__FP9SPI_STACK(arg0);
+    ((time_light_field *) MapInfo)->value = value;
+    return 1;
+}
+struct SPI_STACK;
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(SPI_STACK *);
+extern "C" u32 MapInfo;
+struct def_foot_field { char pad[0xD4]; s32 value; };
+extern "C" s32 mapDEF_FOOT__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    s32 value = spiGetStackInt__FP9SPI_STACK(arg0);
+    ((def_foot_field *) MapInfo)->value = value;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapSKY_INFO__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapLENS_FLARE__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapTIME_CFADE__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapALL_SCISSOR__FP9SPI_STACKi);
+struct SPI_STACK;
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(SPI_STACK *);
+extern "C" u32 MapInfo;
+struct lens_flare_field { char pad[0xE4]; s32 value; };
+extern "C" s32 mapLENS_FLARE__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    s32 value = spiGetStackInt__FP9SPI_STACK(arg0);
+    ((lens_flare_field *) MapInfo)->value = value;
+    return 1;
+}
+struct SPI_STACK;
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(SPI_STACK *);
+extern "C" u32 MapInfo;
+struct time_cfade_field { char pad[0xA4]; s32 value; };
+extern "C" s32 mapTIME_CFADE__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    s32 value = spiGetStackInt__FP9SPI_STACK(arg0);
+    ((time_cfade_field *) MapInfo)->value = value;
+    return 1;
+}
+struct SPI_STACK;
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(SPI_STACK *);
+extern "C" u32 MapInfo;
+struct scissor_field { char pad[0xE8]; s32 value; };
+extern "C" s32 mapALL_SCISSOR__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    s32 value = spiGetStackInt__FP9SPI_STACK(arg0);
+    ((scissor_field *) MapInfo)->value = value;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapCHARA_LIGHT_ADJUST__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", LoadMapInfo__8CMapInfoFPciP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__16CMapLightingInfoFv);
+struct CMapLightingInfo;
+extern "C" void *memset(void *, int, unsigned);
+extern "C" CMapLightingInfo *__ct__16CMapLightingInfoFv(CMapLightingInfo *objet) {
+    memset(objet, 0, 0x1D0);
+    return objet;
+}
 extern "C" u32 MapInfo;
 extern "C" u32 MapInfoStack;
 static inline u32 Align16Blocks(u32 n) {

@@ -90,7 +90,13 @@ INCLUDE_ASM("nonmatchings/game/cmenuitemuse", DrawMenuNumber__FP11mgCDrawPrimii9
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", PrimDrawNumber__FP11mgCDrawPrimiiii9mgRect_i_ii);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", PrimDrawNumber2__FP11mgCDrawPrimiiii9mgRect_i_ii);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", PrimFillRect4__FP11mgCDrawPrim9mgRect_f_PfPfPfPf);
-INCLUDE_ASM("nonmatchings/game/cmenuitemuse", MenuReloadTexture__FRii);
+extern "C" u8 mgTexManager[540]; struct sceVif1Packet;
+extern "C" s32 ReloadTexture__17mgCTextureManagerFiP13sceVif1Packet(void *, s32, sceVif1Packet *);
+extern "C" void MenuReloadTexture__FRii(s32 &arg0, s32 arg1) {
+    void *manager = &mgTexManager;
+    if (arg0 != arg1) { arg0 = arg1; ReloadTexture__17mgCTextureManagerFiP13sceVif1Packet(manager, arg0, 0); }
+}
+
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", MenuReloadCLUT__Fi);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", DrawMenuFillBox__Fiiii);
 extern "C" s32 GetMenuPrim__Fv(void);
@@ -160,5 +166,8 @@ extern "C" s32 MenuMainFrame_LeftTop_Pos[2];
 extern "C" void *GetMenuMainFrameLeftTopPos__Fi(s32 arg0) {
     return MenuMainFrame_LeftTop_Pos;
 }
-INCLUDE_ASM("nonmatchings/game/cmenuitemuse", GetMenuMainFrameCount__Fv);
+extern short MenuMainFrame_Display_Mode;
+extern float tbl_2072[];
+extern "C" float GetMenuMainFrameCount__Fv(void) { return tbl_2072[MenuMainFrame_Display_Mode / 2]; }
+
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", MenuMainFrameModeSet__Fii);

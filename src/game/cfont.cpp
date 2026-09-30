@@ -506,7 +506,11 @@ extern "C" void *GetUndoData__Fv(void) {
     return &UndoData;
 }
 
-INCLUDE_ASM("nonmatchings/game/cfont", UndoEnable__Fv);
+extern "C" void *GetUndoData__Fv(void);
+extern "C" s32 UndoEnable__Fv(void) {
+    return *(s32 *)GetUndoData__Fv() >= 0;
+}
+
 INCLUDE_ASM("nonmatchings/game/cfont", UndoPlaceParts__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/cfont", StackUndoData__FP9UNDO_DATA);
 INCLUDE_ASM("nonmatchings/game/cfont", StartEditPutWall__FPQ210CEditParts8WallInfo);

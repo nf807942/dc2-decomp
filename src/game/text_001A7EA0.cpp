@@ -96,7 +96,13 @@ void EditDebugStart(s32 arg0, mgCMemory * arg1) {
     EditDebugFlag = 1;
     EditDebugTexb = arg0;
 }
-INCLUDE_ASM("nonmatchings/game/text_001A7EA0", PrintCursor__FPci);
+extern "C" unsigned char _1028_0036A6F8[0x10000];
+extern "C" unsigned char _1029_0036A700[0x10000];
+extern "C" int sprintf(...);
+extern "C" void PrintCursor__FPci(signed char *arg0, int arg1) {
+    if (arg1 == Select) { sprintf((char *)arg0, &_1028_0036A6F8); return; }
+    sprintf((char *)arg0, &_1029_0036A700);
+}
 INCLUDE_ASM("nonmatchings/game/text_001A7EA0", EditDebugLoop__FP6CSceneP13EditDebugInfo);
 extern "C" void EditDebugInit__Fv(void);
 extern "C" void EditDebugEnd__Fv(void) {

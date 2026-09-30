@@ -327,7 +327,10 @@ void ShowOffOnceHelpMes(void) {
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", DrawHelpMes__Fv);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", ShowHelpMes__Fii);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", ShowErrorHelpMes__Fii);
-INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", GetVlgrPlaceInfo__Fi);
+extern int PlaceInfoNum;
+extern char *PlaceInfo;
+extern "C" int GetVlgrPlaceInfo__Fi(int i) { if(i<0 || i>=PlaceInfoNum) return 0; int base=(int)PlaceInfo; int off=i<<6; base+=off; return base; }
+
 extern "C" char VlgrPlace[];
 extern "C" void *GetVlgrPlaceTable__FPi(s32 *arg0) {
     *arg0 = 0x200;
@@ -379,7 +382,14 @@ INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", niNPC_INFO__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", LoadNPCInfo__FPciP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", LoadPlaceInfo__FPciP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", vpiNPC_PLACE_NUM__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", __ct__18CVillagerPlaceInfoFv);
+extern "C" void *memset(void *, int, unsigned);
+struct CVPlace_fields { char pad[0x20]; s32 unk20; };
+extern "C" CVPlace_fields *__ct__18CVillagerPlaceInfoFv(CVPlace_fields *objet) {
+    memset(objet, 0, 0x40);
+    objet->unk20 = -1;
+    return objet;
+}
+
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", vpiNPC_PLACE__FP9SPI_STACKi);
 s32 vpiNPC_PLACE_END(SPI_STACK * arg0, s32 arg1) {
     vpiInfo = 0;

@@ -8,7 +8,10 @@
 
 #include "common.h"
 
-INCLUDE_ASM("nonmatchings/game/clsmes", AddYokoHaba__6ClsMesFii);
+extern "C" void AddYokoHaba__6ClsMesFii(void *objet, s32 index, s32 value) {
+    if (value < 0) return;
+    *(s32 *)((index << 2) + (s32)objet + 0x258C) += value;
+}
 extern "C" void SetYokoHaba__6ClsMesFii(void *self, s32 arg0, s32 arg1) {
     if (arg1 >= 0) {
         *(s32 *) ((arg0 << 2) + (s32) self + 0x258C) = arg1;

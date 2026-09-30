@@ -276,7 +276,15 @@ block_5:
     }
 }
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcMAP_NO__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cgamedata", gcPROGRESS__FP9SPI_STACKi);
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(SPI_STACK *);
+extern "C" s32 GetSaveData__Fv(void);
+extern "C" s32 gcPROGRESS__FP9SPI_STACKi(SPI_STACK *stack, int arg) {
+    s32 value = spiGetStackInt__FP9SPI_STACK(stack);
+    char *save = (char *)GetSaveData__Fv();
+    *(s32 *)(save + 0x1A08) = value;
+    return 0;
+}
+
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcBIT_FLAG_ON__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcBIT_FLAG_OFF__FP9SPI_STACKi);
 extern "C" u32 DefStartEventNo;
@@ -321,7 +329,14 @@ INCLUDE_ASM("nonmatchings/game/cgamedata", gcHP__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcALL_GEO_PARTS__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcPARAM_DRAW__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcOPTION__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cgamedata", gcMONICA__FP9SPI_STACKi);
+extern "C" void *GetUserDataMan__Fv(void);
+extern "C" void JoinPartyMember__16CUserDataManagerFi(void *, int);
+extern "C" int gcMONICA__FP9SPI_STACKi(void *stack, int arg) {
+    void *manager = GetUserDataMan__Fv();
+    if (manager) JoinPartyMember__16CUserDataManagerFi(manager, 1);
+    return 1;
+}
+
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcSTEVE__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcMONSTER__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", gcPARTY__FP9SPI_STACKi);
@@ -378,12 +393,32 @@ CDataItem::CDataItem(void) {
     this->field_0xC = 0;
     this->field_0xE = 0;
 }
-INCLUDE_ASM("nonmatchings/game/cgamedata", __ct__11CDataAttachFv);
-INCLUDE_ASM("nonmatchings/game/cgamedata", __ct__11CDataWeaponFv);
+struct CDataAttach;
+extern "C" s32 memset(...);
+extern "C" CDataAttach *__ct__11CDataAttachFv(CDataAttach *objet) {
+    memset(objet, 0, 0x18);
+    return objet;
+}
+
+struct CDataWeapon_local { short unk0, unk2; };
+extern "C" int memset(...);
+extern "C" CDataWeapon_local *__ct__11CDataWeaponFv(CDataWeapon_local *objet) {
+    memset((int)objet, 0, 0x4C);
+    objet->unk0 = 0x14;
+    objet->unk2 = 0x14;
+    return objet;
+}
+
 u8 CDataRoboPart::GetOffsetNo(void) {
     return this->field_0x22;
 }
-INCLUDE_ASM("nonmatchings/game/cgamedata", __ct__14CDataBreedFishFv);
+struct CDataBreedFish;
+extern "C" s32 memset(...);
+extern "C" CDataBreedFish *__ct__14CDataBreedFishFv(CDataBreedFish *objet) {
+    memset(objet, 0, 0x14);
+    return objet;
+}
+
 INCLUDE_ASM("nonmatchings/game/cgamedata", Initialize__9CGameDataFv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", _DATACOMINIT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", _DATACOM__FP9SPI_STACKi);

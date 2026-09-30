@@ -56,7 +56,9 @@ class CRandomCircle {
 public:
     int CheckArea(f32 *pos, f32 radius);
 
-    u8 unknown_000[0x6A0];
+    u8 unknown_000[0x3C8];
+    f32 motNowt;
+    u8 unknown_3CC[0x2D4];
 };
 
 /* La carte que le jeu dessine à mesure qu'on explore, et le chemin qu'elle

@@ -31,7 +31,10 @@ void InitMenuBGReadInfo2(MENU_BGREAD_INFO2 * arg0) {
 }
 INCLUDE_ASM("nonmatchings/game/cworldmapmenu", MenuLoadFileCheck__FPP17MENU_BGREAD_INFO2);
 INCLUDE_ASM("nonmatchings/game/cworldmapmenu", MenuBGReadInfo2Malloc__FP9mgCMemoryPi);
-INCLUDE_ASM("nonmatchings/game/cworldmapmenu", ConvertCharaLoadDataPhase__Fii);
+extern short tbl_992[];
+extern "C" short ConvertCharaLoadDataPhase__Fii(int a0, int a1) {
+    return tbl_992[a1 + a0 * 5];
+}
 INCLUDE_ASM("nonmatchings/game/cworldmapmenu", CheckBattleLoop__Fv);
 INCLUDE_ASM("nonmatchings/game/cworldmapmenu", SetMenuLoadItemNo__Fi);
 INCLUDE_ASM("nonmatchings/game/cworldmapmenu", MenuMemoryDivide__FP9mgCMemoryPP9mgCMemoryi);

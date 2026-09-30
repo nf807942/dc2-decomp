@@ -67,12 +67,26 @@ extern "C" void AddRate__11COMMON_GAGEFf(COMMON_GAGE_infere3 *objet, f32 arg0) {
         objet->unk4 = temp_f1;
     }
 }
-INCLUDE_ASM("nonmatchings/game/gamedataused", GetCommonGageRate__FP11COMMON_GAGE);
+extern "C" f32 GetRate__11COMMON_GAGEFv(void *);
+extern "C" f32 GetCommonGageRate__FP11COMMON_GAGE(COMMON_GAGE *arg0) {
+    if (arg0 != NULL) return GetRate__11COMMON_GAGEFv(arg0);
+    return 0.0f;
+}
 INCLUDE_ASM("nonmatchings/game/gamedataused", CalcBreedFishParam__FP14BREEDFISH_USED);
 void SetFishingGamePreEquip(CGameDataUsed *data) {
     FishGamePreEquip = data;
 }
-INCLUDE_ASM("nonmatchings/game/gamedataused", ReEquipFishingGameWeapon__Fv);
+struct CGameDataUsed;
+extern CGameDataUsed *FishGamePreEquip;
+extern "C" s32 GetUserDataMan__Fv(void);
+extern "C" s32 SetChrEquip__16CUserDataManagerFiP13CGameDataUsed(void *, s32, CGameDataUsed *);
+extern "C" void ReEquipFishingGameWeapon__Fv(void) {
+    if (FishGamePreEquip != NULL) {
+        s32 manager = GetUserDataMan__Fv();
+        SetChrEquip__16CUserDataManagerFiP13CGameDataUsed((void *) manager, 0, FishGamePreEquip);
+        FishGamePreEquip = NULL;
+    }
+}
 extern "C" s32 CheckFishingWeapon__FP13CGameDataUsed(CGameDataUsed *w) {
     return FishGamePreEquip == w;
 }
@@ -125,7 +139,14 @@ extern "C" u8 GetActiveSetNum__13CGameDataUsedFv(CGameDataUsed_infere_3a34f9 *ob
     return IsActiveSet__13CGameDataUsedFv(objet);
 }
 INCLUDE_ASM("nonmatchings/game/gamedataused", AddNum__13CGameDataUsedFii);
-INCLUDE_ASM("nonmatchings/game/gamedataused", GetUseCapacity__13CGameDataUsedFv);
+extern "C" u8 GameItemDataManage[48];
+extern "C" s32 GetRoboData__9CGameDataFi(void *, s16);
+struct used_fields { char pad[2]; s16 itemNo; };
+extern "C" s32 GetUseCapacity__13CGameDataUsedFv(void *objet) {
+    s16 *temp_v0 = (s16 *) GetRoboData__9CGameDataFi(&GameItemDataManage, ((used_fields *)objet)->itemNo);
+    if (temp_v0 != NULL) return *temp_v0;
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/gamedataused", AddFishHp__13CGameDataUsedFi);
 INCLUDE_ASM("nonmatchings/game/gamedataused", Boiled__13CGameDataUsedFv);
 extern "C" s32 GetCommonItemData__Fi(s32);

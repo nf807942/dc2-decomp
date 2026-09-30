@@ -357,7 +357,13 @@ INCLUDE_ASM("nonmatchings/game/ceditinfomngr", GetePartsInfoAtID__13CEditInfoMng
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", GetePartsInfoAtType__13CEditInfoMngrFi);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapEDIT_PARTS_NUM__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapEDIT_PARTS__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapID__FP9SPI_STACKi);
+extern "C" u32 emapNowInfo_0037E114;
+extern "C" s32 spiGetStackInt__FP9SPI_STACK(...);
+extern "C" s32 emapID__FP9SPI_STACKi(void *arg0, s32 arg1) {
+    if (emapNowInfo_0037E114 == 0) return 0;
+    *(s32 *)emapNowInfo_0037E114 = spiGetStackInt__FP9SPI_STACK(arg0);
+    return 1;
+}
 extern "C" u32 emapNowInfo_0037E114;
 extern "C" u32 emapStack_0037E108;
 struct SPI_STACK_chaine {
