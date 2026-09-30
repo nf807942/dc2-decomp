@@ -8,3 +8,4 @@
 runtime/copysign
 runtime/copysignf
 runtime/sfp
+runtime/multiply
