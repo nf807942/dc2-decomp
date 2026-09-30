@@ -168,6 +168,50 @@ def aplati(symbole: str, chemin: str, tag: str) -> Path:
     return sortie
 
 
+def isole(symbole: str, chemin: str, tag: str) -> Path:
+    """La seule fonction du symbole, avec la licence de son fichier, sans ses voisines.
+
+    La fonction commence à sa définition (la ligne du type de retour qui la précède
+    comprise) et finit à la première accolade fermante en colonne 0. Le nom cherché est celui
+    du symbole ou, à défaut, l'alias que les en-têtes de newlib lui donnent (`Balloc` pour
+    `_Balloc`) : dans le fichier il s'écrit sous cet alias, et le binaire le porte sous le
+    symbole — `_DEFUN (_Balloc, …)` rend le même code que `_DEFUN (Balloc, …)` après la macro.
+    """
+    texte = (INDEX / tag / chemin).read_text(encoding="latin-1")
+    base = INDEX / tag
+    noms = [symbole]
+    alias = re.compile(rf"^\s*#\s*define\s+(\w+)\s+{re.escape(symbole)}", re.M)
+    for f in base.rglob("*.h"):
+        noms += [m.group(1) for m in alias.finditer(f.read_text(encoding="latin-1"))]
+    noms += [m.group(1) for m in alias.finditer(texte)]   # alias posés dans le fichier lui-même
+    lignes = texte.splitlines()
+    debut = None
+    for nom in noms:
+        motif = re.compile(rf"(?:_DEFUN\s*\(\s*{re.escape(nom)}\b|^[ \t]*(?:[A-Za-z_][\w \t\*]*)?\b{re.escape(nom)}\s*\()")
+        for i, l in enumerate(lignes):
+            if motif.search(l):
+                debut = i
+                break
+        if debut is not None:
+            break
+    if debut is None:
+        raise SystemExit(f"{symbole} : définition introuvable dans {chemin}")
+    # la ligne du type de retour, si la définition est au style `type\nnom (…)`
+    if debut > 0 and lignes[debut - 1].strip() and not lignes[debut - 1].rstrip().endswith((";", "*/", "}")):
+        debut -= 1
+    fin = next((j for j in range(debut, len(lignes)) if lignes[j].startswith("}")), len(lignes) - 1)
+    licence = []
+    for l in lignes:
+        licence.append(l)
+        if "*/" in l:
+            break
+    sortie = ROOT / "progress" / "newlib" / f"{symbole}.fn.c"
+    sortie.parent.mkdir(parents=True, exist_ok=True)
+    sortie.write_text("\n".join(licence) + f"\n/* {chemin}, newlib 1.9.0 */\n\n"
+                      + "\n".join(lignes[debut:fin + 1]) + "\n", encoding="latin-1", newline="\n")
+    return sortie
+
+
 def main() -> int:
     p = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     p.add_argument("symbole", nargs="?")
@@ -175,6 +219,8 @@ def main() -> int:
     p.add_argument("--tag", default="newlib-1_9_0")
     p.add_argument("--indexe", action="store_true")
     p.add_argument("--cherche", metavar="SYMBOLE")
+    p.add_argument("--fonction", action="store_true",
+                   help="n'écrit que la fonction du symbole, avec la licence du fichier")
     a = p.parse_args()
 
     if a.indexe:
@@ -194,6 +240,9 @@ def main() -> int:
             return 1
         chemin = trouves[0][0]
         print(f"source retenue : {chemin}")
+    if a.fonction:
+        print(isole(a.symbole, chemin, a.tag).relative_to(ROOT))
+        return 0
     print(aplati(a.symbole, chemin, a.tag).relative_to(ROOT))
     return 0
 

@@ -158,6 +158,31 @@ def modifier_liste_gcc(unite: str, ajouter: bool) -> None:
         verrou.unlink(missing_ok=True)
 
 
+def _diff_court(sortie: str, contexte: int = 3, long: int = 50) -> str:
+    """Le diff en entier s'il est court ; sinon l'en-tête et les seules lignes qui divergent.
+
+    Une fonction de trois cents instructions rend un tableau de trois cents lignes dont une
+    poignée seulement porte `≠`, `+` ou `-` : les agents le réduisaient à la main avec `grep`.
+    """
+    lignes = sortie.splitlines()
+    if len(lignes) <= long:
+        return sortie
+    marque = [i for i, l in enumerate(lignes) if l[:1] in ("≠", "+", "-", "~")
+              and not l.startswith("---")]
+    if not marque:
+        return _extrait(sortie)
+    garder = set(range(0, min(8, len(lignes))))
+    for i in marque:
+        garder.update(range(max(0, i - contexte), min(len(lignes), i + contexte + 1)))
+    sortie_c, precedent = [], -1
+    for i in sorted(garder):
+        if precedent != -1 and i != precedent + 1:
+            sortie_c.append("    …")
+        sortie_c.append(lignes[i])
+        precedent = i
+    return "\n".join(sortie_c) + f"\n({len(marque)} lignes divergent sur {len(lignes)})"
+
+
 def _erreurs_gcc(sortie: str) -> str:
     """Les lignes d'erreur de GCC (`fichier:ligne: message`), sans la trace qui suit."""
     lignes = [l for l in sortie.splitlines() if re.match(r"^\S+:\d+: ", l)]
@@ -245,8 +270,19 @@ def main() -> int:
         print(f"{a.symbole} : INCLUDE_ASM introuvable dans {source}.")
         return 2
 
-    corps = a.essai.read_text(encoding="utf-8").rstrip() + "\n"
-    if a.symbole not in corps:
+    brut = a.essai.read_bytes()
+    try:
+        texte_essai = brut.decode("utf-8")
+    except UnicodeDecodeError:
+        # Un script qui a écrit l'essai sous Windows l'a écrit en cp1252 : on le lit tel quel
+        # et on le réécrit en UTF-8 dans la source, sans jeter l'essai pour si peu.
+        texte_essai = brut.decode("cp1252", errors="replace")
+        print("l'essai n'est pas en UTF-8 : lu en cp1252.")
+    corps = texte_essai.rstrip() + "\n"
+    # Dans une unité GCC, newlib définit souvent la fonction sous un alias d'en-tête
+    # (`Balloc` pour `_Balloc`) : le symbole n'y figure pas toujours tel quel, et le
+    # compilateur, puis la mesure, disent si la bonne fonction est définie.
+    if a.symbole not in corps and source.parent.name not in ("sdk", "runtime"):
         print("l'essai ne mentionne pas le symbole : il doit le définir.")
         return 2
 
@@ -341,7 +377,7 @@ def main() -> int:
              + " — il reste `make build` à l'orchestrateur"
              if gardee else "rendue, source rétablie"))
     if not gardee:
-        print(_extrait(sortie))
+        print(_diff_court(sortie))
     return 0 if gardee else 1
 
 

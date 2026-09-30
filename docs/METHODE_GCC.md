@@ -80,6 +80,31 @@ La compilation est `scripts/build/ee_gcc_cc`, qui se fait passer pour MWCC aupr�
 - **Le SDK** n'a pas de source : on part du désassemblage (`make decompile` donne un squelette
   de structure, en C++ de MWCC à réécrire en C) et des prototypes de `ps2sdk`.
 
+## Ce qu'un essai complet a appris (17 fonctions de `mprec.c`, un agent, 21 soumissions)
+
+L'unité `runtime/multiply` (le `mprec.c` de newlib 1.9.0) a été écrite en entier par un agent
+en quatre minutes et 87 000 jetons : 17 fonctions sur 17 à 100 %, l'image identique au disque.
+Quinze passent avec le corps de newlib **tel quel**. Les autres leçons :
+
+- **newlib renomme par macro** : le fichier définit `_DEFUN (Balloc, …)`, `mprec.h` fait
+  `#define Balloc _Balloc`. Dans l'essai, on écrit le nom du symbole du binaire
+  (`_DEFUN (_Balloc, …)`) : la macro le laisse tel quel et le code est le même.
+  `newlib_source.py --cherche` indique l'alias (« définie sous un alias d'en-tête ») ;
+  `--fonction` isole le corps d'une fonction avec la licence de son fichier, sans ses voisines
+  (il échoue sur `mallocr.c`, qui est de la macro du début à la fin : à lire à la main).
+- **Une statique locale porte un autre nom dans le binaire** : `static const int p05[3]` dans
+  `_pow5mult` s'appelle `p05.27` chez GCC et `p05_27` dans le binaire (99,84 % pour ce seul
+  écart de nom). On la remplace par `extern const int p05_27[3];` — la donnée est déjà dans
+  `asm/data/`. C'est la règle des statiques de MWCC (`old_viewmode_8715`).
+- **Un écart de registre n'est pas toujours un écart de registre.** `_d2b` (97,58 %) : le
+  diff montre `v0` contre `a1` et un `ori` hissé, et la cause est `if (d1) { y = d1; …`, que le
+  SDK écrit `if ((y = d1) != 0) { …`. Les variantes à tenter, dans l'ordre : lire dans la
+  condition (`if ((y = x))`), retirer un stockage, en ajouter un, retirer un doublon,
+  permuter deux déclarations.
+- **`soumettre` accepte un essai cp1252** (un script Python sous Windows l'écrit ainsi) et
+  n'exige plus le symbole tel quel dans les unités GCC ; son diff ne garde que les lignes qui
+  divergent (avec trois lignes de contexte) quand il dépasse cinquante lignes.
+
 ## Ce qui n'est pas encore prouvé
 
 - Les unités **partiellement écrites** (une partie des fonctions en `INCLUDE_ASM`) greffent
