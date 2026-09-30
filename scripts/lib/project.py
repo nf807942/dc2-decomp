@@ -48,7 +48,11 @@ def sources() -> list[Path]:
     """Les unités de traduction du projet, celles qu'on écrit."""
     if not SRC_DIR.is_dir():
         return []
-    return sorted(list(SRC_DIR.rglob("*.cpp")) + list(SRC_DIR.rglob("*.c")))
+    # mwccgap pose à côté de la source un fichier `tmpXXXXXXXX.c` le temps d'une
+    # compilation. Avec plusieurs agents, un autre processus en voit un passer
+    # et plante à sa lecture (`FileNotFoundError`) : ce n'est pas une unité.
+    return sorted(p for p in list(SRC_DIR.rglob("*.cpp")) + list(SRC_DIR.rglob("*.c"))
+                  if not p.name.startswith("tmp"))
 
 
 # `INCLUDE_ASM("nonmatchings/<unite>", <symbole>);`

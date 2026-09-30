@@ -886,3 +886,309 @@ reconstruction complète le fait.
 - **Un champ 64 bits écrit depuis un `u32` peut exiger `s64` côté destination.**
   Cette déclaration donne le couple `lwu`/`sd` observé. Témoin :
   `_RESET_SUBJECT_COUNTER`.
+
+- **Une boucle de remise à zéro se déplie d'elle-même.** `for (i = 0; i < 450; i++)`
+  qui met à zéro les cinq champs d'un enregistrement de 16 octets rend le corps
+  déplié huit fois du commerce (pas de 8, bornes 0x1BA puis 0x1C2, boucle de queue
+  de 8). Ne pas dérouler à la main ; les jets m2c en champs `unk1F8..` sont à
+  remplacer par un tableau de structures. Témoin : `InitMesWinTbl__6ClsMesFv`.
+
+- **Deux variables distinctes pour « le résultat de la recherche » et « le dernier
+  maillon ».** Réemployer celle de la boucle de recherche échange deux registres.
+  L'ordre de déclaration `p`, `last`, `q` rend le commerce. Témoin :
+  `AddOutLine__11CCharacter2FPcP12COutLineDraw`.
+
+- **L'ajout en queue de liste garde le double test que m2c laisse voir** :
+  `if (last != NULL) { do { q = last->next; if (q == NULL) break; last = q; }
+  while (q != NULL); } last->next = line;`. Le `while ((q = p->next) != NULL)`
+  naturel laisse 15 instructions divergentes. Même témoin.
+
+- **Un `char *` lu par `lb` se déclare `s8 *` dans le corps**, quoique le mangling
+  dise `Pc` : `*name` sur un `char *` (non signé ici, `-char unsigned`) rend
+  `lbu`. 99,09 % → 100 %. Même témoin.
+
+- **Deux sorties `return 0` / `return 1` distinctes, sans variable `ret`** : la
+  variable donne 27 instructions divergentes, les deux retours mettent `v0` dans
+  le créneau de délai. Témoin : `ChkEventEditStart__Fv`.
+
+- **Le type d'une globale hors `$gp` se corrige dans la déclaration de l'unité,
+  pas par un cast.** Un `pad0[0x1290]` opaque ne rend `lui at, %hi(g+0x20)` /
+  `swc1 …(at)` pour aucune forme de cast, de référence ou de `pad0 + 0x20` : elles
+  prennent toutes l'adresse. Il faut un champ réel à `0x20` (`f32 f20;`) dans le
+  type déjà posé, mesuré à 92,31 % → 100 %. Élargir un type qu'aucun code n'emploie
+  encore ne change pas les octets. Témoin : `ChkEventEditStart__Fv`
+  (`EdEventInfo_keep`, `src/game/cripple.cpp`).
+
+- **Une variable déclarée avant l'autre échange deux registres callee-saved** :
+  `n` avant `p` a réglé un échange à 2 essais. Témoin :
+  `GetTerritoryParts__8CEditMapFiPii`.
+
+- **Le pas de pointeur d'une pile de script s'écrit `SetStack(p++, x)`, et le
+  paramètre lui-même sert de pointeur mobile** : le renommer `p` a réglé un
+  `addiu a0,a0,0x20` là où le commerce a `addiu a0,s0,0x20`. Témoin :
+  `_GET_DUN_WORLD_COORD__FP12RS_STACKDATAi`.
+
+- **Assigner dans la condition place le `daddu` dans le créneau de délai.**
+  `if ((p = Get()) != NULL)` et `while ((p = Get()) != NULL)` rendent
+  `daddu s1, v0, zero` dans le créneau du `beqz`/`bnez` ; sans l'affectation dans
+  la condition, MWCC met le `daddu` avant le test, suivi d'un `nop`. 96,01 % → 100 %.
+  Témoin : `GetSeSrcVolPan__FPA4_fP14CFuncPointMngrP15CFuncPointCheckPiPfPfi`.
+
+- **Un vecteur de pile dont le quatrième mot s'écrit à part** : pour `sw v0, 0x9C(sp)`
+  en sp-relatif avec `lq`/`sq` et `daddu a2, a0`, il faut
+  `struct { f32 v[3]; u32 w; } q;` avec `*(u128 *) q.v = …`, `q.w = 0x3F800000` et
+  `q.v` passé aux appels. `f32 v[4]` donne `sw 0xC(a0)`, `&q` un second `addiu` à
+  la place du `daddu`, et `f32 v[3]` avec un `u32` séparé change l'ordre des
+  emplacements. Même témoin.
+
+- **Un prototype typé règle l'ordre de chargement des arguments qu'un `(...)`
+  inverse.** `GetLWMatrix(void *, f32 (*)[4])`, `mgMulMatrix(f32 (*)[4] ×3)` avec
+  `f32 mB0[4][4]` rétablissent `a0` puis `a1` ; `sceMcRead(s32, void *, s32)` typé
+  corrige l'ordre des `lw a1` / `lw a0` dans `LoadOmakeFile__18CMemoryCardManagerFv`.
+  Cela précise la neutralité du prototype `(...)` : elle vaut pour les octets de
+  l'appel, non pour l'ordonnancement des arguments chargés depuis la mémoire.
+
+- **L'ordre de déclaration choisit les registres sauvegardés** : `slot` déclaré avant
+  `sp38`/`sp3C`/`idx` donne `self` = `s0`, `slot` = `s1` ; après, l'inverse. Témoin :
+  `LoadOmakeFile__18CMemoryCardManagerFv`.
+
+- **Une table de saut qui part d'une base a besoin d'un `case` vide devant le
+  `default`.** Quand l'entrée 0 pointe vers le défaut, un `case 0xA0:` vide juste
+  avant `default:` rend `-0xA0` et `0x40` là où son absence rend `-0xA1` et `0x3f`.
+  Le nom de la table (`@118` contre `_288_00368800`) ne s'apparie jamais : `soumettre
+  --table` garde à partir de 99,9 % et `make build` tranche. Témoin :
+  `ascii2serno__FUc`, `SetWindowMode__6ClsMesFi`.
+
+- **Une comparaison flottante à négatif dans un `default`** : `if (x < -10)` rend
+  `slti at` + `beqz at`, `x > -11` rend `slti v0` + `bnez`, donc l'autre sens.
+  Témoin : `SearchMcType__18CMemoryCardManagerFv`.
+
+- **Le résultat d'un appel se range dans un paramètre inutilisé pour passer devant
+  l'argument précédent.** `arg1 = GetWindowMode(mes); SetStack(next_slot, arg1);`
+  place le déplacement de `v0` vers `a1` avant celui de `a0`, dans le créneau de
+  délai ; la forme directe reste à 99,05 %, un local neuf et les casts `u32`/`u8`
+  n'y font rien. Témoin : `_GET_MES_WINDOW_MODE__FP12RS_STACKDATAi`. Les trois
+  fonctions `_CHECK_ITEM_OVER`, `_CHECK_LOADBG_FILE` et `_GET_SYS_SND_ID` (98,46 %,
+  même écart `a1` avant `a0`) attendent d'être reprises avec cette forme.
+
+- **Le compteur d'une boucle peut vivre dans le registre du paramètre.** Écrire dans
+  le paramètre (`if (arg0 != 0) { arg0 = 0; … do { …; arg0 += 8; … } while
+  (arg0 < 0x1B0); }`) rend le commerce ; un local `j` donne 98 %, une copie
+  préalable `n = arg0` 89,5 %. Témoin : `InitItemMes__9CGameDataFii` (le premier
+  paramètre s'écrit `void *` quand la classe est définie après la fonction).
+
+- **Un type incomplet dans l'unité refuse `arg0++`** (« illegal operand »). Le
+  pas dans le créneau de délai du premier `jal` s'obtient par un pointeur sur une
+  structure locale de la bonne taille : `struct { u32 a, b; } *p = (…*)arg0;
+  GetStackInt((RS_STACKDATA *) p++)`. `(u8 *) arg0 + 8` donne 87,65 %, copier puis
+  avancer `arg0` 93,82 %. Témoin : `_SET_CHARA_NO__FP12RS_STACKDATAi`.
+
+- **L'ordre des arguments de script peut être inversé** : le premier `GetStackInt`
+  passe en `a2` et le second en `a1`, donc `SetDraw(esMother, GetStackInt(arg0),
+  id)`. Témoin : `_IMG_SET_DRAW__FP12RS_STACKDATAi`.
+
+- **Les accesseurs `_GET_CHARA_*` suivent la sœur `_GET_MES_STATUS`** : l'adresse du
+  second emplacement se calcule avant la garde, le champ est un `f32` à un
+  décalage fixe, `SetStack…f_00262E90(void *, f32)`. Cent pour cent du premier
+  coup sur les trois. Témoins : `_GET_CHARA_HEIGHT`, `_GET_CHARA_WEIGHT`,
+  `_GET_CHARA_WIDTH`.
+
+- **Un `j f` en queue se rend par `return f(…)`, et le type de retour n'y change
+  aucun octet** (`s32` ou `void`, même code). Les 60 fonctions de moins de 32 octets
+  de la première vague sont presque toutes de cette forme. Témoins :
+  `LoadHdBd__6CSoundFiiiii`, `Initialize__13CSceneGameObjFv`.
+
+- **Ce que le créneau de délai d'un `j` porte passe avant l'appel.**
+  `addiu a0, a0, N` se rend par `f(objet + N)` (avec `self` en `u8 *` pour éviter la
+  mise à l'échelle : `GetMonsterBajjiDataPtr__16CUserDataManagerFi`,
+  `Step__11CAutoMapGenFv` avec `(u8 *) this + 0x1C0`) ; `sw zero, 0x34(a0)` par
+  `((u32 *) self)[0x34 / 4] = 0;` écrit avant l'appel (`Initialize__9CSceneMapFv`) ;
+  un argument constant par l'argument en plus.
+
+- **Un retour `u8` transmis d'une appelée `u8` impose le même type de retour** :
+  avec `s32`, MWCC ajoute un `andi 0xff` et un cadre de pile que le commerce n'a
+  pas. Témoin : `GetActiveSetNum__13CGameDataUsedFv`.
+
+- **`jr ra; nop` est un corps vide**, et un `INIT_LOOP_ARG` qui ne fait rien se
+  contente d'un paramètre `s32` (le type réel n'est pas lisible dans le binaire).
+  Témoins : `ExitEnd__14CBaseMenuClassFv`, `InitCharaViewerMain__F13INIT_LOOP_ARG`.
+
+- **Une signature déjà posée dans l'unité, même plus loin, est imposée à
+  l'identique** : `s32 InitReadBG__Fv`, `s32 switchThread__Fv`, `s32 (void *)` pour les
+  `Initialize__*` de `cscene.cpp`. Une autre forme donne « illegal function
+  overloading » ; une fonction définie plus loin avec un type défini après exige une
+  déclaration avancée (`struct X;`) puis le prototype recopié. Témoins :
+  `switchThread__Fv`, `GetActiveSetNum__13CGameDataUsedFv`.
+
+- **`sqc2 $vf0, 0($a0)` s'obtient par de l'asm en ligne MWCC** : `asm { sqc2 vf0, 0(v) }`
+  dans une fonction `float *v` rend `jr ra` avec le `sqc2` dans le créneau de délai,
+  sans prologue. `*v = 0` en `u128` donnerait `sq`. Première occurrence d'`asm {` du
+  dépôt. Témoin : `mgZeroVectorW__FPf`.
+
+- **Un `lw` de l'ancienne valeur avant le `sw` veut dire que la fonction retourne
+  l'ancienne valeur** : `old = x; x = a; return old;`. Un `void` avec lecture
+  `volatile` met l'ancienne valeur dans `$v1` au lieu de `$v0` (98,33 %). Témoins :
+  `PauseEnable__Fi`, `videoDecSetState__FP8VideoDecUi`.
+
+- **`slt` contre `sltu` : le signe du type décide.** `slt v0, zero, v0` demande
+  `(s32) x > 0` ; `u32 x > 0` donne `sltu` (80 %), sans toucher à la déclaration
+  `u32` de l'unité. Témoin : `NowTakePhoto__Fv`.
+
+- **Une globale dont le type n'est défini que plus loin se prend par une déclaration
+  avancée** : `struct dbinfo_champs; extern "C" dbinfo_champs dbinfo; return &dbinfo;`.
+  Sans `struct X;` en tête, MWCC prend le nom pour un `int` (« function call does not
+  match (int) »). Témoins : `dngGetDebugInfo__Fv`, `MenuShopDraw__Fv`,
+  `NameRegistKey__Fv`.
+
+- **Un tableau de taille inconnue relu en `u16` passe par une locale pointeur** :
+  `extern "C" char FontTblBinBuff[]; u16 *p = (u16 *) FontTblBinBuff; return *p;` rend
+  `lui`/`addiu` puis `lhu 0($v0)` ; lire `FontTblBinBuff[0]` en `u16[]` donne
+  `lui $at` + `lhu %lo($at)` (72 %). Témoin : `GetHalfFontNum__Fv`.
+
+- **Une copie `u128` suivie d'un appel de queue** : `*(u128 *)(self + 0x40) = *v;
+  Draw(self, a, b);` rend `lq`, `j`, `sq` dans le créneau de délai, les flottants
+  restant en `$f12`/`$f13`. Témoin : `Draw__12COutLineDrawFPfff`.
+
+- **Les stockages suivent l'ordre des décalages croissants, non celui des paramètres** :
+  `a2 → 0xC80` avant `a1 → 0xC84`. Écrits dans l'ordre des paramètres : 96 %. Témoin :
+  `SetCameraInfoTable__4CMapFP11CCameraInfoi`.
+
+- **Un champ lu à un grand décalage est un champ de structure, pas un tableau indexé**
+  (règle de `CLAUDE.md`, ici en lecture) : `*(s16 *)(u8 *)self + 0x643D8` rend
+  `lui`/`ori`/`addu` (72 %) ; `struct { u8 pad[0x643D8]; s16 tour; }` et `self->tour`
+  rendent `lui`, `addu at`, `lh off(at)`. Témoin : `CheckNowTourEvent__9CSaveDataFv`.
+
+- **Copie de vecteur avec décalage, sens « get »** : pour `daddu v0, a0, zero` puis
+  `addiu a1, v0, off` dans le créneau, le paramètre est un `f32 *self` et le
+  décalage s'écrit en éléments (`self + 0x10`). `(f32 *)((u8 *) self + 0x40)` calcule
+  le décalage en premier (70 %). Le sens « set » rend l'inverse avec `(u8 *) self + off`.
+  Témoins : `GetColor__13CEventSprite2FPf`, `GetPosition__13CEventSprite2FPf`.
+
+- **Une adresse globale décalée en argument se replie dans `%hi`/`%lo` par un index
+  scalaire** : `&(&mgRenderInfo.field_0x0)[0x68]` rend `lui`/`addiu` appariés ;
+  `(u8 *) &mgRenderInfo + 0x1A0` rend un `addiu` de plus (57,5 %). Un prototype dont la
+  matrice est `void *` évite la conversion qui ferait matérialiser l'argument avant les
+  autres. Témoin : `mgTransWorldView__FPfPf`.
+
+- **`#pragma schedule off` … `#pragma schedule reset` rend le créneau de délai vide du
+  commerce.** Les fonctions dont le commerce écrit `daddu v0, zero, zero; jr ra; nop`
+  (ou `lw` avant `jr`, ou un dernier `sw` hors du créneau) sont compilées sans
+  ordonnanceur ; la chaîne remplit sinon le créneau. Douze fonctions l'exigent dans
+  `mgCVisual` et `mgCVisualMDT` (`CreateBBox__9mgCVisualFPfPfPA4_f`,
+  `Initialize__9mgCVisualFv`, `GetMaterialNum__12mgCVisualMDTFv`,
+  `GetpMaterial__12mgCVisualMDTFv`, `Copy`, `CreatePacket`, `CreateRenderInfoPacket`,
+  `Draw`, `GetMaterial`, `GetMaterialNum`, `GetpMaterial`). Signature : un `nop` dans le
+  créneau là où l'on s'attendrait à une instruction utile ; `Set__9mgRect_i_Fiiii`
+  (73 %, dernier `sw` glissé dans le créneau) est un candidat.
+
+- **Un décalage 16 bits signé s'écrit comme un champ de structure** : au-delà de 0x7FFF,
+  `struct { char pad[0xA490]; s32 f; }` rend `lui at,1 ; addu at,a0,at ; sw a1,-0x5B70(at)` ;
+  `*(T *)((u8 *) p + 0xA490)` rend `ori at,zero,0xa494` (82 %). Témoins :
+  `AutoChangeEnvOffset__6CSceneFi`, `GetEnvBGMVol__6CSceneFv`,
+  `CheckNowTourType__9CSaveDataFv`.
+
+- **Un tableau `char` extern lu à un décalage constant** : `*(u16 *)(Buff + 4)` replie le
+  décalage dans `%hi/%lo(Buff+4)` (97 %) ; `((struct { u16 a, b, c; } *) Buff)->c` le garde
+  dans le `lhu`. Une adresse retournée en `addiu v0, v0, 8` se prend comme adresse d'un champ
+  `char tbl[1]` placé à 0x8. Témoins : `GetYoyakuTblNum__Fv`, `GetYoyakuTblTop__Fv`,
+  `GetKanjiTopNo__Fv`.
+
+- **Un corps à deux arguments par prototype `(...)`** : `__as(other + 0x10, self + 0x10)`
+  rend le `daddu v0, a0, zero` du commerce. Témoin : `Copy__10CCollisionFR10CCollisionP9mgCMemory`.
+
+- **Un `addiu v0, zero, 1` suivi du stockage en `$v0` dit que la fonction renvoie la valeur
+  qu'elle écrit** : `texBugPatch = 1; return 1;` (retour `s32`), comme les `_RESET_*`.
+  `#pragma scheduling off` n'existe pas et MWCC l'ignore sans message : le nom est
+  `#pragma schedule off`. Témoin : `texBUG_PATCH__FP9SPI_STACKi`.
+
+- **Un `Ul` est un 64 bits (`s64`)** : un pointeur par octets donne `ori at` + `addu v1`
+  (72 %) ; `struct { char pad[0x45598]; s64 f; }` rend `lui at, 4` puis `sd 0x5598(at)`.
+  Témoin : `SetCostumeBit__16CUserDataManagerFUl`.
+
+- **La forme composée d'une expression flottante suit le commerce** : `t = b - a; t -= c;
+  t *= d; t += a;` rend 100 % ; la même expression en une ligne rend 96 %, l'ordre des
+  opérandes de `mul.s`/`add.s` étant inversé (même règle que `x += c`). Témoin :
+  `CalcAutoPosSet__Fffff`.
+
+- **`movz` vient d'un `c ? K1 : K2` dont l'un des deux est un `lui` seul** :
+  `buff_id ? 0x70002000 : 0x70000000`. Témoin : `GetScrPad__Fv`.
+
+- **Un vptr à un décalage non nul** (`lw t9, 0xD00(a0); lw t9, 8(t9); jr t9`) s'obtient par
+  `struct Base { char pad[0xD00]; }; struct Virt : Base { virtual void Fn(s32); };` : le
+  vptr tombe après la base. Témoins : `Draw__4CMapFv`, `DrawDirect__4CMapFv`.
+
+- **Deux champs lus pour un appel de queue, dans une structure typée**, rendent la copie
+  `daddu v0, a0, zero` du commerce (les casts d'octets : 83,6 %). Témoin :
+  `ExeScript__14CBaseMenuClassFPc`.
+
+- **`#pragma schedule off` pour un `jr ra` suivi d'un `nop` sans écriture** : sans lui,
+  46,67 %. Il rend `Set__9mgRect_i_Fiiii` (73 % → 100 %), `Iam__12mgCVisualMDTFv`,
+  `Iam__9mgCVisualFv`, `SetVisual__8mgCFrameFP9mgCVisual`, `__as__9sceGsTex0FRC9sceGsTex0`
+  (copie de `u64` : le commerce charge dans `$v0` au lieu de `$v1`, 67 % sans le pragma).
+
+- **Une fonction déclarée en `(...)` dans l'unité ne peut pas être définie avec des
+  paramètres typés** (« illegal function overloading ») : on type la ligne de déclaration
+  de l'unité — neutre en octets si l'appelant passe déjà des `s32` (`(CScene *, s32,
+  s32, s32)`), puis on soumet. Témoin : `RegisterVillager__6CSceneFiiP18CVillagerPlaceInfo`.
+
+- **Un booléen `>= 2` sur un `s16` s'écrit `(x < 2) ^ 1`** avec un retour `s32` : `>= 2`
+  et `!(x < 2)` ajoutent un `andi 0xff` (60 %). Témoin : `IsUsed__12GYORACE_DATAFv`.
+
+- **Une globale `$gp` lue deux fois se prend dans un pointeur local** : `u8 *p = (u8 *)
+  EventScene; *(s32 *)(p + 0x303C) = 1; *(s32 *)(p + 0x3038) = 1;` ; la forme
+  `*(s32 *)(EventScene + …)` recharge la globale (80 %). Témoins :
+  `_CANCEL_LOAD_VILLAGER__FP12RS_STACKDATAi`, `_RESET_PALLET_ANIM__FP12RS_STACKDATAi`.
+
+- **Un appel virtuel sur un sous-objet sans classe connue se rend par une classe locale
+  de N virtuelles muettes plus la méthode** : slot 0x44 → 15 muettes + `Draw(s32)` ;
+  slot 0xD4 → 51 muettes + `Step()` (une muette de trop donne 0x48 ou 0xD8, 99,8 %).
+  Témoins : `Draw__8mgCFrameFv`, `Step__13CRandomCircleFv`.
+
+- **Un `lb` dans le créneau du `beqz` avec `daddu v0, zero, zero` sur l'autre branche** :
+  charger avant la garde puis écraser : `s32 b = *(s8 *)(p + 0x76C); if (*(s16 *)(p + 0x71C)
+  != 0) b = 0; return b;`. Les formes `if/return` ou `r = 0; if …` divergent sur 5 instructions
+  de 8. Témoin : `CheckRunEvent__12CActionCharaFv`.
+
+- **Une adresse prise sur un vrai champ `f32[4]` matérialise `this` d'abord** :
+  `struct { u8 pad[0x60]; f32 lo[4]; f32 hi[4]; }` avec `self->hi`, `self->lo` rend le
+  `daddu v0, a0, zero` avant les `addiu` ; le cast `(f32 *)((u8 *) self + 0x70)` : 78 %.
+  Témoin : `SetVertex__6CWaterFPfPf`.
+
+- **Un champ à l'offset 0x906C derrière un entier `EventScene`** : une structure distincte
+  par décalage (`struct S { u8 pad[0x906C]; s32 a; }`, `((S *) EventScene)->a`) rend
+  `lui at,1 / addu at / sw -0x6F94(at)` ; l'arithmétique sur l'entier rend `swr`/`swl` ou
+  `ori at,zero`. Témoins : `_BGM_LOAD_CANCEL`, `_BGM_PLAY_ENABLE`.
+
+- **Indice avant base** : `sll v1,a1,2 ; addu v1,v1,a0 ; sw 0x258C(v1)` s'écrit
+  `*(s32 *)((arg0 << 2) + (s32) self + 0x258C) = arg1;` ; `((s32 *) self)[0x963 + arg0]`
+  donne `addu v1, a0, v1`. Témoin : `SetYokoHaba__6ClsMesFii`.
+
+- **Un flottant passé en `$f12` traverse tel quel un appel de queue** ; les entiers
+  suivent en `$a2`/`$a3` et `1.0f` en `$f13` : `f(a0, a1, arg2, 0, arg3, 1.0f)`. Témoin :
+  `MenuCursorDraw__FP10mgCTexturePffi`.
+
+- **Un registre qui garde une valeur lue avant le calcul et survit jusqu'au `jr ra` est le
+  retour de la fonction**, même quand rien ne le dit : `DirectData__11mgCDrawPrimFi` renvoie
+  l'ancien pointeur du curseur (`u8 *p = objet->cur; objet->cur = p + (n << 4); return p;`).
+  Avec un retour `void`, MWCC réemploie `a1` en place (96 %, six essais perdus).
+
+- **Les fonctions de vecteur `mgmath` s'écrivent en `asm {}` avec les registres `vfNN`
+  nommés** : `lqc2 vf15,0(a)` / `lqc2 vf16,0(b)` / `vadd.xyzw vf15,vf15,vf16` /
+  `sqc2 vf15,0(a)` ; MWCC ne réalloue pas les `vf`, le dernier `sqc2` tombe dans le créneau
+  de délai, sans prologue. Témoins : `mgSubVector__FPfPf`, `mgAddVector__FPfPf`,
+  `mgVectorMin__FPfPfPf`, `mgZeroMatrix__FPA4_f`. Une déclaration `(...)` de la même
+  fonction plus bas dans l'unité est à retirer (elle contredit la définition).
+
+- **Un octet de drapeaux modifié par un bit est un champ de bits** : `struct { u8 pad[0x20];
+  u8 alphaTest:1; u8 hi:7; }` et `objet->alphaTest = arg0;` rendent `lbu`/`andi 1`/`or`/`sb`
+  (`(*p & ~1) | (arg0 & 1)` : 37–46 %). Le premier champ déclaré occupe le bit 0. Témoin :
+  `AlphaTestEnable__11mgCDrawPrimFi`.
+
+- **Une copie `u128` à pointeur d'écriture avancé : lire la source d'abord, réemployer le
+  paramètre** : `u128 v = *src; src = *(u128 **)(o + 0xDC); *(…) = src + 1; *src = v;` place
+  le `lq` avant le `lw` et le `sq` dans le créneau (une locale `dst` : 63 %). Témoin :
+  `Data__11mgCDrawPrimFPi` ; `Data4`/`Data0` passent par l'`asm` (`vftoi4`/`vftoi0`).
+
+- **Un appel terminal dont l'argument est calculé (`addiu` dans le créneau du `j`) veut
+  l'ordonnanceur actif** : `#pragma schedule off` laisse l'`addiu` avant le `j` (77 %).
+  Témoin : `Initialize__13mgCVisualPrimFv`.

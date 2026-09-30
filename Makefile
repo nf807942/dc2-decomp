@@ -134,7 +134,7 @@ REF_O_FILES := $(addprefix $(BUILD_DIR)/, $(REF_S_FILES:.s=.o))
 O_FILES   := $(addprefix $(BUILD_DIR)/, $(S_FILES:.s=.o) $(BIN_FILES:.bin=.o) \
              $(addsuffix .o, $(basename $(SRC_FILES))))
 
-.PHONY: all setup tools patch split build objects check diff decompile measure \
+.PHONY: soumettre similaires dossier all setup tools patch split build objects check diff decompile measure \
         atlas carve clean distclean contexte injecte provenance chaine affinage ecarts classes lot banc forge tailles vtables champs entetes contexte_prouve taux instructions controle ci etat progress report
 
 all: build
@@ -304,6 +304,21 @@ provenance:
 # du disque. `ARGS=--reprendre` repart de ce que `progress/chaine.json` sait.
 chaine:
 	@$(PYTHON) scripts/build/chaine.py $(ARGS)
+
+# Pour chaque fonction qui reste, la fonction deja ecrite qui lui ressemble le
+# plus : l'exemple qu'on met sous les yeux d'un agent.
+similaires:
+	@$(PYTHON) scripts/build/similaires.py $(ARGS)
+
+# Le dossier d'une fonction (desassemblage, appeles, soeur ecrite, jet) et la
+# file a reservations d'ou les agents tirent leur travail.
+dossier:
+	@$(PYTHON) scripts/build/dossier.py $(ARGS)
+
+# La porte des agents : pose une fonction, la mesure, la garde a 100 % ou
+# retablit la source.
+soumettre:
+	@$(PYTHON) scripts/build/soumettre.py $(ARGS)
 
 # La seconde passe : reprend ce qui compile entre 85 et 100 %, la ou le gros
 # des octets se trouve. `ARGS=--rendement` mesure ce que chaque idiome
