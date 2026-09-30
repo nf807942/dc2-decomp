@@ -365,12 +365,35 @@ INCLUDE_ASM("nonmatchings/game/ceohmother", UpdatePosition__10CEohMotherFi);
 INCLUDE_ASM("nonmatchings/game/ceohmother", SetFrameObjAlpha__10CEohMotherFiPcf);
 INCLUDE_ASM("nonmatchings/game/ceohmother", SetFootSeId__10CEohMotherFii);
 INCLUDE_ASM("nonmatchings/game/ceohmother", FileNameConvLanguage__FPc);
-INCLUDE_ASM("nonmatchings/game/ceohmother", GetStackInt__FP12RS_STACKDATA_00262DA0);
-INCLUDE_ASM("nonmatchings/game/ceohmother", GetStackFloat__FP12RS_STACKDATA_00262DE0);
+extern "C" s32 fptosi(f32);
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(void *arg0) {
+    if (*(s32 *) arg0 == 1) {
+        return fptosi(*(f32 *) ((u8 *) arg0 + 4));
+    }
+    return *(s32 *) ((u8 *) arg0 + 4);
+}
+extern "C" f32 GetStackFloat__FP12RS_STACKDATA_00262DE0(void *arg0) {
+    if (*(s32 *) arg0 == 0) {
+        return (f32) *(s32 *) ((u8 *) arg0 + 4);
+    }
+    return *(f32 *) ((u8 *) arg0 + 4);
+}
 INCLUDE_ASM("nonmatchings/game/ceohmother", GetStackVector__FPfP12RS_STACKDATA_00262E10);
-INCLUDE_ASM("nonmatchings/game/ceohmother", GetStackString__FP12RS_STACKDATA_00262E60);
-INCLUDE_ASM("nonmatchings/game/ceohmother", SetStack__FP12RS_STACKDATAi_00262E70);
-INCLUDE_ASM("nonmatchings/game/ceohmother", SetStack__FP12RS_STACKDATAf_00262E90);
+extern "C" s32 GetStackString__FP12RS_STACKDATA_00262E60(void *arg0) {
+    return *(s32 *) ((u8 *) arg0 + 4);
+}
+extern "C" void SetStack__FP12RS_STACKDATAi_00262E70(s32 arg0, s32 arg1) {
+    s32 *stack = (s32 *) arg0;
+    if (stack[0] == 3) {
+        *(s32 *) ((u8 *) stack[1] + 4) = arg1;
+    }
+}
+extern "C" void SetStack__FP12RS_STACKDATAf_00262E90(s32 arg0, f32 arg1) {
+    s32 *stack = (s32 *) arg0;
+    if (stack[0] == 3) {
+        *(f32 *) ((u8 *) stack[1] + 4) = arg1;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/ceohmother", BuildArgData__15CEventScriptArgFPUi);
 INCLUDE_ASM("nonmatchings/game/ceohmother", _DATA__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/ceohmother", _ID_OFFSET__FP12RS_STACKDATAi);
@@ -420,7 +443,11 @@ void CRaster::Initialize(void) {
     this->field_0x24 = -1;
     this->field_0x28 = 0;
 }
-INCLUDE_ASM("nonmatchings/game/ceohmother", SetParam__7CRasterFfff);
+extern "C" void SetParam__7CRasterFfff(void *objet, f32 arg0, f32 arg1, f32 arg2) {
+    *(f32 *) ((u8 *) objet + 4) = arg0;
+    *(f32 *) ((u8 *) objet + 0xC) = arg1;
+    *(f32 *) ((u8 *) objet + 0x14) = arg2;
+}
 typedef struct CRaster_infere {
     /* 0x00 */ s32 unk0;                            /* inferred */
     /* 0x04 */ f32 unk4;                            /* inferred */
@@ -537,14 +564,19 @@ struct CScreenEffect {
     s32 field_48;
 };
 extern "C" s32 Initialize__7CRasterFv(void *);
-extern "C" s32 SetParam__7CRasterFfff(void *, f32, f32, f32);
+extern "C" void SetParam__7CRasterFfff(void *, f32, f32, f32);
 extern "C" void InitRaster__13CScreenEffectFfff(CScreenEffect *objet, f32 arg0, f32 arg1, f32 arg2) {
     Initialize__7CRasterFv((CRaster *) objet);
     SetParam__7CRasterFfff((CRaster *) objet, arg0, arg1, arg2);
 }
 INCLUDE_ASM("nonmatchings/game/ceohmother", StartRaster__13CScreenEffectFfffi);
 INCLUDE_ASM("nonmatchings/game/ceohmother", StopRaster__13CScreenEffectFfffi);
-INCLUDE_ASM("nonmatchings/game/ceohmother", SetSepiaTexture__13CScreenEffectFP10mgCTextureP1);
+extern "C" void SetSepiaTexture__13CScreenEffectFP10mgCTextureP1(void *objet, void *arg0, s32 arg1) {
+    if (arg0 != NULL) {
+        *(void **) ((u8 *) objet + 0x2C) = arg0;
+        *(s32 *) ((u8 *) *(volatile void **) ((u8 *) objet + 0x2C) + 0x50) = arg1;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/ceohmother", CaptureSepiaScreen__13CScreenEffectFv);
 typedef struct CScreenEffect_infere3 {
     /* 0x00 */ char pad0[0x2C];
@@ -773,7 +805,7 @@ INCLUDE_ASM("nonmatchings/game/ceohmother", GetObjSeq__Fi);
 extern "C" u8 GamePad_003FA5A0[1144];
 #include "runscript.hpp"
 extern "C" s32 GetPadOn__8CGamePadFv(void *);
-extern "C" s32 SetStack__FP12RS_STACKDATAi_00262E70(...);
+extern "C" void SetStack__FP12RS_STACKDATAi_00262E70(s32, s32);
 extern "C" s32 _GET_PADON__FP12RS_STACKDATAi_00266260(s32 arg0, s32 arg1) {
     if (arg1 <= 0) {
         return 0;
@@ -1060,7 +1092,7 @@ struct CScene {
     s32 field_C4D4;
 };
 extern "C" s32 ClearStack__6CSceneFi(void *, s32);
-extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(RS_STACKDATA *);
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(void *);
 extern "C" s32 _CLEAR_STACK__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     ClearStack__6CSceneFi(EventScene, GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
     return 1;

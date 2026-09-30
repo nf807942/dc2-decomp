@@ -251,7 +251,11 @@ INCLUDE_ASM("nonmatchings/game/ccharacter2", Step__13CDynamicAnimeFv);
 s32 CDACollision::CheckHit(f32 *point) {
     return 0;
 }
-INCLUDE_ASM("nonmatchings/game/ccharacter2", SetWind__13CDynamicAnimeFfPf);
+extern "C" void sceVu0Normalize(f32 *, f32 *);
+extern "C" void SetWind__13CDynamicAnimeFfPf(CDynamicAnime *objet, f32 arg0, f32 *arg1) {
+    *(f32 *) ((u8 *) objet + 0x68) = arg0;
+    sceVu0Normalize((f32 *) ((u8 *) objet + 0x70), arg1);
+}
 void CDynamicAnime::ResetWind(void) {
     this->field_0x68 = 0;
 }

@@ -109,11 +109,15 @@ extern "C" void Initialize__13CCollisionMDTFv(CCollisionMDT *objet) {
     ((struct objet_champs_332138 *) objet)->unk44 = 0;
 }
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", Copy__10CCollisionFR10CCollisionP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/ccollisionmdt", CreateBBox__10CCollisionFv);
+extern "C" void CreateBBox__10CCollisionFv(void *objet) {
+}
 s32 CCollision::GetMaxY(f32 *y) {
     return 0;
 }
-INCLUDE_ASM("nonmatchings/game/ccollisionmdt", Initialize__10CCollisionFv);
+extern "C" void Initialize__10CCollisionFv(void *objet) {
+    *(s32 *) objet = 0;
+    memset((u8 *) objet + 0x10, 0, 0x20);
+}
 extern "C" s32 size_to_sector__Fi(s32 arg0) {
     s32 var_v0;
 

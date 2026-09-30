@@ -830,3 +830,59 @@ reconstruction complète le fait.
   `DIFF_INSERT` du nôtre. Les apparier par indice décale tout après le premier
   écart de longueur et affiche des divergences imaginaires ; `match_percent`
   d'objdiff est le verdict, non le compte de lignes.
+
+## Faits mesurés pendant la fournée du 29 septembre 2026
+
+- **Une case de pile de script s'avance par `arg0++`.** `RS_STACKDATA` occupe
+  huit octets : `GetStackInt(arg0++); GetStackInt(arg0);` place
+  `addiu sN, a0, 8` dans le créneau de délai de l'appel, là où un calcul par
+  octets le fait plus tard. Un vecteur de trois cases s'avance par `arg0 += 3`.
+  Témoins : `_SET_CHARA_TYPE`, `_ADD_FUSION_POINT`, `_SPHIDA_GET_PRIZE` et
+  `_POST_TREASURE_BOX`.
+
+- **Affecter le résultat dans la condition laisse le test sur `v0`.**
+  `if ((p = f()) == NULL) return 0;` place la copie de `v0` vers `s0` dans le
+  créneau de délai du branchement ; séparer l'affectation et le test fait porter
+  le branchement sur `s0`. Témoins : `_GET_BIT_CTRL`, `_CHARA_RESET_DA` et
+  `_SET_BIT_CTRL`.
+
+- **Un `switch` qui remplit une variable puis retourne conserve les branches de
+  sortie.** La forme `switch (x) { case ...: ret = f(); break; default: ret = 0;
+  break; } return ret;` rend les `b fin; nop` du commerce, contrairement à un
+  `return` dans chaque cas. Un `case 1:` vide avant `default:` peut aussi
+  matérialiser la valeur `1` avant l'appel par défaut. Témoins :
+  `_ESM_SET_TARGET_ID_0027E700`, `_ESM_LOAD_BASE`, `Step__14CWeaponElementFv`.
+
+- **Pour inverser un booléen retourné, `==`/`!=` suivi de `^ 1` garde le XOR.**
+  `!(f() == 3)` et `!(f() != 0)` produisent un `andi 0xff` supplémentaire ;
+  `(f() == 3) ^ 1` rend le `xori` attendu. Témoins : `scsMotionTrgWait` et
+  `scsMotionWait`.
+
+- **Le type des tampons de pile détermine à la fois leur taille et les
+  instructions vectorielles.** `f32 sp[16]; f32 sp2[4];` réserve un cadre de
+  `0x70` octets là où des tampons entiers sous-dimensionnés ne donnent que
+  `0x40`. Pour une copie `lq`/`sq`, `*(u128 *) dst = *(u128 *) src` sur un
+  `f32[4]` conserve les accès quadmot. Témoins : `CalcPosWorldCoord__FPf` et
+  `PlaceRiverStep`.
+
+- **L'ordre d'évaluation peut se fixer en matérialisant un appel avant une
+  opération bit à bit.** `t = f(x); t & mask;` rend `and v0, v0, s0`, tandis que
+  `f(x) & mask` rend les opérandes dans l'ordre inverse. Témoin : `_GET_BIT_CTRL`.
+
+- **Une affectation composée flottante et la constante à gauche n'ont pas le
+  même ordonnancement.** `x = 1.2f * x;` rend `mul.s fs0, fv0, fs0` ;
+  `x *= 1.2f` ne le rend pas. Témoin : `Jump__12CSceneObjSeqFPffi`.
+
+- **Le type de retour flottant doit être présent dans le prototype d'un appel.**
+  Déclarer `SetStack` avec `(RS_STACKDATA *, f32)` évite la promotion par défaut
+  de l'ellipse en `double`; lire le champ via `*(f32 *)&champ` donne le
+  chargement flottant du commerce. Témoin : `_SPHIDA_GET_SHOT_POW`.
+
+- **Pour un champ éloigné, la forme d'accès choisit le registre d'adresse.**
+  `&((struct { char pad[0x1D2A0]; char m; } *)p)->m` rend la séquence
+  `lui`/`ori`/`addu` avec `$at`; `p + 0x1D2A0` emploie un registre ordinaire.
+  Témoin : `_CHECK_ENABLE_CHARA_CHANGE`.
+
+- **Un champ 64 bits écrit depuis un `u32` peut exiger `s64` côté destination.**
+  Cette déclaration donne le couple `lwu`/`sd` observé. Témoin :
+  `_RESET_SUBJECT_COUNTER`.

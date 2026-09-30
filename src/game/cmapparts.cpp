@@ -184,6 +184,11 @@ public:
     s32 field_64C;
     s32 field_650;
 
+    void Show(s32 arg0);
+    void SetFarDist(f32 arg0);
+    f32 GetFarDist(void);
+    void SetNearDist(f32 arg0);
+    f32 GetNearDist(void);
     s32 Draw();
     s32 DrawDirect();
 };
@@ -307,11 +312,21 @@ s32 CObject::Draw(void) {
 s32 CObject::DrawDirect(void) {
     return 0;
 }
-INCLUDE_ASM("nonmatchings/game/cmapparts", Show__7CObjectFi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", SetFarDist__7CObjectFf);
-INCLUDE_ASM("nonmatchings/game/cmapparts", GetFarDist__7CObjectFv);
-INCLUDE_ASM("nonmatchings/game/cmapparts", SetNearDist__7CObjectFf);
-INCLUDE_ASM("nonmatchings/game/cmapparts", GetNearDist__7CObjectFv);
+void CObject::Show(s32 arg0) {
+    this->field_64 = arg0;
+}
+void CObject::SetFarDist(f32 arg0) {
+    this->field_50 = arg0;
+}
+f32 CObject::GetFarDist(void) {
+    return this->field_50;
+}
+void CObject::SetNearDist(f32 arg0) {
+    this->field_60 = arg0;
+}
+f32 CObject::GetNearDist(void) {
+    return this->field_60;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", Copy__7CObjectFR7CObjectP9mgCMemory);
 extern "C" s32 GetTimeBand__Ff(f32 arg0) {
     s32 var_v0;
@@ -672,7 +687,9 @@ extern "C" s32 mapFIX_CAMERA_POS__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFIX_CAMERA_POS2__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFIX_CAMERA_OFF_GROUP__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFIX_CAMERA_RECT__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", SetCollision__9CColFrameFP10CCollision);
+extern "C" void SetCollision__9CColFrameFP10CCollision(void *arg0, void *arg1) {
+    *(void **) ((char *) arg0 + 0x114) = arg1;
+}
 extern "C" u8 __vt__10CCollision[36];
 struct inferred;
 typedef struct CCollision {

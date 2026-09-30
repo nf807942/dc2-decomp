@@ -59,8 +59,15 @@ INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", DrawShadowDirect__11CChar
 INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", UpdatePosition__11CCharacter2Fv);
 INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", ResetDAPosition__11CCharacter2Fv);
 INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", GetDefaultStep__11CCharacter2Fv);
-INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", SetStep__11CCharacter2Ff);
-INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", ResetMotion__11CCharacter2Fv);
+extern "C" void SetStep__11CCharacter2Ff(void *objet, f32 arg0) {
+    *(f32 *) ((u8 *) objet + 0x390) = arg0;
+}
+extern "C" void ResetMotion__11CCharacter2Fv(void *objet) {
+    *(s32 *) ((u8 *) objet + 0x374) = 0;
+    *(s32 *) ((u8 *) objet + 0x368) = 0;
+    *(s32 *) ((u8 *) objet + 0x3A8) = 0;
+    *(s32 *) ((u8 *) objet + 0x3A4) = 0;
+}
 typedef struct CCharacter2_infere2 {
     /* 0x000 */ char pad0[0x384];
     /* 0x384 */ s32 unk384;                         /* inferred */

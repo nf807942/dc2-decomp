@@ -128,8 +128,37 @@ extern "C" s32 _MENU_FORM_VIBECNT__FP9SPI_STACKi(SPI_STACK_7a2f96 *arg0, s32 arg
 s32 _MENU_FORM_SETEND(SPI_STACK *stack, int argc) {
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_FORM_MOVERATE__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_FORM_PUTXY__FP9SPI_STACKi);
+extern "C" f32 spiGetStackFloat__FP9SPI_STACK(...);
+struct menu_formPt_moverate_local {
+    u8 pad0[0x2C];
+    f32 rateX;
+    f32 rateY;
+};
+extern "C" s32 _MENU_FORM_MOVERATE__FP9SPI_STACKi(SPI_STACK_7a2f96 *arg0, s32 arg1) {
+    SPI_STACK_7a2f96 *next_slot = (SPI_STACK_7a2f96 *)((u8 *)arg0 + 8);
+
+    if (menu_formPt == 0) {
+        return 0;
+    }
+    ((menu_formPt_moverate_local *)menu_formPt)->rateX = spiGetStackFloat__FP9SPI_STACK(arg0);
+    ((menu_formPt_moverate_local *)menu_formPt)->rateY = spiGetStackFloat__FP9SPI_STACK(next_slot);
+    return 1;
+}
+struct menu_formPt_putxy_local {
+    u8 pad0[0xC];
+    f32 x;
+    f32 y;
+};
+extern "C" s32 _MENU_FORM_PUTXY__FP9SPI_STACKi(SPI_STACK_7a2f96 *arg0, s32 arg1) {
+    SPI_STACK_7a2f96 *next_slot = (SPI_STACK_7a2f96 *)((u8 *)arg0 + 8);
+
+    if (menu_formPt == 0) {
+        return 0;
+    }
+    ((menu_formPt_putxy_local *)menu_formPt)->x = (f32)spiGetStackInt__FP9SPI_STACK(arg0);
+    ((menu_formPt_putxy_local *)menu_formPt)->y = (f32)spiGetStackInt__FP9SPI_STACK(next_slot);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_FORM_RGBA__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_FORM_RGBA_BIT__FP9SPI_STACKi);
 extern "C" u32 MenuSpiStack;
@@ -178,7 +207,21 @@ extern "C" s32 _MENU_ACTION_SETACTION__FP9SPI_STACKi(SPI_STACK_bdf4f5 *arg0, s32
     SetAction__16CMenuPosDataFormFPc(menu_formPt, spiGetStackString__FP9SPI_STACK(arg0));
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_PARTVIBECNT__FP9SPI_STACKi);
+extern "C" u32 menu_form_part;
+struct SPI_STACK_vibe {
+    s32 field_0;
+    s32 field_4;
+};
+struct menu_form_part_vibe_count {
+    u8 pad0[0xE];
+    s16 count;
+    s16 rate;
+};
+extern "C" s32 _MENU_PARTVIBECNT__FP9SPI_STACKi(SPI_STACK_vibe *arg0, s32 arg1) {
+    ((menu_form_part_vibe_count *)menu_form_part)->count = spiGetStackInt__FP9SPI_STACK(arg0++);
+    ((menu_form_part_vibe_count *)menu_form_part)->rate = spiGetStackInt__FP9SPI_STACK(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_PARTVIBER__FP9SPI_STACKi);
 extern "C" u32 menu_form_part;
 struct SPI_STACK_6fe5e6 {
@@ -248,7 +291,25 @@ extern "C" s32 _MENU_PART_ALPHA_BLEND__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) 
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_PART_ETCINFO__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_PART_BILINEAR__FP9SPI_STACKi);
+extern "C" s32 _MENU_PART_BILINEAR__FP9SPI_STACKi(void *, s32) {
+    u32 partAddress = menu_form_part;
+    u8 *field = (u8 *)partAddress + 0x19;
+    u8 *part;
+
+    if (partAddress == 0) {
+        return 0;
+    }
+    part = (u8 *)partAddress;
+    {
+        u8 value = part[0x19];
+        if (value == 0) {
+        *field = 1;
+        } else {
+            *field = value | 1;
+        }
+    }
+    return 1;
+}
 extern "C" u32 MenuSpiStack;
 struct SPI_STACK_e9481d {
     s32 field_0;
@@ -333,19 +394,110 @@ extern "C" s32 _MENU_EXE_FORM_PARTSONOFF__FP9SPI_STACKi(SPI_STACK_c613eb *arg0, 
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_EXE_FORM_PARTSONOFF_GRP__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_EXE_FORM_SWAP__FP9SPI_STACKi);
+extern "C" void FormReLink__14CPosDataManageFPcPc(void *, s8 *, s8 *);
+extern "C" s32 _MENU_EXE_FORM_SWAP__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    SPI_STACK *next_slot = (SPI_STACK *)((u8 *)arg0 + 8);
+    s8 *form;
+
+    if (SpiMenuExeCommandFlag == 0) {
+        return 1;
+    }
+    form = (s8 *)spiGetStackString__FP9SPI_STACK(arg0);
+    FormReLink__14CPosDataManageFPcPc(MenuPosData, form, (s8 *)spiGetStackString__FP9SPI_STACK(next_slot));
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_EXE_FORM_GROUP_SWAP__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_EXE_MSGENV__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_EXE_MAKEMSG__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_EXE_SETABSPOS__FP9SPI_STACKi);
+extern "C" s32 MakeMsg__7CDC2MesFi(void *, s32);
+extern "C" s32 _MENU_EXE_MAKEMSG__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    SPI_STACK *next_slot = (SPI_STACK *)((u8 *)arg0 + 8);
+    s32 message;
+    s32 id;
+
+    if (SpiMenuExeCommandFlag == 0) {
+        return 1;
+    }
+    message = spiGetStackInt__FP9SPI_STACK(arg0);
+    id = spiGetStackInt__FP9SPI_STACK(next_slot);
+    MakeMsg__7CDC2MesFi(MenuDCMsg[message], id);
+    return 1;
+}
+extern "C" void SetAbsPos__7CDC2MesFi(void *, s32);
+extern "C" s32 _MENU_EXE_SETABSPOS__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    SPI_STACK *next_slot = (SPI_STACK *)((u8 *)arg0 + 8);
+    s32 index;
+    s32 value;
+
+    if (SpiMenuExeCommandFlag == 0) {
+        return 1;
+    }
+    index = spiGetStackInt__FP9SPI_STACK(arg0);
+    value = spiGetStackInt__FP9SPI_STACK(next_slot);
+    SetAbsPos__7CDC2MesFi(MenuDCMsg[index], value);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_EXE_MSGSETSYSTEMBUFF__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_EXE_MSGSETBUFF__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_EXE_MSGSETFUCHI__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_EXE_MSGSETCURSOR__FP9SPI_STACKi);
+extern "C" u8 tbl_2422[];
+extern "C" s32 menu_spi_analyze_func_strcut1__FP24MENU_SPI_ANALYZE_STRUCT1Pc(void *, s8 *);
+extern "C" s32 _MENU_EXE_MSGSETFUCHI__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    SPI_STACK *next_slot = (SPI_STACK *)((u8 *)arg0 + 8);
+    s32 message;
+    s8 *text;
+    s32 type;
+
+    if (SpiMenuExeCommandFlag == 0) {
+        return 1;
+    }
+    message = spiGetStackInt__FP9SPI_STACK(arg0);
+    text = (s8 *)spiGetStackString__FP9SPI_STACK(next_slot);
+    type = menu_spi_analyze_func_strcut1__FP24MENU_SPI_ANALYZE_STRUCT1Pc(tbl_2422, text);
+    *(s32 *)((u8 *)MenuDCMsg[message] + 0xB8) = type;
+    return 1;
+}
+extern "C" void SetMsgCursor__7CDC2MesFi(void *, s32);
+extern "C" s32 _MENU_EXE_MSGSETCURSOR__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    SPI_STACK *next_slot = (SPI_STACK *)((u8 *)arg0 + 8);
+    s32 index;
+    s32 cursor;
+
+    if (SpiMenuExeCommandFlag == 0) {
+        return 1;
+    }
+    index = spiGetStackInt__FP9SPI_STACK(arg0);
+    cursor = spiGetStackInt__FP9SPI_STACK(next_slot);
+    SetMsgCursor__7CDC2MesFi(MenuDCMsg[index], cursor);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_SET_QUESTIONGYOU__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_SET_OPENSPEED__FP9SPI_STACKi);
+extern "C" s32 _MENU_SET_OPENSPEED__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    s32 message;
+    SPI_STACK *next_slot = (SPI_STACK *)((u8 *)arg0 + 8);
+
+    if (SpiMenuExeCommandFlag == 0) {
+        return 1;
+    }
+    message = spiGetStackInt__FP9SPI_STACK(arg0);
+    *(f32 *)((u8 *)MenuDCMsg[message] + 0x190) = spiGetStackFloat__FP9SPI_STACK(next_slot);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_INPUT_KEY__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_CURSOR_ONOFF__FP9SPI_STACKi);
+class CMenuKeyFunc;
+extern CMenuKeyFunc *MenuCommonInfo;
+extern "C" s32 _MENU_CURSOR_ONOFF__FP9SPI_STACKi(void *arg0, s32 arg1) {
+    s32 value;
+    u8 *cursor;
+
+    if (SpiMenuExeCommandFlag == 0) {
+        return 1;
+    }
+    value = spiGetStackInt__FP9SPI_STACK(arg0);
+    cursor = *(u8 **)((u8 *)MenuCommonInfo + 0x138);
+    if (cursor != NULL) {
+        cursor[1] = (s8)(value != 0);
+    }
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_CURSOR_FADE__FP9SPI_STACKi);
 extern "C" u8 SpiMenuExeCommandFlag;
 #include "menu.hpp"
@@ -363,7 +515,16 @@ extern "C" s32 _MENU_WAKUTYPE__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_SCENE_FADE__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/c3dspline", _MENU_SE_PLAY__FP9SPI_STACKi);
+extern "C" u8 tbl_2516[];
+extern "C" void MenuSePlay__Fi(s32);
+extern "C" s32 _MENU_SE_PLAY__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    if (SpiMenuExeCommandFlag == 0) {
+        return 1;
+    }
+    MenuSePlay__Fi(menu_spi_analyze_func_strcut1__FP24MENU_SPI_ANALYZE_STRUCT1Pc(
+        tbl_2516, (s8 *)spiGetStackString__FP9SPI_STACK(arg0)));
+    return 1;
+}
 extern "C" void InitDrawList__14CPosDataManageFv(...);
 extern "C" s32 _MENU_EXE_INIT_DRAWLIST__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     if (SpiMenuExeCommandFlag == 0) {
@@ -429,12 +590,21 @@ extern "C" s32 GetSquareEvent__Fv(void) {
 }
 INCLUDE_ASM("nonmatchings/game/c3dspline", InitEvent__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/c3dspline", SetEventScript__FPcPcP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/c3dspline", RunEvent__FiP6CScene);
+struct CScene;
+extern "C" CScene *EventScene;
+extern "C" u8 EventScript[];
+extern "C" void run__10CRunScriptFi(void *, s32);
+extern "C" void RunEvent__FiP6CScene(s32 arg0, CScene *arg1) {
+    EventScene = arg1;
+    run__10CRunScriptFi(EventScript, arg0);
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", EventDoorLoop__Fii);
 INCLUDE_ASM("nonmatchings/game/c3dspline", StartEventSyori__Fv);
 INCLUDE_ASM("nonmatchings/game/c3dspline", SkipEventStart__Fv);
 INCLUDE_ASM("nonmatchings/game/c3dspline", SkipEvent__Fv);
-INCLUDE_ASM("nonmatchings/game/c3dspline", CheckEventSkip__Fv);
+extern "C" s32 CheckEventSkip__Fv(void) {
+    return EdEventInfo.field_0xD4 != 0;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", EventLoop__Fv);
 struct CScene;
 extern "C" CScene *EventScene;
@@ -696,7 +866,12 @@ INCLUDE_ASM("nonmatchings/game/c3dspline", Initialize__9C3DSplineFv);
 INCLUDE_ASM("nonmatchings/game/c3dspline", SetUpSpline__9C3DSplineFPA4_fPiif);
 INCLUDE_ASM("nonmatchings/game/c3dspline", StepS__9C3DSplineFv);
 INCLUDE_ASM("nonmatchings/game/c3dspline", Step__9C3DSplineFv);
-INCLUDE_ASM("nonmatchings/game/c3dspline", GetNowXYZ__9C3DSplineFPf);
+extern "C" s32 GetNowXYZ__9C3DSplineFPf(void *objet, f32 *arg0) {
+    arg0[0] = *(f32 *) ((u8 *) objet + 0x38C);
+    arg0[1] = *(f32 *) ((u8 *) objet + 0x390);
+    arg0[2] = *(f32 *) ((u8 *) objet + 0x394);
+    ((s32 *) arg0)[3] = 0x3F800000;
+}
 extern "C" s32 Initialize__10CCameraPasFv(void *);
 extern "C" u8 *__ct__10CCameraPasFv(u8 *objet) {
     __ct__9C3DSplineFv((C3DSpline *) (objet + 0x208));
@@ -772,7 +947,13 @@ extern "C" void Step__10CCameraPasFPfPf(CCameraPasView *objet, f32 *arg0, f32 *a
         GetNowXYZ__9C3DSplineFPf(&objet->look, arg1);
     }
 }
-INCLUDE_ASM("nonmatchings/game/c3dspline", CheckEnd__10CCameraPasFv);
+typedef struct CCameraPas_end_local {
+    u8 pad0[0x940];
+    s32 done;
+} CCameraPas_end_local;
+extern "C" s32 CheckEnd__10CCameraPasFv(CCameraPas_end_local *objet) {
+    return (u8)(((u32)objet->done > 0) ^ 1);
+}
 typedef struct CCharaPas_infere {
     /* 0x000 */ char pad0[0x108];
     /* 0x108 */ C3DSpline unk108;                   /* inferred */
@@ -801,12 +982,40 @@ extern "C" s32 AddCharaPas__9CCharaPasFPf(CCharaPasView *objet, f32 *arg0) {
     return 0;
 }
 INCLUDE_ASM("nonmatchings/game/c3dspline", Setup__9CCharaPasFv);
-INCLUDE_ASM("nonmatchings/game/c3dspline", Run__9CCharaPasFv);
+typedef struct CCharaPas_run_local {
+    u8 pad0[0x104];
+    s32 count;
+    u8 pad108[0x39C];
+    s32 done;
+} CCharaPas_run_local;
+extern "C" void Run__9CCharaPasFv(CCharaPas_run_local *objet) {
+    if (objet->count > 0) {
+        objet->done = 1;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", Step__9CCharaPasFPfPf);
-INCLUDE_ASM("nonmatchings/game/c3dspline", CheckEnd__9CCharaPasFv);
+typedef struct CCharaPas_end_local {
+    u8 pad0[0x4A4];
+    s32 done;
+} CCharaPas_end_local;
+extern "C" s32 CheckEnd__9CCharaPasFv(CCharaPas_end_local *objet) {
+    return (u8)(((u32)objet->done > 0) ^ 1);
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", InsCharaPas__9CCharaPasFiPf);
-INCLUDE_ASM("nonmatchings/game/c3dspline", SetCharaPas__9CCharaPasFiPf);
-INCLUDE_ASM("nonmatchings/game/c3dspline", GetCharaPas__9CCharaPasFiPf);
+extern "C" s32 SetCharaPas__9CCharaPasFiPf(void *objet, s32 index, f32 *value) {
+    if (index >= 0x10) {
+        return 1;
+    }
+    sceVu0CopyVector((u8 *)objet + (index * 0x10), value);
+    return 0;
+}
+extern "C" s32 GetCharaPas__9CCharaPasFiPf(void *objet, s32 index, f32 *value) {
+    if (index >= 0x10) {
+        return 1;
+    }
+    sceVu0CopyVector(value, (u8 *)objet + (index * 0x10));
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/c3dspline", DelCharaPas__9CCharaPasFi);
 void CCharaPas::SetFrame(s32 arg0) {
     this->field_0x100 = arg0;

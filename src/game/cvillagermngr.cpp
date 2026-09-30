@@ -52,8 +52,15 @@ extern "C" s32 GetStackInt__FP12RS_STACKDATA_002D27A0(void *arg0) {
     }
     return ((struct arg0_champs_61f0c0 *) arg0)->unk4;
 }
-INCLUDE_ASM("nonmatchings/game/cvillagermngr", GetStackFloat__FP12RS_STACKDATA_002D27E0);
-INCLUDE_ASM("nonmatchings/game/cvillagermngr", GetStackString__FP12RS_STACKDATA_002D2810);
+extern "C" f32 GetStackFloat__FP12RS_STACKDATA_002D27E0(void *arg0) {
+    if (*(s32 *) arg0 == 0) {
+        return (f32) *(s32 *) ((u8 *) arg0 + 4);
+    }
+    return *(f32 *) ((u8 *) arg0 + 4);
+}
+extern "C" s32 GetStackString__FP12RS_STACKDATA_002D2810(void *arg0) {
+    return *(s32 *) ((u8 *) arg0 + 4);
+}
 INCLUDE_ASM("nonmatchings/game/cvillagermngr", SetStack__FP12RS_STACKDATAi_002D2820);
 INCLUDE_ASM("nonmatchings/game/cvillagermngr", SetStack__FP12RS_STACKDATAf_002D2840);
 extern "C" u32 action_info[4];

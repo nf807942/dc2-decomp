@@ -1,5 +1,5 @@
-#ifndef GEN_MGCDRAWPRIM_HPP
-#define GEN_MGCDRAWPRIM_HPP
+#ifndef GEN_MGCMEMORY_HPP
+#define GEN_MGCMEMORY_HPP
 
 #include "common.h"
 
@@ -9,17 +9,11 @@
  * la taille de la classe ni ses méthodes virtuelles n'y paraissent :
  * déclarer une virtuelle ferait émettre une table que le disque
  * porte déjà. */
-struct mgCDrawPrim {
-    u8 pad_0x0[0xC8];
-    s32 field_0xC8;
-    s32 field_0xCC;
-    u8 pad_0xD0[0x2C];
-    s32 field_0xFC;
-
-    void AlphaBlend(s32 arg0);
-    void Bilinear(s32 arg0);
-    void Coord(s32 arg0);
-    void ZMask(s32 arg0);
+struct mgCMemory {
+    u8 pad_0x0[0x1C];
+    s32 field_0x1C;
+    u8 pad_0x20[0x4];
+    s32 field_0x24;
 };
 
-#endif /* GEN_MGCDRAWPRIM_HPP */
+#endif /* GEN_MGCMEMORY_HPP */

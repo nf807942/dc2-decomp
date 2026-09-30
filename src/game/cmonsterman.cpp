@@ -90,11 +90,32 @@ INCLUDE_ASM("nonmatchings/game/cmonsterman", ThinkHost__11CMonsterManFv);
 INCLUDE_ASM("nonmatchings/game/cmonsterman", _MONSTER_NAME__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmonsterman", LoadMonsterLanguage__Fi);
 INCLUDE_ASM("nonmatchings/game/cmonsterman", RunScript__11CMonsterManFi);
-INCLUDE_ASM("nonmatchings/game/cmonsterman", GetStackInt__FP12RS_STACKDATA_001E1B60);
-INCLUDE_ASM("nonmatchings/game/cmonsterman", GetStackFloat__FP12RS_STACKDATA_001E1BA0);
-INCLUDE_ASM("nonmatchings/game/cmonsterman", GetStackString__FP12RS_STACKDATA_001E1BD0);
-INCLUDE_ASM("nonmatchings/game/cmonsterman", SetStack__FP12RS_STACKDATAi_001E1BE0);
-INCLUDE_ASM("nonmatchings/game/cmonsterman", SetStack__FP12RS_STACKDATAf_001E1C00);
+extern "C" s32 fptosi(f32);
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_001E1B60(RS_STACKDATA *arg0) {
+    if (arg0->type == 1) {
+        return fptosi(*(f32 *) &arg0->value);
+    }
+    return arg0->value;
+}
+extern "C" f32 GetStackFloat__FP12RS_STACKDATA_001E1BA0(void *arg0) {
+    if (*(s32 *) arg0 == 0) {
+        return (f32) *(s32 *) ((u8 *) arg0 + 4);
+    }
+    return *(f32 *) ((u8 *) arg0 + 4);
+}
+extern "C" s32 GetStackString__FP12RS_STACKDATA_001E1BD0(void *arg0) {
+    return *(s32 *) ((u8 *) arg0 + 4);
+}
+extern "C" void SetStack__FP12RS_STACKDATAi_001E1BE0(s32 *arg0, s32 arg1) {
+    if (arg0[0] == 3) {
+        *(s32 *) ((u8 *) arg0[1] + 4) = arg1;
+    }
+}
+extern "C" void SetStack__FP12RS_STACKDATAf_001E1C00(s32 *arg0, f32 arg1) {
+    if (arg0[0] == 3) {
+        *(f32 *) ((u8 *) arg0[1] + 4) = arg1;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cmonsterman", GetStackVector__FPfPP12RS_STACKDATA);
 INCLUDE_ASM("nonmatchings/game/cmonsterman", SetStackVector__FPfPP12RS_STACKDATA);
 INCLUDE_ASM("nonmatchings/game/cmonsterman", _SQRT__FP12RS_STACKDATAi_001E1CE0);

@@ -160,10 +160,23 @@ INCLUDE_ASM("nonmatchings/game/ceffectscriptman", SetTexb__16CEffectScriptManFii
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", GetEffSptBaseDefPtr__Fi);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", DrawEffSptSprite__FP11_EFF_SCRIPTP10mgCTexturePfP11mgC3DSpriteP16CMapLightingInfo);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", GetSpritePtr__FP11_EFF_SCRIPTi);
-INCLUDE_ASM("nonmatchings/game/ceffectscriptman", GetStackInt__FP12RS_STACKDATA_002E8280);
-INCLUDE_ASM("nonmatchings/game/ceffectscriptman", GetStackFloat__FP12RS_STACKDATA_002E82C0);
+extern "C" s32 fptosi(f32);
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_002E8280(void *arg0) {
+    if (*(s32 *) arg0 == 1) {
+        return fptosi(*(f32 *) ((u8 *) arg0 + 4));
+    }
+    return *(s32 *) ((u8 *) arg0 + 4);
+}
+extern "C" f32 GetStackFloat__FP12RS_STACKDATA_002E82C0(void *arg0) {
+    if (*(s32 *) arg0 == 0) {
+        return (f32) *(s32 *) ((u8 *) arg0 + 4);
+    }
+    return *(f32 *) ((u8 *) arg0 + 4);
+}
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", GetStackVector__FPfP12RS_STACKDATA_002E82F0);
-INCLUDE_ASM("nonmatchings/game/ceffectscriptman", GetStackString__FP12RS_STACKDATA_002E8340);
+extern "C" s32 GetStackString__FP12RS_STACKDATA_002E8340(void *arg0) {
+    return *(s32 *) ((u8 *) arg0 + 4);
+}
 struct arg0_champs_aef12e {
     /* 0x0 */ s32 unk0;
     /* 0x4 */ struct unk4_champs_aef12e *unk4;
@@ -177,7 +190,11 @@ extern "C" void SetStack__FP12RS_STACKDATAi_002E8350(struct arg0_champs_aef12e *
         arg0->unk4->unk4 = arg1;
     }
 }
-INCLUDE_ASM("nonmatchings/game/ceffectscriptman", SetStack__FP12RS_STACKDATAf_002E8370);
+extern "C" void SetStack__FP12RS_STACKDATAf_002E8370(struct arg0_champs_aef12e *arg0, f32 arg1) {
+    if (arg0->unk0 == 3) {
+        *(f32 *) ((u8 *) arg0->unk4 + 4) = arg1;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _ZERO_VECTOR__FP12RS_STACKDATAi_002E8390);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _NORMAL_VECTOR__FP12RS_STACKDATAi_002E83E0);
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _COPY_VECTOR__FP12RS_STACKDATAi_002E8490);
@@ -261,9 +278,9 @@ extern "C" s32 _SPT_DELETE_SPRITE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg
 extern "C" u32 now_script;
 #include "runscript.hpp"
 extern "C" void strcpy(s32, s32);
-extern "C" s32 GetStackString__FP12RS_STACKDATA_002E8340();
+extern "C" s32 GetStackString__FP12RS_STACKDATA_002E8340(void *);
 extern "C" s32 _SPT_SET_TEXNAME__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
-    strcpy(now_script + 0x30, GetStackString__FP12RS_STACKDATA_002E8340());
+    strcpy(now_script + 0x30, GetStackString__FP12RS_STACKDATA_002E8340(arg0));
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", _SPT_SET_ALPHAB__FP12RS_STACKDATAi);

@@ -306,7 +306,10 @@ INCLUDE_ASM("nonmatchings/game/text_002798A0", _SPHIDA_GET_SCORE__FP12RS_STACKDA
 s32 _TEST(RS_STACKDATA *stack, int argc) {
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/text_002798A0", _MT_TEST__FP12RS_STACKDATAi);
+extern "C" void mt_test__FP12RS_STACKDATAi(RS_STACKDATA *, s32);
+extern "C" void _MT_TEST__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    mt_test__FP12RS_STACKDATAi(arg0, arg1);
+}
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _ZERO_VECTOR__FP12RS_STACKDATAi_0027A530);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _NORMAL_VECTOR__FP12RS_STACKDATAi_0027A570);
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _COPY_VECTOR__FP12RS_STACKDATAi_0027A610);

@@ -10,7 +10,9 @@
 #include "gen/CActionChara.hpp"
 #include "gen/CMapPiece.hpp"
 
-INCLUDE_ASM("nonmatchings/game/cactionchara", GetMotionStatus__11CCharacter2Fv);
+extern "C" s32 GetMotionStatus__11CCharacter2Fv(void *objet) {
+    return *(s32 *) ((u8 *) objet + 0x384);
+}
 struct inferred;
 typedef struct CCharacter2_infere5 {
     /* 0x000 */ char pad0[0x374];
@@ -25,12 +27,24 @@ extern "C" s32 GetNowMotionName__11CCharacter2Fv(CCharacter2_infere5 *objet) {
     }
     return 0;
 }
-INCLUDE_ASM("nonmatchings/game/cactionchara", GetNowFrameWait__11CCharacter2Fv);
-INCLUDE_ASM("nonmatchings/game/cactionchara", SetNowFrame__11CCharacter2Ff);
-INCLUDE_ASM("nonmatchings/game/cactionchara", GetNowFrame__11CCharacter2Fv);
-INCLUDE_ASM("nonmatchings/game/cactionchara", GetStep__11CCharacter2Fv);
-INCLUDE_ASM("nonmatchings/game/cactionchara", SetFadeFlag__11CCharacter2Fi);
-INCLUDE_ASM("nonmatchings/game/cactionchara", GetFadeFlag__11CCharacter2Fv);
+extern "C" f32 GetNowFrameWait__11CCharacter2Fv(void *objet) {
+    return *(f32 *) ((u8 *) objet + 0x38C);
+}
+extern "C" void SetNowFrame__11CCharacter2Ff(void *objet, f32 arg0) {
+    *(f32 *) ((u8 *) objet + 0x388) = arg0;
+}
+extern "C" f32 GetNowFrame__11CCharacter2Fv(void *objet) {
+    return *(f32 *) ((u8 *) objet + 0x388);
+}
+extern "C" f32 GetStep__11CCharacter2Fv(void *objet) {
+    return *(f32 *) ((u8 *) objet + 0x390);
+}
+extern "C" void SetFadeFlag__11CCharacter2Fi(void *objet, s32 arg0) {
+    *(s32 *) ((u8 *) objet + 0x54) = arg0;
+}
+extern "C" s32 GetFadeFlag__11CCharacter2Fv(void *objet) {
+    return *(s32 *) ((u8 *) objet + 0x54);
+}
 typedef struct CCharacter2 {
     /* 0x000 */ char pad0[0x118];
     /* 0x118 */ s32 unk118;                         /* inferred */

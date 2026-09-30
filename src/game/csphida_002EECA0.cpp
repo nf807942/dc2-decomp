@@ -7,6 +7,7 @@
  */
 
 #include "common.h"
+#include "gen/CameraCtrlParam.hpp"
 
 INCLUDE_ASM("nonmatchings/game/csphida_002EECA0", Omake_SetUp__7CSphidaFii);
 INCLUDE_ASM("nonmatchings/game/csphida_002EECA0", Step__7CSphidaFv);
@@ -47,5 +48,12 @@ extern "C" s32 SetCollisionModel__7CSphidaFP10MDS_HEADERP9mgCMemory(CSphida_infe
 }
 INCLUDE_ASM("nonmatchings/game/csphida_002EECA0", PickupCollision__7CSphidaFPfP6CCPoly9mgVu0FBOXi);
 INCLUDE_ASM("nonmatchings/game/csphida_002EECA0", DrawMiniMapSymbol__7CSphidaFP14CMiniMapSymbol);
-INCLUDE_ASM("nonmatchings/game/csphida_002EECA0", SetFixHeight__15CameraCtrlParamFf);
+void CameraCtrlParam::SetFixHeight(f32 arg0) {
+    this->field_0x14 = arg0;
+    this->field_0x18 = arg0;
+    this->field_0x8 = arg0;
+    this->field_0xC = arg0;
+    this->field_0x1C = arg0;
+    this->field_0x20 = arg0;
+}
 INCLUDE_ASM("nonmatchings/game/csphida_002EECA0", SetFixDist__15CameraCtrlParamFf);

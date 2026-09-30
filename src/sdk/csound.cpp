@@ -64,7 +64,9 @@ extern "C" void SetVol__6CSoundFii(CSound *objet, s32 arg0, s32 arg1) {
     }
     ezMidi__Fii(arg0 + 0xB0, var_a2);
 }
-INCLUDE_ASM("nonmatchings/sdk/csound", SetStereoMode__6CSoundFi);
+extern "C" void SetStereoMode__6CSoundFi(CSound *objet, s32 arg0) {
+    ezMidi__Fii(0xC0, arg0);
+}
 struct CSound;
 extern "C" s32 sceSdRemote(...);
 extern "C" void SetMasterVol__6CSoundFii(CSound *objet, s32 arg0, s32 arg1) {
@@ -78,8 +80,13 @@ INCLUDE_ASM("nonmatchings/sdk/csound", LoadSeq__6CSoundFiii);
 INCLUDE_ASM("nonmatchings/sdk/csound", SE_SetPitch__6CSoundFiiiiii);
 INCLUDE_ASM("nonmatchings/sdk/csound", StreamOpenFast__6CSoundFiPc);
 INCLUDE_ASM("nonmatchings/sdk/csound", StreamOpenFromFPLFast__6CSoundFiPcPc);
-INCLUDE_ASM("nonmatchings/sdk/csound", StreamPlay__6CSoundFi);
-INCLUDE_ASM("nonmatchings/sdk/csound", StreamStop__6CSoundFi);
+extern "C" void ezBgm__Fii(s32 arg0, s32 arg1);
+extern "C" void StreamPlay__6CSoundFi(void *objet, s32 arg0) {
+    ezBgm__Fii(arg0 | 0x50, 0);
+}
+extern "C" void StreamStop__6CSoundFi(CSound *objet, s32 arg0) {
+    ezBgm__Fii(arg0 | 0x60, 0);
+}
 struct CSound;
 extern "C" void ezBgm__Fii(s32 arg0, s32 arg1);
 extern "C" void StreamClose__6CSoundFi(CSound *objet, s32 arg0) {
@@ -94,11 +101,19 @@ extern "C" void StreamEND__6CSoundFi(CSound *objet, s32 arg0) {
     ezBgm__Fii(arg0 | 0x70, 0);
     ezBgm__Fii(arg0 | 0x10, 0);
 }
-INCLUDE_ASM("nonmatchings/sdk/csound", StreamPause__6CSoundFi);
-INCLUDE_ASM("nonmatchings/sdk/csound", StreamRePlay__6CSoundFi);
-INCLUDE_ASM("nonmatchings/sdk/csound", StreamSetVol__6CSoundFiii);
+extern "C" void StreamPause__6CSoundFi(void *objet, s32 arg0) {
+    ezBgm__Fii(arg0 | 0x60, 0);
+}
+extern "C" void StreamRePlay__6CSoundFi(void *objet, s32 arg0) {
+    ezBgm__Fii(arg0 | 0x50, 0);
+}
+extern "C" void StreamSetVol__6CSoundFiii(CSound *objet, s32 arg0, s32 arg1, s32 arg2) {
+    ezBgm__Fii(arg0 | 0x80, (arg1 << 16) | arg2);
+}
 INCLUDE_ASM("nonmatchings/sdk/csound", StreamGetState__6CSoundFi);
-INCLUDE_ASM("nonmatchings/sdk/csound", StreamGetLevel__6CSoundFi);
+extern "C" void StreamGetLevel__6CSoundFi(CSound *objet, s32 arg0) {
+    ezBgm__Fii(arg0 | 0x80E0, 0);
+}
 INCLUDE_ASM("nonmatchings/sdk/csound", StreamStandBy__6CSoundFi);
 INCLUDE_ASM("nonmatchings/sdk/csound", TransBdState__6CSoundFi);
 extern "C" u8 _33_00369320[23];
@@ -267,12 +282,18 @@ INCLUDE_ASM("nonmatchings/sdk/csound", Step__11CLoopSeMngrFv);
 INCLUDE_ASM("nonmatchings/sdk/csound", AllSeStop__11CLoopSeMngrFv);
 INCLUDE_ASM("nonmatchings/sdk/csound", sndGetReverbDepth__Fi);
 INCLUDE_ASM("nonmatchings/sdk/csound", sndCreateID__FUii);
-INCLUDE_ASM("nonmatchings/sdk/csound", sndGetSeNo__FUi);
+extern "C" u32 sndGetSeNo__FUi(u32 arg0) {
+    return arg0 & 0xFFFF;
+}
 INCLUDE_ASM("nonmatchings/sdk/csound", GetPortInfo__Fi);
 INCLUDE_ASM("nonmatchings/sdk/csound", GetSeSeq__Fi);
 INCLUDE_ASM("nonmatchings/sdk/csound", GetEmptySeSeq__FPi);
-INCLUDE_ASM("nonmatchings/sdk/csound", GetPortNo__FUi);
-INCLUDE_ASM("nonmatchings/sdk/csound", GetBankNo__FUi);
+extern "C" u32 GetPortNo__FUi(u32 arg0) {
+    return (arg0 >> 24) & 0xFF;
+}
+extern "C" u32 GetBankNo__FUi(u32 arg0) {
+    return (arg0 >> 16) & 0xFF;
+}
 INCLUDE_ASM("nonmatchings/sdk/csound", GetBankInfo__FUi);
 INCLUDE_ASM("nonmatchings/sdk/csound", GetSeInfo__FUii);
 INCLUDE_ASM("nonmatchings/sdk/csound", sndInitMngr__Fv);
@@ -464,19 +485,19 @@ extern "C" void sndStreamStandBy__Fv(void) {
     sndSignalSema__Fv();
 }
 INCLUDE_ASM("nonmatchings/sdk/csound", sndStreamSetVol__Fff);
-extern "C" s32 StreamPlay__6CSoundFi(void *, s32);
+extern "C" void StreamPlay__6CSoundFi(void *, s32);
 extern "C" void sndStreamPlay__Fv(void) {
     sndWaitSema__Fv();
     StreamPlay__6CSoundFi(&CSnd, 1);
     sndSignalSema__Fv();
 }
-extern "C" s32 StreamPause__6CSoundFi(void *, s32);
+extern "C" void StreamPause__6CSoundFi(void *, s32);
 extern "C" void sndStreamPause__Fv(void) {
     sndWaitSema__Fv();
     StreamPause__6CSoundFi(&CSnd, 1);
     sndSignalSema__Fv();
 }
-extern "C" s32 StreamRePlay__6CSoundFi(void *, s32);
+extern "C" void StreamRePlay__6CSoundFi(void *, s32);
 extern "C" void sndStreamRePlay__Fv(void) {
     sndWaitSema__Fv();
     StreamRePlay__6CSoundFi(&CSnd, 1);

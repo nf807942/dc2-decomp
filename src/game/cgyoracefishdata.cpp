@@ -48,7 +48,12 @@ void SetGyoRaceClass(s32 value) {
 s32 GetGyoRaceClass(void) {
     return GyoRaceClass;
 }
-INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", SetGyoRaceNo__Fi);
+void SetGyoRaceNo(s32 value) {
+    GyoRaceProgressNum = value;
+    if (GyoRaceProgressNum < 0) {
+        GyoRaceProgressNum = 0;
+    }
+}
 s32 GetGyoRaceNo(void) {
     return GyoRaceProgressNum;
 }

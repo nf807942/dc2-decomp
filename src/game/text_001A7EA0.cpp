@@ -7,6 +7,7 @@
  */
 
 #include "common.h"
+#include "gen/mgCMemory.hpp"
 
 /* Les globales que ces accesseurs servent. Leur taille déclarée est celle que
  * le découpage leur donne, et c'est elle qui décide du `%gp_rel`. */
@@ -89,7 +90,12 @@ void EditDebugInit(void) {
 s32 EditDebugMode(void) {
     return EditDebugFlag;
 }
-INCLUDE_ASM("nonmatchings/game/text_001A7EA0", EditDebugStart__FiP9mgCMemory);
+void EditDebugStart(s32 arg0, mgCMemory * arg1) {
+    arg1->field_0x24 = 0;
+    arg1->field_0x1C = 0;
+    EditDebugFlag = 1;
+    EditDebugTexb = arg0;
+}
 INCLUDE_ASM("nonmatchings/game/text_001A7EA0", PrintCursor__FPci);
 INCLUDE_ASM("nonmatchings/game/text_001A7EA0", EditDebugLoop__FP6CSceneP13EditDebugInfo);
 INCLUDE_ASM("nonmatchings/game/text_001A7EA0", EditDebugEnd__Fv);

@@ -162,7 +162,9 @@ INCLUDE_ASM("nonmatchings/game/cmap", DrawFireEffect__4CMapFi);
 INCLUDE_ASM("nonmatchings/game/cmap", DrawFireRaster__4CMapFv);
 INCLUDE_ASM("nonmatchings/game/cmap", DrawWater__4CMapFP9mgCCameraP10mgCTextureP10mgCTexture);
 INCLUDE_ASM("nonmatchings/game/cmap", DrawTrBox__4CMapFv);
-INCLUDE_ASM("nonmatchings/game/cmap", GetShow__7CObjectFv);
+extern "C" s32 GetShow__7CObjectFv(void *objet) {
+    return *(s32 *) ((u8 *) objet + 0x64);
+}
 INCLUDE_ASM("nonmatchings/game/cmap", GetPoly__4CMapFiP6CCPolyR9mgVu0FBOXi);
 INCLUDE_ASM("nonmatchings/game/cmap", GetColPoly__4CMapFP6CCPolyR9mgVu0FBOXi);
 INCLUDE_ASM("nonmatchings/game/cmap", GetCameraPoly__4CMapFP6CCPolyR9mgVu0FBOXi);

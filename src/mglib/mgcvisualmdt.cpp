@@ -14,6 +14,11 @@
 struct mgCDrawEnv {
     s64 field_0;
     s64 field_8;
+    s64 field_10;
+    s64 field_18;
+    s64 field_20;
+    s64 field_28;
+    s64 field_30;
 };
 extern "C" s32 Initialize__10mgCDrawEnvFi(...);
 extern "C" mgCDrawEnv *__ct__10mgCDrawEnvFv(mgCDrawEnv *objet) {
@@ -35,7 +40,21 @@ extern "C" mgCDrawEnv_infere *__as__10mgCDrawEnvFR10mgCDrawEnv(mgCDrawEnv_infere
 }
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Initialize__10mgCDrawEnvFi);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetAlpha__10mgCDrawEnvFi);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", GetAlphaMacroID__10mgCDrawEnvFv);
+extern "C" s32 GetAlphaMacroID__10mgCDrawEnvFv(mgCDrawEnv *objet) {
+    if (objet->field_30 == 0x48) {
+        return 2;
+    }
+    if (objet->field_30 == 0x42) {
+        return 3;
+    }
+    if (objet->field_30 == 0x44) {
+        return 1;
+    }
+    if (objet->field_30 == 0x800000002A) {
+        return 4;
+    }
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetZBuf__10mgCDrawEnvFi);
 struct inferred;
 struct mgRENDER_INFO_infere_b5eb30;
@@ -83,14 +102,16 @@ INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetRenderInfo__13mgRENDER_INFOFfi
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetViewMatrix__13mgRENDER_INFOFPA4_fPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetDropShadowMatrix__13mgRENDER_INFOFPfPfPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", ActiveLighting__13mgRENDER_INFOFii);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", GetpLightInfo__13mgRENDER_INFOFv);
+extern "C" s32 GetpLightInfo__13mgRENDER_INFOFv(void *objet) {
+    s32 index = *(s32 *)((char *)objet + 0x3F4);
+    return (s32)((char *)objet + index * 0x150 + 0x400);
+}
 struct inferred;
 typedef struct mgRENDER_INFO_infere {
     /* 0x000 */ char pad0[0x3F0];
     /* 0x3F0 */ s32 unk3F0;                         /* inferred */
 } mgRENDER_INFO_infere;                                    /* size >= 0x3F4 */
 extern "C" s32 memset(...);
-extern "C" s32 GetpLightInfo__13mgRENDER_INFOFv(...);
 extern "C" void InitActiveLighting__13mgRENDER_INFOFv(mgRENDER_INFO_infere *objet) {
     objet->unk3F0 = 1;
     memset(GetpLightInfo__13mgRENDER_INFOFv(objet), 0, 0x150);
@@ -136,7 +157,6 @@ extern "C" void SetLight__13mgRENDER_INFOFPA4_fPA4_f(mgRENDER_INFO_infere2 *obje
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", GetLight__13mgRENDER_INFOFPA4_fPA4_f);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetLight__13mgRENDER_INFOFiPfPf);
 extern "C" void sceVu0CopyVector(...);
-extern "C" s32 GetpLightInfo__13mgRENDER_INFOFv(...);
 extern "C" void SetAmbient__13mgRENDER_INFOFPf(mgRENDER_INFO *objet, f32 *arg0) {
     sceVu0CopyVector(GetpLightInfo__13mgRENDER_INFOFv(objet) + 0x80, arg0);
 }
@@ -235,7 +255,12 @@ INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", stAlloc__9mgCMemoryFi);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Alloc__9mgCMemoryFi);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", stAlign64__9mgCMemoryFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Align64__9mgCMemoryFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", stSetBuffer__9mgCMemoryFP1i);
+extern "C" void stSetBuffer__9mgCMemoryFP1i(void *objet, void *arg0, s32 arg1) {
+    u32 *fields = (u32 *)((char *)objet + 0x20);
+    fields[0] = (u32)arg0;
+    fields[1] = 0;
+    fields[2] = (u32)arg1;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", mgCopyString__FPcP9mgCMemory);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetShadowData__FPUiPA4_f);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", CreateFacePacket__12mgCShadowMDTFPUiP7mgCFace);
@@ -329,7 +354,7 @@ struct objet_champs_81cc83 {
     /* 0x44 */ s32 unk44;
 };
 extern "C" s32 Initialize__13mgCVisualAttrFv(...);
-extern "C" s32 SetColor__9mgCSpriteFiiii(void *, s32, s32, s32, s32);
+extern "C" void SetColor__9mgCSpriteFiiii(void *, s32, s32, s32, s32);
 extern "C" void Initialize__9mgCSpriteFv(mgCSprite *objet) {
     ((struct objet_champs_81cc83 *) objet)->unk0 = 0;
     ((struct objet_champs_81cc83 *) objet)->unk4 = 0;
@@ -343,7 +368,14 @@ extern "C" void Initialize__9mgCSpriteFv(mgCSprite *objet) {
     ((struct objet_champs_81cc83 *) objet)->unk28 = -1;
     ((struct objet_champs_81cc83 *) objet)->unk2C = -1;
 }
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetColor__9mgCSpriteFiiii);
+extern "C" void SetColor__9mgCSpriteFiiii(void *objet, s32 r, s32 g, s32 b, s32 a) {
+    u8 *color = (u8 *)objet + 0x70;
+    color[0] = r;
+    color[1] = g;
+    color[2] = b;
+    color[3] = a;
+    *(s32 *)((char *)objet + 0x74) = 0;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", CreatePacket__9mgCSpriteFP14mgCDrawManager);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Draw__9mgCSpriteFPUiPA4_fP14mgCDrawManager);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Draw__9mgCSpriteFPA4_fP14mgCDrawManager);
@@ -450,7 +482,10 @@ INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", CopyMaterial__FP10mgMaterialP13MD
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", CopyMDTData__12mgCVisualMDTFP10MDT_HEADERP9mgCMemory);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", CopyMDTDataPointer__12mgCVisualMDTFP10MDT_HEADERP9mgCMemory);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", GetMaterial__12mgCVisualMDTFi);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", GetColor__12mgCVisualMDTFPi);
+extern "C" s32 GetColor__12mgCVisualMDTFPi(void *objet, s32 *arg0) {
+    *arg0 = *(s32 *)((char *)objet + 0x28);
+    return *(s32 *)((char *)objet + 0x38);
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", CreateBBox__12mgCVisualMDTFPfPfPA4_f);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", CreateFace__12mgCVisualMDTFP8FACES_IDP9mgCMemoryP9mgCMemoryPP7mgCFace);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", DataAssignMDT__12mgCVisualMDTFP10MDT_HEADERP9mgCMemoryP17mgCTextureManager);
@@ -468,7 +503,9 @@ INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetData6__FiiPPiP1P1P1P1P1);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetData7__FiiPPiP1P1P1P1P1);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", CreateFacePacket__12mgCVisualMDTFPUiP7mgCFace);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", CreateRenderInfoPacket__12mgCVisualMDTFPUiPA4_fP13mgRENDER_INFO);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", CreateExtRenderInfoPacket__12mgCVisualMDTFPUiPA4_fP13mgRENDER_INFO);
+extern "C" s32 CreateExtRenderInfoPacket__12mgCVisualMDTFPUiPA4_fP13mgRENDER_INFO(void *, u32 *, f32 (*)[4], void *) {
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Copy__15mgCVisualFixMDTFP9mgCMemory);
 typedef struct mgCVisualMDT_infere {
     /* 0x00 */ s32 unk0;                            /* inferred */

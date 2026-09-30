@@ -132,7 +132,16 @@ INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetUsedDataPtr__16CUserDataMan
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetCharaDataPtr__16CUserDataManagerFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetCharaHpGage__16CUserDataManagerFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AddHp__16CUserDataManagerFii);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetHp__16CUserDataManagerFi);
+struct COMMON_GAGE_hp { char pad0[4]; f32 unk4; };
+extern "C" s32 fptosi(f32);
+extern "C" COMMON_GAGE_hp *GetCharaHpGage__16CUserDataManagerFi(void *, s32);
+extern "C" f32 GetHp__16CUserDataManagerFi(void *objet, s32 arg0) {
+    COMMON_GAGE_hp *gage = GetCharaHpGage__16CUserDataManagerFi(objet, arg0);
+    if (gage != NULL) {
+        return (f32) fptosi(gage->unk4);
+    }
+    return 0.0f;
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AddHp_Rate__16CUserDataManagerFif);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetWHpGage__16CUserDataManagerFii);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetAbsGage__16CUserDataManagerFii);
@@ -142,7 +151,16 @@ INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AddAbs__16CUserDataManagerFiii
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetAbs__16CUserDataManagerFiiPi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", JoinPartyMember__16CUserDataManagerFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", LeavePartyMember__16CUserDataManagerFi);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetNowPartyMember__16CUserDataManagerFv);
+struct CUserDataManager_partybits { char pad0[0x44D90]; u16 unk44D90; };
+extern "C" s32 SearchItemOnItemBrd__16CUserDataManagerFii(void *, s32, s32);
+extern "C" s32 GetNowPartyMember__16CUserDataManagerFv(CUserDataManager_partybits *objet) {
+    s32 temp_s0 = objet->unk44D90;
+    s32 result = temp_s0;
+    if (SearchItemOnItemBrd__16CUserDataManagerFii(objet, 0x134, 0) != 0) {
+        result = temp_s0 | 8;
+    }
+    return result;
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", EnableCharaChange__16CUserDataManagerFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", DisableCharaChange__16CUserDataManagerFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", CheckEnableCharaChange__16CUserDataManagerFiPi);
@@ -219,7 +237,10 @@ extern "C" void SetRoboName__16CUserDataManagerFPc(CUserDataManager_infere5 *obj
         strcpy(&objet->unk4662);
     }
 }
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetRoboName__16CUserDataManagerFv);
+struct CUserDataManager_roboname { char pad0[0x4662]; s8 unk4662; };
+extern "C" s8 *GetRoboName__16CUserDataManagerFv(CUserDataManager_roboname *objet) {
+    return &objet->unk4662;
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetRoboNameDefault__16CUserDataManagerFv);
 typedef struct CUserDataManager_infere4 {
     /* 0x0000 */ char pad0[0x467C];
@@ -232,7 +253,10 @@ extern "C" void SetVoiceUnit__16CUserDataManagerFi(CUserDataManager_infere4 *obj
         SetRoboVoiceFlag__16CUserDataManagerFi(objet, 1);
     }
 }
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", CheckVoiceUnit__16CUserDataManagerFv);
+struct CUserDataManager_voiceunit { char pad0[0x467C]; s8 unk467C; };
+extern "C" s8 CheckVoiceUnit__16CUserDataManagerFv(CUserDataManager_voiceunit *objet) {
+    return objet->unk467C;
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SetRoboVoiceFlag__16CUserDataManagerFi);
 typedef struct CUserDataManager_infere6 {
     /* 0x0000 */ char pad0[0x467C];
@@ -266,7 +290,10 @@ extern "C" f32 AddRoboAbs__16CUserDataManagerFf(CUserDataManager_3e774a *objet, 
     }
     return objet->unk468C;
 }
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetRoboAbs__16CUserDataManagerFv);
+struct CUserDataManager_roboabs { char pad0[0x468C]; f32 unk468C; };
+extern "C" f32 GetRoboAbs__16CUserDataManagerFv(CUserDataManager_roboabs *objet) {
+    return objet->unk468C;
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", CheckCapacity__16CUserDataManagerFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", CheckRobotCore__16CUserDataManagerFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetDefenceVol__16CUserDataManagerFi);
@@ -279,7 +306,10 @@ INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetPartyCharaInfo__16CUserData
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", UseNpcAbility__16CUserDataManagerFiii);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AllWeaponRepair__16CUserDataManagerFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", RefreshNPCStatus__16CUserDataManagerFi);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetFishingRodNo__16CUserDataManagerFv);
+struct CUserDataManager;
+extern "C" s32 GetFishingRodNo__16CUserDataManagerFv(struct CUserDataManager *objet) {
+    return *(s16 *) ((u8 *) objet + 0x40BA);
+}
 #include "gamedataused.hpp"
 struct CUserDataManager_2a7d53;
 typedef struct CUserDataManager_2a7d53 {
@@ -477,7 +507,10 @@ extern "C" s32 FishInAquarium__16CUserDataManagerFP13CGameDataUsedi(CUserDataMan
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", CheckElectricFish__16CUserDataManagerFv);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetNumSameItem__16CUserDataManagerFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AddYarikomiMedal__16CUserDataManagerFi);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetYarikomiMedal__16CUserDataManagerFv);
+struct CUserDataManager_medal { char pad0[0x44DA0]; s16 unk44DA0; };
+extern "C" s16 GetYarikomiMedal__16CUserDataManagerFv(CUserDataManager_medal *objet) {
+    return objet->unk44DA0;
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetItem__16CUserDataManagerFii);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetItemNotOver__16CUserDataManagerFii);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetOverItem__16CUserDataManagerFii);
@@ -529,7 +562,10 @@ extern "C" s32 CopyGameData__16CUserDataManagerFP13CGameDataUsedi(CUserDataManag
 }
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", AddMoney__16CUserDataManagerFi);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SetCostumeBit__16CUserDataManagerFUl);
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetCostumeBit__16CUserDataManagerFv);
+struct CUserDataManager_costumebit { char pad0[0x45598]; s64 unk45598; };
+extern "C" s64 GetCostumeBit__16CUserDataManagerFv(CUserDataManager_costumebit *objet) {
+    return objet->unk45598;
+}
 extern "C" s32 GetCosInfo__Fi(s32);
 struct CUserDataManager_infere8;
 typedef struct CUserDataManager_infere8 {
@@ -781,7 +817,15 @@ extern "C" s32 GetMaxHp_i__16CBattleCharaInfoFv(CBattleCharaInfo_infere *objet) 
     }
     return 0;
 }
-INCLUDE_ASM("nonmatchings/game/cuserdatamanager", GetNowHp_i__16CBattleCharaInfoFv);
+struct CBattleCharaInfo_nowhp { char pad0[0x74]; COMMON_GAGE *unk74; };
+extern "C" s32 GetDispVolumeForFloat__Ff(f32);
+extern "C" s32 GetNowHp_i__16CBattleCharaInfoFv(CBattleCharaInfo_nowhp *objet) {
+    COMMON_GAGE *gage = objet->unk74;
+    if (gage != NULL) {
+        return GetDispVolumeForFloat__Ff(((COMMON_GAGE_hp *) gage)->unk4);
+    }
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SetAttr__16CBattleCharaInfoFii);
 INCLUDE_ASM("nonmatchings/game/cuserdatamanager", SetAttrVol__16CBattleCharaInfoFii);
 typedef struct CBattleCharaInfo_infere2 {

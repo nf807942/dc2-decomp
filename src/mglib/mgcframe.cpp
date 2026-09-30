@@ -26,12 +26,18 @@ typedef struct mgCCamera {
     /* 0x04 */ f32 unk4;                            /* inferred */
     /* 0x08 */ f32 unk8;                            /* inferred */
     /* 0x0C */ s32 unkC;                            /* inferred */
-    /* 0x10 */ char pad10[0x10];                    /* maybe part of unkC[5]? */
+    /* 0x10 */ f32 unk10;
+    /* 0x14 */ f32 unk14;
+    /* 0x18 */ f32 unk18;
+    /* 0x1C */ char pad1C[4];
     /* 0x20 */ f32 unk20;                           /* inferred */
     /* 0x24 */ f32 unk24;                           /* inferred */
     /* 0x28 */ f32 unk28;                           /* inferred */
     /* 0x2C */ s32 unk2C;                           /* inferred */
-} mgCCamera;                                        /* size >= 0x30 */
+    /* 0x30 */ f32 unk30;
+    /* 0x34 */ f32 unk34;
+    /* 0x38 */ f32 unk38;
+} mgCCamera;                                        /* size >= 0x3C */
 extern "C" void SetPos__9mgCCameraFfff(mgCCamera *objet, f32 arg0, f32 arg1, f32 arg2) {
     objet->unk20 = arg0;
     objet->unk0 = arg0;
@@ -42,13 +48,36 @@ extern "C" void SetPos__9mgCCameraFfff(mgCCamera *objet, f32 arg0, f32 arg1, f32
     objet->unk2C = 0x3F800000;
     objet->unkC = 0x3F800000;
 }
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetPos__9mgCCameraFPf);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetNextPos__9mgCCameraFfff);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetNextPos__9mgCCameraFPf);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetRef__9mgCCameraFfff);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetRef__9mgCCameraFPf);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetNextRef__9mgCCameraFfff);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetNextRef__9mgCCameraFPf);
+extern "C" void SetPos__9mgCCameraFPf(mgCCamera *objet, f32 *arg0) {
+    SetPos__9mgCCameraFfff(objet, arg0[0], arg0[1], arg0[2]);
+}
+extern "C" void SetNextPos__9mgCCameraFfff(mgCCamera *objet, f32 arg0, f32 arg1, f32 arg2) {
+    objet->unk20 = arg0;
+    objet->unk24 = arg1;
+    objet->unk28 = arg2;
+}
+extern "C" void SetNextPos__9mgCCameraFPf(mgCCamera *objet, f32 *arg0) {
+    SetNextPos__9mgCCameraFfff(objet, arg0[0], arg0[1], arg0[2]);
+}
+extern "C" void SetRef__9mgCCameraFfff(mgCCamera *objet, f32 arg0, f32 arg1, f32 arg2) {
+    objet->unk10 = arg0;
+    objet->unk30 = arg0;
+    objet->unk14 = arg1;
+    objet->unk34 = arg1;
+    objet->unk18 = arg2;
+    objet->unk38 = arg2;
+}
+extern "C" void SetRef__9mgCCameraFPf(mgCCamera *objet, f32 *arg0) {
+    SetRef__9mgCCameraFfff(objet, arg0[0], arg0[1], arg0[2]);
+}
+extern "C" void SetNextRef__9mgCCameraFfff(mgCCamera *objet, f32 arg0, f32 arg1, f32 arg2) {
+    objet->unk30 = arg0;
+    objet->unk34 = arg1;
+    objet->unk38 = arg2;
+}
+extern "C" void SetNextRef__9mgCCameraFPf(mgCCamera *objet, f32 *arg0) {
+    SetNextRef__9mgCCameraFfff(objet, arg0[0], arg0[1], arg0[2]);
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetDir__9mgCCameraFPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetCameraMatrix__9mgCCameraFPA4_f);
 typedef struct mgCCamera_infere {
@@ -63,13 +92,37 @@ extern "C" void SetSpeed__9mgCCameraFff(mgCCamera_infere *objet, f32 arg0, f32 a
         objet->unk4C = objet->unk48;
     }
 }
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetRoll__9mgCCameraFf);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetPos__9mgCCameraFPf);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetRef__9mgCCameraFPf);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetNextPos__9mgCCameraFPf);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetNextRef__9mgCCameraFPf);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetAngleH__9mgCCameraFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetAngleV__9mgCCameraFv);
+typedef struct mgCCamera_roll {
+    /* 0x00 */ char pad0[0x40];
+    /* 0x40 */ f32 roll;
+} mgCCamera_roll;
+extern "C" void SetRoll__9mgCCameraFf(mgCCamera_roll *objet, f32 arg0) {
+    objet->roll = arg0;
+}
+extern "C" void sceVu0CopyVector(f32 *, f32 *);
+extern "C" void GetPos__9mgCCameraFPf(mgCCamera *objet, f32 *arg0) {
+    sceVu0CopyVector(arg0, &objet->unk0);
+}
+extern "C" void GetRef__9mgCCameraFPf(mgCCamera *objet, f32 *arg0) {
+    sceVu0CopyVector(arg0, &objet->unk10);
+}
+extern "C" void GetNextPos__9mgCCameraFPf(mgCCamera *objet, f32 *arg0) {
+    sceVu0CopyVector(arg0, &objet->unk20);
+}
+extern "C" void GetNextRef__9mgCCameraFPf(mgCCamera *objet, f32 *arg0) {
+    sceVu0CopyVector(arg0, &objet->unk30);
+}
+typedef struct mgCCamera_angles {
+    /* 0x00 */ char pad0[0x50];
+    /* 0x50 */ f32 angleH;
+    /* 0x54 */ f32 angleV;
+} mgCCamera_angles;
+extern "C" f32 GetAngleH__9mgCCameraFv(mgCCamera_angles *objet) {
+    return objet->angleH;
+}
+extern "C" f32 GetAngleV__9mgCCameraFv(mgCCamera_angles *objet) {
+    return objet->angleV;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", __ct__9mgCCameraFf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetFollowNextPos__15mgCCameraFollowFPf);
 typedef struct mgCCameraFollow {
@@ -84,22 +137,67 @@ extern "C" void GetFollowNext__15mgCCameraFollowFPf(mgCCameraFollow *objet, f32 
 }
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Step__15mgCCameraFollowFi);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Stay__15mgCCameraFollowFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetFollow__15mgCCameraFollowFfff);
+extern "C" void SetFollow__15mgCCameraFollowFfff(void *objet, f32 arg0, f32 arg1, f32 arg2) {
+    f32 *fields = (f32 *)((char *)objet + 0x70);
+    fields[0] = arg0;
+    fields[1] = arg1;
+    fields[2] = arg2;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", FollowOn__15mgCCameraFollowFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", FollowOff__15mgCCameraFollowFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetAngle__15mgCCameraFollowFf);
+typedef struct mgCCameraFollow_state {
+    /* 0x00 */ char pad0[0xA0];
+    /* 0xA0 */ s32 active;
+} mgCCameraFollow_state;
+extern "C" void FollowOff__15mgCCameraFollowFv(mgCCameraFollow_state *objet) {
+    objet->active = 0;
+}
+typedef struct mgCCameraFollow_values {
+    /* 0x00 */ char pad0[0x90];
+    /* 0x90 */ f32 distance;
+    /* 0x94 */ f32 height;
+    /* 0x98 */ f32 angle;
+    /* 0x9C */ f32 nextAngle;
+} mgCCameraFollow_values;
+extern "C" void SetAngle__15mgCCameraFollowFf(mgCCameraFollow_values *objet, f32 arg0) {
+    objet->angle = arg0;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetAngleSoon__15mgCCameraFollowFf);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetAngle__15mgCCameraFollowFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", AddAngle__15mgCCameraFollowFf);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetDistance__15mgCCameraFollowFf);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetDistance__15mgCCameraFollowFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", AddDistance__15mgCCameraFollowFf);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetHeight__15mgCCameraFollowFf);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetHeight__15mgCCameraFollowFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", AddHeight__15mgCCameraFollowFf);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetFollowOffset__15mgCCameraFollowFfff);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetFollow__15mgCCameraFollowFPf);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetFollowOffset__15mgCCameraFollowFPf);
+extern "C" f32 GetAngle__15mgCCameraFollowFv(mgCCameraFollow_values *objet) {
+    return objet->nextAngle;
+}
+extern "C" void AddAngle__15mgCCameraFollowFf(mgCCameraFollow_values *objet, f32 arg0) {
+    objet->angle += arg0;
+}
+extern "C" void SetDistance__15mgCCameraFollowFf(mgCCameraFollow_values *objet, f32 arg0) {
+    objet->distance = arg0;
+}
+extern "C" f32 GetDistance__15mgCCameraFollowFv(mgCCameraFollow_values *objet) {
+    return objet->distance;
+}
+extern "C" void AddDistance__15mgCCameraFollowFf(mgCCameraFollow_values *objet, f32 arg0) {
+    objet->distance += arg0;
+}
+extern "C" void SetHeight__15mgCCameraFollowFf(mgCCameraFollow_values *objet, f32 arg0) {
+    objet->height = arg0;
+}
+extern "C" f32 GetHeight__15mgCCameraFollowFv(mgCCameraFollow_values *objet) {
+    return objet->height;
+}
+extern "C" void AddHeight__15mgCCameraFollowFf(mgCCameraFollow_values *objet, f32 arg0) {
+    objet->height += arg0;
+}
+extern "C" void SetFollowOffset__15mgCCameraFollowFfff(void *objet, f32 arg0, f32 arg1, f32 arg2) {
+    f32 *fields = (f32 *)((char *)objet + 0x80);
+    fields[0] = arg0;
+    fields[1] = arg1;
+    fields[2] = arg2;
+}
+extern "C" void GetFollow__15mgCCameraFollowFPf(mgCCameraFollow *objet, f32 *arg0) {
+    *(s128 *)arg0 = *(s128 *)((char *)objet + 0x70);
+}
+extern "C" void GetFollowOffset__15mgCCameraFollowFPf(mgCCameraFollow *objet, f32 *arg0) {
+    *(s128 *)arg0 = *(s128 *)((char *)objet + 0x80);
+}
 extern "C" s32 __ct__9mgCCameraFf(void *, f32);
 extern "C" u8 __vt__15mgCCameraFollow[36];
 struct inferred;
@@ -138,10 +236,20 @@ extern "C" mgCCameraFollow_infere *__ct__15mgCCameraFollowFffff(mgCCameraFollow_
      * */
     return objet;
 }
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", Iam__15mgCCameraFollowFv);
+extern "C" s32 Iam__15mgCCameraFollowFv(void *objet) {
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Suspend__9mgCCameraFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", Resume__9mgCCameraFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", Iam__9mgCCameraFv);
+typedef struct mgCCamera_resume {
+    /* 0x00 */ char pad0[0x5C];
+    /* 0x5C */ s32 suspended;
+} mgCCamera_resume;
+extern "C" void Resume__9mgCCameraFv(mgCCamera_resume *objet) {
+    objet->suspended = 0;
+}
+extern "C" s32 Iam__9mgCCameraFv(void *objet) {
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", conv_new_text__FPcPc);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", htoi__FPc);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgSetFrameAttr__FP8mgCFramei);
@@ -240,7 +348,10 @@ INCLUDE_ASM("nonmatchings/mglib/mgcframe", TextureCrd__11mgCDrawPrimFii);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Direct__11mgCDrawPrimFUlUl);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Texture__11mgCDrawPrimFP10mgCTexture);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", AlphaBlendEnable__11mgCDrawPrimFi);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", AlphaBlend__11mgCDrawPrimFi);
+extern "C" void SetAlpha__10mgCDrawEnvFi(void *, s32);
+void mgCDrawPrim::AlphaBlend(s32 arg0) {
+    SetAlpha__10mgCDrawEnvFi((u8 *) this + 0x10, arg0);
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", AlphaTestEnable__11mgCDrawPrimFi);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", AlphaTest__11mgCDrawPrimFii);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", DAlphaTest__11mgCDrawPrimFii);
@@ -362,13 +473,25 @@ extern "C" void mgInsideScreen__FPA4_fPA4_f(f32 (*arg0)[4], f32 (*arg1)[4]) {
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgInsideScreen__FPA4_fPA4_fPfPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetPosition__9mgCObjectFPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetPosition__9mgCObjectFfff);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetPosition__9mgCObjectFPf);
+typedef struct mgCObject_position {
+    char pad0[0x10];
+    f32 position[4];
+    f32 rotation[4];
+    f32 scale[4];
+} mgCObject_position;
+extern "C" void GetPosition__9mgCObjectFPf(mgCObject_position *objet, f32 *arg0) {
+    sceVu0CopyVector(arg0, objet->position);
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetRotation__9mgCObjectFPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetRotation__9mgCObjectFfff);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetRotation__9mgCObjectFPf);
+extern "C" void GetRotation__9mgCObjectFPf(mgCObject_position *objet, f32 *arg0) {
+    sceVu0CopyVector(arg0, objet->rotation);
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetScale__9mgCObjectFPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetScale__9mgCObjectFfff);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetScale__9mgCObjectFPf);
+extern "C" void GetScale__9mgCObjectFPf(mgCObject_position *objet, f32 *arg0) {
+    sceVu0CopyVector(arg0, objet->scale);
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Initialize__9mgCObjectFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", __ct__8mgCFrameFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Initialize__12mgCFrameBaseFv);
@@ -531,7 +654,10 @@ extern "C" void SetTransMatrix__8mgCFrameFPA4_f(mgCFrame_infere2 *objet, f32 (*a
     objet->unk40 = 1;
 }
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", StrCmp__FPcPc);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgFrameNameComp__FPcPc);
+extern "C" s32 StrCmp__FPcPc(char *, char *);
+extern "C" s32 mgFrameNameComp__FPcPc(char *arg0, char *arg1) {
+    return StrCmp__FPcPc(arg0, arg1);
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SearchFrame__8mgCFrameFPc);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SearchFrameID__8mgCFrameFPc);
 extern "C" s32 sceVu0ApplyMatrix(...);
@@ -542,7 +668,11 @@ extern "C" void GetWorldPosition__8mgCFrameFPfPf(mgCFrame *objet, f32 *arg0, f32
     GetLWMatrix__8mgCFrameFPA4_f(objet, (f32 (*)[4]) sp30);
     sceVu0ApplyMatrix(arg0, sp30, arg1);
 }
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetWorldPosition0__8mgCFrameFPf);
+extern "C" void GetWorldPosition0__8mgCFrameFPf(mgCFrame *objet, f32 *arg0) {
+    f32 matrix[4][4];
+    GetLWMatrix__8mgCFrameFPA4_f(objet, matrix);
+    *(s128 *)arg0 = *(s128 *)&matrix[3][0];
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetWorldDir__8mgCFrameFPfPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetRotation__8mgCFrameFPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetRotation__8mgCFrameFfff);

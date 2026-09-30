@@ -22,14 +22,23 @@ extern "C" void MsgPreset__7CDC2MesFii(CDC2Mes *objet, s32 arg0, s32 arg1) {
         objet->unk2248 = 1;
     }
 }
-INCLUDE_ASM("nonmatchings/game/cdc2mes_0021F2B0", SetMsgCursor__7CDC2MesFi);
+struct CDC2Mes_setcursor { char pad0[0x2959]; s8 unk2959; };
+extern "C" void SetMsgCursor__7CDC2MesFi(CDC2Mes_setcursor *objet, s32 arg0) {
+    objet->unk2959 = (s8) arg0;
+}
 INCLUDE_ASM("nonmatchings/game/cdc2mes_0021F2B0", AddMsgCursor2__7CDC2MesFiii);
 INCLUDE_ASM("nonmatchings/game/cdc2mes_0021F2B0", AddMsgCursor__7CDC2MesFiiii);
 INCLUDE_ASM("nonmatchings/game/cdc2mes_0021F2B0", CommandMsgCursor__7CDC2MesFv);
 INCLUDE_ASM("nonmatchings/game/cdc2mes_0021F2B0", YesNoCursor__7CDC2MesFv);
 INCLUDE_ASM("nonmatchings/game/cdc2mes_0021F2B0", YesNoCursor2__7CDC2MesFi);
-INCLUDE_ASM("nonmatchings/game/cdc2mes_0021F2B0", GetMsgCursor__7CDC2MesFv);
-INCLUDE_ASM("nonmatchings/game/cdc2mes_0021F2B0", GetMsgItemNo__7CDC2MesFi);
+struct CDC2Mes_msgcursor { char pad0[0x2959]; s8 unk2959; };
+extern "C" s8 GetMsgCursor__7CDC2MesFv(CDC2Mes_msgcursor *objet) {
+    return objet->unk2959;
+}
+struct CDC2Mes_itemnumbers { char pad0[0x217C]; s32 unk217C[1]; };
+extern "C" s32 GetMsgItemNo__7CDC2MesFi(CDC2Mes_itemnumbers *objet, s32 arg0) {
+    return objet->unk217C[arg0];
+}
 INCLUDE_ASM("nonmatchings/game/cdc2mes_0021F2B0", SetFontColor__7CDC2MesFiiii);
 extern "C" u32 mgScreenWidth;
 typedef struct CDC2Mes_infere {
@@ -53,7 +62,10 @@ extern "C" void SetPutPos__7CDC2MesFiiii(CDC2Mes_infere *objet, s32 arg0, s32 ar
     }
 }
 INCLUDE_ASM("nonmatchings/game/cdc2mes_0021F2B0", SetPutPos__7CDC2MesFPi);
-INCLUDE_ASM("nonmatchings/game/cdc2mes_0021F2B0", SetAbsPos__7CDC2MesFi);
+struct CDC2Mes_abspos { char pad0[0x158]; s32 unk158; };
+extern "C" void SetAbsPos__7CDC2MesFi(CDC2Mes_abspos *objet, s32 arg0) {
+    objet->unk158 = arg0;
+}
 #include "gen/ClsMes.hpp"
 extern "C" s32 GetStrWidth__6ClsMesFPc(...);
 extern "C" s32 GetStringDrawWidthDC__7CDC2MesFPc(CDC2Mes *objet, s8 *arg0) {

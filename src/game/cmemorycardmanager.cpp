@@ -114,8 +114,39 @@ extern "C" CMemoryCardManager *__ct__18CMemoryCardManagerFv(CMemoryCardManager *
     return objet;
 }
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Initialize__18CMemoryCardManagerFP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", InitSaveFileInfoTable__18CMemoryCardManagerFv);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetOpenAttribute__18CMemoryCardManagerFPc);
+extern "C" void InitSaveFileInfoTable__18CMemoryCardManagerFv(CMemoryCardManager *objet) {
+    s32 var_s0;
+    s32 var_s1;
+    u8 *temp_s2;
+
+    var_s1 = 0;
+    var_s0 = 0;
+    do {
+        temp_s2 = (u8 *) objet + var_s1;
+        memset(temp_s2 + 0x80, 0, 0x40);
+        var_s0 += 1;
+        *(s8 *) (temp_s2 + 0xA0) = 0;
+        var_s1 += 0x40;
+    } while (var_s0 < 0x11);
+}
+extern "C" s32 strcmp(s8 *, void *);
+extern "C" s32 GetOpenAttribute__18CMemoryCardManagerFPc(CMemoryCardManager *objet, s8 *arg0) {
+    s32 var_s0;
+    s32 var_s1;
+
+    var_s1 = 0;
+    var_s0 = 0;
+loop_1:
+    if (strcmp(arg0, (u8 *) objet + var_s1 + 0xA0) == 0) {
+        return 1;
+    }
+    var_s0 += 1;
+    var_s1 += 0x40;
+    if (var_s0 >= 0x11) {
+        return 0;
+    }
+    goto loop_1;
+}
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", InitError__18CMemoryCardManagerFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", InitForMC__18CMemoryCardManagerFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", FinishForMC__18CMemoryCardManagerFv);
@@ -174,7 +205,9 @@ extern "C" void SetFuncNo__18CMemoryCardManagerFi(CMemoryCardManager_infere *obj
         objet->unk90C = 0xB;
     }
 }
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetFuncNo__18CMemoryCardManagerFv);
+extern "C" s32 GetFuncNo__18CMemoryCardManagerFv(CMemoryCardManager *objet) {
+    return objet->field_50;
+}
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", CheckMaxUniqueCounter__18CMemoryCardManagerFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetUpdateFile__18CMemoryCardManagerFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", CheckDataFileNum__18CMemoryCardManagerFv);
@@ -183,7 +216,9 @@ INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", CheckDebugCode__18CMemoryCar
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", InitPlayDataInfo__18CMemoryCardManagerFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", UpDateViewInfo__18CMemoryCardManagerFP13SAVEDATA_INFOP15SAVEDATA_FORMAT);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Step__18CMemoryCardManagerFv);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetVersion__18CMemoryCardManagerFv);
+extern "C" CMemoryCardManager *GetVersion__18CMemoryCardManagerFv(CMemoryCardManager *objet) {
+    return objet;
+}
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", SearchMcType__18CMemoryCardManagerFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Write__18CMemoryCardManagerFv);
 s32 CMemoryCardManager::Convert(void) {

@@ -12,9 +12,11 @@
 #include "gen/input_str.hpp"
 extern s32 draw_performance_meter;
 extern s32 rot_priority;
+extern s32 vcount_0037CEC0;
 struct SPI_STACK;
 
 extern mgRenderInfoData mgRenderInfo;
+extern "C" void StoreImage__Fi(s32);
 
 
 void mgPerformanceMeter(s32 arg0) {
@@ -39,7 +41,9 @@ loop_1:
         goto loop_1;
     }
 }
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetVSyncCount__Fv);
+extern "C" s32 mgGetVSyncCount__Fv(void) {
+    return vcount_0037CEC0;
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", GetScreenSize__FiPiPiPiPiPiPi);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgInit__Fii);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgInitVif1Packet__FP1P1i);
@@ -47,15 +51,35 @@ INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetPacketBuffer__FP9mgCMe
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetDataBuffer__FP9mgCMemoryP9mgCMemoryi);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetDataBuffer__Fv);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetTopVRAMAddress__Fv);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetNowFrameRate__Fv);
+extern s32 mgFrameRate;
+extern "C" f32 mgGetNowFrameRate__Fv(void) {
+    return (f32)mgFrameRate;
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgBeginFrame__FP14mgCDrawManager);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgBeginPacket__FP14mgCDrawManager);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgBeginDraw__FP9mgCMemoryPiP14mgCDrawManager);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgEndDraw__FP14mgCDrawManager);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgPreEndDraw__FP14mgCDrawManager);
+struct mgCDrawManager;
+extern "C" u32 mgVif1Packet;
+extern "C" u8 mgDrawManager[128];
+extern "C" void EndDraw__14mgCDrawManagerFP13sceVif1Packet(mgCDrawManager *, u32);
+extern "C" void PreEndDraw__14mgCDrawManagerFv(mgCDrawManager *);
+extern "C" void mgEndDraw__FP14mgCDrawManager(mgCDrawManager *arg0) {
+    if (arg0 == NULL) {
+        arg0 = (mgCDrawManager *)mgDrawManager;
+    }
+    EndDraw__14mgCDrawManagerFP13sceVif1Packet(arg0, mgVif1Packet);
+}
+extern "C" void mgPreEndDraw__FP14mgCDrawManager(mgCDrawManager *arg0) {
+    if (arg0 == NULL) {
+        arg0 = (mgCDrawManager *)mgDrawManager;
+    }
+    PreEndDraw__14mgCDrawManagerFv(arg0);
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgEndDrawReloadTexture__FiP14mgCDrawManager);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgEndDraw__FiP14mgCDrawManager);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgStoreFrameImage__Fv);
+extern "C" void mgStoreFrameImage__Fv(void) {
+    StoreImage__Fi(0);
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgEndFrame__FP14mgCDrawManager);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSendPacket__FP14mgCDrawManager);
 extern "C" u32 mgVif1Packet;
@@ -142,8 +166,21 @@ INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetProjection__Ff);
 f32 mgGetProjection(void) {
     return mgRenderInfo.field_0x0;
 }
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetBackGround__FPf);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetBackGround__Fffff);
+extern f32 mgBackColor[4];
+extern "C" void sceVu0CopyVector(f32 *, f32 *);
+extern "C" void mgSetBackGround__FPf(f32 *arg0) {
+    sceVu0CopyVector(mgBackColor, arg0);
+}
+extern f32 _863_003996F0[4];
+extern "C" void mgSetBackGround__Fffff(f32 arg0, f32 arg1, f32 arg2, f32 arg3) {
+    f32 vector[4];
+    *(s128 *)vector = *(s128 *)_863_003996F0;
+    vector[0] = arg0;
+    vector[1] = arg1;
+    vector[2] = arg2;
+    vector[3] = arg3;
+    mgSetBackGround__FPf(vector);
+}
 extern "C" u32 mgChangeLight;
 extern "C" s32 InitLighting__13mgRENDER_INFOFv(void *);
 extern "C" void mgInitLighting__Fv(void) {
@@ -156,14 +193,44 @@ extern "C" void mgInitActiveLighting__Fv(void) {
     mgChangeLight = 1;
 }
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgActiveLighting__Fii);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetLight__FPA4_fPA4_f);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetLight__FPA4_fPA4_f);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetLight__FiPfPf);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetAmbient__FPf);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetAmbient__FPf);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetPlight__FiPfPfff);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetPlight__FiP13mgPOINT_LIGHT);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetPlight__FiP13mgPOINT_LIGHT);
+extern "C" void SetLight__13mgRENDER_INFOFPA4_fPA4_f(void *, f32 (*)[4], f32 (*)[4]);
+extern "C" void mgSetLight__FPA4_fPA4_f(f32 (*arg0)[4], f32 (*arg1)[4]) {
+    mgChangeLight = 1;
+    SetLight__13mgRENDER_INFOFPA4_fPA4_f(&mgRenderInfo, arg0, arg1);
+}
+extern "C" void GetLight__13mgRENDER_INFOFPA4_fPA4_f(void *, f32 (*)[4], f32 (*)[4]);
+extern "C" void mgGetLight__FPA4_fPA4_f(f32 (*arg0)[4], f32 (*arg1)[4]) {
+    GetLight__13mgRENDER_INFOFPA4_fPA4_f(&mgRenderInfo, arg0, arg1);
+}
+extern "C" void SetLight__13mgRENDER_INFOFiPfPf(void *, s32, f32 *, f32 *);
+extern "C" void mgSetLight__FiPfPf(s32 arg0, f32 *arg1, f32 *arg2) {
+    mgChangeLight = 1;
+    SetLight__13mgRENDER_INFOFiPfPf(&mgRenderInfo, arg0, arg1, arg2);
+}
+extern "C" void SetAmbient__13mgRENDER_INFOFPf(void *, f32 *);
+extern "C" void mgSetAmbient__FPf(f32 *arg0) {
+    mgChangeLight = 1;
+    SetAmbient__13mgRENDER_INFOFPf(&mgRenderInfo, arg0);
+}
+extern "C" void GetAmbient__13mgRENDER_INFOFPf(void *, f32 *);
+extern "C" void mgGetAmbient__FPf(f32 *arg0) {
+    GetAmbient__13mgRENDER_INFOFPf(&mgRenderInfo, arg0);
+}
+extern "C" void SetPlight__13mgRENDER_INFOFiPfPfff(void *, s32, f32 *, f32 *, f32, f32);
+extern "C" void mgSetPlight__FiPfPfff(s32 arg0, f32 *arg1, f32 *arg2, f32 arg3, f32 arg4) {
+    mgChangeLight = 1;
+    SetPlight__13mgRENDER_INFOFiPfPfff(&mgRenderInfo, arg0, arg1, arg2, arg3, arg4);
+}
+struct mgPOINT_LIGHT;
+extern "C" void SetPlight__13mgRENDER_INFOFiP13mgPOINT_LIGHT(void *, s32, mgPOINT_LIGHT *);
+extern "C" void mgSetPlight__FiP13mgPOINT_LIGHT(s32 arg0, mgPOINT_LIGHT *arg1) {
+    mgChangeLight = 1;
+    SetPlight__13mgRENDER_INFOFiP13mgPOINT_LIGHT(&mgRenderInfo, arg0, arg1);
+}
+extern "C" void GetPlight__13mgRENDER_INFOFiP13mgPOINT_LIGHT(void *, s32, void *);
+extern "C" void mgGetPlight__FiP13mgPOINT_LIGHT(s32 arg0, void *arg1) {
+    GetPlight__13mgRENDER_INFOFiP13mgPOINT_LIGHT(&mgRenderInfo, arg0, arg1);
+}
 extern "C" u32 mgChangeLight;
 struct mgPOINT_LIGHT {
     f32 field_0;
@@ -177,7 +244,6 @@ struct mgPOINT_LIGHT {
     f32 field_20;
     f32 field_24;
 };
-extern "C" s32 SetPlight__13mgRENDER_INFOFiP13mgPOINT_LIGHT(void *, s32, mgPOINT_LIGHT *);
 extern "C" void mgResetPlight__Fv(void) {
     s32 var_s0;
 
@@ -188,12 +254,30 @@ extern "C" void mgResetPlight__Fv(void) {
         var_s0 += 1;
     } while (var_s0 < 4);
 }
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetViewMatrix__FPA4_fPf);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetDropShadowMatrix__FPfPfPf);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgFogEnable__Fi);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetFogEnable__Fv);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgPlightEnable__Fi);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetPlightEnable__Fv);
+extern "C" void SetViewMatrix__13mgRENDER_INFOFPA4_fPf(void *, f32 (*)[4], f32 *);
+extern "C" void mgSetViewMatrix__FPA4_fPf(f32 (*arg0)[4], f32 *arg1) {
+    SetViewMatrix__13mgRENDER_INFOFPA4_fPf(&mgRenderInfo, arg0, arg1);
+}
+extern "C" void SetDropShadowMatrix__13mgRENDER_INFOFPfPfPf(void *, f32 *, f32 *, f32 *);
+extern "C" void mgSetDropShadowMatrix__FPfPfPf(f32 *arg0, f32 *arg1, f32 *arg2) {
+    SetDropShadowMatrix__13mgRENDER_INFOFPfPfPf(&mgRenderInfo, arg0, arg1, arg2);
+}
+extern "C" void FogEnable__13mgRENDER_INFOFi(void *, s32);
+extern "C" void mgFogEnable__Fi(s32 arg0) {
+    FogEnable__13mgRENDER_INFOFi(&mgRenderInfo, arg0);
+}
+extern "C" s32 GetFogEnable__13mgRENDER_INFOFv(void *);
+extern "C" s32 mgGetFogEnable__Fv(void) {
+    return GetFogEnable__13mgRENDER_INFOFv(&mgRenderInfo);
+}
+extern "C" void PlightEnable__13mgRENDER_INFOFi(void *, s32);
+extern "C" void mgPlightEnable__Fi(s32 arg0) {
+    PlightEnable__13mgRENDER_INFOFi(&mgRenderInfo, arg0);
+}
+extern "C" s32 GetPlightEnable__13mgRENDER_INFOFv(void *);
+extern "C" s32 mgGetPlightEnable__Fv(void) {
+    return GetPlightEnable__13mgRENDER_INFOFv(&mgRenderInfo);
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetFogParam__FffUcUcUcff);
 struct inferred;
 typedef struct mgFOG_PARAM {
@@ -221,7 +305,10 @@ INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetPkFrameBuffer__FP10mgC
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetPkFrameBuffer__Fiiii);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetFrameBuffer__FP10mgCTexture);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetFrameBackBuffer__FP10mgCTexture);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetpDrawEnv__Fi);
+extern "C" s32 mgGetpDrawEnv__Fi(u32 arg0) {
+    u32 index = arg0 > 0;
+    return (s32)((char *)&mgRenderInfo + index * 0x40 + 0xF20);
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetPkMoveImage__FP10mgCTexture9mgRect_i_P10mgCTextureiii);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetPkMoveImage__FP9sceGsTex09mgRect_i_P9sceGsTex0iii);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetPkMoveImage__FP10mgCTexture9mgRect_i_P10mgCTexture9mgRect_i_P10mgCDrawEnv);
@@ -245,7 +332,12 @@ INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgTransWorldPrim3DSprite__F
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", CheckVuProgID__Fi);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetVuProgPacket__Fi);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSendVuProg__FPUii);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetUserVuProg__FPP1i);
+extern void *user_prog_adr;
+extern s32 user_prog_num;
+extern "C" void mgSetUserVuProg__FPP1i(void **arg0, s32 arg1) {
+    user_prog_adr = arg0;
+    user_prog_num = arg1;
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetUserVuProgAdr__FiP1);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", StoreImage__Fi);
 extern "C" u32 font_cons;

@@ -27,7 +27,30 @@ INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_TARGET_OLD_POS__FP12RS_STACK
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_TARGET_SPEED__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _CALC_MOVE_NEXT_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_MONSTER_LIFE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_NO_DAMAGE_CNT__FP12RS_STACKDATAi);
+struct monster_stats {
+    char pad0[0x6A];
+    s8 unk6A;
+};
+struct muteki_monster {
+    char pad0[0x768];
+    s32 unk768;
+    char pad76C[0x10];
+    s32 unk77C;
+    char pad780[0x114C - 0x780];
+    struct monster_stats *unk114C;
+    char pad1150[0x12F0 - 0x1150];
+    s16 unk12F0;
+    char pad12F2[0x131C - 0x12F2];
+    f32 unk131C;
+    char pad1320[0x1356 - 0x1320];
+    s16 unk1356;
+};
+extern muteki_monster *nowMonster;
+extern "C" s32 SetStack__FP12RS_STACKDATAi_001E1BE0(RS_STACKDATA *, s32);
+extern "C" s32 _GET_NO_DAMAGE_CNT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    SetStack__FP12RS_STACKDATAi_001E1BE0(arg0, nowMonster->unk1356);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_ACTIVE_MONS_LIFEI__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_ACTIVE_MONS_LIFEF__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_ACTIVE_MONS_LIFEI__FP12RS_STACKDATAi);
@@ -38,7 +61,15 @@ INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_MONS_GRADE__FP12RS_STACKDATA
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_ESCAPE_RATE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_GUARD_RATE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_EXT_PARAM_RATE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_BOSS_FLAG__FP12RS_STACKDATAi);
+extern muteki_monster *nowMonster;
+extern "C" s32 SetStack__FP12RS_STACKDATAi_001E1BE0(RS_STACKDATA *, s32);
+extern "C" s32 _GET_BOSS_FLAG__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    if (arg1 != 1) {
+        return 0;
+    }
+    SetStack__FP12RS_STACKDATAi_001E1BE0(arg0, nowMonster->unk114C->unk6A);
+    return 1;
+}
 extern "C" u32 nowScene_0037D4E4;
 struct temp_v0_champs {
     char pad0[0x10];
@@ -54,7 +85,17 @@ extern "C" s32 _RESET_TIMER__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     temp_v0->unk10 = 0;
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_TIMER__FP12RS_STACKDATAi);
+extern "C" s32 SetStack__FP12RS_STACKDATAi_001E1BE0(RS_STACKDATA *, s32);
+extern "C" s32 _GET_TIMER__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    struct temp_v0_champs *temp_v0;
+
+    temp_v0 = (struct temp_v0_champs *) (nowScene_0037D4E4 + 0x2F90);
+    if (temp_v0 == NULL) {
+        return 0;
+    }
+    SetStack__FP12RS_STACKDATAi_001E1BE0(arg0, temp_v0->unk10);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_FRAME_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _MY_SE_PLAY__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _MY_SE_STOP__FP12RS_STACKDATAi);
@@ -186,7 +227,14 @@ INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_HIGH2__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_RANGE_MONS_ID__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_ENTRY_OBJ_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _BLOW_START__FP12RS_STACKDATAi_001E6940);
-INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_ACT_STATUS__FP12RS_STACKDATAi);
+extern muteki_monster *nowMonster;
+extern "C" s32 _SET_ACT_STATUS__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    if (arg1 != 1) {
+        return 0;
+    }
+    nowMonster->unk77C = GetStackInt__FP12RS_STACKDATA_001E1B60(arg0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_INT_FLAG__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_DEAD_START__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_DEAD_OFF__FP12RS_STACKDATAi);
@@ -195,10 +243,30 @@ INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_MOS__FP12RS_STACKDATAi_001E7
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _CHECK_MOS_END__FP12RS_STACKDATAi_001E7500);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _NOW_MOS_WAIT__FP12RS_STACKDATAi_001E75A0);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_MOS_STATUS__FP12RS_STACKDATAi_001E7630);
-INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_MUTEKI__FP12RS_STACKDATAi_001E76D0);
-INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_GEKIRIN__FP12RS_STACKDATAi);
+extern muteki_monster *nowMonster;
+extern "C" s32 _SET_MUTEKI__FP12RS_STACKDATAi_001E76D0(RS_STACKDATA *arg0, s32 arg1) {
+    if (arg1 != 1) {
+        return 1;
+    }
+    nowMonster->unk768 = GetStackInt__FP12RS_STACKDATA_001E1B60(arg0);
+    return 1;
+}
+extern "C" s32 SetStack__FP12RS_STACKDATAf_001E1C00(RS_STACKDATA *, f32);
+extern "C" s32 _GET_GEKIRIN__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    if (arg1 != 1) {
+        return 0;
+    }
+    SetStack__FP12RS_STACKDATAf_001E1C00(arg0, nowMonster->unk131C);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_USER_MONS_ID__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_PRIORITY__FP12RS_STACKDATAi);
+extern "C" s32 _GET_PRIORITY__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    if (arg1 != 1) {
+        return 0;
+    }
+    SetStack__FP12RS_STACKDATAi_001E1BE0(arg0, nowMonster->unk12F0);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _CREATE_MONSTER__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_CLIP_DIST__FP12RS_STACKDATAi);
 s32 _SET_COLLISION(RS_STACKDATA *stack, int argc) {

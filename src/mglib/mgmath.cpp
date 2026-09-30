@@ -14,7 +14,14 @@ INCLUDE_ASM("nonmatchings/mglib/mgmath", __ct__10mgCTextureFv);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", Initialize__10mgCTextureFv);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", Bilinear__10mgCTextureFi);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", __ct__15mgCTextureBlockFv);
-INCLUDE_ASM("nonmatchings/mglib/mgmath", Initialize__15mgCTextureBlockFv);
+#pragma schedule off
+extern "C" void Initialize__15mgCTextureBlockFv(u32 *objet) {
+    objet[1] = 0;
+    objet[0] = 0;
+    objet[3] = 0;
+    objet[2] = 0;
+}
+#pragma schedule reset
 INCLUDE_ASM("nonmatchings/mglib/mgmath", Add__15mgCTextureBlockFP10mgCTexture);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", Delete__15mgCTextureBlockFP10mgCTexture);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", __ct__17mgCTextureManagerFv);
@@ -79,7 +86,9 @@ INCLUDE_ASM("nonmatchings/mglib/mgmath", PageConv32to8__FiiPUcPUc);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", Conv32To8__FiiPUc);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgFotI4__FPiPf);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgCreateBox8__FPA4_fPfPf);
-INCLUDE_ASM("nonmatchings/mglib/mgmath", mgZeroVector__FPf);
+extern "C" void mgZeroVector__FPf(u128 *arg0) {
+    *arg0 = 0;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgZeroVectorW__FPf);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgClipBoxVertex__FPfPfPf);
 INCLUDE_ASM("nonmatchings/mglib/mgmath", mgClipBox__FPfPfPfPf);

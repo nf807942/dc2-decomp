@@ -489,7 +489,10 @@ extern "C" s32 GetCharaTexb__6CSceneFi(CScene_infere *objet, s32 arg0) {
 }
 INCLUDE_ASM("nonmatchings/game/cscene", SetCharaTexb__6CSceneFii);
 INCLUDE_ASM("nonmatchings/game/cscene", SetTime__6CSceneFf);
-INCLUDE_ASM("nonmatchings/game/cscene", AddTime__6CSceneFf);
+extern "C" void SetTime__6CSceneFf(void *, f32);
+extern "C" void AddTime__6CSceneFf(void *objet, f32 arg0) {
+    SetTime__6CSceneFf(objet, arg0 + *(f32 *) ((u8 *) objet + 0x2F6C));
+}
 struct inferred;
 typedef struct CSaveData {
     /* 0x0000 */ char pad0[0x1A14];
@@ -505,7 +508,7 @@ typedef struct CScene {
     /* 0x3040 */ CSaveData *unk3040;                /* inferred */
 } CScene;                                           /* size >= 0x3044 */
 extern "C" s32 CheckTourBoot__9CSaveDataFi(void *, s32);
-extern "C" s32 AddTime__6CSceneFf(void *, f32);
+extern "C" void AddTime__6CSceneFf(void *, f32);
 extern "C" void TimeStep__6CSceneFf(CScene *objet, f32 arg0) {
     CSaveData *temp_v1;
     f32 temp_f20;
@@ -525,13 +528,44 @@ extern "C" void TimeStep__6CSceneFf(CScene *objet, f32 arg0) {
         }
     }
 }
-INCLUDE_ASM("nonmatchings/game/cscene", SetWind__6CSceneFfPf);
-INCLUDE_ASM("nonmatchings/game/cscene", ResetWind__6CSceneFv);
-INCLUDE_ASM("nonmatchings/game/cscene", GetWind__6CSceneFPf);
-INCLUDE_ASM("nonmatchings/game/cscene", SetNowMapNo__6CSceneFi);
-INCLUDE_ASM("nonmatchings/game/cscene", SetNowSubMapNo__6CSceneFi);
+extern "C" void sceVu0Normalize(void *, void *);
+extern "C" void SetWind__6CSceneFfPf(void *objet, f32 arg0, f32 *arg1) {
+    *(f32 *) ((u8 *) objet + 0x2F78) = arg0;
+    sceVu0Normalize((u8 *) objet + 0x2F80, arg1);
+}
+extern "C" void ResetWind__6CSceneFv(void *objet) {
+    *(s32 *) ((u8 *) objet + 0x2F78) = 0;
+}
+extern "C" f32 GetWind__6CSceneFPf(void *objet, f32 *arg0) {
+    *(u128 *) arg0 = *(u128 *) ((u8 *) objet + 0x2F80);
+    return *(f32 *) ((u8 *) objet + 0x2F78);
+}
+struct CSceneMapNo {
+    char pad0[0x2E60];
+    s32 now;
+    s32 sub;
+    s32 previous;
+    s32 previousSub;
+};
+extern "C" void SetNowMapNo__6CSceneFi(CSceneMapNo *objet, s32 arg0) {
+    s32 old = objet->now;
+    if (old != arg0) {
+        objet->previous = old;
+    }
+    objet->now = arg0;
+}
+extern "C" void SetNowSubMapNo__6CSceneFi(CSceneMapNo *objet, s32 arg0) {
+    s32 old = objet->sub;
+    if (old != arg0) {
+        objet->previousSub = old;
+    }
+    objet->sub = arg0;
+}
 INCLUDE_ASM("nonmatchings/game/cscene", LoadMapData__FR17SCN_LOADMAP_INFO2i);
-INCLUDE_ASM("nonmatchings/game/cscene", Initialize__17SCN_LOADMAP_INFO2Fv);
+extern "C" void *memset(void *, s32, u32);
+extern "C" void Initialize__17SCN_LOADMAP_INFO2Fv(void *objet) {
+    memset(objet, 0, 0x1A8);
+}
 INCLUDE_ASM("nonmatchings/game/cscene", LoadChara__6CSceneFiPUiPcP9mgCMemoryP9mgCMemoryP9mgCMemoryii);
 struct CSceneCharacter {
     s32 field_0;

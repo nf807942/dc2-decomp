@@ -72,7 +72,14 @@ extern "C" void Initialize__12CMenuKeyFuncFv(CMenuKeyFuncInitView *objet) {
     }
 }
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", AttachFuncData__12CMenuKeyFuncFv);
-INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", GetActiveCharaNo__12CMenuKeyFuncFv);
+struct MenuArgActiveCharaView {
+    char pad0[0x38];
+    s32 field38;
+};
+extern "C" MenuArgActiveCharaView MenuArg;
+extern "C" s32 GetActiveCharaNo__12CMenuKeyFuncFv(void) {
+    return MenuArg.field38;
+}
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", MenuPosStep__12CMenuKeyFuncFPiPi);
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", MenuSetPos__12CMenuKeyFuncFii);
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", MenuPosStop__12CMenuKeyFuncFv);
@@ -478,7 +485,11 @@ extern "C" void FadeOutMenuBGMVol__12CMenuKeyFuncFii(CMenuKeyFunc *objet, s32 ar
     }
     objet->unk15A = 1;
 }
-INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", FadeInMenuBGMVol__12CMenuKeyFuncFi);
+extern "C" void FadeInMenuBGMVol__12CMenuKeyFuncFi(CMenuKeyFunc *objet, s32 arg0) {
+    objet->unk154 = arg0;
+    objet->unk158 = objet->unk150;
+    objet->unk15A = 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", StepMenuBGM__12CMenuKeyFuncFv);
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", CheckEnableHaveItemNum__Fv);
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", MenuEquipCameraSetEnv__FP12CActionCharaP9mgCCameraii);

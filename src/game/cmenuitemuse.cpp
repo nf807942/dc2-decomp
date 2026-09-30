@@ -49,8 +49,14 @@ extern "C" s32 UseItem__12CMenuItemUseFP13CGameDataUsedP14CItemUseTarget(CMenuIt
     MenuUsedTarget.unk4 = (s32) arg1->unk4;
     return MenuUseItemCheckFunc__FP13CGameDataUsedP14CItemUseTargeti(arg0, arg1, 1);
 }
-INCLUDE_ASM("nonmatchings/game/cmenuitemuse", Initialize__12CMenuItemUseFv);
-INCLUDE_ASM("nonmatchings/game/cmenuitemuse", CheckNowStateUseThisItem__FP13CGameDataUsedP14CItemUseTarget);
+extern "C" void Initialize__12CMenuItemUseFv(CMenuItemUse *objet) {
+    objet->unk0 = 0;
+    objet->unk4 = 0;
+    *(s32 *) ((u8 *) objet + 0x18) = 0;
+}
+extern "C" s32 CheckNowStateUseThisItem__FP13CGameDataUsedP14CItemUseTarget(CGameDataUsed *arg0, CItemUseTarget *arg1) {
+    return MenuUseItemCheckFunc__FP13CGameDataUsedP14CItemUseTargeti(arg0, arg1, 0);
+}
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", AttachMessageForm__Fv);
 void Init_MENUFORM_MAKEBRD_INFO(MENUFORM_MAKEBRD_INFO * arg0) {
     memset(arg0, 0, 44);
@@ -119,7 +125,14 @@ extern "C" void DrawMenuFillBox__FP11mgCDrawPrimffffiiii(mgCDrawPrim *arg0, f32 
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", GenarateRandamLine__FPiiiPiii);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", DrawRandamLine__FP11mgCDrawPrimPiiiPUc);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", GetMenuDlTexture__Fv);
-INCLUDE_ASM("nonmatchings/game/cmenuitemuse", InitMenuDl__FP10mgCTexturei);
+extern "C" void *Tex_MenuDl;
+extern "C" s32 MenuDl_TotalSize;
+extern "C" s32 MenuDl_ProcessSize;
+extern "C" void InitMenuDl__FP10mgCTexturei(void *arg0, s32 arg1) {
+    Tex_MenuDl = arg0;
+    MenuDl_TotalSize = arg1;
+    MenuDl_ProcessSize = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", StepMenuDl__Fi);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", StepMenuDl2__Fi);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", DrawMenuDl__FRiiiii);
@@ -133,6 +146,9 @@ INCLUDE_ASM("nonmatchings/game/cmenuitemuse", DrawMenuMainFrmImg__FRi9mgRect_i_9
 s32 GetMenuMainFrameEndFlag(void) {
     return MenuMainFrame_ActionEndFlag;
 }
-INCLUDE_ASM("nonmatchings/game/cmenuitemuse", GetMenuMainFrameLeftTopPos__Fi);
+extern "C" s32 MenuMainFrame_LeftTop_Pos[2];
+extern "C" void *GetMenuMainFrameLeftTopPos__Fi(s32 arg0) {
+    return MenuMainFrame_LeftTop_Pos;
+}
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", GetMenuMainFrameCount__Fv);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", MenuMainFrameModeSet__Fii);
