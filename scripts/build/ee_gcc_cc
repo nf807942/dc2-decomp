@@ -15,6 +15,7 @@ l'autre (`/tmp/ee-gcc-cache/<version>`), sans quoi chaque unité paierait 2 Mo d
 """
 
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -66,6 +67,53 @@ def newlib() -> list[str]:
     return [f"-I{cible / d}" for d in NEWLIB_DOSSIERS if (cible / d).exists()]
 
 
+def sections_en_text(objet: Path) -> None:
+    """Rend `.text` à chaque section `.text.<fonction>` que `-ffunction-sections` a posée.
+
+    `mwccgap` greffe fonction par fonction, donc il lui faut une section par fonction —
+    ce que `-ffunction-sections` donne. Mais le script de lien de l'image ne réclame que
+    `<unité>.o(.text)` : les sections s'appellent toutes `.text`, comme celles de MWCC.
+    """
+    bs = chr(92)
+    vue = subprocess.run(["mips-ps2-decompals-objdump", "-h", str(objet)],
+                         capture_output=True, text=True).stdout
+    noms = re.findall(r"^\s*\d+\s+(\.text\.\S+)".replace(chr(92) + chr(92), bs), vue, flags=re.M)
+    if not noms:
+        return
+    args = ["mips-ps2-decompals-objcopy"]
+    # Le `.text` vide que GCC pose toujours en tête compterait pour une fonction de plus :
+    # on le renomme, ce qui le met hors du script de lien comme de la lecture de mwccgap.
+    vide = re.search(r"^\s*\d+\s+\.text\s+0{8}", vue, flags=re.M)
+    if vide:
+        args += ["--rename-section", ".text=.gcc_text_vide"]
+    for n in noms:
+        args += ["--rename-section", f"{n}=.text"]
+    subprocess.run([*args, str(objet)], check=True)
+
+
+def stubs_gcc(texte: str) -> str:
+    """Les fonctions en `nop` que mwccgap pose à la place d'un `INCLUDE_ASM`, en syntaxe GCC.
+
+    mwccgap les écrit à la manière de MWCC : `asm void nom() { nop … }`. GCC n'a pas cette
+    forme ; le même emplacement s'écrit en assembleur de niveau fichier, avec `.ent` et
+    `.end` pour que l'assembleur donne au symbole le type et la taille d'une fonction,
+    que mwccgap retrouve ensuite pour y greffer le désassemblage.
+    """
+    bs = chr(92)                      # la barre oblique inverse, pour la chaîne C comme pour le motif
+    nl = bs + "n" + bs + "t"          # retour à la ligne puis tabulation, écrits comme une chaîne C les porte
+
+    def un(m: re.Match) -> str:
+        nom, corps = m.group(1), m.group(2)
+        nops = "".join(nl + "nop" for _ in re.findall(bs + "bnop" + bs + "b", corps))
+        lignes = [f".section .text.{nom}", ".align 3", f".globl {nom}", f".ent {nom}", nom + ":",
+                  ".set noreorder", ".set nomacro"]
+        corps_c = nl.join(lignes) + nops + nl + f".end {nom}" + nl + ".set macro" + nl + ".set reorder"
+        return '__asm__("' + corps_c + '");'
+
+    return re.sub("asm void (" + bs + "w+)" + bs + "(" + bs + ")" + bs + "s*" + bs + "{(.*?)" + bs + "}",
+                  un, texte, flags=re.S)
+
+
 def main(argv: list[str]) -> int:
     sortie = None
     source = None
@@ -90,14 +138,15 @@ def main(argv: list[str]) -> int:
         tmp = Path(tmp)
         shutil.copytree(ROOT / "include" / "gcc", tmp / "inc")
         copie = tmp / source.name
-        shutil.copy(source, copie)
+        copie.write_text(stubs_gcc(source.read_text(encoding="utf-8")), encoding="utf-8")
         objet = tmp / "sortie.o"
         commande = [str(racine / "bin" / "ee-gcc"), f"-B{bib}/", f"-B{racine}/ee/bin/",
-                    "-x", "c", *options, f"-I{tmp / 'inc'}", *newlib(), "-c", "-o", str(objet), str(copie)]
+                    "-x", "c", "-ffunction-sections", *options, f"-I{tmp / 'inc'}", *newlib(), "-c", "-o", str(objet), str(copie)]
         r = subprocess.run(commande, cwd=tmp, capture_output=True, text=True)
         sys.stderr.write(r.stdout + r.stderr)
         if r.returncode != 0 or not objet.exists():
             return r.returncode or 1
+        sections_en_text(objet)
         shutil.copy(objet, sortie)
     return 0
 

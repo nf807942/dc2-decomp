@@ -18,12 +18,6 @@ typedef short s16;
 typedef int s32;
 typedef long s64;
 
-typedef int __int32_t;
-typedef unsigned int __uint32_t;
-typedef unsigned int size_t;
-
-#define NULL ((void *) 0)
-
 #define INCLUDE_ASM(FOLDER, NAME)
 #define INCLUDE_RODATA(FOLDER, NAME)
 

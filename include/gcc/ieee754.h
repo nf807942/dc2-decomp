@@ -6,6 +6,9 @@
  * granted, provided that this notice is preserved »), telles que newlib les
  * reprend. L'Emotion Engine est petit-boutiste : le mot fort est le second. */
 
+/* `__int32_t` et `__uint32_t`, comme newlib les pose. */
+#include <sys/config.h>
+
 typedef union {
     double value;
     struct {

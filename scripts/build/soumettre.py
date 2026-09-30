@@ -254,7 +254,9 @@ def main() -> int:
     # dans l'essai ou dans l'unité : on le sait sans lancer le conteneur, et
     # l'essai n'est pas décompté.
     asm = fichiers_asm().get(a.symbole)
-    if asm is not None and not a.sans_controle:
+    # Les unités de la voie GCC incluent les vrais en-têtes de newlib : le compilateur
+    # dit ce qui manque, mieux que ce contrôle qui lit les déclarations MWCC de l'unité.
+    if asm is not None and not a.sans_controle and source.parent.name not in ("sdk", "runtime"):
         appeles, donnees = references(asm)
         employes = [n for n in appeles + donnees
                     if n != a.symbole and re.search(rf"\b{re.escape(n)}\b", corps)]
