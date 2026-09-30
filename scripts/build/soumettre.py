@@ -69,6 +69,17 @@ def journalise(symbole: str, score: float | None, gardee: bool) -> None:
                             "gardee": gardee, "heure": int(time.time())}) + "\n")
 
 
+def bash_hote() -> str:
+    """Sous Windows, choisir Git Bash avant le relais WSL nommé `bash`."""
+    if os.name == "nt":
+        git = shutil.which("git")
+        if git:
+            candidat = Path(git).parent.parent / "usr" / "bin" / "bash.exe"
+            if candidat.exists():
+                return str(candidat)
+    return shutil.which("bash") or "bash"
+
+
 def _extrait(sortie: str, limite: int = 12000) -> str:
     """Le diff en entier tant qu'il tient ; sinon son début, où sont les écarts."""
     return sortie if len(sortie) <= limite else (
@@ -210,17 +221,28 @@ def main() -> int:
     score = None
     try:
         # Dans le conteneur `make` existe déjà ; sur l'hôte on y entre par dc2.
-        commande = (["make"] if shutil.which("objdiff-cli")
-                    else ["bash", str(DC2), "make"])
+        dans_conteneur = not shutil.which("objdiff-cli")
+        commande = ([bash_hote(), str(DC2), "make"] if dans_conteneur
+                    else ["make"])
+        environnement = None
+        if os.name == "nt" and dans_conteneur:
+            # Git Bash lance le script depuis Python sans préparer son PATH.
+            # Ses utilitaires (dirname, env, sh) doivent précéder le relais WSL.
+            git_bin = Path(commande[0]).parent
+            environnement = os.environ.copy()
+            environnement["PATH"] = (str(git_bin) + os.pathsep +
+                                     str(git_bin.parent.parent / "mingw64" / "bin") +
+                                     os.pathsep + environnement.get("PATH", ""))
         r = subprocess.run([*commande, "diff", f"S={a.symbole}"],
                            capture_output=True, text=True, cwd=ROOT,
-                           encoding="utf-8", errors="replace")
+                           encoding="utf-8", errors="replace",
+                           env=environnement)
         sortie = r.stdout + r.stderr
         m = _SCORE.search(re.sub(r"\x1b\[[0-9;]*m", "", sortie))
         # Une mesure ne vaut que si la greffe a disparu : sans elle, l'unité
         # compilerait son propre assembleur et rendrait 100 % à tout coup.
         greffe_restante = re.search(
-            rf'INCLUDE_ASM\s*\([^)]*{re.escape(a.symbole)}\s*\)',
+            rf'INCLUDE_ASM\s*\(\s*"[^"]*"\s*,\s*{re.escape(a.symbole)}\s*\)',
             source.read_text(encoding="utf-8"))
         if m and not greffe_restante:
             score = float(m.group(1))

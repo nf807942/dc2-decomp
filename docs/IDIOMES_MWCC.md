@@ -1030,6 +1030,21 @@ reconstruction complète le fait.
   `volatile` met l'ancienne valeur dans `$v1` au lieu de `$v0` (98,33 %). Témoins :
   `PauseEnable__Fi`, `videoDecSetState__FP8VideoDecUi`.
 
+- **Un compteur `volatile` peut imposer une seconde lecture avant l'écriture** :
+  dans `voBufDecCount__FP5VoBuf`, qualifier le champ compteur `volatile` conserve
+  le second `lw` entre le test et le `sw`. La première soumission a donné 100 %.
+
+- **Une adresse globale prise avant une garde reste matérialisée avant le
+  branchement** : dans `MenuReloadTexture__FRii`, mettre `&mgTexManager` dans une
+  locale avant le test a fait passer l'essai de 66,07 % à 100 %. La prendre
+  seulement dans l'appel laissait le `lui` trop tard.
+
+- **Les constructeurs qui remettent tout l'objet à zéro peuvent se réduire à
+  `memset(this, 0, taille)` puis retourner `this`** : cette forme a donné 100 %
+  sur `__ct__14CVillagerPlaceFv`, `__ct__14MapJumpMapInfoFv`,
+  `__ct__14mgVertexWeightFv`, `__ct__16CMapLightingInfoFv` et
+  `__ct__9CGridDataFv`.
+
 - **`slt` contre `sltu` : le signe du type décide.** `slt v0, zero, v0` demande
   `(s32) x > 0` ; `u32 x > 0` donne `sltu` (80 %), sans toucher à la déclaration
   `u32` de l'unité. Témoin : `NowTakePhoto__Fv`.
@@ -1080,6 +1095,9 @@ reconstruction complète le fait.
   `Draw`, `GetMaterial`, `GetMaterialNum`, `GetpMaterial`). Signature : un `nop` dans le
   créneau là où l'on s'attendrait à une instruction utile ; `Set__9mgRect_i_Fiiii`
   (73 %, dernier `sw` glissé dans le créneau) est un candidat.
+  Les pragmas doivent encadrer la définition au niveau du fichier : placés dans
+  le corps de `AddFace__13mgCMDTBuilderFi`, ils laissaient 82,22 % ; autour de
+  la définition, ils ont donné 100 %.
 
 - **Un décalage 16 bits signé s'écrit comme un champ de structure** : au-delà de 0x7FFF,
   `struct { char pad[0xA490]; s32 f; }` rend `lui at,1 ; addu at,a0,at ; sw a1,-0x5B70(at)` ;
