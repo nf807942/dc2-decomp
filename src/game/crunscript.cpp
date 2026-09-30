@@ -9,7 +9,13 @@
 #include "common.h"
 
 INCLUDE_ASM("nonmatchings/game/crunscript", exe__10CRunScriptFP8vmcode_t);
-INCLUDE_ASM("nonmatchings/game/crunscript", rsGetStackInt__FP12RS_STACKDATA);
+extern "C" s32 fptosi(f32);
+extern "C" s32 rsGetStackInt__FP12RS_STACKDATA(void *arg0) {
+    if (*(s32 *) arg0 == 1) {
+        return fptosi(*(f32 *) ((u8 *) arg0 + 4));
+    }
+    return *(s32 *) ((u8 *) arg0 + 4);
+}
 struct inferred;
 typedef struct RS_STACKDATA {
     /* 0x0 */ s32 unk0;                             /* inferred */

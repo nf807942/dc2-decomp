@@ -179,7 +179,12 @@ s32 mgRENDER_INFO::GetPlightEnable(void) {
     return this->field_0xFA8;
 }
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetFogParam__13mgRENDER_INFOFffUcUcUcff);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", __as__9mgVu0FBOXFR9mgVu0FBOX);
+struct mgVu0FBOX_q { u128 a; u128 b; };
+extern "C" mgVu0FBOX_q *__as__9mgVu0FBOXFR9mgVu0FBOX(mgVu0FBOX_q *objet, mgVu0FBOX_q *src) {
+    objet->a = src->a;
+    objet->b = src->b;
+    return objet;
+}
 extern "C" u8 _166[18];
 extern "C" void printf(...);
 extern "C" void *MG_ADDRESS_CHECK__FPvPc(void *arg0, s8 *arg1) {
@@ -189,8 +194,8 @@ extern "C" void *MG_ADDRESS_CHECK__FPvPc(void *arg0, s8 *arg1) {
     }
     return arg0;
 }
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", __nw__FUiP1);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", __nwa__FUiP1);
+extern "C" void *__nw__FUiP1(unsigned int, void *p) { return p; }
+extern "C" void *__nwa__FUiP1(unsigned int, void *p) { return p; }
 typedef struct mgCMemory_infere {
     /* 0x00 */ s8 unk0;                             /* inferred */
     /* 0x01 */ char pad1[0xF];                      /* maybe part of unk0[0x10]? */
@@ -379,7 +384,7 @@ extern "C" void SetColor__9mgCSpriteFiiii(void *objet, s32 r, s32 g, s32 b, s32 
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", CreatePacket__9mgCSpriteFP14mgCDrawManager);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Draw__9mgCSpriteFPUiPA4_fP14mgCDrawManager);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Draw__9mgCSpriteFPA4_fP14mgCDrawManager);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Iam__13mgCVisualPrimFv);
+extern "C" s32 Iam__13mgCVisualPrimFv(void *) { return 7; }
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Draw__11mgC3DSpriteFPA4_fP14mgCDrawManager);
 void mgC3DSprite::Initialize(void) {
     this->field_0x20 = 0;
@@ -398,7 +403,13 @@ INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetGroupName__15mgCTextureAnimeFi
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", GetEmptyGroup__15mgCTextureAnimeFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SearchGroupName__15mgCTextureAnimeFPc);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", NewTexAnimeData__15mgCTextureAnimeFP9mgCMemory);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Initialize__24CList_15mgCTexAnimeData_Fv);
+struct CList_15mgCTexAnimeData_ { int a; int b; };
+#pragma schedule off
+extern "C" void Initialize__24CList_15mgCTexAnimeData_Fv(CList_15mgCTexAnimeData_ *p) {
+    p->b = 0;
+    p->a = 0;
+}
+#pragma schedule reset
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", NewTexAnimeGroupData__15mgCTextureAnimeFiP9mgCMemory);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", EnterTexAnime__15mgCTextureAnimeFP15mgCTexAnimeDataP9mgCMemory);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", DeleteGroup__15mgCTextureAnimeFi);
@@ -419,9 +430,25 @@ INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", texALPHA_TEST__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", texWAIT__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", texTEX_ANIME_DATA_END__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", texTEX_ANIME_END__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", texBUG_PATCH__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Set__9mgRect_i_Fiiii);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", GetScrPad__Fv);
+struct SPI_STACK;
+extern "C" s32 texBugPatch;
+#pragma schedule off
+extern "C" s32 texBUG_PATCH__FP9SPI_STACKi(SPI_STACK *a, s32 b) {
+    return texBugPatch = 1;
+}
+#pragma schedule reset
+#pragma schedule off
+extern "C" void Set__9mgRect_i_Fiiii(s32 *objet, s32 a, s32 b, s32 c, s32 d) {
+    objet[0] = a;
+    objet[1] = b;
+    objet[2] = c;
+    objet[3] = d;
+}
+#pragma schedule reset
+extern "C" s32 buff_id;
+extern "C" s32 GetScrPad__Fv(void) {
+    return buff_id ? 0x70002000 : 0x70000000;
+}
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SendDMA__FPvi);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", mgSetPkTEX0__FPUiUlUl);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", mgSetPkTEX0__FPUiUlUlUl);
@@ -551,5 +578,12 @@ extern "C" mgCVisualMDT_infere *__as__12mgCVisualMDTFRC12mgCVisualMDT(mgCVisualM
 }
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", SetDrawEnv__FP10mgCDrawEnvP13mgCVisualAttrP10mgCDrawEnv);
 INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", CreateRenderInfoPacket__13mgCVisualPrimFPUiPA4_fP13mgRENDER_INFO);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Initialize__13mgCVisualPrimFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcvisualmdt", Iam__15mgCVisualFixMDTFv);
+extern "C" void Initialize__13mgCVisualPrimFv(s32 *objet) {
+    objet[0] = 0;
+    objet[1] = 0;
+    objet[2] = 0;
+    objet[5] = 0;
+    objet[4] = 0;
+    Initialize__13mgCVisualAttrFv(objet + 8);
+}
+extern "C" s32 Iam__15mgCVisualFixMDTFv(void *) { return 2; }

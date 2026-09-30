@@ -552,7 +552,9 @@ extern "C" void Initialize__13CScreenEffectFv(CScreenEffect_infere *objet) {
     objet->unk44 = 0;
     objet->unk48 = 0;
 }
-INCLUDE_ASM("nonmatchings/game/ceohmother", Step__13CScreenEffectFv);
+extern "C" void StepRaster__7CRasterFv(void *);
+extern "C" void Step__13CScreenEffectFv(void *o) { StepRaster__7CRasterFv(o); }
+
 INCLUDE_ASM("nonmatchings/game/ceohmother", Draw__13CScreenEffectFv);
 struct CScreenEffect {
     char pad_0[0x30];
@@ -569,8 +571,10 @@ extern "C" void InitRaster__13CScreenEffectFfff(CScreenEffect *objet, f32 arg0, 
     Initialize__7CRasterFv((CRaster *) objet);
     SetParam__7CRasterFfff((CRaster *) objet, arg0, arg1, arg2);
 }
-INCLUDE_ASM("nonmatchings/game/ceohmother", StartRaster__13CScreenEffectFfffi);
-INCLUDE_ASM("nonmatchings/game/ceohmother", StopRaster__13CScreenEffectFfffi);
+extern "C" void StartRaster__13CScreenEffectFfffi(CRaster_infere *o, f32 a, f32 b, f32 c, s32 i) { StartRaster__7CRasterFfffi(o, a, b, c, i); }
+
+extern "C" void StopRaster__13CScreenEffectFfffi(CRaster_infere *o, f32 a, f32 b, f32 c, s32 i) { StopRaster__7CRasterFfffi(o, a, b, c, i); }
+
 extern "C" void SetSepiaTexture__13CScreenEffectFP10mgCTextureP1(void *objet, void *arg0, s32 arg1) {
     if (arg0 != NULL) {
         *(void **) ((u8 *) objet + 0x2C) = arg0;
@@ -770,7 +774,21 @@ void InitDramaScene(void) {
 void CancelDramaScene(void) {
     EdEventInfo.field_0xD4 = 0;
 }
-INCLUDE_ASM("nonmatchings/game/ceohmother", EdEventMenuExit__Fv);
+struct p_use_item_s { s32 pad0; s32 f4; };
+extern "C" p_use_item_s *p_use_item;
+typedef struct MenuArg_champs {
+    char pad0[64];
+    s32 unk40;
+    char pad44[104];
+} MenuArg_champs;
+extern "C" MenuArg_champs MenuArg;
+extern "C" void EdEventMenuExit__Fv(void) {
+    if (p_use_item != 0) {
+        p_use_item->f4 = MenuArg.unk40;
+    }
+    p_use_item = 0;
+}
+
 INCLUDE_ASM("nonmatchings/game/ceohmother", EdEventLoopInit__Fv);
 void EdSetBrokenObject(void) {
 }
@@ -902,7 +920,9 @@ extern "C" s32 _INITIALIZE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/ceohmother", _LOAD_CHARA_sub__FiPPciPUii);
-INCLUDE_ASM("nonmatchings/game/ceohmother", _LOAD_CHARA_sub__FiPPciPUi);
+extern "C" void _LOAD_CHARA_sub__FiPPciPUii(int, char **, int, unsigned int *, int);
+extern "C" void _LOAD_CHARA_sub__FiPPciPUi(int a, char **b, int c, unsigned int *d) { _LOAD_CHARA_sub__FiPPciPUii(a, b, c, d, 0); }
+
 INCLUDE_ASM("nonmatchings/game/ceohmother", _LOAD_CHARA__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/ceohmother", _CHARA_ACTIVE__FP12RS_STACKDATAi);
 struct CScene;

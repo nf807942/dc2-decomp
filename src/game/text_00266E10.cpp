@@ -57,8 +57,41 @@ s32 _SET_MARKER(RS_STACKDATA *stack, int argc) {
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _SET_WORLD_COORD__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _FINISH__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_00266E10", _GET_DUN_WORLD_COORD__FP12RS_STACKDATAi);
+extern "C" void EdEventFinish__Fv(void);
+extern "C" void _FINISH__FP12RS_STACKDATAi(void *, int) { EdEventFinish__Fv(); }
+
+extern "C" s32 SetStack__FP12RS_STACKDATAf_00262E90(RS_STACKDATA *, f32);
+extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(...);
+extern "C" s32 GetDungeonEventPoint__FPfPfi(f32 *, f32 *, s32);
+extern "C" s32 _GET_DUN_WORLD_COORD__FP12RS_STACKDATAi(RS_STACKDATA *p, s32 arg1) {
+    f32 a[4];
+    f32 b[6];
+    f32 c;
+    f32 d;
+
+    if (arg1 == 4) {
+        if (GetDungeonEventPoint__FPfPfi(a, &c, 0) == 0) {
+            return 0;
+        }
+        SetStack__FP12RS_STACKDATAf_00262E90(p++, a[0]);
+        SetStack__FP12RS_STACKDATAf_00262E90(p++, a[1]);
+        SetStack__FP12RS_STACKDATAf_00262E90(p++, a[2]);
+        SetStack__FP12RS_STACKDATAf_00262E90(p, c);
+        return 1;
+    }
+    if (arg1 == 5) {
+        if (GetDungeonEventPoint__FPfPfi(b, &d, GetStackInt__FP12RS_STACKDATA_00262DA0(p + 4)) == 0) {
+            return 0;
+        }
+        SetStack__FP12RS_STACKDATAf_00262E90(p++, b[0]);
+        SetStack__FP12RS_STACKDATAf_00262E90(p++, b[1]);
+        SetStack__FP12RS_STACKDATAf_00262E90(p++, b[2]);
+        SetStack__FP12RS_STACKDATAf_00262E90(p, d);
+        return 1;
+    }
+    return 0;
+}
+
 INCLUDE_ASM("nonmatchings/game/text_00266E10", _LOAD_IMG__FP12RS_STACKDATAi);
 extern "C" u8 mgTexManager[540];
 struct EventScene_pointe;

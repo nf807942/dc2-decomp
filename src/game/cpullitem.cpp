@@ -20,7 +20,66 @@ INCLUDE_ASM("nonmatchings/game/cpullitem", Clear__18CRocketLauncherManFv);
 INCLUDE_ASM("nonmatchings/game/cpullitem", Initialize__18CRocketLauncherManFP8mgCFrameiP10mgCTexture);
 INCLUDE_ASM("nonmatchings/game/cpullitem", Set__11CMachineGunFPfPf);
 INCLUDE_ASM("nonmatchings/game/cpullitem", Step__11CMachineGunFv);
-INCLUDE_ASM("nonmatchings/game/cpullitem", SetPos__9CLaserGunFPfPfPf);
+extern "C" s32 sceVu0CopyVector(...);
+struct CLaserGunSP {
+    char pad0[0x10];
+    f32 v10[4];
+    f32 v20[4];
+    f32 v30[4];
+    f32 v40[4];
+    f32 trail[8][4];
+    s32 fD0;
+    char padD4[4];
+    s32 fD8;
+    s32 fDC;
+    s32 fE0;
+    s32 fE4;
+    char padE8[4];
+    s32 fEC;
+    s32 fF0;
+    s32 fF4;
+    s32 fF8;
+    s32 fFC;
+    s32 f100;
+    s32 f104;
+    s16 f108;
+    char pad10A[6];
+    s32 f110;
+    s32 f114;
+    s32 f118;
+    s32 f11C;
+    s32 f120;
+};
+extern "C" void Initialize__9CLaserGunFv(void *);
+extern "C" void SetPos__9CLaserGunFPfPfPf(CLaserGunSP *self, f32 *a, f32 *b, f32 *c) {
+    s32 i;
+    Initialize__9CLaserGunFv(self);
+    sceVu0CopyVector(self->v20, a);
+    sceVu0CopyVector(self->v10, a);
+    sceVu0CopyVector(self->v30, b);
+    sceVu0CopyVector(self->v40, c);
+    self->fDC = 0x41A00000;
+    self->fE0 = 0;
+    self->fE4 = 0x41A00000;
+    self->f120 = 1;
+    self->fD8 = 0;
+    for (i = 0; i < 8; i++) {
+        sceVu0CopyVector(self->trail[i], self->v10);
+    }
+    self->fD0 = 0;
+    self->fF0 = 15;
+    self->fF4 = 60;
+    self->fF8 = 120;
+    self->f110 = 0;
+    self->f114 = 0x43000000;
+    self->f118 = 0x43000000;
+    self->f11C = 0x43000000;
+    self->fFC = 0x3F800000;
+    self->f100 = 0;
+    self->f104 = 0x3F800000;
+    self->fEC = 3;
+    self->f108 = 0;
+}
 struct inferred;
 typedef struct CLaserGun_infere {
     /* 0x000 */ char pad0[0xDC];
@@ -358,7 +417,9 @@ extern "C" void Initialize__11CColPrimManFP6CScene(CColPrimMan *objet, CScene *a
         var_s1 += 0x110;
     } while (var_s0 < 0x40);
 }
-INCLUDE_ASM("nonmatchings/game/cpullitem", dngGetDebugInfo__Fv);
+struct dbinfo_champs;
+extern "C" dbinfo_champs dbinfo;
+extern "C" void *dngGetDebugInfo__Fv(void) { return &dbinfo; }
 extern "C" u8 dbFont[184];
 typedef struct dbinfo_champs {
     s16 unk0;

@@ -47,8 +47,77 @@ extern "C" void ShadowStep__12CActionCharaFv(CActionChara *objet) {
 INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", Initialize__12CActionCharaFP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", Copy__12CActionCharaFR12CActionCharaP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", __as__11CCharacter2FRC11CCharacter2);
-INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", SetPosition__11CCharacter2FPf);
-INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", AddOutLine__11CCharacter2FPcP12COutLineDraw);
+extern "C" void SetPosition__9mgCObjectFPf(void *, float *);
+extern "C" void SetPosition__11CCharacter2FPf(void *o, float *p) { SetPosition__9mgCObjectFPf(o, p); }
+
+struct mgCFrameAO {
+    char pad0[0x54];
+    s32 f54;
+    char pad58[0x9C];
+    struct FrameFlag *fF4;
+};
+struct FrameFlag {
+    char pad0[0x18];
+    s32 flags;
+};
+struct COutLineDrawAO {
+    COutLineDrawAO *next;
+    char pad4[0x30];
+    mgCFrameAO *frame;
+};
+struct CCharacter2AO {
+    char pad0[0x70];
+    mgCFrameAO *root;
+    char pad74[0xB0];
+    COutLineDrawAO *outline;
+};
+extern "C" mgCFrameAO *SearchFrame__8mgCFrameFPc(mgCFrameAO *, s8 *);
+extern "C" void SetFrame__12COutLineDrawFP8mgCFrame(COutLineDrawAO *, mgCFrameAO *);
+extern "C" void AddOutLine__11CCharacter2FPcP12COutLineDraw(CCharacter2AO *self, s8 *name, COutLineDrawAO *line) {
+    mgCFrameAO *frame;
+    COutLineDrawAO *p;
+    COutLineDrawAO *last;
+    COutLineDrawAO *q;
+    if (name != NULL) {
+        frame = self->root;
+        if (*name != 0) {
+            frame = SearchFrame__8mgCFrameFPc(frame, name);
+            if (frame == NULL) {
+                for (p = self->outline; p != NULL; p = p->next) {
+                    frame = SearchFrame__8mgCFrameFPc(p->frame, name);
+                    if (frame != NULL) {
+                        break;
+                    }
+                }
+            }
+        }
+        if (frame != NULL) {
+            if (frame->f54 != 0) {
+                FrameFlag *fl = frame->fF4;
+                if (fl != NULL) {
+                    fl->flags |= 4;
+                }
+            }
+            SetFrame__12COutLineDrawFP8mgCFrame(line, frame);
+            last = self->outline;
+            if (last == NULL) {
+                self->outline = line;
+                return;
+            }
+            if (last != NULL) {
+                do {
+                    q = last->next;
+                    if (q == NULL) {
+                        break;
+                    }
+                    last = q;
+                } while (q != NULL);
+            }
+            last->next = line;
+        }
+    }
+}
+
 INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", CopyOutLine__11CCharacter2FP11CCharacter2);
 INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", Draw__11CCharacter2Fv);
 INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", SetDeformMesh__11CCharacter2Fv);
@@ -112,7 +181,9 @@ extern "C" void SetMotion__11CCharacter2Fii(CCharacter2 *objet, s32 arg0, s32 ar
         objet->unk3B8 = 0;
     }
 }
-INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", SetMotion__11CCharacter2FPci);
+extern "C" void SetMotionPara__11CCharacter2FPcii(void *, char *, int, int);
+extern "C" void SetMotion__11CCharacter2FPci(void *o, char *n, int i) { SetMotionPara__11CCharacter2FPcii(o, n, i, -1); }
+
 INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", SetNowFrameWeight__11CCharacter2Ff);
 INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", SetMotionPara__11CCharacter2FPcii);
 INCLUDE_ASM("nonmatchings/game/cactionchara_0016FE00", SetDAnimeEnable__11CCharacter2Fi);

@@ -384,7 +384,44 @@ INCLUDE_ASM("nonmatchings/game/ceditmap_002F0E80", CheckNormalPlaceParts__8CEdit
 INCLUDE_ASM("nonmatchings/game/ceditmap_002F0E80", CheckNormalPlaceParts__8CEditMapFP10CEditParts);
 INCLUDE_ASM("nonmatchings/game/ceditmap_002F0E80", CheckLiveNPC__8CEditMapFii);
 INCLUDE_ASM("nonmatchings/game/ceditmap_002F0E80", GetePlacePartsAtInfoID__8CEditMapFiPii);
-INCLUDE_ASM("nonmatchings/game/ceditmap_002F0E80", GetTerritoryParts__8CEditMapFiPii);
+struct CEditParts { char pad[0x330]; };
+struct CEditMapGT {
+    char pad0[0xD40];
+    s32 count;
+    CEditParts *parts;
+};
+extern "C" void *GetePlaceParts__8CEditMapFi(void *, s32);
+extern "C" s32 CheckNormalPlaceParts__8CEditMapFi(void *, s32);
+extern "C" s32 CheckNormalPlaceParts__8CEditMapFP10CEditParts(void *, CEditParts *);
+extern "C" s32 CheckTerritory__10CEditPartsFP10CEditParts(void *, CEditParts *);
+extern "C" s32 GetTerritoryParts__8CEditMapFiPii(CEditMapGT *self, s32 id, s32 *out, s32 max) {
+    void *place;
+    s32 n;
+    CEditParts *p;
+    s32 i;
+    if (out == NULL || max <= 0) {
+        return 0;
+    }
+    place = GetePlaceParts__8CEditMapFi(self, id);
+    if (place == NULL) {
+        return 0;
+    }
+    if (CheckNormalPlaceParts__8CEditMapFi(self, id) == 0) {
+        return 0;
+    }
+    p = self->parts;
+    n = 0;
+    for (i = 0; i < self->count; i++, p++) {
+        if (CheckNormalPlaceParts__8CEditMapFP10CEditParts(self, p) != 0 && CheckTerritory__10CEditPartsFP10CEditParts(place, p) != 0) {
+            n++;
+            *out++ = i;
+            if (n >= max) {
+                break;
+            }
+        }
+    }
+    return n;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap_002F0E80", GetChildParts__8CEditMapFiPii);
 /* La carte que l'éditeur remanie. Seule `RePaintNum` est écrite ici, et elle ne
  * touche aucun champ : la disposition reste à établir. */

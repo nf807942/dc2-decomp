@@ -26,7 +26,9 @@ extern "C" s32 CheckFill__11COMMON_GAGEFv(COMMON_GAGE_infere2 *objet) {
     return var_v0;
 }
 INCLUDE_ASM("nonmatchings/game/gamedataused", GetRate__11COMMON_GAGEFv);
-INCLUDE_ASM("nonmatchings/game/gamedataused", SetFillRate__11COMMON_GAGEFf);
+extern "C" void SetFillRate__11COMMON_GAGEFf(f32 *objet, f32 arg0) {
+    objet[1] = objet[0] * arg0;
+}
 struct inferred;
 typedef struct COMMON_GAGE_infere {
     /* 0x0 */ f32 unk0;                             /* inferred */
@@ -71,7 +73,9 @@ void SetFishingGamePreEquip(CGameDataUsed *data) {
     FishGamePreEquip = data;
 }
 INCLUDE_ASM("nonmatchings/game/gamedataused", ReEquipFishingGameWeapon__Fv);
-INCLUDE_ASM("nonmatchings/game/gamedataused", CheckFishingWeapon__FP13CGameDataUsed);
+extern "C" s32 CheckFishingWeapon__FP13CGameDataUsed(CGameDataUsed *w) {
+    return FishGamePreEquip == w;
+}
 INCLUDE_ASM("nonmatchings/game/gamedataused", GameDataSwap__FP13CGameDataUsedP13CGameDataUsedi);
 struct ROBO_DATA;
 extern "C" s32 GetUserDataMan__Fv(void);
@@ -100,16 +104,26 @@ extern "C" CGameDataUsed *__ct__13CGameDataUsedFv(CGameDataUsed *objet) {
     Init__13CGameDataUsedFv(objet);
     return objet;
 }
-INCLUDE_ASM("nonmatchings/game/gamedataused", Init__13CGameDataUsedFv);
+extern "C" s32 memset(...);
+extern "C" s32 Init__13CGameDataUsedFv(void *self) {
+    return memset(self, 0, 0x6C);
+}
 INCLUDE_ASM("nonmatchings/game/gamedataused", CheckTypeEnableStack__13CGameDataUsedFv);
-INCLUDE_ASM("nonmatchings/game/gamedataused", GetDataPath__13CGameDataUsedFv);
+extern "C" void *GetItemFilePath__Fii(s32, s32);
+extern "C" void *GetDataPath__13CGameDataUsedFv(s16 *self) {
+    return GetItemFilePath__Fii(self[1], 0);
+}
 INCLUDE_ASM("nonmatchings/game/gamedataused", IsWhoEquip__13CGameDataUsedFv);
 INCLUDE_ASM("nonmatchings/game/gamedataused", GetLevel__13CGameDataUsedFv);
 INCLUDE_ASM("nonmatchings/game/gamedataused", GetPalletColor__13CGameDataUsedFv);
 INCLUDE_ASM("nonmatchings/game/gamedataused", GetSpectolNo__13CGameDataUsedFv);
 INCLUDE_ASM("nonmatchings/game/gamedataused", CheckStackRemain__13CGameDataUsedFv);
 INCLUDE_ASM("nonmatchings/game/gamedataused", GetNum__13CGameDataUsedFv);
-INCLUDE_ASM("nonmatchings/game/gamedataused", GetActiveSetNum__13CGameDataUsedFv);
+struct CGameDataUsed_infere_3a34f9;
+extern "C" u8 IsActiveSet__13CGameDataUsedFv(CGameDataUsed_infere_3a34f9 *objet);
+extern "C" u8 GetActiveSetNum__13CGameDataUsedFv(CGameDataUsed_infere_3a34f9 *objet) {
+    return IsActiveSet__13CGameDataUsedFv(objet);
+}
 INCLUDE_ASM("nonmatchings/game/gamedataused", AddNum__13CGameDataUsedFii);
 INCLUDE_ASM("nonmatchings/game/gamedataused", GetUseCapacity__13CGameDataUsedFv);
 INCLUDE_ASM("nonmatchings/game/gamedataused", AddFishHp__13CGameDataUsedFi);

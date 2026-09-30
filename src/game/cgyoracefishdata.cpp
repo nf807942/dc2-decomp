@@ -178,7 +178,13 @@ INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", LoadFishPrize__FiP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", RefreshFishPrize__Fv);
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", GetFishPrize__FiiP15FISH_PRIZE_INFO);
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", TuriTourCount__Fv);
-INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", GyoraceCFGAnalyze__FPc);
+extern "C" void MenuCommandAnalyze__FPciPc(...);
+extern "C" char *GyoraceExeCfgBuffer;
+extern "C" s32 GyoraceExeCfgBufferSize;
+extern "C" void GyoraceCFGAnalyze__FPc(char *p) {
+    MenuCommandAnalyze__FPciPc(GyoraceExeCfgBuffer, GyoraceExeCfgBufferSize, p);
+}
+
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", SearchOmakeGyoracer__Fi);
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", CheckSameRacerFish__Fi);
 INCLUDE_ASM("nonmatchings/game/cgyoracefishdata", GetOmakeGyoracer2__Fi);

@@ -304,8 +304,16 @@ extern "C" void DeleteTrBox__4CMapFiP12CMapFlagData(CMap_a89ba9 *objet, s32 arg0
 INCLUDE_ASM("nonmatchings/game/cmapparts", UpdateTrBoxFlag__4CMapFP12CMapFlagData);
 INCLUDE_ASM("nonmatchings/game/cmapparts", LoadData__4CMapFPUiPUiPiP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cmapparts", CheckFuncEvent__FP10CFuncPointPfiP12MapEventInfoPf);
-INCLUDE_ASM("nonmatchings/game/cmapparts", Draw__4CMapFv);
-INCLUDE_ASM("nonmatchings/game/cmapparts", DrawDirect__4CMapFv);
+struct CMapBaseD00 { char pad[0xD00]; };
+struct CMapVirtD00 : CMapBaseD00 {
+    virtual void Fn(s32 flag);
+};
+extern "C" void Draw__4CMapFv(CMapVirtD00 *objet) {
+    objet->Fn(0);
+}
+extern "C" void DrawDirect__4CMapFv(CMapVirtD00 *objet) {
+    objet->Fn(1);
+}
 s32 CObject::Draw(void) {
     return 0;
 }
@@ -385,11 +393,19 @@ INCLUDE_ASM("nonmatchings/game/cmapparts", GetLightingSunRatio__4CMapFPf);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetTimeLightingRatio__4CMapFPf);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetSunPoint__4CMapFPf);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetLightNoTime__4CMapFi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", GetTimeEnable__4CMapFv);
+extern "C" s32 GetTimeEnable__4CMapFv(void *arg0) {
+    return *(s32 *) ((u8 *) arg0 + 0xC0);
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetLightInfo__4CMapFP16CMapLightingInfo);
 INCLUDE_ASM("nonmatchings/game/cmapparts", __as__16CMapLightingInfoFRC16CMapLightingInfo);
-INCLUDE_ASM("nonmatchings/game/cmapparts", GetLightingInfo__4CMapFi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", GetActiveLightNo__4CMapFv);
+extern "C" s32 GetLightingInfo__8CMapInfoFi(...);
+extern "C" s32 GetLightingInfo__4CMapFi(void *objet, s32 arg0) {
+    return GetLightingInfo__8CMapInfoFi(objet, arg0);
+}
+extern "C" s32 GetActiveLightNo__8CMapInfoFv(...);
+extern "C" s32 GetActiveLightNo__4CMapFv(void *objet) {
+    return GetActiveLightNo__8CMapInfoFv(objet);
+}
 s32 CMapInfo::GetActiveLightNo(void) {
     return this->field_0x98;
 }
@@ -412,7 +428,12 @@ void CList_9CMapParts_::Initialize(void) {
 }
 INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__7CObjectFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", __ct__9mgCObjectFv);
-INCLUDE_ASM("nonmatchings/game/cmapparts", algn16_size__FUi);
+extern "C" s32 algn16_size__FUi(u32 n) {
+    if ((n & 0xF) != 0) {
+        return (n >> 4) + 1;
+    }
+    return n >> 4;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFAR_CLIP__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapLIGHT_FLAG__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapMOVE_FLAG__FP9SPI_STACKi);
@@ -455,7 +476,11 @@ INCLUDE_ASM("nonmatchings/game/cmapparts", mapLOD_PIECE__FP9SPI_STACKi);
 s32 CMapParts::GetLODBlend(void) {
     return this->field_0x1D4;
 }
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapLOD_END__FP9SPI_STACKi);
+extern "C" s32 mapLOD_ID;
+extern "C" s32 mapLOD_END__FP9SPI_STACKi(void *arg0, s32 arg1) {
+    mapLOD_ID += 1;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE__FP9SPI_STACKi);
 void CMapPiece::SetName(char * arg0) {
     this->field_0x80 = arg0;
@@ -564,7 +589,10 @@ extern "C" PieceMaterial *__ct__13PieceMaterialFv(PieceMaterial *objet) {
     Initialize__13PieceMaterialFv(objet);
     return objet;
 }
-INCLUDE_ASM("nonmatchings/game/cmapparts", Initialize__13PieceMaterialFv);
+extern "C" void *memset(void *, int, unsigned);
+extern "C" s32 Initialize__13PieceMaterialFv(PieceMaterial *objet) {
+    memset(objet, 0, 0x20);
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPIECE_MATERIAL__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetMaterial__8mgCFrameFi);
 s32 CObjectFrame::GetFrame(void) {
@@ -734,12 +762,34 @@ INCLUDE_ASM("nonmatchings/game/cmapparts", mapFUNC_INVENT_DATA__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFUNC_EVENT_DATA__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFUNC_SOUND_DATA__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFUNC_EFFECT_NAME__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", SetBound__8mgCFrameFPQ28mgCFrame9BoundInfo);
+extern "C" void SetBound__8mgCFrameFPQ28mgCFrame9BoundInfo(void *self, void *a) {
+    *(void **) ((u8 *) self + 0xF0) = a;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapFUNC_POS__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", SetScale__10CFuncPointFPf);
-INCLUDE_ASM("nonmatchings/game/cmapparts", SetRotation__10CFuncPointFPf);
-INCLUDE_ASM("nonmatchings/game/cmapparts", SetPosition__10CFuncPointFPf);
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapFUNC_DATA_END__FP9SPI_STACKi);
+struct CFP_subS { virtual void v0(float *); virtual void v1(float *); virtual void v2(float *); virtual void v3(float *); virtual void v4(float *); virtual void v5(float *); virtual void v6(float *); virtual void v7(float *); virtual void v8(float *); virtual void v9(float *); };
+struct CFP_oS { char pad[0x70]; CFP_subS sub; char pad2[0x190-0x74-0xc]; u128 v190; u128 v1A0; };
+extern "C" void SetScale__10CFuncPointFPf(CFP_oS *o, float *p) {
+    o->v1A0 = *(u128 *)p;
+    o->sub.v8(p);
+}
+struct CFP_subR { virtual void v0(float *); virtual void v1(float *); virtual void v2(float *); virtual void v3(float *); virtual void v4(float *); virtual void v5(float *); virtual void v6(float *); virtual void v7(float *); virtual void v8(float *); virtual void v9(float *); };
+struct CFP_oR { char pad[0x70]; CFP_subR sub; char pad2[0x190-0x74-0xc]; u128 v190; u128 v1A0; };
+extern "C" void SetRotation__10CFuncPointFPf(CFP_oR *o, float *p) {
+    o->v190 = *(u128 *)p;
+    o->sub.v5(p);
+}
+struct CFP_sub { virtual void v0(float *); virtual void v1(float *); virtual void v2(float *); virtual void v3(float *); virtual void v4(float *); virtual void v5(float *); virtual void v6(float *); virtual void v7(float *); virtual void v8(float *); virtual void v9(float *); };
+struct CFP_o { char pad[0x70]; CFP_sub sub; char pad2[0x180-0x74-0xc]; u128 v180; u128 v190; u128 v1A0; };
+extern "C" void SetPosition__10CFuncPointFPf(CFP_o *o, float *p) {
+    o->v180 = *(u128 *)p;
+    o->sub.v2(p);
+}
+struct SPI_STACK;
+extern "C" s32 mapFUNC_DATA_END__FP9SPI_STACKi(SPI_STACK *, s32) {
+    mapNowFuncPoint = 0;
+    mapFuncPointIdx++;
+    return 1;
+}
 extern "C" u32 mapNowMapParts;
 extern "C" u32 mapPtsFunc;
 #include "gen/CFuncPointMngr.hpp"
@@ -761,7 +811,9 @@ block_5:
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/cmapparts", LoadMapFile__4CMapFPciP9mgCMemoryi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", SetPieceLoadSkip__4CMapFi);
+extern "C" void SetPieceLoadSkip__4CMapFi(void *self, s32 a) {
+    *(s32 *) ((u8 *) self + 0xCA8) = a;
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", cfgDRAW_OFF_RECT__FP9SPI_STACKi);
 extern "C" s32 CreateOcclusion__4CMapFPA4_f(...);
 extern "C" s32 cfgOCCLUSION_PLANE__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
@@ -844,8 +896,14 @@ INCLUDE_ASM("nonmatchings/game/cmapparts", GetDrawInfo__11CCameraInfoFi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", Initialize__8CMapInfoFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetImgName__8CMapInfoFi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetPCPName__8CMapInfoFi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", GetMapFile__8CMapInfoFPi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", GetAddMapFile__8CMapInfoFPi);
+extern "C" s32 GetMapFile__8CMapInfoFPi(u8 *self, s32 *out) {
+    *out = *(s32 *) (self + 0x8C);
+    return *(s32 *) (self + 0x88);
+}
+extern "C" s32 GetAddMapFile__8CMapInfoFPi(u8 *self, s32 *out) {
+    *out = *(s32 *) (self + 0x94);
+    return *(s32 *) (self + 0x90);
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetLightingInfo__8CMapInfoFi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapIMG__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", mapPCP__FP9SPI_STACKi);
@@ -863,7 +921,12 @@ s32 mapLIGHT_SET_END(SPI_STACK * arg0, s32 arg1) {
     LightingInfo = 0;
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/cmapparts", mapFLOOR__FP9SPI_STACKi);
+extern "C" u32 MapInfo;
+extern "C" f32 spiGetStackFloat__FP9SPI_STACK(SPI_STACK *);
+extern "C" s32 mapFLOOR__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    *(f32 *) (MapInfo + 0xA8) = spiGetStackFloat__FP9SPI_STACK(arg0);
+    return 1;
+}
 extern "C" u32 MapInfo;
 extern "C" s32 mapCHARA_POS__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     spiGetStackVector__FPfP9SPI_STACK(MapInfo + 0xB0, arg0);
@@ -956,8 +1019,13 @@ INCLUDE_ASM("nonmatchings/game/cmapparts", AddPiece__9CMapPartsFP17CList_9CMapPi
 INCLUDE_ASM("nonmatchings/game/cmapparts", SearchPiece__9CMapPartsFPc);
 INCLUDE_ASM("nonmatchings/game/cmapparts", SearchPieceColType__9CMapPartsFi);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetPoly__9CMapPartsFiP6CCPolyR9mgVu0FBOXi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", GetColPoly__9CMapPartsFP6CCPolyR9mgVu0FBOXi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", GetCameraPoly__9CMapPartsFP6CCPolyR9mgVu0FBOXi);
+extern "C" s32 GetPoly__9CMapPartsFiP6CCPolyR9mgVu0FBOXi(void *, s32, void *, void *, s32);
+extern "C" s32 GetColPoly__9CMapPartsFP6CCPolyR9mgVu0FBOXi(void *self, void *poly, void *box, s32 n) {
+    return GetPoly__9CMapPartsFiP6CCPolyR9mgVu0FBOXi(self, 1, poly, box, n);
+}
+extern "C" s32 GetCameraPoly__9CMapPartsFP6CCPolyR9mgVu0FBOXi(void *self, void *poly, void *box, s32 n) {
+    return GetPoly__9CMapPartsFiP6CCPolyR9mgVu0FBOXi(self, 3, poly, box, n);
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", UpDatePosition__9CMapPartsFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", SetColor__9CMapPartsFiPf);
 INCLUDE_ASM("nonmatchings/game/cmapparts", GetColor__9CMapPartsFiPf);
@@ -965,8 +1033,14 @@ INCLUDE_ASM("nonmatchings/game/cmapparts", GetDefColor__9CMapPartsFiPf);
 INCLUDE_ASM("nonmatchings/game/cmapparts", UpdateColor__9CMapPartsFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", PreDraw__9CMapPartsFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", DrawSub__9CMapPartsFi);
-INCLUDE_ASM("nonmatchings/game/cmapparts", DrawDirect__9CMapPieceFv);
-INCLUDE_ASM("nonmatchings/game/cmapparts", Draw__9CMapPieceFv);
+extern "C" void DrawSub__9CMapPieceFi(...);
+extern "C" void DrawDirect__9CMapPieceFv(void *objet) {
+    DrawSub__9CMapPieceFi(objet, 1);
+}
+extern "C" void DrawSub__9CMapPieceFi(...);
+extern "C" void Draw__9CMapPieceFv(void *objet) {
+    DrawSub__9CMapPieceFi(objet, 0);
+}
 INCLUDE_ASM("nonmatchings/game/cmapparts", DrawStep__9CMapPartsFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", CreateBoundBox__9CMapPartsFv);
 INCLUDE_ASM("nonmatchings/game/cmapparts", CheckColBox__9CMapPartsFP9mgVu0FBOX);

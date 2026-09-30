@@ -287,7 +287,10 @@ extern "C" s32 InitDataLoading__Fv(void) {
     DrawHit = 0;
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/cdngfloormanager", switch_thread__Fv);
+extern "C" s32 switch_thread__Fv(void);
+extern "C" s32 RotateThreadReadyQueue(...);
+extern "C" s32 switch_thread__Fv(void) { return RotateThreadReadyQueue(10); }
+
 INCLUDE_ASM("nonmatchings/game/cdngfloormanager", CreateLoadThread__FP9mgCMemory);
 extern "C" u32 ThreadRunning;
 extern "C" u32 step_end_flag;

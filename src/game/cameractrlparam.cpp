@@ -19,11 +19,22 @@ extern s32 EditModeChgFlag;
 INCLUDE_ASM("nonmatchings/game/cameractrlparam", LightingEdit__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/cameractrlparam", tagGyoFish__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cameractrlparam", LoadGyorace__Fv);
-INCLUDE_ASM("nonmatchings/game/cameractrlparam", GetUserData__Fv_001AAEF0);
+extern "C" s32 GetSaveData__Fv(void);
+extern "C" s32 GetUserData__Fv_001AAEF0(void) {
+    s32 temp_v0;
+
+    temp_v0 = GetSaveData__Fv();
+    if (temp_v0 != 0) {
+        return (s32) ((u8 *) temp_v0 + 0x1D2A0);
+    }
+    return 0;
+}
 void InitLockCharaCtrl(void) {
     LockChara = 0;
 }
-INCLUDE_ASM("nonmatchings/game/cameractrlparam", LockCharaCtrl__Fv);
+extern "C" void LockCharaCtrl__Fv(void) {
+    LockChara++;
+}
 extern "C" void UnLockCharaCtrl__Fv(void) {
     LockChara -= 1;
     if (LockChara < 0) {
@@ -36,7 +47,14 @@ void InitEditModeChg(void) {
     EditModeChgCnt = 0;
     EditModeChgEvent = 0;
 }
-INCLUDE_ASM("nonmatchings/game/cameractrlparam", NowEditModeChg__Fv);
+struct EditModeChgFlag;
+struct EditModeChgCnt;
+extern "C" s32 NowEditModeChg__Fv(void) {
+    if (EditModeChgFlag != 0) {
+        return EditModeChgCnt > 0;
+    }
+    return 0;
+}
 INCLUDE_ASM("nonmatchings/game/cameractrlparam", EditModeChg__Fi);
 INCLUDE_ASM("nonmatchings/game/cameractrlparam", EditModeChgStep__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/cameractrlparam", SetDataPacket__Fi);

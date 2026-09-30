@@ -360,4 +360,8 @@ INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", KeepEditAnalyze__Fv);
 INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", EditAnalyzeChanged__Fv);
 void LoadComVillaager(void) {
 }
-INCLUDE_ASM("nonmatchings/game/cactionchara_001ACF40", LoadMap__Fv);
+extern "C" void LoadComVillaager__Fv(void);
+extern "C" void LoadMap__Fv(void) {
+    LoadComVillaager__Fv();
+}
+

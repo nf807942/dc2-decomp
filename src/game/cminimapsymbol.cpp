@@ -133,4 +133,7 @@ extern "C" s32 _ROOM_RATE__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/cminimapsymbol", _RD__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/cminimapsymbol", _ROOM_END__FP9SPI_STACKi);
+extern "C" s32 _ROOM_END__FP9SPI_STACKi(void *arg0, s32 arg1) {
+    nowPriset = (nowPriset_pointe *) ((u8 *) nowPriset + 0x18);
+    return 1;
+}

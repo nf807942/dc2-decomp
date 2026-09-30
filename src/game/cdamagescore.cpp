@@ -78,7 +78,10 @@ void CLockOnModel::Initialize(CScene * arg0) {
 INCLUDE_ASM("nonmatchings/game/cdamagescore", GetWeaponEffect__Fv);
 INCLUDE_ASM("nonmatchings/game/cdamagescore", memoryInit__Fv);
 INCLUDE_ASM("nonmatchings/game/cdamagescore", InitDungeonMain__F13INIT_LOOP_ARG);
-INCLUDE_ASM("nonmatchings/game/cdamagescore", Initialize__13MoveCheckInfoFv);
+extern "C" void *memset(void *, int, unsigned);
+extern "C" void Initialize__13MoveCheckInfoFv(void *objet) {
+    memset(objet, 0, 0x110);
+}
 void CRedMarkModel::Initialize(void) {
     this->field_0x80 = 0;
     this->field_0x84 = 0;

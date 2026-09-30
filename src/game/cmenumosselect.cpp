@@ -19,7 +19,9 @@ INCLUDE_ASM("nonmatchings/game/cmenumosselect", CalcTex__14CMenuMosSelectFv);
 INCLUDE_ASM("nonmatchings/game/cmenumosselect", KeyNormalMode__14CMenuMosSelectFiii);
 INCLUDE_ASM("nonmatchings/game/cmenumosselect", MenuMonsterBoxInit__FP9mgCMemoryPii);
 INCLUDE_ASM("nonmatchings/game/cmenumosselect", KeyStep__14CMenuMosSelectFv);
-INCLUDE_ASM("nonmatchings/game/cmenumosselect", MenuMonsterBoxKey__Fv);
+extern "C" void *MenuMosSelectPtr;
+extern "C" void KeyStep__14CMenuMosSelectFv(void *);
+extern "C" void MenuMonsterBoxKey__Fv(void) { KeyStep__14CMenuMosSelectFv(MenuMosSelectPtr); }
 INCLUDE_ASM("nonmatchings/game/cmenumosselect", MenuMonsterBoxDraw__Fv);
 INCLUDE_ASM("nonmatchings/game/cmenumosselect", MenuTimeStepEnvFunc__FP6CSceneP12CActionCharai);
 INCLUDE_ASM("nonmatchings/game/cmenumosselect", MenuWeaponRealStepEnvFunc__FP12CActionCharai);

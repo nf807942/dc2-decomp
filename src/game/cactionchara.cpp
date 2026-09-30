@@ -239,7 +239,11 @@ INCLUDE_ASM("nonmatchings/game/cactionchara", __ct__8CMdsInfoFv);
 INCLUDE_ASM("nonmatchings/game/cactionchara", CreateChara__FPUiPcP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cactionchara", GetMatrix__7CObjectFPA4_f);
 INCLUDE_ASM("nonmatchings/game/cactionchara", FarClip__7CObjectFfPf);
-INCLUDE_ASM("nonmatchings/game/cactionchara", GetCameraDist__7CObjectFv);
+extern "C" s32 mgGetDistFromCamera__FPf(f32 *);
+extern "C" s32 GetCameraDist__7CObjectFv(char *objet) {
+    return mgGetDistFromCamera__FPf((f32 *) (objet + 0x10));
+}
+
 INCLUDE_ASM("nonmatchings/game/cactionchara", CheckDraw__7CObjectFv);
 INCLUDE_ASM("nonmatchings/game/cactionchara", DrawStep__7CObjectFv);
 INCLUDE_ASM("nonmatchings/game/cactionchara", GetAlpha__7CObjectFv);
@@ -274,7 +278,11 @@ extern "C" void UpDatePosition__12CObjectFrameFv(CObjectFrame_1a71a8 *objet) {
         objet->unk70->GetScale(objet->unk30);
     }
 }
-INCLUDE_ASM("nonmatchings/game/cactionchara", DrawStep__12CObjectFrameFv);
+extern "C" void DrawStep__7CObjectFv(...);
+extern "C" void DrawStep__12CObjectFrameFv(void *objet) {
+    DrawStep__7CObjectFv(objet);
+}
+
 extern "C" s32 GetWorldPosition0__8mgCFrameFPf(void *, f32 *);
 extern "C" s32 mgGetDistFromCamera__FPf(f32 *);
 extern "C" void GetCameraDist__12CObjectFrameFv(void *objet) {
@@ -311,7 +319,12 @@ extern "C" s32 DrawDirect__12CObjectFrameFv(CObjectFrame_infere *objet) {
     return 0;
 }
 INCLUDE_ASM("nonmatchings/game/cactionchara", Copy__12CObjectFrameFR12CObjectFrameP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/cactionchara", Initialize__12CObjectFrameFv);
+extern "C" s32 Initialize__7CObjectFv(void *);
+extern "C" s32 Initialize__12CObjectFrameFv(void *self) {
+    ((u32 *) self)[0x70 / 4] = 0;
+    return Initialize__7CObjectFv(self);
+}
+
 void CActionChara::ResetAccele(void) {
     this->field_0x788 = 0;
     this->field_0x784 = 0;
@@ -320,7 +333,14 @@ void CActionChara::ResetAccele(void) {
 }
 INCLUDE_ASM("nonmatchings/game/cactionchara", ResetAction__12CActionCharaFv);
 INCLUDE_ASM("nonmatchings/game/cactionchara", ResetScript__12CActionCharaFv);
-INCLUDE_ASM("nonmatchings/game/cactionchara", CheckRunEvent__12CActionCharaFv);
+extern "C" s32 CheckRunEvent__12CActionCharaFv(void *self) {
+    s32 b = *(s8 *) ((u8 *) self + 0x76C);
+    if (*(s16 *) ((u8 *) self + 0x71C) != 0) {
+        b = 0;
+    }
+    return b;
+}
+
 INCLUDE_ASM("nonmatchings/game/cactionchara", SetMaskFlag__12CActionCharaFii);
 INCLUDE_ASM("nonmatchings/game/cactionchara", EntryObject__12CActionCharaFPci);
 struct CActionChara_infere_2070c5;

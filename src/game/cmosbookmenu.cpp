@@ -42,8 +42,12 @@ INCLUDE_ASM("nonmatchings/game/cmosbookmenu", LoadMenuData__15CMenuCostumeSelFP9
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", KeyStep__15CMenuCostumeSelFv);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", Draw__15CMenuCostumeSelFv);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", MenuCostumeInit__FP9mgCMemoryPii);
-INCLUDE_ASM("nonmatchings/game/cmosbookmenu", MenuCostumeKey__Fv);
-INCLUDE_ASM("nonmatchings/game/cmosbookmenu", MenuCostumeDraw__Fv);
+extern "C" void *MenuCosPtr;
+extern "C" void KeyStep__15CMenuCostumeSelFv(void *);
+extern "C" void MenuCostumeKey__Fv(void) { KeyStep__15CMenuCostumeSelFv(MenuCosPtr); }
+extern "C" void *MenuCosPtr;
+extern "C" void Draw__15CMenuCostumeSelFv(void *);
+extern "C" void MenuCostumeDraw__Fv(void) { Draw__15CMenuCostumeSelFv(MenuCosPtr); }
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", GetMonsterBaseInfoForMonsterMemoIndex__Fi);
 void CMosBookMenu::InitMonsterInfo(void) {
     this->field_0x7EC = 0;
@@ -64,9 +68,18 @@ INCLUDE_ASM("nonmatchings/game/cmosbookmenu", InitEnd__12CMosBookMenuFv);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", Draw__12CMosBookMenuFv);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", KeyStep__12CMosBookMenuFv);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", MonsterBookInit__FP9mgCMemoryPii);
-INCLUDE_ASM("nonmatchings/game/cmosbookmenu", MonsterBookKey__Fv);
+extern "C" void KeyStep__12CMosBookMenuFv(void *);
+extern "C" void *MenuMosBookPtr;
+extern "C" void MonsterBookKey__Fv(void) {
+    KeyStep__12CMosBookMenuFv(MenuMosBookPtr);
+}
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", MonsterBookDraw__Fv);
-INCLUDE_ASM("nonmatchings/game/cmosbookmenu", Set__9mgRect_s_Fssss);
+extern "C" void Set__9mgRect_s_Fssss(s16 *arg0, s16 a, s16 b, s16 c, s16 d) {
+    arg0[0] = a;
+    arg0[1] = b;
+    arg0[2] = c;
+    arg0[3] = d;
+}
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", InitMenuReturnMsg__FP9mgCMemory);
 extern "C" u32 LanguageCode;
 extern "C" u32 MenuReturnMsg;
@@ -110,7 +123,9 @@ void InitMnOnePictTex(void) {
     MnOnePictTex.field_0x1C = 0;
 }
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", MenuManualInit__FP9mgCMemoryPii);
-INCLUDE_ASM("nonmatchings/game/cmosbookmenu", MenuManualKey__Fv);
+extern "C" void *CManualPtr;
+extern "C" void KeyStep__11CManualMenuFv(void *);
+extern "C" void MenuManualKey__Fv(void) { KeyStep__11CManualMenuFv(CManualPtr); }
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", MenuManualDraw__Fv);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", KeyStep__11CManualMenuFv);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", CalcTex__11CManualMenuFv);
@@ -118,5 +133,9 @@ INCLUDE_ASM("nonmatchings/game/cmosbookmenu", CalcCursorPosition__11CManualMenuF
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", KeyStep__11CMenuOptionFv);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", CalcTex__11CMenuOptionFv);
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", DefaultButton__11CMenuOptionFPP18MENUFORMPARTS_TYPE);
-INCLUDE_ASM("nonmatchings/game/cmosbookmenu", EnableButton__11CMenuOptionFP18MENUFORMPARTS_TYPE);
+extern "C" void EnableButton__11CMenuOptionFP18MENUFORMPARTS_TYPE(void *objet, u8 *p) {
+    p[7] = 0x80;
+    p[8] = 0x80;
+    p[9] = 0x80;
+}
 INCLUDE_ASM("nonmatchings/game/cmosbookmenu", UpdateOptionForm__11CMenuOptionFv);

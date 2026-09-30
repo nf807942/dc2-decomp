@@ -62,7 +62,12 @@ extern "C" void Initialize__12COutLineDrawFv(COutLineDraw_infere *objet) {
 void COutLineDraw::SetFrame(mgCFrame * arg0) {
     this->field_0x34 = arg0;
 }
-INCLUDE_ASM("nonmatchings/game/ceffectctrl", Draw__12COutLineDrawFPfff);
+extern "C" void Draw__12COutLineDrawFff(void *, float, float);
+extern "C" void Draw__12COutLineDrawFPfff(char *self, u128 *v, float a, float b) {
+    *(u128 *)(self + 0x40) = *v;
+    Draw__12COutLineDrawFff(self, a, b);
+}
+
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", Draw__12COutLineDrawFff);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", DrawDivSprite__FP11mgCDrawPrim9mgRect_i_P10mgCTexturePiiiii);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", DrawDivSprite4__FP11mgCDrawPrim9mgRect_i_P10mgCTexturePiii);
@@ -145,15 +150,28 @@ extern "C" void FadeOut__10CFadeInOutFifff(CFadeInOut_infere2 *objet, s32 arg0, 
     objet->unk8 = arg3;
     objet->unk20 = 0;
 }
-INCLUDE_ASM("nonmatchings/game/ceffectctrl", CrossFade__10CFadeInOutFif);
+extern "C" void CrossFadeIn__10CFadeInOutFiif(void *, int, int, float);
+extern "C" void CrossFade__10CFadeInOutFif(void *self, int a, float b) {
+    CrossFadeIn__10CFadeInOutFiif(self, 0, a, b);
+}
+
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", CrossFadeIn__10CFadeInOutFiif);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", CrossFadeOut__10CFadeInOutFiif);
 s32 CFadeInOut::FadeCheck(void) {
     return this->field_0x14;
 }
-INCLUDE_ASM("nonmatchings/game/ceffectctrl", NowFade__10CFadeInOutFv);
+extern "C" s32 NowFade__10CFadeInOutFv(CFadeInOut *self) {
+    return self->field_0x10 != 0;
+}
+
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", FadeStep__10CFadeInOutFv);
-INCLUDE_ASM("nonmatchings/game/ceffectctrl", SetCrossTexture__10CFadeInOutFP10mgCTextureP1);
+extern "C" void SetCrossTexture__10CFadeInOutFP10mgCTextureP1(void *objet, void *arg0, s32 arg1) {
+    if (arg0 != NULL) {
+        *(void **) ((u8 *) objet + 0x28) = arg0;
+        *(s32 *) ((u8 *) *(volatile void **) ((u8 *) objet + 0x28) + 0x50) = arg1;
+    }
+}
+
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", CaptureScreen__10CFadeInOutFv);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", DivSpriteScreen__FR11mgCDrawPrim_0017EF10);
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", DivSpriteScreen__FR11mgCDrawPrimiii);
@@ -323,7 +341,9 @@ void CEffectCtrl::Run(void) {
     this->field_0x50 = 0;
     this->field_0x64 = 0;
 }
-INCLUDE_ASM("nonmatchings/game/ceffectctrl", SetOrigin__11CEffectCtrlFPf);
+extern "C" void sceVu0CopyVector(void *, float *);
+extern "C" void SetOrigin__11CEffectCtrlFPf(void *o, float *p) { sceVu0CopyVector(o, p); }
+
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", __as__11CEffectCtrlFRC11CEffectCtrl);
 extern "C" s32 __BUFFER_SIZE__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     s32 temp = spiGetStackInt__FP9SPI_STACK(arg0++);
@@ -484,14 +504,22 @@ extern "C" s32 __ALPHA_RAND__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     *(s32 *) ((u8 *) g_tmp_effc + 0x24C) = spiGetStackInt__FP9SPI_STACK(arg0);
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/ceffectctrl", __ALPHA_P1__FP9SPI_STACKi);
+extern "C" s32 __ALPHA_P1__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    *(f32 *) ((u8 *) g_tmp_effc + 0x22C) = spiGetStackFloat__FP9SPI_STACK(arg0);
+    return 1;
+}
+
 extern "C" s32 __ALPHA_P1_RAND__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     *(s32 *) ((u8 *) g_tmp_effc + 0x238) = spiGetStackInt__FP9SPI_STACK(arg0++);
     *(f32 *) ((u8 *) g_tmp_effc + 0x244) = spiGetStackFloat__FP9SPI_STACK(arg0++);
     *(s32 *) ((u8 *) g_tmp_effc + 0x250) = spiGetStackInt__FP9SPI_STACK(arg0);
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/ceffectctrl", __ALPHA_P2__FP9SPI_STACKi);
+extern "C" s32 __ALPHA_P2__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    *(f32 *) ((u8 *) g_tmp_effc + 0x230) = spiGetStackFloat__FP9SPI_STACK(arg0);
+    return 1;
+}
+
 extern "C" s32 __ALPHA_P2_RAND__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     *(s32 *) ((u8 *) g_tmp_effc + 0x23C) = spiGetStackInt__FP9SPI_STACK(arg0++);
     *(f32 *) ((u8 *) g_tmp_effc + 0x248) = spiGetStackFloat__FP9SPI_STACK(arg0++);
@@ -529,7 +557,13 @@ extern "C" CEffectManager_infere *__ct__14CEffectManagerFv(CEffectManager_infere
     return objet;
 }
 INCLUDE_ASM("nonmatchings/game/ceffectctrl", Initialize__14CEffectManagerFv);
-INCLUDE_ASM("nonmatchings/game/ceffectctrl", EntryEffCtrls__14CEffectManagerFP7CEffectiP11CEffectCtrli);
+extern "C" s32 EntryEffCtrls__14CEffectManagerFP7CEffectiP11CEffectCtrli(void *self, CEffect *a, s32 b, CEffectCtrl *c, s32 d) {
+    *(CEffect **) ((u8 *) self + 0x20) = a;
+    *(s32 *) ((u8 *) self + 0x24) = b;
+    *(CEffectCtrl **) ((u8 *) self + 0x28) = c;
+    *(s32 *) ((u8 *) self + 0x2C) = d;
+}
+
 void CEffectManager::SetEffectNums(s32 arg0, s32 arg1) {
     this->field_0x24 = arg0;
     this->field_0x2C = arg1;

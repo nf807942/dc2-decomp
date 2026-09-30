@@ -82,11 +82,32 @@ extern "C" s32 GetActiveCharaNo__12CMenuKeyFuncFv(void) {
 }
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", MenuPosStep__12CMenuKeyFuncFPiPi);
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", MenuSetPos__12CMenuKeyFuncFii);
-INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", MenuPosStop__12CMenuKeyFuncFv);
-INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", MenuPosPlay__12CMenuKeyFuncFv);
-INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", SetMoveMethod__12CMenuKeyFuncFi);
-INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", SetWakuMoveMethod__12CMenuKeyFuncFi);
-INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", GetItemPos__12CMenuKeyFuncFPi);
+extern "C" void MenuPosStop__12CMenuKeyFuncFv(void *self) {
+    *(u8 *)(*(u8 **)((u8 *)self + 0x138) + 3) = 1;
+    *(u8 *)(*(u8 **)((u8 *)self + 0x13C) + 3) = 1;
+}
+
+extern "C" void MenuPosPlay__12CMenuKeyFuncFv(void *arg0) {
+    *(*(u8 **) ((u8 *) arg0 + 0x138) + 3) = 0;
+    *(*(u8 **) ((u8 *) arg0 + 0x13C) + 3) = 0;
+}
+
+extern "C" void SetWakuMoveMethod__12CMenuKeyFuncFi(void *, s32);
+extern "C" void SetMoveMethod__12CMenuKeyFuncFi(void *objet, s32 arg0) {
+    *(u8 *) (*(u8 **) ((u8 *) objet + 0x138) + 0x20) = arg0;
+    SetWakuMoveMethod__12CMenuKeyFuncFi(objet, arg0);
+}
+
+extern "C" void SetWakuMoveMethod__12CMenuKeyFuncFi(void *objet, s32 arg0) {
+    *(u8 *) (*(u8 **) ((u8 *) objet + 0x13C) + 0x20) = arg0;
+}
+
+extern "C" s32 GetPutPosXY__16CMenuPosDataFormFPcRiRi(...);
+extern "C" char _2546_00370180[];
+extern "C" void GetItemPos__12CMenuKeyFuncFPi(void *self, s32 *pos) {
+    GetPutPosXY__16CMenuPosDataFormFPcRiRi(*(void **)((u8 *)self + 0x138), _2546_00370180, pos, pos + 1);
+}
+
 extern "C" s32 GetPartInfo__16CMenuPosDataFormFPc(...);
 extern "C" u8 _2651[];
 extern "C" s32 sprintf(...);
@@ -132,7 +153,12 @@ extern "C" void SetWakuType__12CMenuKeyFuncFi(CMenuKeyFuncWakuView *objet, s32 a
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", SetWakuWH__12CMenuKeyFuncFiii);
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", SetVibeCnt__12CMenuKeyFuncFii);
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", SetVibeR__12CMenuKeyFuncFii);
-INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", GetCursorPos__12CMenuKeyFuncFPi);
+extern "C" s32 GetPutPosXY__16CMenuPosDataFormFPcRiRi(...);
+extern "C" char _2545_00370178[];
+extern "C" void GetCursorPos__12CMenuKeyFuncFPi(void *self, s32 *pos) {
+    GetPutPosXY__16CMenuPosDataFormFPcRiRi(*(void **)((u8 *)self + 0x138), _2545_00370178, pos, pos + 1);
+}
+
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", CursorFadeIn__12CMenuKeyFuncFfi);
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", CursorFadeOut__12CMenuKeyFuncFfi);
 INCLUDE_ASM("nonmatchings/game/cmenukeyfunc", EnableSwapNowPos__12CMenuKeyFuncFP18MENU_SWAPITEM_INFO);

@@ -68,5 +68,8 @@ extern "C" void SetPtr__14CItemUseTargetFiPv(CItemUseTarget *objet, s32 arg0, vo
         objet->unk4 = arg1;
     }
 }
-INCLUDE_ASM("nonmatchings/game/citemusetarget", GetSystemMessage__Fv);
+extern "C" void GetSystemMessage__Fi(s32);
+extern "C" void GetSystemMessage__Fv(void) {
+    GetSystemMessage__Fi(0);
+}
 INCLUDE_ASM("nonmatchings/game/citemusetarget", GetSystemMessage__Fi);

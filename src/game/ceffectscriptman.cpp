@@ -9,7 +9,11 @@
 #include "common.h"
 
 INCLUDE_ASM("nonmatchings/game/ceffectscriptman", Initialize__16CEffectScriptManFP9mgCMemoryii);
-INCLUDE_ASM("nonmatchings/game/ceffectscriptman", SetWorkBuffer__16CEffectScriptManFP9mgCMemory);
+extern "C" void SetWorkBuffer__16CEffectScriptManFP9mgCMemory(void *arg0, void *arg1) {
+    if (arg1 != NULL) {
+        *(void **) ((u8 *) arg0 + 4) = arg1;
+    }
+}
 struct CEffectScriptMan {
     char pad_0[0xC];
     s32 field_C;

@@ -104,7 +104,11 @@ INCLUDE_ASM("nonmatchings/game/text_002D3110", _SET_SHOT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _SET_SPECIAL_SHOT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _SHOT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _GET_OBJECT_POS__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002D3110", _SET_DIR_GUN__FP12RS_STACKDATAi);
+extern "C" s32 _SET_DIR_GUN__FP12RS_STACKDATAi(void *arg0, s32 arg1) {
+    *((u8 *) action_info[0] + 0x76E) = 1;
+    return 1;
+}
+
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _GET_NOW_HP_RATE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _SET_BOMB__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _GET_ACTION_CODE__FP12RS_STACKDATAi);
@@ -117,7 +121,11 @@ INCLUDE_ASM("nonmatchings/game/text_002D3110", _NOW_MOS_CHGWAIT__FP12RS_STACKDAT
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _GET_MOS_STATUS__FP12RS_STACKDATAi_002D6420);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _SET_XCHG_STEP__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _SET_MOS_STEP__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002D3110", _TRG_ON_MOS__FP12RS_STACKDATAi);
+extern "C" s32 _TRG_ON_MOS__FP12RS_STACKDATAi(void *arg0, s32 arg1) {
+    *(s32 *) ((u8 *) action_info[0] + 0x3BC) = 1;
+    return 1;
+}
+
 INCLUDE_ASM("nonmatchings/game/text_002D3110", _RESET_MOS__FP12RS_STACKDATAi);
 extern "C" s32 GetStackString__FP12RS_STACKDATA_002D2810(RS_STACKDATA *);
 extern "C" s32 _SET_DEFAULT_MOS__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
@@ -269,8 +277,26 @@ INCLUDE_ASM("nonmatchings/game/text_002D3110", GetRectFontTex__FiPi);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", MySetTexMini__FiP11mgCDrawPrim);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", GetRectFontTexMini__FiPi);
 INCLUDE_ASM("nonmatchings/game/text_002D3110", My_strncpy__FPcPCcUi);
-INCLUDE_ASM("nonmatchings/game/text_002D3110", GetYoyakuTblTop__Fv);
+extern "C" char FontTblBinBuff[];
+struct FontHdrT { u16 a; u16 b; u16 c; u16 d; char tbl[1]; };
+extern "C" char *GetYoyakuTblTop__Fv(void) {
+    return ((FontHdrT *) FontTblBinBuff)->tbl;
+}
+
 INCLUDE_ASM("nonmatchings/game/text_002D3110", LoadFontTblBin__Fv);
-INCLUDE_ASM("nonmatchings/game/text_002D3110", GetYoyakuTblNum__Fv);
-INCLUDE_ASM("nonmatchings/game/text_002D3110", GetKanjiTopNo__Fv);
-INCLUDE_ASM("nonmatchings/game/text_002D3110", GetHalfFontNum__Fv);
+extern "C" char FontTblBinBuff[];
+struct FontHdrN { u16 a; u16 b; u16 c; };
+extern "C" u32 GetYoyakuTblNum__Fv(void) {
+    return ((FontHdrN *) FontTblBinBuff)->c;
+}
+
+extern "C" char FontTblBinBuff[];
+struct FontHdrK { u16 a; u16 b; u16 c; };
+extern "C" u32 GetKanjiTopNo__Fv(void) {
+    return ((FontHdrK *) FontTblBinBuff)->b;
+}
+
+extern "C" u16 *FontTblBinBuff_p;
+extern "C" char FontTblBinBuff[];
+extern "C" u16 GetHalfFontNum__Fv(void) { u16 *p = (u16 *) FontTblBinBuff; return *p; }
+

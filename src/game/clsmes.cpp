@@ -9,7 +9,11 @@
 #include "common.h"
 
 INCLUDE_ASM("nonmatchings/game/clsmes", AddYokoHaba__6ClsMesFii);
-INCLUDE_ASM("nonmatchings/game/clsmes", SetYokoHaba__6ClsMesFii);
+extern "C" void SetYokoHaba__6ClsMesFii(void *self, s32 arg0, s32 arg1) {
+    if (arg1 >= 0) {
+        *(s32 *) ((arg0 << 2) + (s32) self + 0x258C) = arg1;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/clsmes", AddPage__6ClsMesFii);
 INCLUDE_ASM("nonmatchings/game/clsmes", NeedMesWinWH__6ClsMesFi);
 INCLUDE_ASM("nonmatchings/game/clsmes", NeedMesWinWH__6ClsMesFPc);
@@ -23,7 +27,13 @@ INCLUDE_ASM("nonmatchings/game/clsmes", CalcRectScale__F4RECTfP4RECT);
 INCLUDE_ASM("nonmatchings/game/clsmes", SetSelectCursorPos__6ClsMesF4RECT);
 INCLUDE_ASM("nonmatchings/game/clsmes", DrawYesNo__FP11mgCDrawPrimiiiiP10RGBAQ_TYPE);
 INCLUDE_ASM("nonmatchings/game/clsmes", GetPos_AbsPosSet__F4RECTiiiPiPi);
-INCLUDE_ASM("nonmatchings/game/clsmes", CalcAutoPosSet__Fffff);
+extern "C" f32 CalcAutoPosSet__Fffff(f32 a, f32 b, f32 c, f32 d) {
+    f32 t = b - a;
+    t -= c;
+    t *= d;
+    t += a;
+    return t;
+}
 INCLUDE_ASM("nonmatchings/game/clsmes", RgbqToUint__FUi);
 INCLUDE_ASM("nonmatchings/game/clsmes", GetFontColor__6ClsMesFiPi);
 INCLUDE_ASM("nonmatchings/game/clsmes", GetGyouAlpha__6ClsMesFi);

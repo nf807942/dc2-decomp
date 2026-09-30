@@ -19,7 +19,12 @@ INCLUDE_ASM("nonmatchings/game/cnameregimenu", search_txt_asci__FPc);
 INCLUDE_ASM("nonmatchings/game/cnameregimenu", ConvertShitJiss2Ascii__FPcPc);
 INCLUDE_ASM("nonmatchings/game/cnameregimenu", ConvertAscii2ShitJiss__FPcPc);
 INCLUDE_ASM("nonmatchings/game/cnameregimenu", NameRegistInit__FP9mgCMemoryPii);
-INCLUDE_ASM("nonmatchings/game/cnameregimenu", NameRegistKey__Fv);
+struct CNameRegiMenu;
+extern "C" void KeyStep__13CNameRegiMenuFv(CNameRegiMenu *);
+extern "C" CNameRegiMenu *NameRegiMenuPtr;
+extern "C" void NameRegistKey__Fv(void) {
+    KeyStep__13CNameRegiMenuFv(NameRegiMenuPtr);
+}
 struct CNameRegiMenu;
 extern "C" CNameRegiMenu *NameRegiMenuPtr;
 extern "C" u32 OldReloadTexNumber;
@@ -101,7 +106,12 @@ INCLUDE_ASM("nonmatchings/game/cnameregimenu", DrawSelectedWord__13CNameRegiMenu
 INCLUDE_ASM("nonmatchings/game/cnameregimenu", DrawMessage__13CNameRegiMenuFv);
 INCLUDE_ASM("nonmatchings/game/cnameregimenu", GetMesTxt__Fi);
 INCLUDE_ASM("nonmatchings/game/cnameregimenu", PhotoAddProjection__Fv);
-INCLUDE_ASM("nonmatchings/game/cnameregimenu", InitPhotoTitle__Fv);
+extern "C" u8 PhotoTitle[];
+extern "C" s32 ShowTitleCnt;
+extern "C" s32 InitPhotoTitle__Fv(void) {
+    ShowTitleCnt = 0;
+    PhotoTitle[0] = 0;
+}
 extern "C" u32 AddProj_0037E8CC;
 extern "C" u32 CameraTexb;
 extern "C" u32 OpenMenu;

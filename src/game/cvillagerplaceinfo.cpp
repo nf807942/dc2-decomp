@@ -40,7 +40,11 @@ extern "C" void BuggyDamage__Fi(s32 arg0) {
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", PlayBuggyLoopSe__FP6CScenei);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", BuggyControl__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", InitBomb__FP6CScene);
-INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", TakeBombCheck__Fv);
+extern "C" u32 BombStatus;
+extern "C" s32 TakeBombCheck__Fv(void) {
+    return (BombStatus != 3) ^ 1;
+}
+
 extern "C" u32 BombStatus;
 extern "C" s32 TakeBombCheck__Fv(void);
 extern "C" s32 TakeBomb__Fv(void) {
@@ -63,7 +67,10 @@ extern "C" s32 BombBomb__Fv(void) {
     }
     return 0;
 }
-INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", NowPutBomb__Fv);
+extern "C" s32 NowPutBomb__Fv(void) {
+    return BombStatus == 3;
+}
+
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", BombControl__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", BombCheck__FP6CScene);
 extern "C" s32 GetSaveData__Fv(void);
@@ -307,7 +314,11 @@ extern "C" void LoadHelpMes__FP1(void *arg0) {
         InitFlag_0037E9CC = 1;
     }
 }
-INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", GetHepMesInfo__Fv);
+extern "C" u8 HelpMesInfo[];
+extern "C" void *GetHepMesInfo__Fv(void) {
+    return HelpMesInfo;
+}
+
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", CreateHelpMes__Fi);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", StepHelpMes__Fv);
 void ShowOffOnceHelpMes(void) {
@@ -317,7 +328,12 @@ INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", DrawHelpMes__Fv);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", ShowHelpMes__Fii);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", ShowErrorHelpMes__Fii);
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", GetVlgrPlaceInfo__Fi);
-INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", GetVlgrPlaceTable__FPi);
+extern "C" char VlgrPlace[];
+extern "C" void *GetVlgrPlaceTable__FPi(s32 *arg0) {
+    *arg0 = 0x200;
+    return VlgrPlace;
+}
+
 INCLUDE_ASM("nonmatchings/game/cvillagerplaceinfo", GetVillagerInfo__Fi);
 extern "C" s32 GetVillagerInfo__Fi(s32);
 extern "C" u8 _214[13];

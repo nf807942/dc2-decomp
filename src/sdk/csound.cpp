@@ -73,7 +73,10 @@ extern "C" void SetMasterVol__6CSoundFii(CSound *objet, s32 arg0, s32 arg1) {
     sceSdRemote(1, 0x8010, arg0 | 0x980, arg1);
     sceSdRemote(1, 0x8010, arg0 | 0xA80, arg1);
 }
-INCLUDE_ASM("nonmatchings/sdk/csound", LoadHdBd__6CSoundFiiiii);
+extern "C" s32 LoadHdBd2__6CSoundFiiiii(void *, s32, s32, s32, s32, s32);
+extern "C" s32 LoadHdBd__6CSoundFiiiii(void *self, s32 a, s32 b, s32 c, s32 d, s32 e) {
+    return LoadHdBd2__6CSoundFiiiii(self, a, b, c, d, e);
+}
 INCLUDE_ASM("nonmatchings/sdk/csound", LoadHdBd2__6CSoundFiiiii);
 INCLUDE_ASM("nonmatchings/sdk/csound", LoadHdBdAdd__6CSoundFiiiii);
 INCLUDE_ASM("nonmatchings/sdk/csound", LoadSeq__6CSoundFiii);

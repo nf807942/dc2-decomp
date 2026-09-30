@@ -25,17 +25,38 @@ extern "C" f32 ParabolicInitialVectorY__Fffff(f32 arg0, f32 arg1, f32 arg2, f32 
     return ((2.0f * (arg1 - arg0)) - (arg3 * (arg2 * arg3))) / (2.0f * arg3);
 }
 INCLUDE_ASM("nonmatchings/game/cshopmenu", CalcPosParabolicJump__FPfPfPffff);
-INCLUDE_ASM("nonmatchings/game/cshopmenu", Draw__7CMarkerFv);
+struct CMarker_d { int count; };
+extern "C" void Draw__7CMarkerFv(CMarker_d *o) {
+    if (o->count > 0) {
+        o->count = o->count - 1;
+    }
+}
 void CMarker::Set(s32 arg0) {
     this->field_0x0 = arg0;
 }
-INCLUDE_ASM("nonmatchings/game/cshopmenu", Init__7CMarkerFv);
-INCLUDE_ASM("nonmatchings/game/cshopmenu", SetName__12CEventSpriteFPc);
+extern "C" s32 Set__7CMarkerFi(void *, s32);
+extern "C" s32 Init__7CMarkerFv(void *self) {
+    return Set__7CMarkerFi(self, 0);
+}
+extern "C" s32 strcpy(...);
+extern "C" void SetName__12CEventSpriteFPc(void *self, char *a) {
+    strcpy((char *) self + 8, a);
+}
 void CEventSprite::SetDraw(s32 arg0) {
     this->field_0x0 = arg0;
 }
-INCLUDE_ASM("nonmatchings/game/cshopmenu", SetGet__12CEventSpriteFiiii);
-INCLUDE_ASM("nonmatchings/game/cshopmenu", SetPut__12CEventSpriteFiiii);
+extern "C" void SetGet__12CEventSpriteFiiii(u8 *self, s32 a, s32 b, s32 c, s32 d) {
+    *(s32 *) (self + 0x58) = a;
+    *(s32 *) (self + 0x58 + 4) = b;
+    *(s32 *) (self + 0x58 + 8) = c;
+    *(s32 *) (self + 0x58 + 12) = d;
+}
+extern "C" void SetPut__12CEventSpriteFiiii(u8 *self, s32 a, s32 b, s32 c, s32 d) {
+    *(s32 *) (self + 0x68) = a;
+    *(s32 *) (self + 0x68 + 4) = b;
+    *(s32 *) (self + 0x68 + 8) = c;
+    *(s32 *) (self + 0x68 + 12) = d;
+}
 void CEventSprite::SetMove(s32 arg0, s32 arg1, s32 arg2) {
     this->field_0x78 = -1;
     this->field_0x7C = -1;
@@ -67,7 +88,12 @@ extern "C" void SetFade__12CEventSpriteFii(CEventSprite_infere *objet, s32 arg0,
     }
     objet->unk80 = arg1;
 }
-INCLUDE_ASM("nonmatchings/game/cshopmenu", SetColor__12CEventSpriteFiiii);
+extern "C" void SetColor__12CEventSpriteFiiii(u8 *self, s32 a, s32 b, s32 c, s32 d) {
+    *(s32 *) (self + 0x48) = a;
+    *(s32 *) (self + 0x48 + 4) = b;
+    *(s32 *) (self + 0x48 + 8) = c;
+    *(s32 *) (self + 0x48 + 12) = d;
+}
 INCLUDE_ASM("nonmatchings/game/cshopmenu", Step__12CEventSpriteFv);
 INCLUDE_ASM("nonmatchings/game/cshopmenu", Draw__12CEventSpriteFv);
 struct inferred;
@@ -144,20 +170,38 @@ void CEventSprite2::SetDrawFlag(s32 arg0) {
 void CEventSprite2::SetSpriteType(s32 arg0) {
     this->field_0x4 = arg0;
 }
-INCLUDE_ASM("nonmatchings/game/cshopmenu", SetPosition__13CEventSprite2FPf);
-INCLUDE_ASM("nonmatchings/game/cshopmenu", SetColor__13CEventSprite2FPf);
+extern "C" void sceVu0CopyVector(void *, f32 *);
+extern "C" void SetPosition__13CEventSprite2FPf(void *self, f32 *a) {
+    sceVu0CopyVector((u8 *) self + 0x30, a);
+}
+extern "C" void sceVu0CopyVector(void *, f32 *);
+extern "C" void SetColor__13CEventSprite2FPf(void *self, f32 *a) {
+    sceVu0CopyVector((u8 *) self + 0x40, a);
+}
 void CEventSprite2::SetPutSize(s32 arg0, s32 arg1) {
     this->field_0x54 = arg0;
     this->field_0x58 = arg1;
 }
-INCLUDE_ASM("nonmatchings/game/cshopmenu", SetUvSize__13CEventSprite2Fiiii);
+extern "C" void SetUvSize__13CEventSprite2Fiiii(u8 *objet, s32 a, s32 b, s32 c, s32 d) {
+    *(s32 *)(objet + 0x5C) = a;
+    *(s32 *)(objet + 0x60) = b;
+    *(s32 *)(objet + 0x64) = c;
+    *(s32 *)(objet + 0x68) = d;
+}
 void CEventSprite2::SetScale(f32 arg0, f32 arg1) {
     this->field_0x6C = arg0;
     this->field_0x70 = arg1;
 }
-INCLUDE_ASM("nonmatchings/game/cshopmenu", GetScale__13CEventSprite2FPfPf);
-INCLUDE_ASM("nonmatchings/game/cshopmenu", GetPosition__13CEventSprite2FPf);
-INCLUDE_ASM("nonmatchings/game/cshopmenu", GetColor__13CEventSprite2FPf);
+extern "C" void GetScale__13CEventSprite2FPfPf(u8 *objet, f32 *arg0, f32 *arg1) {
+    *arg0 = *(f32 *) (objet + 0x6C);
+    *arg1 = *(f32 *) (objet + 0x70);
+}
+extern "C" void GetPosition__13CEventSprite2FPf(f32 *self, f32 *out) {
+    sceVu0CopyVector(out, self + 0xC);
+}
+extern "C" void GetColor__13CEventSprite2FPf(f32 *self, f32 *out) {
+    sceVu0CopyVector(out, self + 0x10);
+}
 s32 CEventSprite2::GetType(void) {
     return this->field_0x4;
 }

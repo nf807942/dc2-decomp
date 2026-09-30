@@ -887,7 +887,13 @@ s32 scsDummy(_SEN_OBJ_SEQ *sequence, CSceneObjSeq *owner) {
 }
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", InitSceneObjSeq__FP12_SEN_OBJ_SEQ);
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", __ct__12CSceneObjSeqFv);
-INCLUDE_ASM("nonmatchings/game/cscenecmrseq", ZeroInitialize__12CSceneObjSeqFv);
+extern "C" s32 Initialize__12CSceneObjSeqFP12_SEN_OBJ_SEQi(...);
+extern "C" s32 ZeroInitialize__12CSceneObjSeqFv(void *arg0) {
+    *(s32 *) arg0 = 0;
+    *(s32 *) ((u8 *) arg0 + 4) = 0;
+    return Initialize__12CSceneObjSeqFP12_SEN_OBJ_SEQi(arg0, 0, 0);
+}
+
 INCLUDE_ASM("nonmatchings/game/cscenecmrseq", Initialize__12CSceneObjSeqFP12_SEN_OBJ_SEQi);
 typedef struct CSceneObjSeq_infere {
     /* 0x000 */ char pad0[8];

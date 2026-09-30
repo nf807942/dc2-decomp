@@ -326,7 +326,9 @@ extern "C" void Initialize__14CRepairManagerFv(CRepairManagerView *objet) {
     objet->unk1E8 = 0;
 }
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", SetStack__14CRepairManagerFP9mgCMemoryi);
-INCLUDE_ASM("nonmatchings/game/cposdatamanage", Clear__14CRepairManagerFv);
+extern "C" void Clear__14CRepairManagerFv(CRepairManagerView *objet) {
+    Initialize__14CRepairManagerFv(objet);
+}
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", LoadDataBG__14CRepairManagerFP9mgCMemory);
 extern "C" u8 _4888[20];
 extern "C" u8 mgTexManager[540];
@@ -361,7 +363,7 @@ extern "C" void CheckDataBG__14CRepairManagerFi(CRepairManager *objet, s32 arg0)
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", SetRepairData__14CRepairManagerFP9mgCMemoryiPUi);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", GeneratePoly__14CRepairManagerFPfi);
 INCLUDE_ASM("nonmatchings/game/cposdatamanage", Generate__14CRepairManagerFii);
-INCLUDE_ASM("nonmatchings/game/cposdatamanage", IsRunModel__14CRepairManagerFv);
+extern "C" s32 IsRunModel__14CRepairManagerFv(void *objet) { return *(s32 *) ((u8 *) objet + 0x1B0) != 0; }
 extern "C" s32 IsRunModel__14CRepairManagerFv(void *);
 extern "C" s32 IsRun__14CRepairManagerFv(CRepairManager *objet) {
     s32 i;

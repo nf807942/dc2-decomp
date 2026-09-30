@@ -70,7 +70,57 @@ INCLUDE_ASM("nonmatchings/game/cmonsterman", SetActiveMonster__11CMonsterManFiPf
 INCLUDE_ASM("nonmatchings/game/cmonsterman", DrawMiniMapSymbol__11CMonsterManFP14CMiniMapSymbol);
 INCLUDE_ASM("nonmatchings/game/cmonsterman", DrawLifeGage__11CMonsterManFii);
 INCLUDE_ASM("nonmatchings/game/cmonsterman", DrawPiyori__11CMonsterManFv);
-INCLUDE_ASM("nonmatchings/game/cmonsterman", DrawActMonster__11CMonsterManFv);
+extern "C" u8 mgTexManager[540];
+struct sceVif1Packet;
+extern "C" s32 ReloadTexture__17mgCTextureManagerFiP13sceVif1Packet(void *, s32, sceVif1Packet *);
+struct DamObj {
+    virtual void v0();
+    virtual void v1();
+    virtual void v2();
+    virtual void v3();
+    virtual void v4();
+    virtual void v5();
+    virtual void v6();
+    virtual void v7();
+    virtual void v8();
+    virtual void v9();
+    virtual void v10();
+    virtual void v11();
+    virtual void Draw();
+    char pad4[0xFC];
+    f32 c100;
+    char pad104[0x586];
+    s16 kind;
+    char pad68C[0xAC8];
+    s16 tex;
+    char pad1156[0x18E];
+    s16 mode;
+    char pad12E6[2];
+    f32 c12E8;
+    f32 c12EC;
+};
+struct DamMan {
+    char pad0[0x484];
+    DamObj *slot[0x18];
+};
+extern "C" void DrawActMonster__11CMonsterManFv(DamMan *objet) {
+    u8 *tex = mgTexManager;
+    s32 j;
+    DamObj *m;
+    s32 i;
+
+    i = 0;
+    j = 0;
+    do {
+        m = objet->slot[i];
+        if (m != NULL && m->kind == 2 && m->mode != 1 && !(m->c100 < 1.0f) && !(m->c12E8 < 1.0f) && !(m->c12EC < 1.0f)) {
+            ReloadTexture__17mgCTextureManagerFiP13sceVif1Packet(tex, m->tex + 0x28, NULL);
+            objet->slot[i]->Draw();
+        }
+        j += 1;
+        i += 1;
+    } while (j < 0x18);
+}
 INCLUDE_ASM("nonmatchings/game/cmonsterman", DrawInvisibleMonster__11CMonsterManFv);
 INCLUDE_ASM("nonmatchings/game/cmonsterman", DrawShadowActMonster__11CMonsterManFv);
 INCLUDE_ASM("nonmatchings/game/cmonsterman", PriorityLevelCheck__11CMonsterManFv);

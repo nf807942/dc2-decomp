@@ -56,4 +56,7 @@ void CameraCtrlParam::SetFixHeight(f32 arg0) {
     this->field_0x1C = arg0;
     this->field_0x20 = arg0;
 }
-INCLUDE_ASM("nonmatchings/game/csphida_002EECA0", SetFixDist__15CameraCtrlParamFf);
+extern "C" void SetFixDist__15CameraCtrlParamFf(void *objet, f32 arg0) {
+    *(f32 *) ((u8 *) objet + 4) = arg0;
+    *(f32 *) objet = arg0;
+}

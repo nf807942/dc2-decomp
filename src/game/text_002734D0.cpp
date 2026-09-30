@@ -522,10 +522,25 @@ extern "C" s32 _AUTO_CHANGE_ENV__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1)
     AutoChangeEnvBGM__6CSceneFi(EventScene, GetStackInt__FP12RS_STACKDATA_00262DA0(arg0));
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _BGM_LOAD_CANCEL__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _SOUND_LOAD_CANCEL__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _BGM_LOAD_ENABLE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _SOUND_LOAD_ENABLE__FP12RS_STACKDATAi);
+struct EventSceneBgm { u8 pad[0x906C]; s32 load; s32 play; };
+extern "C" s32 _BGM_LOAD_CANCEL__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    ((EventSceneBgm *) EventScene)->load = 1;
+    return 1;
+}
+struct EventScene;
+struct EventSceneSnd { u8 pad[0x9070]; s32 load; };
+extern "C" s32 _SOUND_LOAD_CANCEL__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    ((EventSceneSnd *) EventScene)->load = 1;
+    return 1;
+}
+extern "C" s32 _BGM_LOAD_ENABLE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    ((EventSceneBgm *) EventScene)->load = 0;
+    return 1;
+}
+extern "C" s32 _SOUND_LOAD_ENABLE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    ((EventSceneSnd *) EventScene)->load = 0;
+    return 1;
+}
 extern "C" s32 CheckLoadSeBase__6CSceneFi(...);
 extern "C" s32 LoadSeBase__6CSceneFiP1(...);
 extern "C" s32 _LOAD_SE_BASE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
@@ -631,8 +646,15 @@ extern "C" s32 _SOUND_ALL_STOP__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) 
     SoundAllStop__6CSceneFv(EventScene);
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _BGM_PLAY_CANCEL__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002734D0", _BGM_PLAY_ENABLE__FP12RS_STACKDATAi);
+struct EventSceneBgmPlay { u8 pad[0x9074]; s32 play; };
+extern "C" s32 _BGM_PLAY_CANCEL__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    ((EventSceneBgmPlay *) EventScene)->play = 1;
+    return 1;
+}
+extern "C" s32 _BGM_PLAY_ENABLE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    ((EventSceneBgmPlay *) EventScene)->play = 0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _GET_DEF_BGM_NO__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _SET_MOVIE_CC__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _REGISTER_VILLAGER2__FP12RS_STACKDATAi);

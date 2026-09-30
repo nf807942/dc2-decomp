@@ -26,7 +26,8 @@ s32 mgGetPerformanceMeterFlag(void) {
     return draw_performance_meter;
 }
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", VSyncCallBack__Fi_00141870);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgInitVSyncCallBack__FPFi_i);
+extern unsigned int VSyncCallBack2;
+extern "C" void mgInitVSyncCallBack__FPFi_i(unsigned int cb) { VSyncCallBack2 = cb; }
 void mgSetRotateThread(s32 arg0) {
     rot_priority = arg0;
 }
@@ -192,7 +193,13 @@ extern "C" void mgInitActiveLighting__Fv(void) {
     InitActiveLighting__13mgRENDER_INFOFv(&mgRenderInfo);
     mgChangeLight = 1;
 }
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgActiveLighting__Fii);
+extern "C" u32 mgChangeLight;
+extern mgRenderInfoData mgRenderInfo;
+extern "C" s32 ActiveLighting__13mgRENDER_INFOFii(void *, s32, s32);
+extern "C" void mgActiveLighting__Fii(s32 a, s32 b) {
+    mgChangeLight = 1;
+    ActiveLighting__13mgRENDER_INFOFii(&mgRenderInfo, a, b);
+}
 extern "C" void SetLight__13mgRENDER_INFOFPA4_fPA4_f(void *, f32 (*)[4], f32 (*)[4]);
 extern "C" void mgSetLight__FPA4_fPA4_f(f32 (*arg0)[4], f32 (*arg1)[4]) {
     mgChangeLight = 1;
@@ -278,7 +285,11 @@ extern "C" s32 GetPlightEnable__13mgRENDER_INFOFv(void *);
 extern "C" s32 mgGetPlightEnable__Fv(void) {
     return GetPlightEnable__13mgRENDER_INFOFv(&mgRenderInfo);
 }
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgSetFogParam__FffUcUcUcff);
+extern mgRenderInfoData mgRenderInfo;
+extern "C" s32 SetFogParam__13mgRENDER_INFOFffUcUcUcff(void *, f32, f32, u8, u8, u8, f32, f32);
+extern "C" void mgSetFogParam__FffUcUcUcff(f32 a, f32 b, u8 c, u8 d, u8 e, f32 f, f32 g) {
+    SetFogParam__13mgRENDER_INFOFffUcUcUcff(&mgRenderInfo, a, b, c, d, e, f, g);
+}
 struct inferred;
 typedef struct mgFOG_PARAM {
     /* 0x00 */ f32 unk0;                            /* inferred */
@@ -322,11 +333,22 @@ INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", prim_clip_check__FPf);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgTransWorldPrim__FPiPf);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgTransWorldScreen__FPiPf);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgTransViewPrim__FPiPf);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgTransWorldView__FPfPf);
+extern "C" void sceVu0ApplyMatrix(f32 *result, void *matrix, f32 *vector);
+extern "C" void mgTransWorldView__FPfPf(f32 *a, f32 *b) {
+    sceVu0ApplyMatrix(a, &(&mgRenderInfo.field_0x0)[0x68], b);
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgTransZPrim__Ff);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetDistFromCamera__FPf);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetDirFromCamera__FPfPf);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetCameraPos__FPf);
+extern "C" f32 mgDistVector__FPfPf(...);
+extern "C" f32 mgGetDistFromCamera__FPf(f32 *arg0) {
+    return mgDistVector__FPfPf(arg0, &mgRenderInfo.field_0x0 + 0xE8);
+}
+extern "C" void sceVu0SubVector(...);
+extern "C" void mgGetDirFromCamera__FPfPf(f32 *arg0, f32 *arg1) {
+    sceVu0SubVector(arg0, arg1, &mgRenderInfo.field_0x0 + 0xE8);
+}
+extern "C" void mgGetCameraPos__FPf(f32 *arg0) {
+    *(u128 *) arg0 = *(u128 *) (&mgRenderInfo.field_0x0 + 0xE8);
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgGetCameraPose__FPA4_f);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", mgTransWorldPrim3DSprite__FPiPiPfffi);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", CheckVuProgID__Fi);
@@ -364,7 +386,12 @@ INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", spiGetStackFloat__FP9SPI_ST
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", spiGetStackString__FP9SPI_STACK);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", spiGetStackVector__FPfP9SPI_STACK);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", PushStack__18CScriptInterpreterF9SPI_STACK);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", __as__9SPI_STACKFRC9SPI_STACK);
+struct SPI_STACK { int a; int b; };
+extern "C" SPI_STACK *__as__9SPI_STACKFRC9SPI_STACK(SPI_STACK *t, const SPI_STACK &o) {
+    t->a = o.a;
+    t->b = o.b;
+    return t;
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", GetNextTAG__18CScriptInterpreterFi);
 void CScriptInterpreter::SetStack(SPI_STACK * arg0, s32 arg1) {
     this->field_0x14 = arg0;
@@ -414,7 +441,11 @@ input_str::input_str(void) {
 }
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", GetArgBin__18CScriptInterpreterFv);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", GetArg__18CScriptInterpreterFv);
-INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", back__9input_strFv);
+extern "C" void back__9input_strFv(input_str *objet) {
+    if (objet->field_0x8 > 0) {
+        objet->field_0x8--;
+    }
+}
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", SearchCommand__18CScriptInterpreterFPi);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", SkipSpace__FR9input_str);
 INCLUDE_ASM("nonmatchings/mglib/cscriptinterpreter", CheckChar__Fc);

@@ -14,7 +14,12 @@ INCLUDE_ASM("nonmatchings/game/text_002717C0", _GET_FISHINGTOURNAMENT_ETC__FP12R
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _SET_CHARA_FAR_DIST__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _SET_MODEL_LIGHT_SWITCH__FP12RS_STACKDATAi_00271C40);
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _SET_MODEL_LIGHT_COLOR__FP12RS_STACKDATAi_00271D30);
-INCLUDE_ASM("nonmatchings/game/text_002717C0", _GET_OMAKE_FLAG__FP12RS_STACKDATAi);
+extern "C" u32 OmakeFlag;
+extern "C" s32 SetStack__FP12RS_STACKDATAi_00262E70(...);
+extern "C" s32 _GET_OMAKE_FLAG__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    SetStack__FP12RS_STACKDATAi_00262E70(arg0, OmakeFlag);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _SET_WIND__FP12RS_STACKDATAi);
 extern "C" u32 OmakeFlag;
 extern "C" s32 GetStackInt__FP12RS_STACKDATA_00262DA0(RS_STACKDATA *);
@@ -22,7 +27,10 @@ extern "C" s32 _SET_OMAKE_FLAG__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) 
     OmakeFlag = GetStackInt__FP12RS_STACKDATA_00262DA0(arg0);
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/text_002717C0", GetCamera__Fv);
+extern "C" s32 GetActiveCamera__Fv(void);
+extern "C" s32 GetCamera__Fv(void) {
+    return GetActiveCamera__Fv();
+}
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _SET_CAMERA_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _GET_CAMERA_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _SET_CAMERA_REF__FP12RS_STACKDATAi);
@@ -88,7 +96,14 @@ s32 _ASQ_ANIME(RS_STACKDATA *stack, int argc) {
 s32 _ASQ_SE_PLAY(RS_STACKDATA *stack, int argc) {
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/text_002717C0", _IMG_SET_DRAW__FP12RS_STACKDATAi);
+extern "C" u8 esMother[1088];
+extern "C" void SetDraw__18CEventSpriteMotherFii(void *, s32, s32);
+extern "C" void _IMG_SET_DRAW__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    s32 id;
+
+    id = GetStackInt__FP12RS_STACKDATA_00262DA0(arg0++);
+    SetDraw__18CEventSpriteMotherFii(esMother, GetStackInt__FP12RS_STACKDATA_00262DA0(arg0), id);
+}
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _IMG_SET_GET__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _IMG_SET_PUT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_002717C0", _IMG_SET_NAME__FP12RS_STACKDATAi);

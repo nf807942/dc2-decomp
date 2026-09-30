@@ -124,7 +124,13 @@ extern "C" void DrawMenuFillBox__FP11mgCDrawPrimffffiiii(mgCDrawPrim *arg0, f32 
 }
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", GenarateRandamLine__FPiiiPiii);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", DrawRandamLine__FP11mgCDrawPrimPiiiPUc);
-INCLUDE_ASM("nonmatchings/game/cmenuitemuse", GetMenuDlTexture__Fv);
+extern "C" s32 GetTexture__17mgCTextureManagerFPci(...);
+extern "C" u8 mgTexManager[540];
+extern "C" char _1622_0036F8E0[];
+extern "C" s32 GetMenuDlTexture__Fv(void) {
+    return GetTexture__17mgCTextureManagerFPci(mgTexManager, _1622_0036F8E0, -1);
+}
+
 extern "C" void *Tex_MenuDl;
 extern "C" s32 MenuDl_TotalSize;
 extern "C" s32 MenuDl_ProcessSize;
@@ -140,7 +146,11 @@ INCLUDE_ASM("nonmatchings/game/cmenuitemuse", DrawMenuDl__Fi);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", CalcCommonBrdDrawInfo__FPfP21MENUFORM_MAKEBRD_INFOP6ClsMes);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", CommonBoardDraw__FPfRi);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", MenuCursorDraw__FP10mgCTexturePffiif);
-INCLUDE_ASM("nonmatchings/game/cmenuitemuse", MenuCursorDraw__FP10mgCTexturePffi);
+extern "C" void MenuCursorDraw__FP10mgCTexturePffiif(void *, f32 *, f32, s32, s32, f32);
+extern "C" void MenuCursorDraw__FP10mgCTexturePffi(void *arg0, f32 *arg1, f32 arg2, s32 arg3) {
+    MenuCursorDraw__FP10mgCTexturePffiif(arg0, arg1, arg2, 0, arg3, 1.0f);
+}
+
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", DrawMenuTilePattern__FP11mgCDrawPrimP10mgCTextureff9mgRect_i_iPUc);
 INCLUDE_ASM("nonmatchings/game/cmenuitemuse", DrawMenuMainFrmImg__FRi9mgRect_i_9mgRect_i_iiiii);
 s32 GetMenuMainFrameEndFlag(void) {

@@ -56,7 +56,8 @@ extern "C" s32 SearchCharaTexb__6CSceneFi(CScene *objet, s32 arg0) {
     return -1;
 }
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", PreLoadVillager__6CSceneFiP1);
-INCLUDE_ASM("nonmatchings/game/cscene_002CC360", PreLoadVillagerEnd__6CSceneFv);
+extern "C" void DeleteFileCache__Fv(void);
+extern "C" void PreLoadVillagerEnd__6CSceneFv(void *) { DeleteFileCache__Fv(); }
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", DeleteVillager__6CSceneFi);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", DeleteSubVillager__6CSceneFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", DeleteVillager__6CSceneFv);
@@ -87,11 +88,14 @@ struct CVillagerPlaceInfo {
     char pad_0[0x20];
     s32 field_20;
 };
-extern "C" s32 RegisterVillager__6CSceneFiiP18CVillagerPlaceInfo(...);
+extern "C" s32 RegisterVillager__6CSceneFiiP18CVillagerPlaceInfo(CScene *, s32, s32, s32);
 extern "C" void RegisterVillager__6CSceneFiii(CScene *objet, s32 arg0, s32 arg1, s32 arg2) {
     RegisterVillager__6CSceneFiiP18CVillagerPlaceInfo(objet, arg0, arg1, GetVlgrPlaceInfo__Fi(arg2));
 }
-INCLUDE_ASM("nonmatchings/game/cscene_002CC360", RegisterVillager__6CSceneFiiP18CVillagerPlaceInfo);
+extern "C" s32 Register__13CVillagerMngrFiiP18CVillagerPlaceInfo(...);
+extern "C" s32 RegisterVillager__6CSceneFiiP18CVillagerPlaceInfo(CScene *arg0, s32 arg1, s32 arg2, s32 arg3) {
+    return Register__13CVillagerMngrFiiP18CVillagerPlaceInfo((u8 *) arg0 + 0x3050, arg2, arg1, arg3);
+}
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", RegisterVillager__6CSceneFiiP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", GetTalkEvent__6CSceneFPfP15CSceneEventData);
 INCLUDE_ASM("nonmatchings/game/cscene_002CC360", GetMotionName__Fi);

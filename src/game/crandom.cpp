@@ -12,7 +12,16 @@ struct i;
 
 
 INCLUDE_ASM("nonmatchings/game/crandom", __ct__14CVillagerPlaceFv);
-INCLUDE_ASM("nonmatchings/game/crandom", GetQuestData__Fv);
+extern "C" s32 GetSaveData__Fv(void);
+extern "C" s32 GetQuestData__Fv(void) {
+    s32 temp_v0;
+
+    temp_v0 = GetSaveData__Fv();
+    if (temp_v0 != 0) {
+        return (s32) ((u8 *) temp_v0 + 0x62A40);
+    }
+    return 0;
+}
 void CQuestManager::Initialize(void) {
     this->field_0x0 = 0;
     this->field_0x4 = 0;
@@ -52,9 +61,15 @@ extern "C" s32 quest_NUM__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
 }
 INCLUDE_ASM("nonmatchings/game/crandom", quest_NEW__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/crandom", quest_COMMENT__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/crandom", quest_END__FP9SPI_STACKi);
+extern "C" s32 quest_END__FP9SPI_STACKi(void *arg0, s32 arg1) {
+    spi_quest_info += 0x3D0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/crandom", LoadCfg__13CQuestManagerFP9mgCMemoryPci);
-INCLUDE_ASM("nonmatchings/game/crandom", Initialize__10CQuestDataFv);
+extern "C" s32 memset(...);
+extern "C" s32 Initialize__10CQuestDataFv(void *self) {
+    return memset(self, 0, 0x480);
+}
 INCLUDE_ASM("nonmatchings/game/crandom", SetQuestFlag__10CQuestDataFii);
 INCLUDE_ASM("nonmatchings/game/crandom", QuestClear__10CQuestDataFi);
 INCLUDE_ASM("nonmatchings/game/crandom", GetPlayQuestData__10CQuestDataFi);

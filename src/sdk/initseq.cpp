@@ -23,7 +23,23 @@ INCLUDE_ASM("nonmatchings/sdk/initseq", _initRefImages);
 INCLUDE_ASM("nonmatchings/sdk/initseq", _setDefaultQM);
 INCLUDE_ASM("nonmatchings/sdk/initseq", _sequenceExtension);
 INCLUDE_ASM("nonmatchings/sdk/initseq", _sequenceDisplayExtension);
-INCLUDE_ASM("nonmatchings/sdk/initseq", _sequenceScalableExtension);
-INCLUDE_ASM("nonmatchings/sdk/initseq", _unknown_extension);
-INCLUDE_ASM("nonmatchings/sdk/initseq", _pictureSpatialScalableExtension);
-INCLUDE_ASM("nonmatchings/sdk/initseq", _pictureTemporalScalableExtension);
+extern "C" void _Error(...);
+extern "C" char D_003651B8[];
+extern "C" void _sequenceScalableExtension(s32 arg0) {
+    _Error(arg0, D_003651B8);
+}
+extern "C" void _Error(...);
+extern "C" char D_003651E8[];
+extern "C" void _unknown_extension(s32 arg0) {
+    _Error(arg0, D_003651E8);
+}
+extern "C" void _Error(...);
+extern "C" char D_00365200[];
+extern "C" void _pictureSpatialScalableExtension(s32 arg0) {
+    _Error(arg0, D_00365200);
+}
+extern "C" void _Error(...);
+extern "C" char D_00365238[];
+extern "C" void _pictureTemporalScalableExtension(s32 arg0) {
+    _Error(arg0, D_00365238);
+}

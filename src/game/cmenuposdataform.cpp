@@ -96,7 +96,12 @@ extern "C" void Func_MallocPartEffectInfo__FP18MENUFORMPARTS_TYPEP9mgCMemoryi(ME
     }
 }
 INCLUDE_ASM("nonmatchings/game/cmenuposdataform", Func_SetPartEffectInfo__FP25MENU_PARTS_EFFECT_STRUCT1UiPs);
-INCLUDE_ASM("nonmatchings/game/cmenuposdataform", SetActionCharaPtr__16CMenuPosDataFormFP12CActionCharaii);
+struct CActionChara;
+extern "C" void SetActionCharaPtr__16CMenuPosDataFormFP12CActionCharaii(CMenuPosDataForm *objet, CActionChara *a, s32 b, s32 c) {
+    *(CActionChara **) ((u8 *) objet + 0x38) = a;
+    *(s16 *) ((u8 *) objet + 0x34) = b;
+    *(s16 *) ((u8 *) objet + 0x36) = c;
+}
 INCLUDE_ASM("nonmatchings/game/cmenuposdataform", SetRGBACalcParam__16CMenuPosDataFormFiii);
 INCLUDE_ASM("nonmatchings/game/cmenuposdataform", FormFadeIn__16CMenuPosDataFormFii);
 INCLUDE_ASM("nonmatchings/game/cmenuposdataform", FormFadeOut__16CMenuPosDataFormFii);
@@ -144,7 +149,11 @@ extern "C" s32 CheckMoveEnd__16CMenuPosDataFormFii(CMenuPosDataForm_infere *obje
 }
 INCLUDE_ASM("nonmatchings/game/cmenuposdataform", CheckMoveEnd__16CMenuPosDataFormFv);
 INCLUDE_ASM("nonmatchings/game/cmenuposdataform", SetAction__16CMenuPosDataFormFPc);
-INCLUDE_ASM("nonmatchings/game/cmenuposdataform", SetNextMovePos__16CMenuPosDataFormFPii);
+extern "C" void SetNextMovePos__16CMenuPosDataFormFPii(void *self, s32 *arg0, s32 arg1) {
+    *(s8 *) ((u8 *) self + 0x20) = arg1;
+    *(s32 *) ((u8 *) self + 0x24) = arg0[0];
+    *(s32 *) ((u8 *) self + 0x28) = arg0[1];
+}
 INCLUDE_ASM("nonmatchings/game/cmenuposdataform", GetNextMovePos__16CMenuPosDataFormFPi);
 INCLUDE_ASM("nonmatchings/game/cmenuposdataform", Menu3DivideTextureDraw__FP11mgCDrawPrim9mgRect_i_Psi);
 INCLUDE_ASM("nonmatchings/game/cmenuposdataform", MenuFormDrawNormal__16CMenuPosDataFormFiiffRi);

@@ -18,7 +18,11 @@ void DrawDownLoadAnaunceSwitch(s32 value) {
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", StepDownLoadAnaunce__Fi);
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", DrawDownLoadAnaunce__Fv);
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", MakeDownLoadAnaunce__FiP9mgCMemoryPiPiPi);
-INCLUDE_ASM("nonmatchings/game/cmenugeorama", InitMenuDl3__FP10mgCTexture);
+struct mgCTexture;
+extern "C" u32 MenuGeoStoneDownLoadTime;
+extern "C" s32 InitMenuDl__FP10mgCTexturei(mgCTexture *, s32);
+extern "C" void InitMenuDl3__FP10mgCTexture(mgCTexture *tex) { InitMenuDl__FP10mgCTexturei(tex, MenuGeoStoneDownLoadTime); }
+
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", StepMenuDl3__Fv);
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", MenuPlacedHouseDraw__FRi);
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", MenuPlacedHouseMessMake__FP14CEditPartsInfoP10CEditHousei);
@@ -211,7 +215,12 @@ extern "C" void ExitEnd__12CMenuGeoramaFv(CMenuGeorama_infere *objet) {
     GeoRequestFlag = 0;
 }
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", GetPartsIDListNum__12CMenuGeoramaFi);
-INCLUDE_ASM("nonmatchings/game/cmenugeorama", GetNowMakePartsNum__12CMenuGeoramaFi);
+extern "C" s32 GetePlacePartsAtInfoID__8CEditMapFiPii(void *, s32, s32 *, s32);
+extern "C" void *MenuMainMapInfo;
+extern "C" s32 GetNowMakePartsNum__12CMenuGeoramaFi(void *self, s32 id) {
+    return GetePlacePartsAtInfoID__8CEditMapFiPii(MenuMainMapInfo, id, 0, 0);
+}
+
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", GetPenkiItemNo__Fi);
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", ArrangePartsList__12CMenuGeoramaFii);
 INCLUDE_ASM("nonmatchings/game/cmenugeorama", UpdateGeoramaPartsList__12CMenuGeoramaFv);

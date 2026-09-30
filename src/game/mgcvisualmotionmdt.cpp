@@ -180,7 +180,12 @@ loop_3:
     goto loop_1;
 }
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", ezBgm__Fii);
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", StreamOpenState__6CSoundFv);
+extern "C" gCd2_champs gCd2;
+extern "C" s32 sceSifCheckStatRpc(...);
+extern "C" s32 StreamOpenState__6CSoundFv(void) {
+    return sceSifCheckStatRpc(&gCd2);
+}
+
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", DrawEpisode__20CStartupEpisodeTitleFii);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Switch__20CStartupEpisodeTitleFi);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Step__20CStartupEpisodeTitleFv);
@@ -251,7 +256,64 @@ INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", GeoStep__9CGeoStoneFv);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", CheckEvent__9CGeoStoneFPf);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Initialize__9CGeoStoneFv);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Draw__13CRandomCircleFPf);
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Step__13CRandomCircleFv);
+struct CRC_v {
+    virtual void v0() = 0;
+    virtual void v1() = 0;
+    virtual void v2() = 0;
+    virtual void v3() = 0;
+    virtual void v4() = 0;
+    virtual void v5() = 0;
+    virtual void v6() = 0;
+    virtual void v7() = 0;
+    virtual void v8() = 0;
+    virtual void v9() = 0;
+    virtual void v10() = 0;
+    virtual void v11() = 0;
+    virtual void v12() = 0;
+    virtual void v13() = 0;
+    virtual void v14() = 0;
+    virtual void v15() = 0;
+    virtual void v16() = 0;
+    virtual void v17() = 0;
+    virtual void v18() = 0;
+    virtual void v19() = 0;
+    virtual void v20() = 0;
+    virtual void v21() = 0;
+    virtual void v22() = 0;
+    virtual void v23() = 0;
+    virtual void v24() = 0;
+    virtual void v25() = 0;
+    virtual void v26() = 0;
+    virtual void v27() = 0;
+    virtual void v28() = 0;
+    virtual void v29() = 0;
+    virtual void v30() = 0;
+    virtual void v31() = 0;
+    virtual void v32() = 0;
+    virtual void v33() = 0;
+    virtual void v34() = 0;
+    virtual void v35() = 0;
+    virtual void v36() = 0;
+    virtual void v37() = 0;
+    virtual void v38() = 0;
+    virtual void v39() = 0;
+    virtual void v40() = 0;
+    virtual void v41() = 0;
+    virtual void v42() = 0;
+    virtual void v43() = 0;
+    virtual void v44() = 0;
+    virtual void v45() = 0;
+    virtual void v46() = 0;
+    virtual void v47() = 0;
+    virtual void v48() = 0;
+    virtual void v49() = 0;
+    virtual void v50() = 0;
+    virtual void Step() = 0;
+};
+extern "C" void Step__13CRandomCircleFv(void *arg0) {
+    ((CRC_v *) ((u8 *) arg0 + 0x40))->Step();
+}
+
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", DrawSymbol__13CRandomCircleFP14CMiniMapSymbol);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", CheckArea__13CRandomCircleFPff);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", GetPosition__13CRandomCircleFPfi);
@@ -283,7 +345,13 @@ loop_1:
     goto loop_1;
 }
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", SetCircle__13CRandomCircleFPf);
-INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Clear__13CRandomCircleFv);
+extern "C" void Clear__13CRandomCircleFv(int *p) {
+    p[12] = 0;
+    p[13] = 0;
+    p[14] = 0;
+    p[15] = -1;
+}
+
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Initialize__13CRandomCircleFv);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", Draw__12CTreasureBoxFPf);
 INCLUDE_ASM("nonmatchings/game/mgcvisualmotionmdt", DrawShadow__12CTreasureBoxFPfPf);

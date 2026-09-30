@@ -226,8 +226,22 @@ extern "C" s32 _UNLOCK_STACK__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     temp_v0->unk1C = 0;
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/cripple", _RESET_EVENT_TRG__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/cripple", _SET_CHARA_NO__FP12RS_STACKDATAi);
+extern "C" s32 _RESET_EVENT_TRG__FP12RS_STACKDATAi(RS_STACKDATA *a, s32 b) {
+    *(s32 *) ((u8 *) EventScene + 0x2E88) = 0;
+    return 1;
+}
+
+struct SetCharaNoSlot { u32 a; u32 b; };
+extern "C" void SetCharaNo__6CSceneFii(void *, s32, s32);
+extern "C" s32 _SET_CHARA_NO__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    s32 id;
+    SetCharaNoSlot *p = (SetCharaNoSlot *) arg0;
+
+    id = GetStackInt__FP12RS_STACKDATA_00262DA0((RS_STACKDATA *) p++);
+    SetCharaNo__6CSceneFii(EventScene, id, GetStackInt__FP12RS_STACKDATA_00262DA0((RS_STACKDATA *) p));
+    return 1;
+}
+
 INCLUDE_ASM("nonmatchings/game/cripple", _GET_CHARA_NO__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cripple", _SEARCH_CHARA_NO__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cripple", _GET_NEAR_RANDOM_STONE_POS__FP12RS_STACKDATAi);
@@ -299,7 +313,9 @@ extern "C" s32 _AMG_GET_ATTR_STATUS__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 a
 INCLUDE_ASM("nonmatchings/game/cripple", _SET_NEAR_DIST__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cripple", _SET_KEEP_TIME__FP12RS_STACKDATAi);
 struct EdEventInfo_keep {
-    char pad0[0x1290];
+    char pad0[0x20];
+    f32 f20;
+    char pad24[0x126C];
     f32 keepTime;
     char pad1294[12];
 };
@@ -418,7 +434,68 @@ INCLUDE_ASM("nonmatchings/game/cripple", MoveCamera__FPfPf);
 INCLUDE_ASM("nonmatchings/game/cripple", MoveCameraRef__FPfPf);
 INCLUDE_ASM("nonmatchings/game/cripple", MoveChara__FP11CCharacter2P9mgCCameraP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cripple", InitEventEdit__FiP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/cripple", ChkEventEditStart__Fv);
+struct g_info_CE {
+    s32 f0;
+    char pad4[8];
+    s32 fC;
+    s32 f10;
+    char pad14[12];
+    f32 pos[4];
+    f32 ref[4];
+};
+struct mgCCameraCE;
+extern "C" u32 DebugFlag;
+extern "C" u8 GamePad_003FA5A0[1144];
+extern "C" mgCCameraCE *GetActiveCamera__Fv(void);
+extern "C" s32 Down__8CGamePadFi(void *, s32);
+extern "C" f32 mgGetProjection__Fv(void);
+extern "C" s32 GetPos__9mgCCameraFPf(void *, f32 *);
+extern "C" s32 GetRef__9mgCCameraFPf(void *, f32 *);
+extern "C" s32 evLoadDebugFont__FiP9mgCMemory(s32, s32);
+extern "C" s32 Initialize__10CCameraPasFv(void *);
+extern "C" s32 SetFrame__10CCameraPasFi(void *, s32);
+extern "C" s32 Initialize__9CCharaPasFv(void *);
+extern "C" s32 SetFrame__9CCharaPasFi(void *, s32);
+extern "C" s32 MenuModeOff__8CGamePadFv(void *);
+extern "C" g_info_CE g_info;
+extern "C" s32 StopCamera__9mgCCamera;
+extern "C" u8 g_cmr_pas[2384];
+extern "C" u8 g_chara_pas[1200];
+extern "C" u32 g_cp_cursor;
+extern "C" u32 g_cp_mode;
+extern "C" u32 g_cp_selno;
+extern "C" u32 g_chara_pas_cursor;
+extern "C" u32 g_chara_pas_mode;
+extern "C" u32 g_chara_pas_selno;
+extern "C" s32 ChkEventEditStart__Fv(void) {
+    mgCCameraCE *cam;
+    if (DebugFlag != 1) {
+        return 0;
+    }
+    cam = GetActiveCamera__Fv();
+    if (Down__8CGamePadFi(GamePad_003FA5A0, 0x200) != 0) {
+        g_info.f0 = 1;
+        EdEventInfo.f20 = mgGetProjection__Fv();
+        StopCamera__9mgCCamera = 1;
+        GetPos__9mgCCameraFPf(cam, g_info.pos);
+        GetRef__9mgCCameraFPf(cam, g_info.ref);
+        evLoadDebugFont__FiP9mgCMemory(g_info.f10, g_info.fC);
+        Initialize__10CCameraPasFv(g_cmr_pas);
+        SetFrame__10CCameraPasFi(g_cmr_pas, 200);
+        g_cp_cursor = 0;
+        g_cp_mode = 0;
+        g_cp_selno = 0;
+        Initialize__9CCharaPasFv(g_chara_pas);
+        SetFrame__9CCharaPasFi(g_chara_pas, 200);
+        g_chara_pas_cursor = 0;
+        g_chara_pas_mode = 0;
+        g_chara_pas_selno = 0;
+        MenuModeOff__8CGamePadFv(GamePad_003FA5A0);
+        return 1;
+    }
+    return 0;
+}
+
 INCLUDE_ASM("nonmatchings/game/cripple", EventEdit__FP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cripple", DrawEventEdit__Fv);
 extern "C" s32 rand(void);
@@ -429,7 +506,13 @@ extern "C" f32 f_rand__Fff(f32 arg0, f32 arg1) {
 extern "C" s32 i_rand__Fii(s32 arg0, s32 arg1) {
     return fptosi(f_rand__Fff((f32) arg0, (f32) arg1));
 }
-INCLUDE_ASM("nonmatchings/game/cripple", InitVector__FPf);
+extern "C" s32 InitVector__FPf(f32 *arg0) {
+    arg0[0] = 0.0f;
+    arg0[1] = 0.0f;
+    arg0[2] = 0.0f;
+    arg0[3] = 1.0f;
+}
+
 INCLUDE_ASM("nonmatchings/game/cripple", RandXYinViewArea__FfffPfPf);
 INCLUDE_ASM("nonmatchings/game/cripple", Birth__7CRippleFPf);
 struct CRipple_step {

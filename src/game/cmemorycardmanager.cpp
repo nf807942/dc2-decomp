@@ -147,9 +147,16 @@ loop_1:
     }
     goto loop_1;
 }
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", InitError__18CMemoryCardManagerFv);
+extern "C" void InitError__18CMemoryCardManagerFv(u8 *objet) {
+    memset(objet + 0x4D0, 0, 0x14);
+}
+
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", InitForMC__18CMemoryCardManagerFv);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", FinishForMC__18CMemoryCardManagerFv);
+extern "C" s32 sceMcEnd(...);
+extern "C" void FinishForMC__18CMemoryCardManagerFv(void) {
+    sceMcEnd();
+}
+
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", SetBuff_Album__18CMemoryCardManagerFPc);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", SetIconData__18CMemoryCardManagerFP12MC_ICON_DATAi);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetIconDataSize__18CMemoryCardManagerFv);
@@ -412,7 +419,13 @@ extern "C" void SetTexture__17CSWordAfterEffectFiP10mgCTextureiiii(CSWordAfterEf
     objet->unk34 = 0x80;
     objet->unk30 = 0x80;
 }
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", SetTexture__17CSWordAfterEffectFiiii);
+extern "C" void SetTexture__17CSWordAfterEffectFiiii(u8 *self, s32 a, s32 b, s32 c, s32 d) {
+    *(s32 *) (self + 0x68) = a;
+    *(s32 *) (self + 0x68 + 4) = b;
+    *(s32 *) (self + 0x68 + 8) = c;
+    *(s32 *) (self + 0x68 + 12) = d;
+}
+
 extern "C" u8 _356_00377D08[10];
 struct inferred;
 #include "gen/mgCFrame.hpp"
@@ -499,7 +512,11 @@ INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", AddBuildPartsNum__9CSaveData
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetEditData__9CSaveDataFi);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetPlaceEditPartsNum__9CSaveDataFi);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetMapFlag__9CSaveDataFi);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", InitBitCtrl__9CSaveDataFv);
+struct SaveBitB { char pad[0x643C8]; u8 v; };
+extern "C" void InitBitCtrl__9CSaveDataFv(SaveBitB *self) {
+    self->v = 0;
+}
+
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", SetBitCtrl__9CSaveDataFi);
 typedef struct CSaveData_infere2 {
     /* 0x00000 */ char pad0[0x643C8];
@@ -508,8 +525,16 @@ typedef struct CSaveData_infere2 {
 extern "C" void ResetBitCtrl__9CSaveDataFi(CSaveData_infere2 *objet, s32 arg0) {
     objet->unk643C8 &= ~arg0 & 0xFF;
 }
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetBitCtrl__9CSaveDataFv);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetItem__9CSaveDataFii);
+struct SaveBitA { char pad[0x643C8]; u8 v; };
+extern "C" s32 GetBitCtrl__9CSaveDataFv(SaveBitA *self) {
+    return self->v;
+}
+
+extern "C" s32 GetItem__16CUserDataManagerFii(...);
+extern "C" s32 GetItem__9CSaveDataFii(void *self, s32 a, s32 b) {
+    return GetItem__16CUserDataManagerFii((u8 *) self + 0x1D2A0, a, b);
+}
+
 typedef struct CSaveData {
     /* 0x00000 */ char pad0[0x643D0];
     /* 0x643D0 */ s32 unk643D0;                     /* inferred */
@@ -541,10 +566,22 @@ extern "C" s32 CheckEventDay__9CSaveDataFi(CSaveData_infere3 *objet, s32 arg0) {
     return arg0 - temp_v0;
 }
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", CheckTourBoot__9CSaveDataFi);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", CheckNowTourEvent__9CSaveDataFv);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", CheckNowTourType__9CSaveDataFv);
+struct CSaveData_tour { u8 pad[0x643D8]; s16 tour; };
+extern "C" s16 CheckNowTourEvent__9CSaveDataFv(CSaveData_tour *self) {
+    return self->tour;
+}
+
+struct SaveTourA { char pad[0x643DA]; s8 v; };
+extern "C" s32 CheckNowTourType__9CSaveDataFv(SaveTourA *self) {
+    return self->v;
+}
+
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", AddTourCountEtc__9CSaveDataFi);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetTourCountEtc__9CSaveDataFv);
+struct SaveTourB { char pad[0x643DB]; s8 v; };
+extern "C" s32 GetTourCountEtc__9CSaveDataFv(SaveTourB *self) {
+    return self->v;
+}
+
 typedef struct CSaveData_infere {
     /* 0x00000 */ char pad0[0x1A14];
     /* 0x01A14 */ s32 unk1A14;                      /* inferred */
@@ -575,9 +612,18 @@ INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", ClearPlayerScore__11CSphidaD
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", EnterScore__11CSphidaDataFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetPlayerData__11CSphidaDataFi);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", InitPlay__11CSphidaDataFv);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", IsUsed__12GYORACE_DATAFv);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Init__12GYORACE_DATAFv);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Initialize__12CGyoRaceDataFv);
+extern "C" s32 IsUsed__12GYORACE_DATAFv(u8 *objet) {
+    return (*(s16 *) (objet + 2) < 2) ^ 1;
+}
+
+extern "C" void Init__12GYORACE_DATAFv(void *self) {
+    memset(self, 0, 0xA0);
+}
+
+extern "C" void Initialize__12CGyoRaceDataFv(void *self) {
+    memset(self, 0, 0x2C28);
+}
+
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", SearchSpace__12CGyoRaceDataFv);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", SearchSpaceData__12CGyoRaceDataFPi);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", GetData__12CGyoRaceDataFi);
@@ -673,7 +719,15 @@ extern "C" void StepGeyserEffect__FP6CScene(CScene *arg0) {
     }
 }
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", DrawGeyserEffect__FP6CScene);
-INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", Initialize__16CDngFloorManagerFv);
+extern "C" void Initialize__16CDngFloorManagerFv(void *self) {
+    u8 *p = (u8 *)self;
+    *(u8 *)p = 0;
+    *(s32 *)(p + 4) = 0;
+    *(s32 *)(p + 8) = 0;
+    *(s16 *)(p + 0xC) = 0;
+    *(s16 *)(p + 0xE) = 0;
+}
+
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", _TREE_MAPINFO__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", _GLID_INFO__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cmemorycardmanager", _ROOT_INFO__FP9SPI_STACKi);

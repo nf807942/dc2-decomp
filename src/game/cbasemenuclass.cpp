@@ -35,7 +35,10 @@ INCLUDE_ASM("nonmatchings/game/cbasemenuclass", BookshelfMessageMake__FP6ClsMesi
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", DrawTrushMenuMessage__Fv);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", __ct__14CBaseMenuClassFv);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", SetTexBlock__14CBaseMenuClassFPi);
-INCLUDE_ASM("nonmatchings/game/cbasemenuclass", DeleteTexBlock__14CBaseMenuClassFv);
+extern "C" void MenuDeleteTextureBlock__FPi(...);
+extern "C" void DeleteTexBlock__14CBaseMenuClassFv(char *objet) {
+    MenuDeleteTextureBlock__FPi(objet + 0x18);
+}
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", MenuItemCommnadSelectPrepare__14CBaseMenuClassFP13CGameDataUsedii);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", MenuItemMoveItemCommand__14CBaseMenuClassFP13CGameDataUsediiP16CMenuPosDataFormi);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", MenuItemCommandSelect__14CBaseMenuClassFii);
@@ -55,7 +58,11 @@ INCLUDE_ASM("nonmatchings/game/cbasemenuclass", SelectInGiftBox__14CBaseMenuClas
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", SetConditionHowMuchBoard__Fv);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", SetAskHowMuchItemNum__14CBaseMenuClassFP18MENU_SWAPITEM_INFOP13CGameDataUsed);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", SetAskParam__14CBaseMenuClassFP17MENU_ASKMODE_PARA);
-INCLUDE_ASM("nonmatchings/game/cbasemenuclass", ExeScript__14CBaseMenuClassFPc);
+struct CBMC_e { char pad0[8]; s8 *p; s32 n; };
+extern "C" void MenuCommandAnalyze__FPciPc(s8 *arg0, s32 arg1, s8 *arg2);
+extern "C" void ExeScript__14CBaseMenuClassFPc(CBMC_e *objet, s8 *s) {
+    MenuCommandAnalyze__FPciPc(objet->p, objet->n, s);
+}
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", ExtendCommand__14CBaseMenuClassFii);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", SelectMakeObject__14CBaseMenuClassFi);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", IsAskEnd__14CBaseMenuClassFiP16CMenuPosDataForm);
@@ -68,7 +75,10 @@ extern "C" void FadeInMenu__14CBaseMenuClassFif(CBaseMenuClass *objet, s32 arg0,
     FadeStep__10CFadeInOutFv(MenuMainScene + 0x2C70);
 }
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", FadeOutMenu__14CBaseMenuClassFif);
-INCLUDE_ASM("nonmatchings/game/cbasemenuclass", FadeCheckMenu__14CBaseMenuClassFv);
+extern "C" s32 FadeCheck__10CFadeInOutFv(...);
+extern "C" s32 FadeCheckMenu__14CBaseMenuClassFv(void) {
+    return FadeCheck__10CFadeInOutFv(MenuMainScene + 0x2C70);
+}
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", SetPreCmdTrush__FP14CBaseMenuClassiP13CGameDataUsedP16CMenuPosDataForm);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", SetPreCmdSpectolBreak__FP14CBaseMenuClassiP16CMenuPosDataFormP13CGameDataUsedP13CGameDataUsed);
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", SetPreCmdGiftBoxSelect__FP14CBaseMenuClassP13CGameDataUsed);
@@ -118,7 +128,10 @@ void CMENU_USERPARAM::Initialize(void) {
     this->field_0x14 = 0;
 }
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", AttachInfo__15CMENU_USERPARAMFv);
-INCLUDE_ASM("nonmatchings/game/cbasemenuclass", Initialize__17MENU_ASKMODE_PARAFv);
+extern "C" void *memset(void *, int, unsigned);
+extern "C" s32 Initialize__17MENU_ASKMODE_PARAFv(void *objet) {
+    return (s32)memset(objet, 0, 0x94);
+}
 struct inferred;
 typedef struct MENU_ASKMODE_PARA {
     /* 0x00 */ char pad0[0x8C];
@@ -130,14 +143,22 @@ extern "C" MENU_ASKMODE_PARA *__ct__17MENU_ASKMODE_PARAFv(MENU_ASKMODE_PARA *obj
     Initialize__17MENU_ASKMODE_PARAFv(objet);
     return objet;
 }
-INCLUDE_ASM("nonmatchings/game/cbasemenuclass", Set__18MENU_SWAPITEM_INFOFiiii);
+extern "C" void Set__18MENU_SWAPITEM_INFOFiiii(void *arg0, s32 a, s32 b, s32 c, s32 d) {
+    *(s16 *) ((u8 *) arg0 + 2) = a;
+    *(s16 *) ((u8 *) arg0 + 4) = b;
+    *(s16 *) ((u8 *) arg0 + 6) = c;
+    *(s16 *) arg0 = d;
+}
 INCLUDE_ASM("nonmatchings/game/cbasemenuclass", IsEnableChangeRoboParts__FP13CGameDataUsed);
-INCLUDE_ASM("nonmatchings/game/cbasemenuclass", SetSpectolInfo__FP13CGameDataUsedP13CGameDataUsed);
 typedef struct SpectolInfo_champs {
-    char pad0[4];
+    s32 unk0;
     s32 unk4;
 } SpectolInfo_champs;
 extern "C" SpectolInfo_champs SpectolInfo;
+extern "C" void SetSpectolInfo__FP13CGameDataUsedP13CGameDataUsed(s32 a, s32 b) {
+    SpectolInfo.unk0 = a;
+    SpectolInfo.unk4 = b;
+}
 extern "C" s32 Init__13CGameDataUsedFv(...);
 extern "C" void InitSpectol__Fv(void) {
     if (SpectolInfo.unk4 != NULL) {

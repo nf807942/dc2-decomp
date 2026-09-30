@@ -137,7 +137,22 @@ extern "C" s32 _COLPRIM_DELETE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) 
     now_script->unk134 = NULL;
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/cpowgage", _COLPRIM_GET_HITCNT__FP12RS_STACKDATAi);
+struct ColprimHit_a { char pad0[0x134]; struct ColprimHit_b *p; };
+struct ColprimHit_b { char pad0[0x28]; s32 cnt; };
+extern "C" void SetStack__FP12RS_STACKDATAi_002E8350(void *, s32);
+extern "C" s32 _COLPRIM_GET_HITCNT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    ColprimHit_b *t;
+
+    if (arg1 != 1) {
+        return 0;
+    }
+    t = ((ColprimHit_a *) now_script)->p;
+    if (t == NULL) {
+        return 0;
+    }
+    SetStack__FP12RS_STACKDATAi_002E8350(arg0, t->cnt);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/cpowgage", _COLPRIM_GET_GIFT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cpowgage", _COLPRIM_GET_REVCNT__FP12RS_STACKDATAi);
 struct now_script_champs_1ac566 {

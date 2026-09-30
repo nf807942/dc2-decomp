@@ -39,7 +39,10 @@ struct CDC2Mes_itemnumbers { char pad0[0x217C]; s32 unk217C[1]; };
 extern "C" s32 GetMsgItemNo__7CDC2MesFi(CDC2Mes_itemnumbers *objet, s32 arg0) {
     return objet->unk217C[arg0];
 }
-INCLUDE_ASM("nonmatchings/game/cdc2mes_0021F2B0", SetFontColor__7CDC2MesFiiii);
+extern "C" s32 SetDefColor__6ClsMesFUi(void *, u32);
+extern "C" void SetFontColor__7CDC2MesFiiii(void *self, s32 r, s32 g, s32 b, s32 a) {
+    SetDefColor__6ClsMesFUi(self, r | (g << 8 | (a << 24 | b << 16)));
+}
 extern "C" u32 mgScreenWidth;
 typedef struct CDC2Mes_infere {
     /* 0x0000 */ char pad0[0xE0];
@@ -84,7 +87,10 @@ INCLUDE_ASM("nonmatchings/game/cdc2mes_0021F2B0", SetMsgVolumeNo__7CDC2MesFPii);
 INCLUDE_ASM("nonmatchings/game/cdc2mes_0021F2B0", SetMsgVolumeNo__7CDC2MesFPiPii);
 INCLUDE_ASM("nonmatchings/game/cdc2mes_0021F2B0", SetMsgVolumeNoOne__7CDC2MesFi);
 INCLUDE_ASM("nonmatchings/game/cdc2mes_0021F2B0", SetMsgItemPos__7CDC2MesFPii);
-INCLUDE_ASM("nonmatchings/game/cdc2mes_0021F2B0", MakeMsg__7CDC2MesFi);
+extern "C" void MakeMsg__7CDC2MesFi(void *objet, s32 arg0) {
+    *(s16 *) ((u8 *) objet + 0x295E) = arg0;
+    *(u8 *) ((u8 *) objet + 0x2980) = 0;
+}
 typedef struct CDC2Mes_infere2 {
     /* 0x0000 */ char pad0[0x295E];
     /* 0x295E */ s16 unk295E;                       /* inferred */

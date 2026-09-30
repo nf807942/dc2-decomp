@@ -9,8 +9,12 @@
 #include "common.h"
 
 INCLUDE_ASM("nonmatchings/game/text_00197BF0", LoadSystemMes__Fv);
-INCLUDE_ASM("nonmatchings/game/text_00197BF0", GetSystemMesBuffer__Fv);
-INCLUDE_ASM("nonmatchings/game/text_00197BF0", GetSysMesBuffer__Fv);
+extern "C" char SystemMesBuffer[];
+extern "C" void *GetSystemMesBuffer__Fv(void) { return SystemMesBuffer; }
+
+extern "C" char SysMesBuffer[];
+extern "C" void *GetSysMesBuffer__Fv(void) { return SysMesBuffer; }
+
 extern "C" s32 CreateSystemMes__Fii(s32, s32);
 extern "C" void CreateSystemMes__Fv(void) {
     CreateSystemMes__Fii(0, 0);

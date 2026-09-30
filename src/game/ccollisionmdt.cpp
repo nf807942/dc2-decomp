@@ -67,7 +67,15 @@ s32 CCollision::Intersection(f32 *a, f32 *b, f32 *c) {
     return 0;
 }
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", InsidePoint__9CColFrameFPf);
-INCLUDE_ASM("nonmatchings/game/ccollisionmdt", pre_trance_normal__FPA4_f);
+extern "C" void pre_trance_normal__FPA4_f(float (*m)[4]) {
+    asm {
+        lqc2 vf10, 0(a0)
+        lqc2 vf11, 0x10(a0)
+        lqc2 vf12, 0x20(a0)
+        lqc2 vf13, 0x30(a0)
+    }
+}
+
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", trance_normal__FPfPfPfPf);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", PickUpNearPoly__9CColFrameFP6CCPolyRC9mgVu0FBOXi);
 s32 CCollision::PickUpNearPoly(CCPoly *poly, const mgVu0FBOX &box, s32 flag) {
@@ -75,7 +83,13 @@ s32 CCollision::PickUpNearPoly(CCPoly *poly, const mgVu0FBOX &box, s32 flag) {
 }
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", GetWorldBBox__9CColFrameFP9mgVu0FBOX);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", LoadCollisionFile__FP10MDS_HEADERP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/ccollisionmdt", Initialize__9CColFrameFv);
+extern "C" void Initialize__8mgCFrameFv(void *);
+extern "C" void Initialize__9CColFrameFv(u8 *objet) {
+    *(s32 *) (objet + 0x110) = 1;
+    *(s32 *) (objet + 0x114) = 0;
+    Initialize__8mgCFrameFv(objet);
+}
+
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", __ct__9CColFrameFv);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", CreateCollisionMDT__FPUiP9mgCMemory);
 s32 CColFrame::Draw(u32 *mask, mgCDrawManager *manager) {
@@ -108,7 +122,11 @@ extern "C" void Initialize__13CCollisionMDTFv(CCollisionMDT *objet) {
     ((struct objet_champs_332138 *) objet)->unk40 = 0;
     ((struct objet_champs_332138 *) objet)->unk44 = 0;
 }
-INCLUDE_ASM("nonmatchings/game/ccollisionmdt", Copy__10CCollisionFR10CCollisionP9mgCMemory);
+extern "C" s32 __as__9mgVu0FBOXFR9mgVu0FBOX(...);
+extern "C" void Copy__10CCollisionFR10CCollisionP9mgCMemory(u8 *self, u8 *other) {
+    __as__9mgVu0FBOXFR9mgVu0FBOX(other + 0x10, self + 0x10);
+}
+
 extern "C" void CreateBBox__10CCollisionFv(void *objet) {
 }
 s32 CCollision::GetMaxY(f32 *y) {
@@ -154,7 +172,11 @@ extern "C" void SetCurrentDir__FPc(s8 *arg0) {
     }
     strcpy(&CurrentDir, &TopDir);
 }
-INCLUDE_ASM("nonmatchings/game/ccollisionmdt", GetCurrentDir__FPc);
+extern "C" s32 strcpy(...);
+extern "C" s32 GetCurrentDir__FPc(char *a) {
+    return strcpy(a, CurrentDir);
+}
+
 extern "C" u8 CurrentDir[256];
 extern "C" u8 TopDir[256];
 extern "C" s32 strcat(...);
@@ -176,7 +198,9 @@ INCLUDE_ASM("nonmatchings/game/ccollisionmdt", InitReadBG__Fv);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", LoadFileBG__FPcP1Pi);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", GetReadBGFile__FPc);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", GetReadBGFile__Fi);
-INCLUDE_ASM("nonmatchings/game/ccollisionmdt", StartReadBG__Fv);
+extern "C" s32 InitReadBG__Fv(void);
+extern "C" void StartReadBG__Fv(void) { InitReadBG__Fv(); }
+
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", ReadBG__Fv);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", ReadBGSync__Fv);
 extern "C" u8 bg_read_info[9216];
@@ -231,7 +255,11 @@ INCLUDE_ASM("nonmatchings/game/ccollisionmdt", CDRead__FPcPUiPi);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", align_size__FUiUi);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", GetNewFileCache__Fv);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", InitFileCache__FP1i);
-INCLUDE_ASM("nonmatchings/game/ccollisionmdt", DeleteFileCache__Fv);
+extern "C" void InitFileCache__FP1i(int *, int);
+extern "C" void DeleteFileCache__Fv(void) {
+    InitFileCache__FP1i(0, 0);
+}
+
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", EntryFileCache__FPcP1i);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", LoadFileCacheBG__FPc);
 INCLUDE_ASM("nonmatchings/game/ccollisionmdt", SearchFileCache__FPc);

@@ -11,7 +11,11 @@
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _SET_EVENT_DATA__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _STOPWATCH__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _SET_FUNC_ETC__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_0026EA00", GetChara__Fi);
+extern "C" s32 GetCharacter__Fi(s32);
+extern "C" s32 GetChara__Fi(s32 arg0) {
+    return GetCharacter__Fi(arg0);
+}
+
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _GET_CHARA_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _GET_CHARA_TALK_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _TURN_CHARA__FP12RS_STACKDATAi);
@@ -49,9 +53,51 @@ extern "C" s32 _DEL_REFERENCE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
 }
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _SHADOW_CLIP_OFF__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _GET_COORDINATE_ANGLE__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_0026EA00", _GET_CHARA_WIDTH__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_0026EA00", _GET_CHARA_HEIGHT__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_0026EA00", _GET_CHARA_WEIGHT__FP12RS_STACKDATAi);
+struct CharaDim_WIDTH { char pad0[0x10C]; f32 v; };
+extern "C" void SetStack__FP12RS_STACKDATAf_00262E90(void *, f32);
+extern "C" s32 _GET_CHARA_WIDTH__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    char *next_slot;
+    CharaDim_WIDTH *chara;
+
+    next_slot = (char *) arg0 + 8;
+    chara = (CharaDim_WIDTH *) (GetChara__Fi(GetStackInt__FP12RS_STACKDATA_00262DA0(arg0)));
+    if (chara == NULL) {
+        return 0;
+    }
+    SetStack__FP12RS_STACKDATAf_00262E90(next_slot, chara->v);
+    return 1;
+}
+
+struct CharaDim_HEIGHT { char pad0[0x110]; f32 v; };
+extern "C" void SetStack__FP12RS_STACKDATAf_00262E90(void *, f32);
+extern "C" s32 _GET_CHARA_HEIGHT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    char *next_slot;
+    CharaDim_HEIGHT *chara;
+
+    next_slot = (char *) arg0 + 8;
+    chara = (CharaDim_HEIGHT *) (GetChara__Fi(GetStackInt__FP12RS_STACKDATA_00262DA0(arg0)));
+    if (chara == NULL) {
+        return 0;
+    }
+    SetStack__FP12RS_STACKDATAf_00262E90(next_slot, chara->v);
+    return 1;
+}
+
+struct CharaDim_WEIGHT { char pad0[0x114]; f32 v; };
+extern "C" void SetStack__FP12RS_STACKDATAf_00262E90(void *, f32);
+extern "C" s32 _GET_CHARA_WEIGHT__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    char *next_slot;
+    CharaDim_WEIGHT *chara;
+
+    next_slot = (char *) arg0 + 8;
+    chara = (CharaDim_WEIGHT *) (GetChara__Fi(GetStackInt__FP12RS_STACKDATA_00262DA0(arg0)));
+    if (chara == NULL) {
+        return 0;
+    }
+    SetStack__FP12RS_STACKDATAf_00262E90(next_slot, chara->v);
+    return 1;
+}
+
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _SET_CHARA_SHOW__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _GET_CHARA_SHOW__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _CHARA_DA_ENABLE__FP12RS_STACKDATAi);
@@ -98,7 +144,11 @@ extern "C" s32 _ACTCHR_SOUND_INFO_COPY__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s3
     SetSoundInfoCopy__12CActionCharaFv(temp_v0);
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/text_0026EA00", GetMes__Fi);
+extern "C" s32 GetEventMessage__Fi(s32);
+extern "C" s32 GetMes__Fi(s32 arg0) {
+    return GetEventMessage__Fi(arg0);
+}
+
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _MES_MAKE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _MES_CLOSE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_0026EA00", _MES_NEXTPAGE__FP12RS_STACKDATAi);
@@ -482,7 +532,21 @@ extern "C" s32 _MES_SET_BUFF__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     }
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/text_0026EA00", _GET_MES_WINDOW_MODE__FP12RS_STACKDATAi);
+extern "C" s32 GetWindowMode__6ClsMesFv(void *);
+extern "C" s32 _GET_MES_WINDOW_MODE__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
+    char *next_slot;
+    ClsMes *mes;
+
+    next_slot = (char *) arg0 + 8;
+    mes = (ClsMes *) (GetMes__Fi(GetStackInt__FP12RS_STACKDATA_00262DA0(arg0)));
+    if (mes == NULL) {
+        return 0;
+    }
+    arg1 = GetWindowMode__6ClsMesFv(mes);
+    SetStack__FP12RS_STACKDATAi_00262E70(next_slot, arg1);
+    return 1;
+}
+
 struct EdEventInfoVoice {
     char pad0[0x134];
     s32 field_0x134;

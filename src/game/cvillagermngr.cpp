@@ -185,9 +185,15 @@ extern "C" s32 _GET_PAD_HISTORY__FP12RS_STACKDATAi(void *arg0, s32 arg1) {
     SetStack__FP12RS_STACKDATAi_002D2820(arg0, ((struct action_info_champs_f0160b *) action_info[0])->unk714);
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/cvillagermngr", _RESET_PAD_HISTORY__FP12RS_STACKDATAi);
+extern "C" s32 _RESET_PAD_HISTORY__FP12RS_STACKDATAi(void *arg0, s32 arg1) {
+    *(s32 *) ((u8 *) action_info[0] + 0x714) = 0;
+    return 1;
+}
 extern "C" s32 _GET_ACUMU_PAD__FP12RS_STACKDATAi(void *arg0, s32 arg1) {
     SetStack__FP12RS_STACKDATAi_002D2820(arg0, ((struct action_info_champs_f0160b *) action_info[0])->unk7D8);
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/cvillagermngr", _RESET_ACUMU_PAD__FP12RS_STACKDATAi);
+extern "C" s32 _RESET_ACUMU_PAD__FP12RS_STACKDATAi(void *arg0, s32 arg1) {
+    *(s32 *) ((u8 *) action_info[0] + 0x7D8) = 0;
+    return 1;
+}

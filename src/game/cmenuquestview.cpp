@@ -11,8 +11,17 @@
 INCLUDE_ASM("nonmatchings/game/cmenuquestview", SearchNowPosItemExist__9CShopMenuFv);
 INCLUDE_ASM("nonmatchings/game/cmenuquestview", ShopSellListDraw__FRiPf);
 INCLUDE_ASM("nonmatchings/game/cmenuquestview", MenuShopInit__FP9mgCMemoryPii);
-INCLUDE_ASM("nonmatchings/game/cmenuquestview", MenuShopKey__Fv);
-INCLUDE_ASM("nonmatchings/game/cmenuquestview", MenuShopDraw__Fv);
+extern "C" void KeyStep__9CShopMenuFv(void *);
+extern "C" void *CShopMenuPt;
+extern "C" void MenuShopKey__Fv(void) {
+    KeyStep__9CShopMenuFv(CShopMenuPt);
+}
+struct CPosDataManage;
+extern "C" void FormDraw__14CPosDataManageFv(void *);
+extern "C" CPosDataManage *MenuPosData;
+extern "C" void MenuShopDraw__Fv(void) {
+    FormDraw__14CPosDataManageFv(MenuPosData);
+}
 INCLUDE_ASM("nonmatchings/game/cmenuquestview", UnderMsg__14CMenuQuestViewFi);
 INCLUDE_ASM("nonmatchings/game/cmenuquestview", SelectMax__14CMenuQuestViewFv);
 INCLUDE_ASM("nonmatchings/game/cmenuquestview", InitEnd__14CMenuQuestViewFv);

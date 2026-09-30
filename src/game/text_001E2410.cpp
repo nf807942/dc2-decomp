@@ -12,7 +12,14 @@
 
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_SCALE__FP12RS_STACKDATAi_001E2410);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_PALLET_ANIM__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_001E2410", _RESET_PALLET_ANIM__FP12RS_STACKDATAi);
+struct muteki_monster;
+extern muteki_monster *nowMonster;
+extern "C" s32 _RESET_PALLET_ANIM__FP12RS_STACKDATAi(void *arg0, s32 arg1) {
+    u8 *p = (u8 *) nowMonster;
+    *(s16 *) (p + 0x686) = 0;
+    *(s16 *) (p + 0x684) = 0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _CALC_IP_CIRCLE_LINE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_POSREF_ANGLE__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _NORMAL_VECTOR__FP12RS_STACKDATAi_001E2850);
@@ -207,7 +214,10 @@ INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_ROT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_NEXT_ROT__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _SET_NEXT_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _CHK_MOVE_END__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_001E2410", _RESET_MOVE__FP12RS_STACKDATAi);
+extern "C" s32 _RESET_MOVE__FP12RS_STACKDATAi(RS_STACKDATA *a, s32 b) {
+    *(s32 *) ((u8 *) nowMonster + 0x1480) = 0;
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_TARGET_POS__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_TARGET_DIST__FP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/text_001E2410", _GET_TARGET_ANGLE__FP12RS_STACKDATAi);

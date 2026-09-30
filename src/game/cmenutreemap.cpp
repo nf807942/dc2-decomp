@@ -619,7 +619,8 @@ s32 CBaseMenuClass::IsAskExtend(s32 a, s32 b) {
 s32 CBaseMenuClass::ItemCmdAfter(s32 command, ITEMCMD_RET_PARA *para) {
     return 0;
 }
-INCLUDE_ASM("nonmatchings/game/cmenutreemap", ExitEnd__14CBaseMenuClassFv);
+extern "C" void ExitEnd__14CBaseMenuClassFv(void) {
+}
 void mgRect_f_::Set(f32 arg0, f32 arg1, f32 arg2, f32 arg3) {
     this->field_0x0 = arg0;
     this->field_0x4 = arg1;
@@ -627,7 +628,10 @@ void mgRect_f_::Set(f32 arg0, f32 arg1, f32 arg2, f32 arg3) {
     this->field_0xC = arg3;
 }
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", GetPenkiColor__FiPf);
-INCLUDE_ASM("nonmatchings/game/cmenutreemap", ConvGeoramaDataNo__Fi);
+extern "C" s16 tbl_957[];
+extern "C" s32 ConvGeoramaDataNo__Fi(s32 arg0) {
+    return tbl_957[arg0];
+}
 INCLUDE_ASM("nonmatchings/game/cmenutreemap", CheckMenuLine__FPiPiii);
 struct CPosDataManage;
 extern "C" CPosDataManage *MenuPosData;

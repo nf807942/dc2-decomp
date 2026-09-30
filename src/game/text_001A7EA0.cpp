@@ -98,11 +98,17 @@ void EditDebugStart(s32 arg0, mgCMemory * arg1) {
 }
 INCLUDE_ASM("nonmatchings/game/text_001A7EA0", PrintCursor__FPci);
 INCLUDE_ASM("nonmatchings/game/text_001A7EA0", EditDebugLoop__FP6CSceneP13EditDebugInfo);
-INCLUDE_ASM("nonmatchings/game/text_001A7EA0", EditDebugEnd__Fv);
+extern "C" void EditDebugInit__Fv(void);
+extern "C" void EditDebugEnd__Fv(void) {
+    EditDebugInit__Fv();
+}
 void InitLightingEdit(void) {
     LEditFlag = 0;
 }
-INCLUDE_ASM("nonmatchings/game/text_001A7EA0", EndLightingEdit__Fv);
+extern "C" void InitLightingEdit__Fv(void);
+extern "C" void EndLightingEdit__Fv(void) {
+    InitLightingEdit__Fv();
+}
 s32 IsLightingEditMode(void) {
     return LEditFlag;
 }

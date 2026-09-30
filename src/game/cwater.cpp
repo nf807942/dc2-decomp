@@ -169,7 +169,11 @@ void CThunderEffect::Init(void) {
     this->field_0x98 = 0;
 }
 INCLUDE_ASM("nonmatchings/game/cwater", Hamon__6CWaterFv);
-INCLUDE_ASM("nonmatchings/game/cwater", SetVertex__6CWaterFPfPf);
+struct CWater_vtx { u8 pad[0x60]; f32 lo[4]; f32 hi[4]; };
+extern "C" s32 mgVectorMaxMin__FPfPfPfPf(f32 *, f32 *, f32 *, f32 *);
+extern "C" s32 SetVertex__6CWaterFPfPf(CWater_vtx *self, f32 *arg0, f32 *arg1) {
+    return mgVectorMaxMin__FPfPfPfPf(self->hi, self->lo, arg0, arg1);
+}
 INCLUDE_ASM("nonmatchings/game/cwater", Shake__6CWaterFiif);
 INCLUDE_ASM("nonmatchings/game/cwater", Shake__11CWaterFrameFfff);
 s32 CWaterFrame::GetWater(void) {
@@ -207,10 +211,148 @@ INCLUDE_ASM("nonmatchings/game/cwater", SetColor__11CWaterFrameFUcUcUcUc);
 INCLUDE_ASM("nonmatchings/game/cwater", Shake__11CWaterFrameFiif);
 INCLUDE_ASM("nonmatchings/game/cwater", CreatePacket__11CWaterFrameFv);
 INCLUDE_ASM("nonmatchings/game/cwater", CreateWaterFrame__FiiPfPfP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/cwater", Initialize__11CWaterFrameFv);
+extern "C" void Initialize__8mgCFrameFv(void *);
+extern "C" void Initialize__11CWaterFrameFv(void *objet) {
+    *(s32 *) ((u8 *) objet + 0x110) = 0;
+    *(s32 *) ((u8 *) objet + 0x114) = 0;
+    Initialize__8mgCFrameFv(objet);
+}
 INCLUDE_ASM("nonmatchings/game/cwater", SjisToJis__FUl);
 INCLUDE_ASM("nonmatchings/game/cwater", SjisToSerno__FUl);
-INCLUDE_ASM("nonmatchings/game/cwater", ascii2serno__FUc);
+extern "C" s32 ascii2serno__FUc(u8 arg0) {
+    s32 temp_v0;
+
+    temp_v0 = arg0 & 0xFF;
+    switch (temp_v0) {
+    case 0xA1:
+        return 0x212C;
+    case 0xA2:
+        return 0x215F;
+    case 0xA3:
+        return 0x2160;
+    case 0xA4:
+        return 0x212B;
+    case 0xA5:
+        return 0x212F;
+    case 0xDE:
+        return 0x2134;
+    case 0xDF:
+        return 0x2135;
+    case 0xA7:
+        return 0x21E6;
+    case 0xA8:
+        return 0x21E8;
+    case 0xA9:
+        return 0x21EA;
+    case 0xAA:
+        return 0x21EC;
+    case 0xAB:
+        return 0x21EE;
+    case 0xAC:
+        return 0x2228;
+    case 0xAD:
+        return 0x222A;
+    case 0xAE:
+        return 0x222C;
+    case 0xAF:
+        return 0x2208;
+    case 0xB1:
+        return 0x21E7;
+    case 0xB2:
+        return 0x21E9;
+    case 0xB3:
+        return 0x21EB;
+    case 0xB4:
+        return 0x21ED;
+    case 0xB5:
+        return 0x21EF;
+    case 0xB6:
+        return 0x21F0;
+    case 0xB7:
+        return 0x21F2;
+    case 0xB8:
+        return 0x21F4;
+    case 0xB9:
+        return 0x21F6;
+    case 0xBA:
+        return 0x21F8;
+    case 0xBB:
+        return 0x21FA;
+    case 0xBC:
+        return 0x21FC;
+    case 0xBD:
+        return 0x21FE;
+    case 0xBE:
+        return 0x2200;
+    case 0xBF:
+        return 0x2202;
+    case 0xC0:
+        return 0x2204;
+    case 0xC1:
+        return 0x2206;
+    case 0xC2:
+        return 0x2209;
+    case 0xC3:
+        return 0x220B;
+    case 0xC4:
+        return 0x220D;
+    case 0xC5:
+        return 0x220F;
+    case 0xC6:
+        return 0x2210;
+    case 0xC7:
+        return 0x2211;
+    case 0xC8:
+        return 0x2212;
+    case 0xC9:
+        return 0x2213;
+    case 0xCA:
+        return 0x2214;
+    case 0xCB:
+        return 0x2217;
+    case 0xCC:
+        return 0x221A;
+    case 0xCD:
+        return 0x221D;
+    case 0xCE:
+        return 0x2220;
+    case 0xCF:
+        return 0x2223;
+    case 0xD0:
+        return 0x2224;
+    case 0xD1:
+        return 0x2225;
+    case 0xD2:
+        return 0x2226;
+    case 0xD3:
+        return 0x2227;
+    case 0xD4:
+        return 0x2229;
+    case 0xD5:
+        return 0x222B;
+    case 0xD6:
+        return 0x222D;
+    case 0xD7:
+        return 0x222E;
+    case 0xD8:
+        return 0x222F;
+    case 0xD9:
+        return 0x2230;
+    case 0xDA:
+        return 0x2231;
+    case 0xDB:
+        return 0x2232;
+    case 0xDC:
+        return 0x2234;
+    case 0xA6:
+        return 0x2237;
+    case 0xDD:
+        return 0x2238;
+    case 0xA0:
+    default:
+        return 0x227E;
+    }
+}
 extern "C" s32 Initialize__11dbgCJISFontFv(void *);
 extern "C" dbgCJISFont *__ct__11dbgCJISFontFv(dbgCJISFont *objet) {
     Initialize__11dbgCJISFontFv(objet);
@@ -255,11 +397,23 @@ void dbgCJISFont::Clear(void) {
 INCLUDE_ASM("nonmatchings/game/cwater", __putc__11dbgCJISFontFUl);
 INCLUDE_ASM("nonmatchings/game/cwater", PrintDirect__11dbgCJISFontFiiPce);
 INCLUDE_ASM("nonmatchings/game/cwater", runerror__FPCc);
-INCLUDE_ASM("nonmatchings/game/cwater", stkoverflow__Fv);
+extern "C" void runerror__FPCc(...);
+extern char _173[];
+extern "C" s32 stkoverflow__Fv(void) {
+    runerror__FPCc(_173);
+}
 INCLUDE_ASM("nonmatchings/game/cwater", chk_int__F12RS_STACKDATAP8funcdata);
 INCLUDE_ASM("nonmatchings/game/cwater", is_true__F12RS_STACKDATA);
-INCLUDE_ASM("nonmatchings/game/cwater", divby0error__Fv);
-INCLUDE_ASM("nonmatchings/game/cwater", modby0error__Fv);
+extern "C" void runerror__FPCc(...);
+extern char _197[];
+extern "C" void divby0error__Fv(void) {
+    runerror__FPCc(_197);
+}
+extern "C" void runerror__FPCc(...);
+extern char _202[];
+extern "C" void modby0error__Fv(void) {
+    runerror__FPCc(_202);
+}
 INCLUDE_ASM("nonmatchings/game/cwater", print__FP12RS_STACKDATAi);
 struct inferred;
 typedef struct CRunScript_infere {
@@ -321,7 +475,11 @@ INCLUDE_ASM("nonmatchings/game/cwater", call_func__10CRunScriptFP8funcdataP8vmco
 INCLUDE_ASM("nonmatchings/game/cwater", ret_func__10CRunScriptFv);
 INCLUDE_ASM("nonmatchings/game/cwater", ext__10CRunScriptFP12RS_STACKDATAi);
 INCLUDE_ASM("nonmatchings/game/cwater", load__10CRunScriptFP14RS_PROG_HEADERP12RS_STACKDATAiP11RS_CALLDATAi);
-INCLUDE_ASM("nonmatchings/game/cwater", ext_func__10CRunScriptFPPFP12RS_STACKDATAi_ii);
+struct CRunScript_ef { char pad0[4]; s32 unk4; s32 unk8; };
+extern "C" void ext_func__10CRunScriptFPPFP12RS_STACKDATAi_ii(CRunScript_ef *objet, s32 arg0, s32 arg1) {
+    objet->unk8 = arg0;
+    objet->unk4 = arg1;
+}
 struct vmcode_t;
 typedef struct CRunScript_infere3 {
     /* 0x00 */ char pad0[0x38];
@@ -338,4 +496,7 @@ extern "C" void resume__10CRunScriptFv(CRunScript_infere3 *objet) {
 }
 INCLUDE_ASM("nonmatchings/game/cwater", run__10CRunScriptFi);
 INCLUDE_ASM("nonmatchings/game/cwater", check_program__10CRunScriptFi);
-INCLUDE_ASM("nonmatchings/game/cwater", skip__10CRunScriptFv);
+extern "C" void skip__10CRunScriptFv(CRunScript_infere3 *objet) {
+    *(s32 *) ((u8 *) objet + 0x40) = 1;
+    resume__10CRunScriptFv(objet);
+}

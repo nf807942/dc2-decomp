@@ -25,19 +25,33 @@ INCLUDE_ASM("nonmatchings/game/nowloadinginfo", DivSpriteScreen__FR11mgCDrawPrim
 INCLUDE_ASM("nonmatchings/game/nowloadinginfo", sgEffectDrawGyoRace__FP11SubGameInfo);
 INCLUDE_ASM("nonmatchings/game/nowloadinginfo", sgSysDrawGyoRace__FP11SubGameInfo);
 INCLUDE_ASM("nonmatchings/game/nowloadinginfo", Jikkyou__FP11SubGameInfo);
-INCLUDE_ASM("nonmatchings/game/nowloadinginfo", SwitchNowLoadingThread__Fv);
+extern "C" void RotateThreadReadyQueue(int);
+extern "C" void SwitchNowLoadingThread__Fv(void) { RotateThreadReadyQueue(10); }
 INCLUDE_ASM("nonmatchings/game/nowloadinginfo", NowLoadingLoop__FPv);
 void CancelNowLoading(void) {
     cancel_now_loading = 1;
 }
 INCLUDE_ASM("nonmatchings/game/nowloadinginfo", CreateNowLoading__FP14NowLoadingInfo);
 INCLUDE_ASM("nonmatchings/game/nowloadinginfo", NowLoadingBarStep__Fv);
-INCLUDE_ASM("nonmatchings/game/nowloadinginfo", NowLoadingBarSteEnd__Fv);
+struct LoadInfo_t {
+    s32 pad0[14];
+    u32 f38;
+    s32 pad3C;
+};
+extern "C" LoadInfo_t LoadInfo;
+extern "C" u32 ProgBarWidthStep;
+extern "C" u32 ProgBarCnt;
+extern "C" void NowLoadingBarSteEnd__Fv(void) {
+
+    ProgBarCnt = LoadInfo.f38;
+    ProgBarWidthStep = 0x3D4CCCCD;
+}
 INCLUDE_ASM("nonmatchings/game/nowloadinginfo", DeleteNowLoading__Fv);
 INCLUDE_ASM("nonmatchings/game/nowloadinginfo", __ct__14NowLoadingInfoFv);
 INCLUDE_ASM("nonmatchings/game/nowloadinginfo", InitPauseData__Fv);
 INCLUDE_ASM("nonmatchings/game/nowloadinginfo", InitPause__Fi);
-INCLUDE_ASM("nonmatchings/game/nowloadinginfo", PauseEnable__Fi);
+extern "C" s32 PauseEnableFlag;
+extern "C" s32 PauseEnable__Fi(s32 arg0) { s32 old = PauseEnableFlag; PauseEnableFlag = arg0; return old; }
 s32 GetPauseFlag(void) {
     return PauseFlag_0037E850;
 }

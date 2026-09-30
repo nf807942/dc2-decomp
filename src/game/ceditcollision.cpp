@@ -14,7 +14,10 @@ extern s32 LadderMode;
 extern s32 EyeViewCancelOnce;
 
 
-INCLUDE_ASM("nonmatchings/game/ceditcollision", GetBattleCharaInfo__Fv);
+extern "C" u8 BattleParamater[];
+extern "C" void *GetBattleCharaInfo__Fv(void) {
+    return BattleParamater;
+}
 extern "C" void ConvertItemAttrToCharaAttr__FiPiPi(s32 arg0, s32 *arg1, s32 *arg2) {
     s32 var_v1;
     s32 var_a3;
@@ -219,19 +222,22 @@ extern "C" void LeaveMonicaItemCheck__Fv(void) {
 }
 INCLUDE_ASM("nonmatchings/game/ceditcollision", AquaFishFatigueClear__Fv);
 INCLUDE_ASM("nonmatchings/game/ceditcollision", DebugGetItem__FP16CUserDataManageri);
-INCLUDE_ASM("nonmatchings/game/ceditcollision", InitCharaViewerMain__F13INIT_LOOP_ARG);
+extern "C" void InitCharaViewerMain__F13INIT_LOOP_ARG(s32 arg0) {
+}
 void FinishCharaVieweMain(void) {
 }
 s32 LoopCharaViewerMain(void) {
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/ceditcollision", InitTextuerViewerMain__F13INIT_LOOP_ARG);
+extern "C" void InitTextuerViewerMain__F13INIT_LOOP_ARG(s32 arg0) {
+}
 void FinishTextuerVieweMain(void) {
 }
 s32 LoopTextuerViewerMain(void) {
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/ceditcollision", MapViewInit__F13INIT_LOOP_ARG);
+extern "C" void MapViewInit__F13INIT_LOOP_ARG(s32 arg0) {
+}
 void MapViewExit(void) {
 }
 s32 MapViewLoop(void) {
@@ -287,7 +293,10 @@ extern "C" s32 EditOnGround__Fv(void) {
     }
     return (LadderMode != 0) ^ 1;
 }
-INCLUDE_ASM("nonmatchings/game/ceditcollision", IsWalkMode__Fv);
+extern "C" s32 ViewMode;
+extern "C" s32 IsWalkMode__Fv(void) {
+    return ViewMode == 0;
+}
 INCLUDE_ASM("nonmatchings/game/ceditcollision", EditControlInit__FP6CScene);
 extern "C" u32 CharaMotionModeCnt;
 extern "C" u32 FixCameraChgCnt;

@@ -11,9 +11,15 @@
 #include "gen/CList_10CFuncPoint_.hpp"
 
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", setImageTag__FPUiPviii);
-INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", videoDecBeginPut__FP8VideoDecPPUcPiPPUcPi);
+extern "C" s32 viBufBeginPut__FP5ViBufPPUcPiPPUcPi(void *, u8 **, s32 *, u8 **, s32 *);
+extern "C" s32 videoDecBeginPut__FP8VideoDecPPUcPiPPUcPi(void *self, u8 **a, s32 *b, u8 **c, s32 *d) {
+    return viBufBeginPut__FP5ViBufPPUcPiPPUcPi((u8 *) self + 0x48, a, b, c, d);
+}
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", videoDecPutTs__FP8VideoDecllPUci);
-INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", videoDecEndPut__FP8VideoDeci);
+extern "C" s32 viBufEndPut__FP5ViBufi(void *, s32);
+extern "C" s32 videoDecEndPut__FP8VideoDeci(void *self, s32 a) {
+    return viBufEndPut__FP5ViBufi((u8 *) self + 0x48, a);
+}
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", cpy2area__FPUciPUciPUciPUci);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", audioDecBeginPut__FP8AudioDecPPUcPiPPUcPi);
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", audioDecEndPut__FP8AudioDeci);
@@ -150,7 +156,9 @@ block_5:
 }
 
 INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", GetLight__14CFuncPointMngrFPfP10CFuncPointiP15CFuncPointChecki);
-INCLUDE_ASM("nonmatchings/game/cfuncpointmngr", Step__14CFuncPointMngrFiP15CFuncPointCheck);
+typedef struct CFuncPointCheck CFuncPointCheck;
+extern "C" s32 UpdateFlag__14CFuncPointMngrFiP15CFuncPointCheck(CFuncPointMngr *objet, s32 arg0, CFuncPointCheck *arg1);
+extern "C" void Step__14CFuncPointMngrFiP15CFuncPointCheck(CFuncPointMngr *o, s32 i, CFuncPointCheck *c) { UpdateFlag__14CFuncPointMngrFiP15CFuncPointCheck(o, i, c); }
 extern "C" s32 Get__14CFuncPointMngrFv(void *);
 struct CFuncPointCheck {
     f32 field_0;

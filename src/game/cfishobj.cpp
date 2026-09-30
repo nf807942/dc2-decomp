@@ -22,8 +22,13 @@ extern s32 CastingLureFlag;
 extern s32 CastingLureTime;
 
 
-INCLUDE_ASM("nonmatchings/game/cfishobj", NowTakePhoto__Fv);
-INCLUDE_ASM("nonmatchings/game/cfishobj", IsEnablePhotoMenu__Fv);
+extern "C" u32 TakePhotoMode;
+extern "C" s32 NowTakePhoto__Fv(void) { return (s32) TakePhotoMode > 0; }
+
+extern "C" s32 IsEnablePhotoMenu__Fv(void) {
+    return TakePhotoMode == 2;
+}
+
 void HidePhoto(void) {
     ShowTakePhotoCnt = 0;
 }
@@ -73,12 +78,20 @@ extern "C" void *GetActiveUkiObj__Fv(void) {
 }
 INCLUDE_ASM("nonmatchings/game/cfishobj", ExtendLine__Ff);
 INCLUDE_ASM("nonmatchings/game/cfishobj", GetNowLineLength__Fv);
-INCLUDE_ASM("nonmatchings/game/cfishobj", GetMinLineLength__Fv);
+extern "C" f32 GetMinLineLength__Fv(void) {
+    return 25.0f;
+}
+
 INCLUDE_ASM("nonmatchings/game/cfishobj", InitRodPoint__FP8mgCFrameP8mgCFrame);
 INCLUDE_ASM("nonmatchings/game/cfishobj", GetTriPose__FPA4_fPA4_fPi);
 INCLUDE_ASM("nonmatchings/game/cfishobj", GetHariPos__FPfPf);
 INCLUDE_ASM("nonmatchings/game/cfishobj", GetUkiPos__FPfPf);
-INCLUDE_ASM("nonmatchings/game/cfishobj", PullUki__Ff);
+struct LinePointT { u8 pad[0xBF4]; f32 x; u8 pad2[8]; };
+extern "C" LinePointT LinePoint;
+extern "C" void PullUki__Ff(f32 f) {
+    LinePoint.x = LinePoint.x - f;
+}
+
 void SetShowHari(s32 value) {
     ShowHari = value;
 }

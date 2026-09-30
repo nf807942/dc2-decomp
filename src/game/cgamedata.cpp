@@ -28,14 +28,22 @@ extern DebugInfoData DebugInfo;
 struct SPI_STACK;
 
 
-INCLUDE_ASM("nonmatchings/game/cgamedata", GetDebugFont__Fv);
+extern "C" u8 Font_003FAF50[4096];
+extern "C" void *GetDebugFont__Fv(void) {
+    return Font_003FAF50;
+}
+
 s32 GetCaptureMode(void) {
     return CaptureMode;
 }
 s32 GetSystemSndID(void) {
     return SystemSND_ID;
 }
-INCLUDE_ASM("nonmatchings/game/cgamedata", GetMainScene__Fv);
+extern "C" u8 MainScene_01DFB130[4096];
+extern "C" void *GetMainScene__Fv(void) {
+    return MainScene_01DFB130;
+}
+
 s32 GetSaveData(void) {
     return ActiveSaveData;
 }
@@ -51,12 +59,20 @@ extern "C" s32 mgGetTopVRAMAddress__Fv(void);
 extern "C" s32 GetVramTopAddress__Fv(void) {
     return mgGetTopVRAMAddress__Fv() + 0x20;
 }
-INCLUDE_ASM("nonmatchings/game/cgamedata", GetMainStack__Fv);
+extern "C" u8 MainBuffer_01DFB100[4096];
+extern "C" void *GetMainStack__Fv(void) {
+    return MainBuffer_01DFB100;
+}
+
 INCLUDE_ASM("nonmatchings/game/cgamedata", NextLoop__Fi13INIT_LOOP_ARG);
 s32 GetNowLoopNo(void) {
     return LoopNo;
 }
-INCLUDE_ASM("nonmatchings/game/cgamedata", GetNowInitArg__Fv);
+extern "C" u8 InitArg[4096];
+extern "C" void *GetNowInitArg__Fv(void) {
+    return InitArg;
+}
+
 void cat_start(void) {
 }
 void cat_end(void) {
@@ -349,7 +365,12 @@ extern "C" CEditData *__ct__9CEditDataFv(CEditData *objet) {
     Initialize__9CEditDataFv(objet);
     return objet;
 }
-INCLUDE_ASM("nonmatchings/game/cgamedata", GetGameDataPt__Fv);
+struct GameItemDataManage;
+extern "C" u8 GameItemDataManage[48];
+extern "C" void *GetGameDataPt__Fv(void) {
+    return GameItemDataManage;
+}
+
 CDataItem::CDataItem(void) {
     this->field_0x4 = 0;
     this->field_0x0 = 0;
@@ -557,7 +578,32 @@ INCLUDE_ASM("nonmatchings/game/cgamedata", _DATAGAURD__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", LoadGameDataAnalyze__FPc);
 INCLUDE_ASM("nonmatchings/game/cgamedata", LoadData__9CGameDataFv);
 INCLUDE_ASM("nonmatchings/game/cgamedata", LoadItemSystemMes__9CGameDataFi);
-INCLUDE_ASM("nonmatchings/game/cgamedata", InitItemMes__9CGameDataFii);
+extern "C" u8 local_com_itemdata[19008];
+struct ItemMesSlot_b2 { char pad0[0x28]; s32 u28; char pad2C[0x28]; s32 u54; char pad58[0x28]; s32 u80; char pad84[0x28]; s32 uAC; char padB0[0x28]; s32 uD8; char padDC[0x28]; s32 u104; char pad108[0x28]; s32 u130; char pad134[0x28]; s32 u15C; };
+extern "C" void InitItemMes__9CGameDataFii(void *objet, s32 arg0, s32 arg1) {
+    s32 off;
+    ItemMesSlot_b2 *p;
+
+
+    if (arg0 != 0) {
+        arg0 = 0;
+        off = 0;
+        do {
+            p = (ItemMesSlot_b2 *) (local_com_itemdata + off);
+            arg0 += 8;
+            p->u28 = 0;
+            p->u54 = 0;
+            off += 0x160;
+            p->u80 = 0;
+            p->uAC = 0;
+            p->uD8 = 0;
+            p->u104 = 0;
+            p->u130 = 0;
+            p->u15C = 0;
+        } while (arg0 < 0x1B0);
+    }
+}
+
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetCommonData__9CGameDataFi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetWeaponData__9CGameDataFi);
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetItemData__9CGameDataFi);
@@ -616,14 +662,36 @@ extern "C" u8 GetDataType__9CGameDataFi(CGameData *objet, s32 arg0) {
     return 0U;
 }
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetDataTypeStartListNo__9CGameDataFi);
-INCLUDE_ASM("nonmatchings/game/cgamedata", GetCommonItemData__Fi);
-INCLUDE_ASM("nonmatchings/game/cgamedata", GetItemInfoData__Fi);
-INCLUDE_ASM("nonmatchings/game/cgamedata", GetWeaponInfoData__Fi);
-INCLUDE_ASM("nonmatchings/game/cgamedata", GetRoboPartInfoData__Fi);
-INCLUDE_ASM("nonmatchings/game/cgamedata", GetBreedFishInfoData__Fi);
+extern "C" s32 GetCommonData__9CGameDataFi(void *, s32);
+extern "C" s32 GetCommonItemData__Fi(s32 arg0) {
+    return GetCommonData__9CGameDataFi(&GameItemDataManage, arg0);
+}
+
+extern "C" s32 GetItemData__9CGameDataFi(void *, s32);
+extern "C" s32 GetItemInfoData__Fi(s32 a) {
+    return GetItemData__9CGameDataFi(GameItemDataManage, a);
+}
+
+extern "C" s32 GetWeaponData__9CGameDataFi(void *, s32);
+extern "C" s32 GetWeaponInfoData__Fi(s32 a) {
+    return GetWeaponData__9CGameDataFi(GameItemDataManage, a);
+}
+
+extern "C" s32 GetRoboPartInfoData__Fi(s32 a) {
+    return GetRoboData__9CGameDataFi((CGameData_3f0e62 *) GameItemDataManage, a);
+}
+
+extern "C" s32 GetFishData__9CGameDataFi(void *, s32);
+extern "C" s32 GetBreedFishInfoData__Fi(s32 arg0) {
+    return GetFishData__9CGameDataFi(&GameItemDataManage, arg0);
+}
+
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetItemFileName__Fii);
 INCLUDE_ASM("nonmatchings/game/cgamedata", GetItemFilePath__Fii);
-INCLUDE_ASM("nonmatchings/game/cgamedata", GetItemDataType__Fi);
+extern "C" u8 GetItemDataType__Fi(s32 a) {
+    return GetDataType__9CGameDataFi((CGameData *) GameItemDataManage, a);
+}
+
 extern "C" u8 GameItemDataManage[48];
 extern "C" s32 GetCommonData__9CGameDataFi(void *, s32);
 struct temp_v0_champs {

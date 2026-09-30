@@ -18,7 +18,11 @@ extern "C" f32 mgRnd__Fv(void) {
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgNRnd__Fv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgCreateSinTable__Fv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgSinf__Ff);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgCosf__Ff);
+extern "C" f32 mgSinf__Ff(f32);
+extern "C" f32 mgCosf__Ff(f32 x) {
+    return mgSinf__Ff(x + 1.5707964f);
+}
+
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Step__9mgCCameraFi);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Stay__9mgCCameraFv);
 typedef struct mgCCamera {
@@ -143,7 +147,10 @@ extern "C" void SetFollow__15mgCCameraFollowFfff(void *objet, f32 arg0, f32 arg1
     fields[1] = arg1;
     fields[2] = arg2;
 }
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", FollowOn__15mgCCameraFollowFv);
+extern "C" void FollowOn__15mgCCameraFollowFv(void *self) {
+    *(s32 *) ((u8 *) self + 0xA0) = 1;
+}
+
 typedef struct mgCCameraFollow_state {
     /* 0x00 */ char pad0[0xA0];
     /* 0xA0 */ s32 active;
@@ -161,7 +168,11 @@ typedef struct mgCCameraFollow_values {
 extern "C" void SetAngle__15mgCCameraFollowFf(mgCCameraFollow_values *objet, f32 arg0) {
     objet->angle = arg0;
 }
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetAngleSoon__15mgCCameraFollowFf);
+extern "C" void SetAngleSoon__15mgCCameraFollowFf(void *objet, f32 arg0) {
+    *(f32 *) ((u8 *) objet + 0x98) = arg0;
+    *(f32 *) ((u8 *) objet + 0x9C) = arg0;
+}
+
 extern "C" f32 GetAngle__15mgCCameraFollowFv(mgCCameraFollow_values *objet) {
     return objet->nextAngle;
 }
@@ -239,7 +250,10 @@ extern "C" mgCCameraFollow_infere *__ct__15mgCCameraFollowFffff(mgCCameraFollow_
 extern "C" s32 Iam__15mgCCameraFollowFv(void *objet) {
     return 1;
 }
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", Suspend__9mgCCameraFv);
+extern "C" void Suspend__9mgCCameraFv(u8 *self) {
+    *(s32 *) (self + 0x5C) = 1;
+}
+
 typedef struct mgCCamera_resume {
     /* 0x00 */ char pad0[0x5C];
     /* 0x5C */ s32 suspended;
@@ -255,15 +269,39 @@ INCLUDE_ASM("nonmatchings/mglib/mgcframe", htoi__FPc);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgSetFrameAttr__FP8mgCFramei);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SearchVisualType__FP18mgCreateVisualTypePc);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", CreateFrameVisual__FP8mgCFrameP9mgCMemoryP9mgCMemoryP8mgCFrameP13MDTOBJ_HEADERP10MDT_HEADERiP17mgCTextureManagerPUiiPP8mgCFramePA4_A4_f);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetVisual__8mgCFrameFP9mgCVisual);
+#pragma schedule off
+extern "C" void SetVisual__8mgCFrameFP9mgCVisual(void *objet, void *arg0) {
+    *(void **) ((u8 *) objet + 0xF8) = arg0;
+}
+#pragma schedule reset
+
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Initialize__15mgCVisualFixMDTFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", Initialize__9mgCVisualFv);
+#pragma schedule off
+extern "C" void Initialize__9mgCVisualFv(s32 *objet) {
+    objet[0] = 0;
+    objet[1] = 0;
+    objet[2] = 0;
+    objet[5] = 0;
+    objet[4] = 0;
+}
+#pragma schedule reset
+
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgLoadMDSFile__FP10MDS_HEADERP9mgCMemoryP18mgCreateVisualTypeP17mgCTextureManager);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgLoadMDSFile__FP10mgLoadData);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgCreateBBoxSphere__FPfPfPfPA4_fi);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", CopyFrame__FP8mgCFrameP8mgCFrameP9mgCMemoryiPP8mgCFrame);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", Iam__9mgCVisualFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", Copy__9mgCVisualFP9mgCMemory);
+#pragma schedule off
+extern "C" s32 Iam__9mgCVisualFv(void *objet) {
+    return 0;
+}
+#pragma schedule reset
+
+#pragma schedule off
+extern "C" void *Copy__9mgCVisualFP9mgCMemory(void *objet, void *mem) {
+    return objet;
+}
+#pragma schedule reset
+
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", CopyFrameSub__FP8mgCFrameP9mgCMemoryiPP8mgCFrame);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", mgCopyFrame__FP8mgCFrameP9mgCMemoryi);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Begin__13mgCMDTBuilderFP9mgCMemory);
@@ -293,17 +331,67 @@ INCLUDE_ASM("nonmatchings/mglib/mgcframe", EndFaces__13mgCMDTBuilderFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", BeginPrim__13mgCMDTBuilderFii);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", AddFace__13mgCMDTBuilderFi);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", EndPrim__13mgCMDTBuilderFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", Iam__12mgCVisualMDTFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetMaterialNum__12mgCVisualMDTFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetpMaterial__12mgCVisualMDTFv);
+#pragma schedule off
+extern "C" s32 Iam__12mgCVisualMDTFv(void *objet) {
+    return 1;
+}
+#pragma schedule reset
+
+#pragma schedule off
+extern "C" s32 GetMaterialNum__12mgCVisualMDTFv(s32 *objet) {
+    return objet[0x10];
+}
+#pragma schedule reset
+
+#pragma schedule off
+extern "C" s32 GetpMaterial__12mgCVisualMDTFv(s32 *objet) {
+    return objet[0x11];
+}
+#pragma schedule reset
+
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Draw__12mgCVisualMDTFPA4_fP14mgCDrawManager);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", CreatePacket__9mgCVisualFP9mgCMemoryP9mgCMemory);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetMaterialNum__9mgCVisualFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetpMaterial__9mgCVisualFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetMaterial__9mgCVisualFi);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", CreateBBox__9mgCVisualFPfPfPA4_f);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", CreateRenderInfoPacket__9mgCVisualFPUiPA4_fP13mgRENDER_INFO);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", Draw__9mgCVisualFPUiPA4_fP14mgCDrawManager);
+#pragma schedule off
+extern "C" s32 CreatePacket__9mgCVisualFP9mgCMemoryP9mgCMemory(void *objet, void *a, void *b) {
+    return 0;
+}
+#pragma schedule reset
+
+#pragma schedule off
+extern "C" s32 GetMaterialNum__9mgCVisualFv(void *objet) {
+    return 0;
+}
+#pragma schedule reset
+
+#pragma schedule off
+extern "C" s32 GetpMaterial__9mgCVisualFv(void *objet) {
+    return 0;
+}
+#pragma schedule reset
+
+#pragma schedule off
+extern "C" s32 GetMaterial__9mgCVisualFi(void *objet, s32 i) {
+    return 0;
+}
+#pragma schedule reset
+
+#pragma schedule off
+extern "C" s32 CreateBBox__9mgCVisualFPfPfPA4_f(void *objet, f32 *a, f32 *b, f32 (*c)[4]) {
+    return 0;
+}
+#pragma schedule reset
+
+#pragma schedule off
+extern "C" s32 CreateRenderInfoPacket__9mgCVisualFPUiPA4_fP13mgRENDER_INFO(void *objet, u32 *a, f32 (*b)[4], void *c) {
+    return 0;
+}
+#pragma schedule reset
+
+#pragma schedule off
+extern "C" s32 Draw__9mgCVisualFPUiPA4_fP14mgCDrawManager(void *objet, u32 *a, f32 (*b)[4], void *c) {
+    return 0;
+}
+#pragma schedule reset
+
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Draw__9mgCVisualFPA4_fP14mgCDrawManager);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", __ct__11mgCDrawPrimFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Initialize__11mgCDrawPrimFP9mgCMemoryP13sceVif1Packet);
@@ -332,27 +420,83 @@ INCLUDE_ASM("nonmatchings/mglib/mgcframe", BeginPrim2__11mgCDrawPrimFi);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", BeginPrim2__11mgCDrawPrimFiUiUii);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", EndPrim2__11mgCDrawPrimFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", End2__11mgCDrawPrimFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", Data0__11mgCDrawPrimFPf);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", Data4__11mgCDrawPrimFPf);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", Data__11mgCDrawPrimFPi);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", DirectData__11mgCDrawPrimFi);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", Vertex__11mgCDrawPrimFiii);
+struct mgCDrawPrim_d0 { u8 pad[0xDC]; u8 *cur; };
+extern "C" void Data0__11mgCDrawPrimFPf(mgCDrawPrim_d0 *objet, float *src) {
+    u8 *dst = objet->cur;
+    objet->cur = dst + 0x10;
+    asm {
+        lqc2 vf1, 0(src)
+        vftoi0.xyzw vf1, vf1
+        sqc2 vf1, 0(dst)
+    }
+}
+
+extern "C" void Data4__11mgCDrawPrimFPf(void *objet, f32 *src) {
+    f32 *dst = *(f32 **) ((u8 *) objet + 0xDC);
+    *(f32 **) ((u8 *) objet + 0xDC) = dst + 4;
+    asm {
+        lqc2 vf1, 0(src)
+        vftoi4.xyzw vf1, vf1
+        sqc2 vf1, 0(dst)
+    }
+}
+
+extern "C" void Data__11mgCDrawPrimFPi(void *objet, u128 *src) {
+    u128 v = *src;
+    src = *(u128 **) ((u8 *) objet + 0xDC);
+    *(u128 **) ((u8 *) objet + 0xDC) = src + 1;
+    *src = v;
+}
+
+struct mgCDrawPrim_dd { u8 pad[0xDC]; u8 *cur; };
+extern "C" u8 *DirectData__11mgCDrawPrimFi(mgCDrawPrim_dd *objet, s32 n) {
+    u8 *p = objet->cur;
+    objet->cur = p + (n << 4);
+    return p;
+}
+
+extern "C" void Vertex4__11mgCDrawPrimFiii(...);
+extern "C" void Vertex__11mgCDrawPrimFiii(void *objet, s32 a, s32 b) {
+    Vertex4__11mgCDrawPrimFiii(objet, a << 4, b << 4);
+}
+
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Vertex__11mgCDrawPrimFfff);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Vertex__11mgCDrawPrimFPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Vertex4__11mgCDrawPrimFiii);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", Vertex4__11mgCDrawPrimFPi);
+extern "C" void Vertex4__11mgCDrawPrimFPi(void *objet, s32 *v) {
+    Vertex4__11mgCDrawPrimFiii(objet, v[0], v[1], v[2]);
+}
+
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Color__11mgCDrawPrimFiiii);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Color__11mgCDrawPrimFPf);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", TextureCrd4__11mgCDrawPrimFii);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", TextureCrd__11mgCDrawPrimFii);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", Direct__11mgCDrawPrimFUlUl);
+extern "C" void TextureCrd4__11mgCDrawPrimFii(...);
+extern "C" void TextureCrd__11mgCDrawPrimFii(void *objet, s32 a, s32 b) {
+    TextureCrd4__11mgCDrawPrimFii(objet, a << 4, b << 4);
+}
+
+extern "C" void Direct__11mgCDrawPrimFUlUl(void *objet, u64 a, u64 b) {
+    u64 *p = *(u64 **) ((u8 *) objet + 0xDC);
+    p[0] = b;
+    p[1] = a;
+    *(u64 **) ((u8 *) objet + 0xDC) = *(u64 **) ((u8 *) objet + 0xDC) + 2;
+}
+
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Texture__11mgCDrawPrimFP10mgCTexture);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", AlphaBlendEnable__11mgCDrawPrimFi);
 extern "C" void SetAlpha__10mgCDrawEnvFi(void *, s32);
 void mgCDrawPrim::AlphaBlend(s32 arg0) {
     SetAlpha__10mgCDrawEnvFi((u8 *) this + 0x10, arg0);
 }
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", AlphaTestEnable__11mgCDrawPrimFi);
+struct mgDrawFlags20 {
+    u8 pad[0x20];
+    u8 alphaTest : 1;
+    u8 hi : 7;
+};
+extern "C" void AlphaTestEnable__11mgCDrawPrimFi(mgDrawFlags20 *objet, s32 arg0) {
+    objet->alphaTest = arg0;
+}
+
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", AlphaTest__11mgCDrawPrimFii);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", DAlphaTest__11mgCDrawPrimFii);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", DepthTestEnable__11mgCDrawPrimFi);
@@ -371,7 +515,15 @@ void mgCDrawPrim::Coord(s32 arg0) {
     this->field_0xFC = arg0;
 }
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetOffset__11mgCDrawPrimFPiPi);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", __ct__14mgCDrawManagerFv);
+#pragma schedule off
+extern "C" void *__ct__14mgCDrawManagerFv(void *objet) {
+    *(s32 *) ((u8 *) objet + 0x68) = 0x40;
+    *(s32 *) ((u8 *) objet + 0x6C) = 0;
+    *(s32 *) ((u8 *) objet + 0x70) = 0;
+    return objet;
+}
+#pragma schedule reset
+
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetSortTable__14mgCDrawManagerFi);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", BeginDraw__14mgCDrawManagerFP9mgCMemoryPi);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", ClearTable__14mgCDrawManagerFv);
@@ -494,7 +646,11 @@ extern "C" void GetScale__9mgCObjectFPf(mgCObject_position *objet, f32 *arg0) {
 }
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Initialize__9mgCObjectFv);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", __ct__8mgCFrameFv);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", Initialize__12mgCFrameBaseFv);
+extern "C" s32 Initialize__9mgCObjectFv(void *);
+extern "C" s32 Initialize__12mgCFrameBaseFv(void *self) {
+    return Initialize__9mgCObjectFv(self);
+}
+
 struct mgCFrame_infere_014b63;
 typedef struct mgCFrame_infere_014b63 {
     /* 0x000 */ char pad0[0x50];
@@ -674,7 +830,12 @@ extern "C" void GetWorldPosition0__8mgCFrameFPf(mgCFrame *objet, f32 *arg0) {
     *(s128 *)arg0 = *(s128 *)&matrix[3][0];
 }
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetWorldDir__8mgCFrameFPfPf);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetRotation__8mgCFrameFPf);
+extern "C" void SetRotation__9mgCObjectFPf(...);
+extern "C" void SetRotation__8mgCFrameFPf(u8 *objet, f32 *arg0) {
+    *(u32 *) (objet + 0x100) |= 1;
+    SetRotation__9mgCObjectFPf(objet, arg0);
+}
+
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", SetRotation__8mgCFrameFfff);
 typedef struct mgCFrame_infere4 {
     /* 0x000 */ char pad0[0x100];
@@ -717,7 +878,28 @@ extern "C" void SetAttrParamDraw__8mgCFrameFii(mgCFrame_infere5 *objet, s32 arg0
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", Draw__8mgCFrameFPUi);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", GetDrawRect__8mgCFrameFP9mgVu0FBOXP14mgCDrawManager);
 INCLUDE_ASM("nonmatchings/mglib/mgcframe", __as__8mgCFrameFR8mgCFrame);
-INCLUDE_ASM("nonmatchings/mglib/mgcframe", Draw__8mgCFrameFv);
+struct mgCFrame_virt {
+    virtual void v1() {}
+    virtual void v2() {}
+    virtual void v3() {}
+    virtual void v4() {}
+    virtual void v5() {}
+    virtual void v6() {}
+    virtual void v7() {}
+    virtual void v8() {}
+    virtual void v9() {}
+    virtual void v10() {}
+    virtual void v11() {}
+    virtual void v12() {}
+    virtual void v13() {}
+    virtual void v14() {}
+    virtual void v15() {}
+    virtual void Draw(s32 a);
+};
+extern "C" void Draw__8mgCFrameFv(mgCFrame_virt *objet) {
+    objet->Draw(0);
+}
+
 void mgCObject::ChangeParam(void) {
     this->field_0x40 = 1;
 }

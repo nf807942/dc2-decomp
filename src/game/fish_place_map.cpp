@@ -73,11 +73,17 @@ extern "C" s32 fpFISH_MAP_END__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
 }
 INCLUDE_ASM("nonmatchings/game/fish_place_map", LoadFishPlaceData__FPciP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/fish_place_map", InitSubGame__FP6CScene);
-INCLUDE_ASM("nonmatchings/game/fish_place_map", SubGameRunning__Fv);
+extern s32 SubGame;
+extern "C" s32 SubGameRunning__Fv(void) {
+    return SubGame != 0;
+}
 s32 GetSubGameNo(void) {
     return SubGame;
 }
-INCLUDE_ASM("nonmatchings/game/fish_place_map", GetNowSubGameInfo__Fv);
+extern "C" u8 GameInfo[48];
+extern "C" void *GetNowSubGameInfo__Fv(void) {
+    return GameInfo;
+}
 INCLUDE_ASM("nonmatchings/game/fish_place_map", sgMenuOpenEnable__Fv);
 void sgSetMenuOpenEnableFlag(s32 value) {
     MenuOpenFlag = value;

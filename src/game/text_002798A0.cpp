@@ -680,7 +680,12 @@ extern "C" s32 _SET_NOW_MAP_NO__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) 
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/text_002798A0", _GET_TBOX_PARAM__FP12RS_STACKDATAi);
-INCLUDE_ASM("nonmatchings/game/text_002798A0", _CANCEL_LOAD_VILLAGER__FP12RS_STACKDATAi);
+extern "C" s32 _CANCEL_LOAD_VILLAGER__FP12RS_STACKDATAi(void *arg0, s32 arg1) {
+    u8 *p = (u8 *) EventScene;
+    *(s32 *) (p + 0x303C) = 1;
+    *(s32 *) (p + 0x3038) = 1;
+    return 1;
+}
 extern "C" void CancelNowLoading__Fv();
 extern "C" s32 _CANCEL_NOW_LOADING__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     CancelNowLoading__Fv();

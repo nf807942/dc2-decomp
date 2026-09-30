@@ -9,8 +9,12 @@
 #include "common.h"
 
 INCLUDE_ASM("nonmatchings/game/csavemenuclass", MenuOptionInit__FP9mgCMemoryPii);
-INCLUDE_ASM("nonmatchings/game/csavemenuclass", MenuOptionKey__Fv);
-INCLUDE_ASM("nonmatchings/game/csavemenuclass", MenuOptionDraw__Fv);
+extern "C" void *CMenuOptionPtr;
+extern "C" void KeyStep__11CMenuOptionFv(void *);
+extern "C" void MenuOptionKey__Fv(void) { KeyStep__11CMenuOptionFv(CMenuOptionPtr); }
+extern "C" void *MenuPosData;
+extern "C" void FormDraw__14CPosDataManageFv(void *);
+extern "C" void MenuOptionDraw__Fv(void) { FormDraw__14CPosDataManageFv(MenuPosData); }
 INCLUDE_ASM("nonmatchings/game/csavemenuclass", LocalFunc_AdjustScrlBar__FPP18MENUFORMPARTS_TYPEPiPiiffi);
 INCLUDE_ASM("nonmatchings/game/csavemenuclass", SetDlInfoMsg__14CSaveMenuClassFii);
 extern "C" u32 LanguageCode;
@@ -214,9 +218,18 @@ INCLUDE_ASM("nonmatchings/game/csavemenuclass", GetDngMapNo__Fi);
 INCLUDE_ASM("nonmatchings/game/csavemenuclass", SaveMapInfo__Fi);
 INCLUDE_ASM("nonmatchings/game/csavemenuclass", ResetMapInfo__Fv);
 INCLUDE_ASM("nonmatchings/game/csavemenuclass", MenuSaveInit__FP9mgCMemoryPii);
-INCLUDE_ASM("nonmatchings/game/csavemenuclass", MenuSaveKey__Fv);
+extern "C" void KeyStep__14CSaveMenuClassFv(void *);
+extern "C" void *SaveMenuPtr;
+extern "C" void MenuSaveKey__Fv(void) {
+    KeyStep__14CSaveMenuClassFv(SaveMenuPtr);
+}
 INCLUDE_ASM("nonmatchings/game/csavemenuclass", MenuSaveDraw__Fv);
-INCLUDE_ASM("nonmatchings/game/csavemenuclass", SubGameCFGAnalyze__FPc);
+extern "C" s8 *SubGameSaveCFGBuffer;
+extern "C" s32 SubGameSaveCFGBufferSize;
+extern "C" void MenuCommandAnalyze__FPciPc(s8 *arg0, s32 arg1, s8 *arg2);
+extern "C" void SubGameCFGAnalyze__FPc(s8 *a) {
+    MenuCommandAnalyze__FPciPc(SubGameSaveCFGBuffer, SubGameSaveCFGBufferSize, a);
+}
 INCLUDE_ASM("nonmatchings/game/csavemenuclass", SubGameSaveInit__FP9mgCMemoryPii);
 INCLUDE_ASM("nonmatchings/game/csavemenuclass", SubGameSaveKey__Fv);
 INCLUDE_ASM("nonmatchings/game/csavemenuclass", SubGameSaveDraw__Fv);

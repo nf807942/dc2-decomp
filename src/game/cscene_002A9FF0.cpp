@@ -114,10 +114,22 @@ INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetActiveBgmStatus__6CSceneFPQ2
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", SetActiveBgmStatus__6CSceneFPQ26CScene10BGM_STATUS);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", PlayEnvBGM__6CSceneFif);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", SetEnvBGMVol__6CSceneFf);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetEnvBGMVol__6CSceneFv);
+struct EnvSceneC { char pad[0xA48C]; f32 vol; };
+extern "C" f32 GetEnvBGMVol__6CSceneFv(EnvSceneC *self) {
+    return self->vol;
+}
+
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", StopEnvBGM__6CSceneFv);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", AutoChangeEnvBGM__6CSceneFi);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", AutoChangeEnvOffset__6CSceneFi);
+struct EnvSceneA { char pad[0xA490]; s32 f490; s32 f494; };
+extern "C" s32 AutoChangeEnvBGM__6CSceneFi(void *self, s32 v) {
+    ((EnvSceneA *) self)->f490 = v;
+}
+
+struct EnvSceneB { char pad[0xA494]; s32 f494; };
+extern "C" void AutoChangeEnvOffset__6CSceneFi(EnvSceneB *self, s32 v) {
+    self->f494 = v;
+}
+
 extern "C" s32 SearchSndDataID__6CSceneFi(void *, s32);
 struct PlayEnvBgmScene {
     char pad0[0x9068];
@@ -367,11 +379,25 @@ INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetTimeBgmVolf__6CSceneFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", StepSnd__6CSceneFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", StopSeSrc__6CSceneFv);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", PlayMapSeSrc__6CSceneFv);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", SePlayOpenDoor__6CSceneFiPf);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", SePlayCloseDoor__6CSceneFiPf);
+struct CSceneSndOff { u8 pad0[0x8864]; u32 revCount; u8 revInfo[0x1C30]; u32 sndHandle; };
+extern "C" s32 sndSePlay__FUiii(u32, s32, s32);
+extern "C" void SePlayOpenDoor__6CSceneFiPf(char *self, s32 arg1, f32 *arg2) {
+    sndSePlay__FUiii(((CSceneSndOff *) self)->sndHandle, arg1 * 2 + 0x3C, 0);
+}
+
+extern "C" s32 sndSePlay__FUiii(u32, s32, s32);
+extern "C" void SePlayCloseDoor__6CSceneFiPf(char *self, s32 arg1, f32 *arg2) {
+    sndSePlay__FUiii(((CSceneSndOff *) self)->sndHandle, arg1 * 2 + 0x3D, 0);
+}
+
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", SePlayFoot__6CSceneFiiPf);
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetLine__FPPcPcPc_002AC650);
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", LoadSndRevInfo__6CSceneFPci);
+extern "C" s32 memcpy(...);
+extern "C" void LoadSndRevInfo__6CSceneFPci(CSceneSndOff *self, char *src, u32 n) {
+    self->revCount = n >> 3;
+    memcpy(self->revInfo, src, n);
+}
+
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", LoadSndFileInfo__6CSceneFPci);
 void EditAnalyzeDataSrc::Init(void) {
     this->field_0x0 = 0;
@@ -458,7 +484,10 @@ extern "C" void Analize__9CEditDataFiPiPi(CEditData_analyze *objet, s32 arg0, s3
         }
     }
 }
-INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetAnalyzeData__9CEditDataFii);
+extern "C" s32 GetAnalyzeData__9CEditDataFii(void *, s32 a, s32 b) {
+    return GetAnalyzeDataSrc__Fii(a, b);
+}
+
 INCLUDE_ASM("nonmatchings/game/cscene_002A9FF0", GetAnalyzeSrc__9CEditDataFi);
 extern "C" s32 GetAnalyzeDataSrc__Fii(s32, s32);
 struct AnalyzeSrcEntry {

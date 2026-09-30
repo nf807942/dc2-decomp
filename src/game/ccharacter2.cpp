@@ -42,7 +42,11 @@ INCLUDE_ASM("nonmatchings/game/ccharacter2", GetEntryObjectPos__11CCharacter2FiP
 INCLUDE_ASM("nonmatchings/game/ccharacter2", GetEntryObjectPos__11CCharacter2FiPA4_f);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", GetEntryObjectPos__11CCharacter2FiiPf);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", GetWaitToFrame__11CCharacter2FPcf);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", LoadSkin__11CCharacter2FPUiPcPcP9mgCMemoryi);
+extern "C" s32 ScanInfoSkinFile__FP11CCharacter2PUiPcPcP9mgCMemoryi(void *, u32 *, char *, char *, void *, s32);
+extern "C" s32 LoadSkin__11CCharacter2FPUiPcPcP9mgCMemoryi(void *self, u32 *a, char *b, char *c, void *d, s32 e) {
+    return ScanInfoSkinFile__FP11CCharacter2PUiPcPcP9mgCMemoryi(self, a, b, c, d, e);
+}
+
 INCLUDE_ASM("nonmatchings/game/ccharacter2", LoadPack__11CCharacter2FPUiPcP9mgCMemoryP9mgCMemoryP9mgCMemoryiP11CCharacter2);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", LoadPackNoLine__11CCharacter2FPUiPcP9mgCMemoryP9mgCMemoryP9mgCMemoryiP11CCharacter2);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", LoadChrFile__11CCharacter2FPUiPcP9mgCMemoryP9mgCMemoryP9mgCMemoryiP11CCharacter2i);
@@ -241,7 +245,11 @@ CCharaLOD::CCharaLOD(void) {
     this->field_0x4 = 0;
 }
 INCLUDE_ASM("nonmatchings/game/ccharacter2", _LOD_MODEL__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", _LOD_MODEL_END__FP9SPI_STACKi);
+extern "C" s32 _LOD_MODEL_END__FP9SPI_STACKi(void *arg0, s32 arg1) {
+    *(s32 *) ((u8 *) nowChr + 0x354) = -1;
+    return 1;
+}
+
 INCLUDE_ASM("nonmatchings/game/ccharacter2", ChangeLOD__11CCharacter2Fi);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", Copy__11CCharacter2FR11CCharacter2P9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", __as__7CObjectFRC7CObject);
@@ -472,7 +480,19 @@ extern "C" s32 dynGRAVITY__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     ((struct dynNowDA_champs_0c1c0d *) dynNowDA)->unk5C = 0;
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/ccharacter2", dynK__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ccharacter2", dynWind__FP9SPI_STACKi);
+extern "C" u32 dynNowDA;
+extern "C" f32 spiGetStackFloat__FP9SPI_STACK(SPI_STACK *);
+extern "C" s32 dynK__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    *(f32 *) (dynNowDA + 0x60) = spiGetStackFloat__FP9SPI_STACK(arg0);
+    return 1;
+}
+
+extern "C" u32 dynNowDA;
+extern "C" f32 spiGetStackFloat__FP9SPI_STACK(SPI_STACK *);
+extern "C" s32 dynWind__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
+    *(f32 *) (dynNowDA + 0x64) = spiGetStackFloat__FP9SPI_STACK(arg0);
+    return 1;
+}
+
 INCLUDE_ASM("nonmatchings/game/ccharacter2", Load__13CDynamicAnimeFPciP8mgCFrameP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/ccharacter2", CheckHit__10CDAColPipeFPf);

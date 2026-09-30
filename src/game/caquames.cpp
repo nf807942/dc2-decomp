@@ -24,7 +24,9 @@ extern "C" s32 Get_aquarium_paul_table__Fi(s32 arg0) {
     }
     return aquarium_paul_table + (var_a0 * 8);
 }
-INCLUDE_ASM("nonmatchings/game/caquames", Get_aquarium_paul_table_xz__Fii);
+extern "C" s32 Get_aquarium_paul_table_xz__Fii(s32 arg0, s32 arg1) {
+    return Get_aquarium_paul_table__Fi(arg0 + arg1 * 10);
+}
 INCLUDE_ASM("nonmatchings/game/caquames", local_aquarium_limmit_check__FPffif);
 INCLUDE_ASM("nonmatchings/game/caquames", GetUseableEsaNo__FPi);
 INCLUDE_ASM("nonmatchings/game/caquames", GetEsaInfo__Fi);
@@ -60,7 +62,10 @@ extern "C" f32 SetFishAdjustScale__Fiiff(s32 arg0, s32 arg1, f32 arg2, f32 arg3)
     }
     return var_f0;
 }
-INCLUDE_ASM("nonmatchings/game/caquames", Initialize__20CAquaFishActionParamFv);
+extern "C" void *memset(void *, int, unsigned);
+extern "C" void Initialize__20CAquaFishActionParamFv(void *objet) {
+    memset(objet, 0, 0x40);
+}
 INCLUDE_ASM("nonmatchings/game/caquames", __ct__9CAquaFishFv);
 INCLUDE_ASM("nonmatchings/game/caquames", Initialize__9CAquaFishFv);
 struct inferred;
@@ -128,7 +133,15 @@ extern "C" void Step__12CAquaFishEffFv(CAquaFishEff_infere *objet) {
 }
 INCLUDE_ASM("nonmatchings/game/caquames", Draw__12CAquaFishEffFv);
 INCLUDE_ASM("nonmatchings/game/caquames", __ct__9CFishFoodFv);
-INCLUDE_ASM("nonmatchings/game/caquames", SetDropPosition__9CFishFoodFPf);
+struct CFishFoodV {
+    virtual void d0();
+    virtual void d1();
+    virtual void SetPos(void *p);
+};
+extern "C" void SetDropPosition__9CFishFoodFPf(CFishFoodV *self, f32 *pos) {
+    *(u128 *)((u8 *)self + 0x670) = *(u128 *)pos;
+    self->SetPos((u8 *)self + 0x670);
+}
 INCLUDE_ASM("nonmatchings/game/caquames", Drop__9CFishFoodFv);
 INCLUDE_ASM("nonmatchings/game/caquames", Step__9CFishFoodFv);
 INCLUDE_ASM("nonmatchings/game/caquames", DrawEsaDropRoot__FP9CFishFoodf);

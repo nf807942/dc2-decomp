@@ -326,9 +326,10 @@ extern "C" s32 TitleLangSelKey__Fv(void) {
     }
     return 0;
 }
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", GetSelectLanguageNo__Fv);
+extern "C" s32 GetSelectLanguageNo__Fv(void) { return title_lang_select + 1; }
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", TitleLangSelDraw__Fv);
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", InitSoundViewerMain__F13INIT_LOOP_ARG);
+extern "C" void InitSoundViewerMain__F13INIT_LOOP_ARG(s32 arg0) {
+}
 void FinishSoundVieweMain(void) {
 }
 s32 LoopSoundViewerMain(void) {
@@ -687,7 +688,8 @@ extern "C" s32 emapPLACE_RECT__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     emapRectIdx_0037E124 = 0;
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapPLACE_RECT_END__FP9SPI_STACKi);
+extern "C" u32 emapRect_0037E11C;
+extern "C" s32 emapPLACE_RECT_END__FP9SPI_STACKi(SPI_STACK *, s32) { emapRect_0037E11C = 0; return 1; }
 extern "C" s32 emapPARTS_RECT__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     if (emapNowInfo_0037E114 == 0) {
         return 0;
@@ -696,7 +698,8 @@ extern "C" s32 emapPARTS_RECT__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     emapRectIdx_0037E124 = 0;
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapPARTS_RECT_END__FP9SPI_STACKi);
+extern "C" u32 emapRect_0037E11C;
+extern "C" s32 emapPARTS_RECT_END__FP9SPI_STACKi(SPI_STACK *, s32) { emapRect_0037E11C = 0; return 1; }
 extern "C" s32 emapPUT_RECT__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     if (emapNowInfo_0037E114 == 0) {
         return 0;
@@ -705,7 +708,8 @@ extern "C" s32 emapPUT_RECT__FP9SPI_STACKi(SPI_STACK *arg0, s32 arg1) {
     emapRectIdx_0037E124 = 0;
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapPUT_RECT_END__FP9SPI_STACKi);
-INCLUDE_ASM("nonmatchings/game/ceditinfomngr", emapEDIT_PARTS_END__FP9SPI_STACKi);
+extern "C" u32 emapRect_0037E11C;
+extern "C" s32 emapPUT_RECT_END__FP9SPI_STACKi(SPI_STACK *, s32) { emapRect_0037E11C = 0; return 1; }
+extern "C" s32 emapEDIT_PARTS_END__FP9SPI_STACKi(SPI_STACK *, s32) { emapNowInfo_0037E114 = 0; return 1; }
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", LoadEditInfo__13CEditInfoMngrFPciP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/ceditinfomngr", GetEvent__8CEditMapFPfiP12MapEventInfo);

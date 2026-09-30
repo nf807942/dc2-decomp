@@ -22,9 +22,14 @@ void CCharaFrameMatching::Initialize(void) {
     this->field_0x8 = 0;
     this->field_0x4 = 0;
 }
-INCLUDE_ASM("nonmatchings/game/cremovalmenu", MenuRemovalKey__Fv);
-INCLUDE_ASM("nonmatchings/game/cremovalmenu", MenuRemovalDraw__Fv);
-INCLUDE_ASM("nonmatchings/game/cremovalmenu", InitEnd__14CBaseMenuClassFv);
+extern "C" void *RemovalMenuPtr;
+extern "C" void KeyStep__12CRemovalMenuFv(void *);
+extern "C" void MenuRemovalKey__Fv(void) { KeyStep__12CRemovalMenuFv(RemovalMenuPtr); }
+extern "C" void *MenuPosData;
+extern "C" void FormDraw__14CPosDataManageFv(void *);
+extern "C" void MenuRemovalDraw__Fv(void) { FormDraw__14CPosDataManageFv(MenuPosData); }
+extern "C" void InitEnd__14CBaseMenuClassFv(void *self) {
+}
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", GetInventUserDataPtr__Fv);
 struct inferred;
 typedef struct USER_PICTURE_INFO {
@@ -60,7 +65,9 @@ INCLUDE_ASM("nonmatchings/game/cremovalmenu", Initialize__15CInventUserDataFv);
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", ResetAddress__15CInventUserDataFv);
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", PhotoCheckEnd__15CInventUserDataFv);
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", GetPhotoInfo__15CInventUserDataFi);
-INCLUDE_ASM("nonmatchings/game/cremovalmenu", GetPhototWorkAdr__15CInventUserDataFv);
+extern "C" u8 *GetPhototWorkAdr__15CInventUserDataFv(u8 *objet) {
+    return objet + 0xD60;
+}
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", IsPhotoSpace__15CInventUserDataFPi);
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", DeletePhotoData__15CInventUserDataFi);
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", CheckNetaFlag__15CInventUserDataFi);
@@ -129,7 +136,9 @@ extern "C" s32 CalcPhotoExp__15CInventUserDataFv(CInventUserData *objet) {
     return var_s0;
 }
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", LevelCheck__15CInventUserDataFP17USER_PICTURE_INFO);
-INCLUDE_ASM("nonmatchings/game/cremovalmenu", GetLevel__15CInventUserDataFv);
+extern "C" s32 GetLevel__15CInventUserDataFv(s32 *self) {
+    return self[1] + 1;
+}
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", SetCreateItemFlag__15CInventUserDataFii);
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", GetCreateItemID__15CInventUserDataFi);
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", IsAlreadyCreatedItem__15CInventUserDataFi);
@@ -179,7 +188,54 @@ extern "C" s32 KnowScoop__17CScoopDataManagerFv(CScoopDataManager *objet) {
     return var_s0;
 }
 
-INCLUDE_ASM("nonmatchings/game/cremovalmenu", CheckScoop__17CScoopDataManagerFv);
+struct PhotoInfoCS {
+    s8 valid;
+    char pad1[9];
+    s16 scoopId;
+};
+struct ScoopInfoCS {
+    char pad0[1];
+    s8 got;
+};
+extern "C" void *GetInventUserDataPtr__Fv(void);
+extern "C" PhotoInfoCS *GetPhotoInfo__15CInventUserDataFi(void *, s32);
+extern "C" s32 GetNetaID__15CInventUserDataFi(void *, s32);
+extern "C" void CheckPhotoFlag__Fv(void);
+extern "C" s32 CheckScoop__17CScoopDataManagerFv(void *self) {
+    void *user;
+    s32 n;
+    s32 i;
+    PhotoInfoCS *photo;
+    ScoopInfoCS *info;
+    s32 neta;
+    user = GetInventUserDataPtr__Fv();
+    n = 0;
+    if (user == NULL) {
+        return 0;
+    }
+    for (i = 0; i < 30; i++) {
+        photo = GetPhotoInfo__15CInventUserDataFi(user, i);
+        if (photo != NULL && photo->valid != 0) {
+            info = (ScoopInfoCS *) GetScoopInfo__17CScoopDataManagerFi(self, photo->scoopId);
+            if (info != NULL && info->got == 0) {
+                n++;
+                info->got = 1;
+            }
+        }
+    }
+    for (i = 0; i < 512; i++) {
+        neta = GetNetaID__15CInventUserDataFi(user, i);
+        if (neta >= 1000) {
+            info = (ScoopInfoCS *) GetScoopInfo__17CScoopDataManagerFi(self, neta);
+            if (info != NULL && info->got == 0) {
+                n++;
+                info->got = 1;
+            }
+        }
+    }
+    CheckPhotoFlag__Fv();
+    return n;
+}
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", GetScoopTotal__17CScoopDataManagerFPi);
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", _PIC_INFO__FP9SPI_STACKi);
 INCLUDE_ASM("nonmatchings/game/cremovalmenu", _PIC_NAME__FP9SPI_STACKi);

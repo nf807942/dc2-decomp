@@ -93,7 +93,14 @@ void CPartsGroup::Initialize(void) {
     this->field_0xC = 0;
 }
 INCLUDE_ASM("nonmatchings/game/cmap", Add__11CPartsGroupFP23CList_14PartsGroupData_);
-INCLUDE_ASM("nonmatchings/game/cmap", Initialize__9CMapWaterFv);
+extern "C" void Initialize__9CMapWaterFv(char *self) {
+    *(s32 *)(self + 0x70) = 0;
+    *(u128 *)(self + 0x80) = 0;
+    *(s32 *)(self + 0x9C) = 0;
+    *(s32 *)(self + 0x94) = 0;
+    *(s32 *)(self + 0x98) = 0;
+    *(s32 *)(self + 0x90) = 0;
+}
 INCLUDE_ASM("nonmatchings/game/cmap", Clear__9CMapWaterFv);
 INCLUDE_ASM("nonmatchings/game/cmap", GetPartsGroup__4CMapFi);
 INCLUDE_ASM("nonmatchings/game/cmap", AddPartsGroup__4CMapFPcP9CMapPartsP9mgCMemory);
@@ -111,13 +118,22 @@ INCLUDE_ASM("nonmatchings/game/cmap", SerachEmptyPartsGroupNo__4CMapFv);
 INCLUDE_ASM("nonmatchings/game/cmap", Initialize__4CMapFv);
 INCLUDE_ASM("nonmatchings/game/cmap", SetPlacePartsBuff__4CMapFP9mgCMemoryi);
 INCLUDE_ASM("nonmatchings/game/cmap", __ct__9CMapPartsFv);
-INCLUDE_ASM("nonmatchings/game/cmap", GetPlacPartsTable__4CMapFPi);
-INCLUDE_ASM("nonmatchings/game/cmap", SetCameraInfoTable__4CMapFP11CCameraInfoi);
+extern "C" s32 GetPlacPartsTable__4CMapFPi(u8 *self, s32 *out) {
+    *out = *(s32 *) (self + 0x328);
+    return *(s32 *) (self + 0x32C);
+}
+extern "C" void SetCameraInfoTable__4CMapFP11CCameraInfoi(u8 *self, void *a, s32 b) {
+    *(s32 *) (self + 0xC80) = b;
+    *(void **) (self + 0xC84) = a;
+}
 INCLUDE_ASM("nonmatchings/game/cmap", GetCameraInfo__4CMapFi);
 INCLUDE_ASM("nonmatchings/game/cmap", NewPlaceParts__4CMapFv);
 INCLUDE_ASM("nonmatchings/game/cmap", SearchMDS__4CMapFPc);
 INCLUDE_ASM("nonmatchings/game/cmap", CreateEffect__4CMapFPUiiP9mgCMemory);
-INCLUDE_ASM("nonmatchings/game/cmap", SaerchEffectIndex__4CMapFPc);
+extern "C" s32 SaerchEffectIndex__11CEffectListFPc(void *, char *);
+extern "C" s32 SaerchEffectIndex__4CMapFPc(void *self, char *a) {
+    return SaerchEffectIndex__11CEffectListFPc((u8 *) self + 0x310, a);
+}
 INCLUDE_ASM("nonmatchings/game/cmap", AddParts__4CMapFP17CList_9CMapParts_);
 INCLUDE_ASM("nonmatchings/game/cmap", GetParts__4CMapFPc);
 INCLUDE_ASM("nonmatchings/game/cmap", CreateDrawRect__4CMapFP9mgCMemoryP9mgVu0FBOXP9mgVu0FBOXi);
@@ -155,8 +171,14 @@ INCLUDE_ASM("nonmatchings/game/cmap", SetFuncPLight__4CMapFPfP15CFuncPointCheck)
 INCLUDE_ASM("nonmatchings/game/cmap", __ct__10CFuncPointFv);
 INCLUDE_ASM("nonmatchings/game/cmap", ResetFuncPLight__4CMapFi);
 INCLUDE_ASM("nonmatchings/game/cmap", DrawSub__4CMapFi);
-INCLUDE_ASM("nonmatchings/game/cmap", Draw__9CMapPartsFv);
-INCLUDE_ASM("nonmatchings/game/cmap", DrawDirect__9CMapPartsFv);
+extern "C" void DrawSub__9CMapPartsFi(...);
+extern "C" void Draw__9CMapPartsFv(void *objet) {
+    DrawSub__9CMapPartsFi(objet, 0);
+}
+extern "C" void DrawSub__9CMapPartsFi(...);
+extern "C" void DrawDirect__9CMapPartsFv(void *objet) {
+    DrawSub__9CMapPartsFi(objet, 1);
+}
 INCLUDE_ASM("nonmatchings/game/cmap", DrawEffect__4CMapFv);
 INCLUDE_ASM("nonmatchings/game/cmap", DrawFireEffect__4CMapFi);
 INCLUDE_ASM("nonmatchings/game/cmap", DrawFireRaster__4CMapFv);

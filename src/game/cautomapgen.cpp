@@ -31,15 +31,62 @@ INCLUDE_ASM("nonmatchings/game/cautomapgen", MinimapVisTest__11CAutoMapGenFPf);
 INCLUDE_ASM("nonmatchings/game/cautomapgen", MinimapDoorOpen__11CAutoMapGenFPf);
 INCLUDE_ASM("nonmatchings/game/cautomapgen", SearchRandomStone__11CAutoMapGenFPff);
 INCLUDE_ASM("nonmatchings/game/cautomapgen", ClearRandomStone__11CAutoMapGenFv);
-INCLUDE_ASM("nonmatchings/game/cautomapgen", Step__11CAutoMapGenFv);
+extern "C" void Step__13CHealingPointFv(void *);
+extern "C" void Step__11CAutoMapGenFv(void *o) { Step__13CHealingPointFv((unsigned char *)o + 0x1C0); }
 INCLUDE_ASM("nonmatchings/game/cautomapgen", GetAttrStatus__11CAutoMapGenFPf);
 INCLUDE_ASM("nonmatchings/game/cautomapgen", MinimapAllVisible__11CAutoMapGenFv);
 INCLUDE_ASM("nonmatchings/game/cautomapgen", GetNaviDistance__11CAutoMapGenFPf);
 INCLUDE_ASM("nonmatchings/game/cautomapgen", UpdateNaviMap__11CAutoMapGenFPfi);
 INCLUDE_ASM("nonmatchings/game/cautomapgen", IsDraw__14CActiveMonsterFi);
 INCLUDE_ASM("nonmatchings/game/cautomapgen", CheckStatusAttr__14CActiveMonsterFv);
-INCLUDE_ASM("nonmatchings/game/cautomapgen", CheckView__14CActiveMonsterFi);
-INCLUDE_ASM("nonmatchings/game/cautomapgen", Step__14CActiveMonsterFv);
+struct CActiveMonsterView {
+    char pad0[0x12E4];
+    s16 state;
+    char pad12E6[2];
+    f32 scale;
+    char pad12EC[4];
+    s16 view;
+    char pad12F2[2];
+    f32 x;
+    char pad12F8[4];
+    f32 y;
+    char pad1300[0x48];
+    s32 flags;
+};
+extern "C" s16 CheckView__14CActiveMonsterFi(CActiveMonsterView *objet, s32 arg0) {
+    s32 v;
+
+    v = objet->view;
+    if (v < 0) {
+        v = 99;
+    }
+    if (objet->flags & 0x200) {
+        objet->state = 2;
+        objet->scale = 1.0f;
+        return objet->state;
+    }
+    if (objet->state == 0) {
+        if (objet->x < objet->y) {
+            objet->state = 2;
+            objet->scale = 1.0f;
+        } else {
+            objet->state = 1;
+            objet->scale = 1.0f;
+        }
+        return objet->state;
+    }
+    if (objet->state == 2) {
+        if (!(objet->x <= 30.0f + objet->y) || v >= arg0) {
+            objet->state = 4;
+        }
+    }
+    if (objet->state == 1 && objet->x < objet->y && v < arg0) {
+        objet->state = 3;
+    }
+    return objet->state;
+}
+extern "C" void Step__12CActionCharaFv(void *);
+extern "C" void Step__14CActiveMonsterFv(void *o) { Step__12CActionCharaFv(o); }
 INCLUDE_ASM("nonmatchings/game/cautomapgen", Copy__14CActiveMonsterFR14CActiveMonsterP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/cautomapgen", __as__12CActionCharaFRC12CActionChara);
 struct CActiveMonsterInitView {

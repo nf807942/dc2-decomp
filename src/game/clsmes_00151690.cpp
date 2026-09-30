@@ -190,7 +190,13 @@ extern "C" void AutoSetSub__6ClsMesFP11CCharacter2P11CCharacter2Pi(ClsMes *objet
     GetScrPosFromChar__FP11CCharacter2Pi(arg1, arg2 + 2);
 }
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", CalcAutoPosSetData__FiiiiP4RECT);
-INCLUDE_ASM("nonmatchings/game/clsmes_00151690", CalcMesWinXYFromFukidashiXY__6ClsMesFv);
+struct ClsMes_cw { char p0[0xC0]; int x; int y; char p1[0x148-0xC8]; int fx; int fy; };
+extern "C" s32 CalcMesWinXYFromFukidashiXY__6ClsMesFv(void *self) {
+    ClsMes_cw *o = (ClsMes_cw *)self;
+    o->x = o->fx + 0x1E;
+    o->y = o->fy + 0x18;
+}
+
 INCLUDE_ASM("nonmatchings/game/clsmes_00151690", CalcFukidashiXY__6ClsMesFPi);
 struct ClsMes_infere_238bbe;
 typedef struct ClsMes_infere_238bbe {

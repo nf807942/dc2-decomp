@@ -48,7 +48,12 @@ extern "C" void SetMemory__11CMenuEffectFP9mgCMemory(CMenuEffect_infere *objet, 
     }
     objet->unk10 = Alloc__9mgCMemoryFi(arg0, var_v0);
 }
-INCLUDE_ASM("nonmatchings/game/cmenueffect", SetTexInfo__11CMenuEffectFP10mgCTexturePi);
+extern "C" void SetTexInfo__11CMenuEffectFP10mgCTexturePi(CMenuEffect *self, s32 tex, s16 *info) {
+    self->field_0x4 = tex;
+    if (info != NULL) {
+        self->field_0x0 = *info;
+    }
+}
 INCLUDE_ASM("nonmatchings/game/cmenueffect", SetBaseInfo__11CMenuEffectFPiiii);
 void CMenuEffect::EffectStart(void) {
     this->field_0xA = 1;
@@ -66,7 +71,16 @@ s32 GetMenuLoopType(void) {
     return MenuLoopType;
 }
 INCLUDE_ASM("nonmatchings/game/cmenueffect", CheckTrushMenu__Fv);
-INCLUDE_ASM("nonmatchings/game/cmenueffect", menu_GetSaveDataDungeon__Fv);
+extern "C" s32 GetSaveData__Fv(void);
+extern "C" s32 menu_GetSaveDataDungeon__Fv(void) {
+    s32 temp_v0;
+
+    temp_v0 = GetSaveData__Fv();
+    if (temp_v0 != 0) {
+        return (s32) ((u8 *) temp_v0 + 0x1C5B4);
+    }
+    return 0;
+}
 extern "C" s32 GetMainScene__Fv(void);
 extern "C" s32 menu_GetBattleAreaScene__Fv(void) {
     s32 temp_v0;
@@ -77,7 +91,16 @@ extern "C" s32 menu_GetBattleAreaScene__Fv(void) {
     }
     return 0;
 }
-INCLUDE_ASM("nonmatchings/game/cmenueffect", GetMenuSysData__Fv);
+extern "C" s32 GetSaveData__Fv(void);
+extern "C" s32 GetMenuSysData__Fv(void) {
+    s32 temp_v0;
+
+    temp_v0 = GetSaveData__Fv();
+    if (temp_v0 != 0) {
+        return (s32) ((u8 *) temp_v0 + 0x640C0);
+    }
+    return 0;
+}
 extern "C" s32 GetSaveData__Fv(void);
 #include "dngfloormanager.hpp"
 extern "C" s32 GetBitFlag__9CSaveDataFi(void *, s32);
@@ -95,7 +118,10 @@ INCLUDE_ASM("nonmatchings/game/cmenueffect", CheckStartChapter8__FP9CSaveData);
 void InitMenuEtcSpecialFlag(void) {
     MenuEtcSpecialCode = 0;
 }
-INCLUDE_ASM("nonmatchings/game/cmenueffect", SetMenuEtcFlag__Fi);
+extern "C" s32 SetMenuEtcFlag__Fi(s32 arg0) {
+    MenuEtcSpecialCode |= arg0;
+    return MenuEtcSpecialCode;
+}
 s32 GetMenuEtcFlag(void) {
     return MenuEtcSpecialCode;
 }
@@ -149,7 +175,11 @@ extern "C" void MenuPolygonSetEnv__Fv(void) {
     mgGetAmbient__FPf(MenuDrawEnv + 0xB0);
     mgSetAmbient__FPf(MenuDrawEnv + 0xC0);
 }
-INCLUDE_ASM("nonmatchings/game/cmenueffect", MenuPolygonEnvReset__Fv);
+extern "C" u32 MenuDrawEnv;
+extern "C" s32 mgSetAmbient__FPf(...);
+extern "C" void MenuPolygonEnvReset__Fv(void) {
+    mgSetAmbient__FPf(MenuDrawEnv + 0xB0);
+}
 INCLUDE_ASM("nonmatchings/game/cmenueffect", GetMenuCfgFileName__Fii);
 typedef struct MenuArg_champs {
     char pad0[32];
@@ -164,10 +194,19 @@ extern "C" void GetMenuMainMessageBuffer__Fv(void) {
 
     GetPackFile__FPUiPcPi(MenuArg.unk20, &_1630_0036FCA8, &sp1C);
 }
-INCLUDE_ASM("nonmatchings/game/cmenueffect", GetMenuMainIMGPtr__Fv);
-INCLUDE_ASM("nonmatchings/game/cmenueffect", GetMenuMainPosCfgBuffer__FPi);
+extern "C" u8 _1635_0036FCB8[12];
+extern "C" s32 GetMenuMainIMGPtr__Fv(void) {
+    return GetPackFile__FPUiPcPi(MenuArg.unk20, &_1635_0036FCB8, 0);
+}
+extern "C" u8 _1640_0036FCC8[12];
+extern "C" void GetMenuMainPosCfgBuffer__FPi(s32 *arg0) {
+    GetPackFile__FPUiPcPi(MenuArg.unk20, &_1640_0036FCC8, arg0);
+}
 INCLUDE_ASM("nonmatchings/game/cmenueffect", SetCommonMenuModeID__Fv);
-INCLUDE_ASM("nonmatchings/game/cmenueffect", GetCommonMenuModeID__Fv);
+extern "C" u8 CommonMenuModeID2[];
+extern "C" void *GetCommonMenuModeID__Fv(void) {
+    return CommonMenuModeID2;
+}
 INCLUDE_ASM("nonmatchings/game/cmenueffect", CursorSaveOptionState__Fv);
 INCLUDE_ASM("nonmatchings/game/cmenueffect", ReturnMenuIntern__Fi);
 INCLUDE_ASM("nonmatchings/game/cmenueffect", MenuAreaBoardNameStep__Fv);

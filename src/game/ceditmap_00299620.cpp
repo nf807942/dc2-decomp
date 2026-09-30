@@ -47,7 +47,9 @@ public:
 };
 
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", MenuNPCQuestViewInit__FP9mgCMemoryPii);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", MenuNPCQuestViewKey__Fv);
+extern "C" void *MenuQuestView;
+extern "C" void KeyStep__14CMenuQuestViewFv(void *);
+extern "C" void MenuNPCQuestViewKey__Fv(void) { KeyStep__14CMenuQuestViewFv(MenuQuestView); }
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", MenuNPCQuestViewDraw__Fv);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", PlaceRiver__8CEditMapFPf);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", RemoveRiver__8CEditMapFPf);
@@ -60,7 +62,16 @@ INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", DrawRiver__8CEditMapFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", Create__9CEditGridFiiP9mgCMemory);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", __ct__9CGridDataFv);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", Clear__9CEditGridFv);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", Initialize__9CEditGridFv);
+extern "C" void mgZeroVector__FPf(...);
+struct CEditGrid_i { int f0, f4, f8, fC, f10; };
+extern "C" void Initialize__9CEditGridFv(CEditGrid_i *o) {
+    o->f4 = 0;
+    o->f0 = 0;
+    o->f8 = 0;
+    o->f10 = 0;
+    o->fC = 0;
+    mgZeroVector__FPf((float *)o + 8);
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", Check__9CEditGridFii);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", Get__9CEditGridFii);
 struct inferred;
@@ -173,8 +184,8 @@ INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", EndCheck__6CMovieFv);
 s32 CMovie::IsStarted(void) {
     return isStarted;
 }
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", GetVoBufDataSize__6CMovieFv);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", GetViBufDataSize__6CMovieFv);
+extern "C" s32 GetVoBufDataSize__6CMovieFv(void *) { return 0x1C0000; }
+extern "C" s32 GetViBufDataSize__6CMovieFv(void *) { return 0x80000; }
 s32 CMovie::GetViBufTagSize(void) {
     return 0x1010;
 }
@@ -190,7 +201,7 @@ extern "C" s32 GetMpegWorkSize__6CMovieFii(CMovie *objet, s32 arg0, s32 arg1) {
     return var_v0 + 0x1768;
 }
 
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", GetReadBufSize__6CMovieFv);
+extern "C" s32 GetReadBufSize__6CMovieFv(void *) { return 0x50050; }
 extern "C" s32 GetTagProgSize__6CMovieFii(CMovie *objet, s32 arg0, s32 arg1) {
     s32 temp_v0;
     s32 var_v0;
@@ -225,15 +236,31 @@ extern "C" s32 videoDecSetStream__6CMovieFP8VideoDeciiPFP7sceMpegP13sceMpegCbDat
 }
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", videoDecDelete__6CMovieFP8VideoDec);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", videoDecFlush__6CMovieFP8VideoDec);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", defMain__FPv);
+extern "C" s32 defMain__FPv(void *) {
+    for (;;) {
+        switchThread__Fv();
+    }
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", videoDecMain__FPv);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", stepMain__FPv);
 s32 mpegError(sceMpeg *mpeg, sceMpegCbDataError *error, void *user) {
     return 1;
 }
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", mpegNodata__FP7sceMpegP13sceMpegCbDataPv);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", mpegStopDMA__FP7sceMpegP13sceMpegCbDataPv);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", mpegRestartDMA__FP7sceMpegP13sceMpegCbDataPv);
+extern "C" u8 videoDec[184];
+struct sceMpegCbData;
+extern "C" s32 viBufStopDMA__FP5ViBuf(...);
+extern "C" s32 mpegStopDMA__FP7sceMpegP13sceMpegCbDataPv(sceMpeg *arg0, sceMpegCbData *arg1, void *arg2) {
+    viBufStopDMA__FP5ViBuf(videoDec + 0x48);
+    return 1;
+}
+extern "C" u8 videoDec[184];
+struct sceMpegCbData;
+extern "C" s32 viBufRestartDMA__FP5ViBuf(...);
+extern "C" s32 mpegRestartDMA__FP7sceMpegP13sceMpegCbDataPv(sceMpeg *arg0, sceMpegCbData *arg1, void *arg2) {
+    viBufRestartDMA__FP5ViBuf(videoDec + 0x48);
+    return 1;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", mpegTS__FP7sceMpegP22sceMpegCbDataTimeStampPv);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", videoCallback__FP7sceMpegP16sceMpegCbDataStrPv);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", pcmCallback__FP7sceMpegP16sceMpegCbDataStrPv);
@@ -244,10 +271,14 @@ void voBufReset(VoBuf * arg0) {
     arg0->field_0xC = 0;
     arg0->field_0x10 = 0;
 }
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", voBufIsFull__FP5VoBuf);
+extern "C" s32 voBufIsFull__FP5VoBuf(VoBuf *arg0) {
+    return arg0->field_0x10 == *(s32 *) ((u8 *) arg0 + 0x14);
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", voBufIncCount__FP5VoBuf);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", voBufGetData__FP5VoBuf);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", voBufIsEmpty__FP5VoBuf);
+extern "C" s32 voBufIsEmpty__FP5VoBuf(VoBuf *b) {
+    return b->field_0x10 == 0;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", voBufGetTag__FP5VoBuf);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", voBufDecCount__FP5VoBuf);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", getFIFOindex__FP5ViBufPv);
@@ -402,7 +433,8 @@ extern "C" s32 audioDecDelete__FP8AudioDec(AudioDec_infere2 *arg0) {
 }
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", audioDecPause__FP8AudioDec);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", audioDecResume__FP8AudioDec);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", audioDecStart__FP8AudioDec);
+extern "C" void audioDecResume__FP8AudioDec(void *);
+extern "C" void audioDecStart__FP8AudioDec(void *a) { audioDecResume__FP8AudioDec(a); }
 typedef struct AudioDec_infere {
     /* 0x00 */ s32 unk0;                            /* inferred */
     /* 0x04 */ char pad4[0x28];                     /* maybe part of unk0[0xB]void */
@@ -429,7 +461,9 @@ extern "C" void audioDecReset__FP8AudioDec(AudioDec_infere *arg0) {
     arg0->unk4C = 0;
     arg0->unk50 = 0;
 }
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", audioDecIsPreset__FP8AudioDec);
+extern "C" s32 audioDecIsPreset__FP8AudioDec(AudioDec *arg0) {
+    return arg0->unk54 >= arg0->unk48;
+}
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", audioDecSendToIOP__FP8AudioDec);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", iopGetArea__FPiPiPiPiP8AudioDeci);
 INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", sendToIOP2area__FiiiiPUciPUci);
@@ -450,8 +484,14 @@ extern "C" void startDisplay__Fi(s32 arg0) {
     frd = 0;
     isCountVblank = 1;
 }
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", switchThread__Fv);
-INCLUDE_ASM("nonmatchings/game/ceditmap_00299620", videoDecSetState__FP8VideoDecUi);
+extern "C" s32 switchThread__Fv(void);
+extern "C" s32 RotateThreadReadyQueue(...);
+extern "C" s32 switchThread__Fv(void) { return RotateThreadReadyQueue(10); }
+extern "C" u32 videoDecSetState__FP8VideoDecUi(void *objet, u32 arg0) {
+    u32 old = *(u32 *) ((u8 *) objet + 0xA8);
+    *(u32 *) ((u8 *) objet + 0xA8) = arg0;
+    return old;
+}
 s32 videoDecGetState(VideoDec * arg0) {
     return arg0->field_0xA8;
 }

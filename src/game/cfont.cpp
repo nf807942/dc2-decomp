@@ -74,7 +74,14 @@ void CFont::SetPos(s32 arg0, s32 arg1) {
     this->field_0x94 = arg0;
     this->field_0x98 = arg1;
 }
-INCLUDE_ASM("nonmatchings/game/cfont", SetColor__5CFontFiiii);
+extern "C" void SetColor__5CFontFiiii(void *self, s32 r, s32 g, s32 b, s32 a) {
+    u8 *p = (u8 *)self;
+    p[0x88] = r;
+    p[0x89] = g;
+    p[0x8A] = b;
+    p[0x8B] = a;
+}
+
 INCLUDE_ASM("nonmatchings/game/cfont", SetColor__5CFontF10RGBAQ_TYPE);
 INCLUDE_ASM("nonmatchings/game/cfont", SetColor__5CFontFUi);
 void CFont::SetFuchi(s32 arg0) {
@@ -325,7 +332,11 @@ INCLUDE_ASM("nonmatchings/game/cfont", DrawVersatileWin_4__FP11mgCDrawPrim4RECTP
 INCLUDE_ASM("nonmatchings/game/cfont", DrawVersatileWin_4__FP11mgCDrawPrim4RECTP10RGBAQ_TYPEi);
 INCLUDE_ASM("nonmatchings/game/cfont", DrawDQFukidashi__FP11mgCDrawPrim4RECTiiP10RGBAQ_TYPEii);
 INCLUDE_ASM("nonmatchings/game/cfont", LoadGaijiImg__Fv);
-INCLUDE_ASM("nonmatchings/game/cfont", GetGaijiImgPtr__Fv);
+extern "C" u8 GaijiBuff[];
+extern "C" void *GetGaijiImgPtr__Fv(void) {
+    return GaijiBuff;
+}
+
 extern "C" u32 LanguageCode;
 extern "C" u8 _278_003765B0[17];
 extern "C" s32 LoadFile__FPcPvPi(...);
@@ -347,7 +358,10 @@ s32 GetFontTex2ImgPtr(void) {
 s32 CheckControl(void) {
     return CtrlLockFlag;
 }
-INCLUDE_ASM("nonmatchings/game/cfont", EditModeControlLock__Fv);
+extern "C" void EditModeControlLock__Fv(void) {
+    CtrlLockFlag++;
+}
+
 extern "C" void EditModeControlUnLock__Fv(void) {
     CtrlLockFlag -= 1;
     if (CtrlLockFlag < 0) {
@@ -456,7 +470,17 @@ void ClearEditStepCnt(void) {
     CursorLockCnt = 0;
     RemoveMtnCnt = 0;
 }
-INCLUDE_ASM("nonmatchings/game/cfont", ClearUndoFlag__Fv);
+struct UndoData_t {
+    s32 flag0;
+    s32 flag4;
+    u8 pad8[4088];
+};
+extern "C" UndoData_t UndoData;
+extern "C" void ClearUndoFlag__Fv(void) {
+    UndoData.flag0 = -1;
+    UndoData.flag4 = -1;
+}
+
 INCLUDE_ASM("nonmatchings/game/cfont", ClearEditFlag__Fv);
 extern "C" u32 EditModeNo;
 extern "C" u32 HighSpeedMoveCnt;
@@ -478,7 +502,10 @@ extern "C" void InitEditFlag__Fv(void) {
 INCLUDE_ASM("nonmatchings/game/cfont", StartEditMode__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/cfont", EndEditMode__FP6CScenePf);
 INCLUDE_ASM("nonmatchings/game/cfont", StartEditModeFromMenu__FP6CSceneiPi);
-INCLUDE_ASM("nonmatchings/game/cfont", GetUndoData__Fv);
+extern "C" void *GetUndoData__Fv(void) {
+    return &UndoData;
+}
+
 INCLUDE_ASM("nonmatchings/game/cfont", UndoEnable__Fv);
 INCLUDE_ASM("nonmatchings/game/cfont", UndoPlaceParts__FP6CScene);
 INCLUDE_ASM("nonmatchings/game/cfont", StackUndoData__FP9UNDO_DATA);
@@ -518,7 +545,10 @@ extern "C" s32 PlaceRiverStep__FP8CEditMap(void *arg0) {
     }
     return 0;
 }
-INCLUDE_ASM("nonmatchings/game/cfont", NowPlaceRiver__Fv);
+extern "C" s32 NowPlaceRiver__Fv(void) {
+    return PlaceRiverCnt > 0;
+}
+
 INCLUDE_ASM("nonmatchings/game/cfont", RemoveMtnStart__FP8CEditMapPfPf);
 extern "C" s32 GetMap__6CSceneFi(void *, s32);
 extern "C" s32 GetePlaceParts__8CEditMapFi(void *, s32);

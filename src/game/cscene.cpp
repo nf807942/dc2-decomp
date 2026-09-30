@@ -30,8 +30,18 @@ void CSceneData::Initialize(void) {
     this->field_0x4 = 0;
 }
 INCLUDE_ASM("nonmatchings/game/cscene", AssignData__15CSceneCharacterFP11CCharacter2Pc);
-INCLUDE_ASM("nonmatchings/game/cscene", Initialize__15CSceneCharacterFv);
-INCLUDE_ASM("nonmatchings/game/cscene", Initialize__9CSceneMapFv);
+extern "C" s32 Initialize__10CSceneDataFv(void *);
+extern "C" s32 Initialize__15CSceneCharacterFv(void *arg0) {
+    *(s32 *) ((u8 *) arg0 + 0x34) = 0;
+    *(s32 *) ((u8 *) arg0 + 0x38) = -1;
+    *(s32 *) ((u8 *) arg0 + 0x3C) = -1;
+    return Initialize__10CSceneDataFv(arg0);
+}
+extern "C" s32 Initialize__10CSceneDataFv(void *);
+extern "C" s32 Initialize__9CSceneMapFv(void *self) {
+    ((u32 *) self)[0x34 / 4] = 0;
+    return Initialize__10CSceneDataFv(self);
+}
 struct CMap {
     char pad_0[0x98];
     s32 field_98;
@@ -118,7 +128,11 @@ extern "C" s32 AssignData__9CSceneMapFP4CMapPc(CSceneMap *objet, CMap *arg0, s8 
     return 1;
 }
 
-INCLUDE_ASM("nonmatchings/game/cscene", Initialize__13CSceneMessageFv);
+extern "C" s32 Initialize__10CSceneDataFv(void *);
+extern "C" s32 Initialize__13CSceneMessageFv(void *self) {
+    ((u32 *) self)[0x34 / 4] = 0;
+    return Initialize__10CSceneDataFv(self);
+}
 #include "gen/ClsMes.hpp"
 struct inferred;
 typedef struct CSceneMessage {
@@ -235,7 +249,11 @@ extern "C" s32 AssignData__12CSceneCameraFP9mgCCameraPc(CSceneCamera *objet, mgC
     objet->unk0 |= 4;
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/cscene", Initialize__12CSceneCameraFv);
+extern "C" s32 Initialize__10CSceneDataFv(void *);
+extern "C" s32 Initialize__12CSceneCameraFv(void *self) {
+    ((u32 *) self)[0x34 / 4] = 0;
+    return Initialize__10CSceneDataFv(self);
+}
 struct CMapSky;
 struct inferred;
 typedef struct CSceneSky {
@@ -261,9 +279,20 @@ extern "C" s32 AssignData__9CSceneSkyFP7CMapSkyPc(CSceneSky *objet, CMapSky *arg
     objet->unk0 |= 4;
     return 1;
 }
-INCLUDE_ASM("nonmatchings/game/cscene", Initialize__9CSceneSkyFv);
-INCLUDE_ASM("nonmatchings/game/cscene", Initialize__13CSceneGameObjFv);
-INCLUDE_ASM("nonmatchings/game/cscene", Initialize__12CSceneEffectFv);
+extern "C" s32 Initialize__10CSceneDataFv(void *);
+extern "C" s32 Initialize__9CSceneSkyFv(void *self) {
+    ((u32 *) self)[0x34 / 4] = 0;
+    return Initialize__10CSceneDataFv(self);
+}
+extern "C" s32 Initialize__15CSceneCharacterFv(void *);
+extern "C" s32 Initialize__13CSceneGameObjFv(void *self) {
+    return Initialize__15CSceneCharacterFv(self);
+}
+extern "C" s32 Initialize__10CSceneDataFv(void *);
+extern "C" s32 Initialize__12CSceneEffectFv(void *self) {
+    ((u32 *) self)[0x34 / 4] = 0;
+    return Initialize__10CSceneDataFv(self);
+}
 struct CEffectScriptMan {
     char pad_0[0xC];
     s32 field_C;
