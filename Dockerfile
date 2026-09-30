@@ -28,6 +28,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         xz-utils \
     && rm -rf /var/lib/apt/lists/*
 
+# Les compilateurs GCC de Sony (ee-gcc 2.9x) sont des binaires i386 32 bits :
+# sans le chargeur 32 bits, `ee-gcc` répond « required file not found ». Ils ont
+# compilé le SDK Sony et la bibliothèque C du jeu, que MWCC ne reproduit pas.
+RUN dpkg --add-architecture i386     && apt-get update && apt-get install -y --no-install-recommends libc6-i386     && rm -rf /var/lib/apt/lists/*
+
 # Binutils du projet decompals : le seul assembleur qui accepte les
 # instructions MMI et COP2 du R5900 telles que le désassembleur les écrit.
 RUN curl -fsSL -o /tmp/binutils.tar.gz \

@@ -77,11 +77,62 @@ def fetch(name: str, destination: Path) -> None:
         path.chmod(0o755)
 
 
+# Les compilateurs GCC de Sony, de la même release. Le SDK et la bibliothèque C du
+# jeu viennent d'eux, non de MWCC (leurs fonctions sont absentes de `.mwcats`) ;
+# quelle version a compilé quoi se mesure avec `scripts/build/gcc_essai.py`.
+GCC_BUILDS = {
+    "ee-gcc2.9-990721": "tar.xz",
+    "ee-gcc2.9-991111": "tar.xz",
+    "ee-gcc2.9-991111-01": "tar.xz",
+    "ee-gcc2.9-991111a": "tar.xz",
+    "ee-gcc2.95.2-273a": "tar.gz",
+    "ee-gcc2.95.3-114": "tar.gz",
+    "ee-gcc2.95.3-136": "tar.gz",
+    "ee-gcc2.96": "tar.xz",
+}
+
+
+def fetch_gcc(name: str, extension: str, destination: Path) -> None:
+    url = BASE_URL.format(name=name).replace(".tar.gz", "." + extension)
+    with urllib.request.urlopen(url) as response:
+        payload = response.read()
+    destination.mkdir(parents=True, exist_ok=True)
+    with tarfile.open(fileobj=io.BytesIO(payload), mode="r:*") as archive:
+        members = [m for m in archive.getmembers() if m.isfile()]
+        # La plupart rangent `bin/`, `ee/` et `lib/` à la racine ; si un paquet
+        # les met sous un répertoire éponyme, on le retire.
+        tops = {Path(m.name).parts[0] for m in members}
+        strip = len(tops) == 1 and tops.isdisjoint({"bin", "ee", "lib"})
+        for member in members:
+            if strip:
+                member.name = str(Path(*Path(member.name).parts[1:]))
+            archive.extract(member, destination, filter="data")
+    for path in destination.rglob("*"):
+        if path.is_file():
+            path.chmod(0o755)
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--all", action="store_true",
                         help="installe toutes les candidates, non la première")
+    parser.add_argument("--gcc", action="store_true",
+                        help="installe aussi les compilateurs GCC de Sony (ee-gcc)")
     args = parser.parse_args()
+
+    if args.gcc:
+        for name, extension in GCC_BUILDS.items():
+            destination = COMPILERS_DIR / name
+            if (destination / "bin" / "ee-gcc").exists():
+                print(f"{name} déjà installé")
+                continue
+            print(f"{name} …", end=" ", flush=True)
+            try:
+                fetch_gcc(name, extension, destination)
+            except Exception as error:  # réseau, archive, droits
+                print(f"échec : {error}")
+                continue
+            print(f"→ {destination.relative_to(ROOT)}")
 
     wanted = CANDIDATES if args.all else CANDIDATES[:1]
     for name in wanted:

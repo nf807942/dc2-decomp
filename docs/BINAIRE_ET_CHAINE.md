@@ -684,3 +684,30 @@ prouve pas un gain. La reconstruction complète reste le seul verdict.
   que Metrowerks emploie a été retiré de `c++filt` ; le démangleur CodeWarrior
   d'objdiff rend 86 % des 7 792 fonctions et nomme 303 classes, dont 961 560
   octets de méthodes. C'est de là que `make units` tire ses propositions.
+
+# 8. Les compilateurs GCC de Sony
+
+Le SDK Sony et la bibliothèque C du jeu (1 082 fonctions, 220 848 octets, 10 % des octets)
+sont absents de `.mwcats` : MWCC ne les a pas compilés. Les marqueurs `gcc2_compiled.` de
+l'ELF, le cadre de `__negsf2` et les noms de newlib (`_free_r`, `__sfp`, `__ieee754_*`)
+disent GCC 2.x, le compilateur de Sony pour l'Emotion Engine.
+
+- **Les compilateurs** sont dans la release `decompme/compilers` d'où vient déjà MWCC :
+  `make tools TOOLS_ARGS=--gcc` installe huit builds sous `tools/compilers/ee-gcc*`
+  (2.9-990721, 2.9-991111 et ses variantes `-01` et `a`, 2.95.2-273a, 2.95.3-114 et 136,
+  2.96). Rien n'entre dans git.
+- **Les binaires** sont des ELF i386 32 bits (2.9x et 2.96) ou des `.exe` de SN Systems
+  (2.95.x, lancés par wibo). L'image Docker porte `libc6-i386` pour les premiers. Sur le
+  montage Windows, leur `stat` 32 bits échoue sur les numéros d'inode (« Value too large for
+  defined data type ») : le compilateur et la source se compilent depuis `/tmp`.
+- **`scripts/build/gcc_essai.py`** compile une fonction sous chaque build et chaque jeu
+  d'options (`-O2 -G0`, `-O2 -G8`, `-O2 -G128`, `-O1 -G0`, `-O3 -G0`) et rend le
+  `match_percent` d'objdiff contre la référence : c'est la méthode qui a départagé les 21
+  versions de MWCC, appliquée aux GCC.
+- **Première mesure** : `sceGifPkInit` (quatre instructions) est à 100 % sous toutes les
+  versions de 2.9-991111a à 2.96 en `-O2` et `-O3`, à 96,75 % en `-O1` : trop courte pour
+  départager. Il faut des fonctions plus longues.
+- **Tout n'est pas du C compilé.** Le `strlen` du jeu est de l'assembleur MMI écrit à la
+  main (`lq`, `psubb`, `pnor`, `pcpyud`) : aucun compilateur ne le rendra depuis le `strlen`
+  de newlib (57,9 % sous toutes les versions). Une fonction de ce genre reste de
+  l'assembleur de référence.
