@@ -82,6 +82,48 @@ def signature(nom: str) -> str:
     return f"{tete}({args})"
 
 
+_MMI = re.compile(r"\b(pcpy\w+|padd\w+|psub\w+|pand|por|pnor|pxor|pext\w+|pmul\w+|pdiv\w+|pmax\w+|pmin\w+|pcgt\w+|pceq\w+|psll\w+|psrl\w+|psra\w+|ppac\w+|qmtc2|qmfc2|lqc2|sqc2|mfhi1|mflo1|mult1|madd1)\b")
+
+
+def section_gcc(nom: str, src: Path, asm: Path | None) -> str:
+    """Ce qu'il faut savoir pour écrire une fonction du SDK ou de la libc : la voie GCC."""
+    l = ["\n## voie GCC (ee-gcc 2.9-ee, du C — non du C++ de MWCC)",
+         "Cette unité ne sort pas de MWCC : `soumettre` la compile avec `ee-gcc` (`-O2 -G0`),",
+         "en C, avec les en-têtes de newlib (`<stdio.h>`, `\"local.h\"`…) et `include/gcc/` "
+         "(`ieee754.h` pour les mots d'un flottant). Voir docs/METHODE_GCC.md."]
+    if asm is not None:
+        mmi = sorted(set(_MMI.findall(asm.read_text(encoding="utf-8", errors="replace"))))
+        if mmi:
+            l.append("ATTENTION : instructions MMI/COP2 (" + ", ".join(mmi[:6]) + ") — "
+                     "probablement de l'assembleur écrit à la main par Sony (comme `strlen`), "
+                     "que le C de newlib ne rendra pas. Mesurez d'abord ; sinon elle reste en "
+                     "assembleur de référence.")
+    try:
+        from newlib_source import cherche, INDEX
+        if INDEX.exists():
+            trouves = cherche(nom, "newlib-1_9_0")
+            if trouves:
+                l.append("Sources de newlib 1.9.0 candidates (`newlib_source.py " + nom
+                         + " [chemin]` les aplatit pour `gcc_essai.py`) :")
+                l += [f"  - {rel}   ({pourquoi})" for rel, pourquoi in trouves[:5]]
+            else:
+                l.append("Aucune source de newlib trouvée pour ce nom : code de Sony (SDK) ou "
+                         "alias du préprocesseur. Écrivez-la d'après le désassemblage ; "
+                         "`ps2sdk` donne les prototypes.")
+    except Exception:  # noqa: BLE001 — l'index manque ou la recherche échoue : on s'en passe
+        l.append("(index de newlib absent : `make tools TOOLS_ARGS=--gcc`)")
+    deja = sorted(u.strip() for u in (ROOT / "config" / "gcc_units.txt")
+                  .read_text(encoding="utf-8").splitlines()
+                  if u.strip() and not u.lstrip().startswith("#"))[:6]
+    if deja:
+        l.append("Unités déjà écrites par cette voie, pour modèle : " + ", ".join(deja))
+    l += ["Mesurer une forme sur toutes les versions d'ee-gcc : "
+          f"`scripts/host/dc2 python3 scripts/build/gcc_essai.py {nom} essai.c --montre`",
+          "Une différence d'une instruction tient souvent à la version de newlib (ex. `std` de "
+          "findfp.c n'a pas `_bf._size = 0;` dans le jeu) : retirez ou ajoutez la ligne."]
+    return "\n".join(l)
+
+
 def dossier(nom: str) -> str:
     table = functions()
     if nom not in table:
@@ -162,6 +204,9 @@ def dossier(nom: str) -> str:
                     sortie.append(f"- {n} : non trouvé ici ni ailleurs — "
                                   "sa nature (fonction, u32, tableau) se lit au désassemblage")
         sortie.append("\n## désassemblage\n" + asm_lisible(asm))
+
+    if src is not None and src.parent.name in ("sdk", "runtime"):
+        sortie.append(section_gcc(nom, src, asm))
 
     sortie.append(
         "\n## vérifier\n"
