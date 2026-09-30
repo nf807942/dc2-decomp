@@ -62,6 +62,8 @@ SLPS_*
 # copyright, non redistribuable), binutils, wibo, objdiff.
 /tools/compilers/
 /tools/bin/
+# Les sources publiques de newlib, que la voie GCC lit (`newlib_source.py --indexe`).
+/tools/newlib/
 # Le témoin que `make patch` pose ; les correctifs, eux, se versionnent.
 /tools/.patched
 

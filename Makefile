@@ -206,6 +206,25 @@ $(BUILD_DIR)/%.o: %.c $(HEADERS) $(MWCCGAP_SRC) $(UNITS) tools/.patched
 	@test -f $(MWCC) || { echo "$(MWCC) absent — lancez \`make tools\`" >&2; exit 1; }
 	$(MWCC_ENV) $(MWCCGAP) $< $@ $(MWCCGAP_ARGS) $(CFLAGS) $(MWCCGAP_TAIL)
 
+# La voie GCC. Le SDK Sony et la bibliotheque C du jeu ne sont pas dans `.mwcats` :
+# MWCC ne les a pas compiles, ee-gcc 2.9 si (mesure : `scripts/build/gcc_essai.py`).
+# `config/gcc_units.txt` liste les unites concernees ; elles passent par le meme
+# mwccgap, qui appelle `scripts/build/ee_gcc_cc` au lieu de MWCC. Les drapeaux sont
+# ceux du SDK de l'epoque : -O2, donnees courtes desactivees.
+EE_GCC        ?= ee-gcc2.9-991111-01
+GCC_FLAGS     ?= -O2 -G0
+GCC_UNITS     := $(shell grep -v '^[[:space:]]*\#' config/gcc_units.txt 2>/dev/null)
+GCC_OBJS     := $(addprefix $(BUILD_DIR)/$(SRC_DIR)/, $(addsuffix .o, $(GCC_UNITS)))
+GCCGAP_ARGS   := --mwcc-path scripts/build/ee_gcc_cc --as-path $(AS) \
+                 --macro-inc-path $(INCLUDE_DIR)/macro.inc \
+                 --asm-dir-prefix $(ASM_DIR) \
+                 --as-march r5900 --as-mabi eabi
+
+$(GCC_OBJS): $(BUILD_DIR)/%.o: %.cpp $(wildcard include/gcc/*.h) $(MWCCGAP_SRC) $(UNITS) config/gcc_units.txt scripts/build/ee_gcc_cc tools/.patched
+	@mkdir -p $(dir $@)
+	@test -d tools/compilers/$(EE_GCC) || { echo "tools/compilers/$(EE_GCC) absent — lancez make tools TOOLS_ARGS=--gcc" >&2; exit 1; }
+	EE_GCC=$(EE_GCC) $(MWCCGAP) $< $@ $(GCCGAP_ARGS) $(GCC_FLAGS) $(MWCCGAP_TAIL)
+
 # Le compilateur, depuis les paquets de decompme/compilers.
 tools: patch
 	@$(PYTHON) scripts/setup/get_tools.py $(TOOLS_ARGS)

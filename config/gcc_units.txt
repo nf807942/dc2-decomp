@@ -1,0 +1,10 @@
+# Les unités compilées par ee-gcc (la voie GCC) et non par MWCC.
+#
+#   <dossier>/<unité>      (le nom que `config/units.txt` donne, sans `src/`)
+#
+# Le SDK Sony et la bibliothèque C du jeu ne sont pas dans `.mwcats` : MWCC ne les a pas
+# compilés. Une unité listée ici est du C, compilée par `scripts/build/ee_gcc_cc` avec
+# `include/gcc/` pour en-têtes, puis greffée par `mwccgap` comme les autres.
+runtime/copysign
+runtime/copysignf
+runtime/sfp

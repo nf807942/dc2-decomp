@@ -115,6 +115,55 @@ def verrouille(source: Path, attente: int = 300) -> None:
     atexit.register(lambda: verrou.unlink(missing_ok=True))
 
 
+GCC_UNITES = ROOT / "config" / "gcc_units.txt"
+
+
+def nom_unite(source: Path) -> str:
+    """`src/runtime/copysign.cpp` → `runtime/copysign`, le nom de `gcc_units.txt`."""
+    return source.relative_to(ROOT / "src").with_suffix("").as_posix()
+
+
+def unites_gcc() -> set[str]:
+    if not GCC_UNITES.exists():
+        return set()
+    return {l.strip() for l in GCC_UNITES.read_text(encoding="utf-8").splitlines()
+            if l.strip() and not l.lstrip().startswith("#")}
+
+
+def modifier_liste_gcc(unite: str, ajouter: bool) -> None:
+    """Ajoute ou retire une unité de la liste, sous un verrou court.
+
+    Plusieurs agents peuvent ajouter chacun la leur au même moment : lire, changer
+    et réécrire le fichier sans verrou en perdrait.
+    """
+    VERROUS.mkdir(parents=True, exist_ok=True)
+    verrou = VERROUS / "gcc_units.lock"
+    debut = time.time()
+    while True:
+        try:
+            os.close(os.open(verrou, os.O_CREAT | os.O_EXCL | os.O_WRONLY))
+            break
+        except FileExistsError:
+            if time.time() - verrou.stat().st_mtime > 60 or time.time() - debut > 60:
+                verrou.unlink(missing_ok=True)
+            else:
+                time.sleep(0.2)
+    try:
+        lignes = GCC_UNITES.read_text(encoding="utf-8").splitlines()
+        lignes = [l for l in lignes if l.strip() != unite]
+        if ajouter:
+            lignes.append(unite)
+        GCC_UNITES.write_text("\n".join(lignes) + "\n", encoding="utf-8", newline="\n")
+    finally:
+        verrou.unlink(missing_ok=True)
+
+
+def _erreurs_gcc(sortie: str) -> str:
+    """Les lignes d'erreur de GCC (`fichier:ligne: message`), sans la trace qui suit."""
+    lignes = [l for l in sortie.splitlines() if re.match(r"^\S+:\d+: ", l)]
+    return "\n".join(lignes[:12])
+
+
 def _erreurs_mwcc(sortie: str) -> str:
     """Les blocs d'erreur de MWCC seuls, sans la trace Python qui les entoure.
 
@@ -125,7 +174,9 @@ def _erreurs_mwcc(sortie: str) -> str:
     lignes = sortie.splitlines()
     blocs = ["\n".join(lignes[i:i + 8])
              for i, ligne in enumerate(lignes) if "Compiler:" in ligne]
-    return "\n---\n".join(blocs[:6]) if blocs else _extrait(sortie)
+    if blocs:
+        return "\n---\n".join(blocs[:6])
+    return _erreurs_gcc(sortie) or _extrait(sortie)
 
 
 def main() -> int:
@@ -169,12 +220,20 @@ def main() -> int:
         print(f"{a.symbole} : aucune source ne la greffe (déjà écrite ?).")
         return 2
 
-    if source.parent.name in ("sdk", "runtime") and not a.sdk:
-        print(f"{a.symbole} : {source.parent.name} est livré compilé (hors de la "
-              "chaîne MWCC). Un score de 100 % sur la fonction y cache une "
-              "longueur différente : trois fonctions l'ont montré (+8 octets "
-              "chacune, toute l'image décalée). --sdk pour tenter quand même.")
-        return 6
+    # Le SDK Sony et la bibliothèque C du jeu ne sortent pas de MWCC : leurs
+    # unités passent par la voie GCC (`config/gcc_units.txt`, ee-gcc 2.9). Une
+    # unité de ces dossiers y entre pour la durée de la mesure et n'y reste que
+    # si la fonction est gardée. Elle est refusée si elle contient déjà du code
+    # que MWCC a compilé : le compiler autrement changerait ce qui est déjà écrit.
+    unite = nom_unite(source)
+    ajoutee_a_la_liste = False
+    if source.parent.name in ("sdk", "runtime") and unite not in unites_gcc():
+        code = re.sub(r'INCLUDE_ASM\s*\([^)]*\)', "", source.read_text(encoding="utf-8"))
+        if re.search(r"\)\s*\{", code) and not a.sdk:
+            print(f"{a.symbole} : l'unité {unite} contient déjà du code compilé par MWCC ; "
+                  "la passer en GCC le changerait. --sdk pour forcer.")
+            return 6
+        ajoutee_a_la_liste = True
 
     verrouille(source)
     original = source.read_bytes()
@@ -218,6 +277,8 @@ def main() -> int:
 
     nouveau = ligne.sub(lambda _: corps, texte, count=1)
     source.write_bytes(nouveau.encode("utf-8"))
+    if ajoutee_a_la_liste:
+        modifier_liste_gcc(unite, ajouter=True)
     score = None
     try:
         # Dans le conteneur `make` existe déjà ; sur l'hôte on y entre par dc2.
@@ -248,11 +309,15 @@ def main() -> int:
             score = float(m.group(1))
     except BaseException:
         source.write_bytes(original)
+        if ajoutee_a_la_liste:
+            modifier_liste_gcc(unite, ajouter=False)
         raise
 
     gardee = score is not None and score >= a.seuil
     if not gardee:
         source.write_bytes(original)
+        if ajoutee_a_la_liste:
+            modifier_liste_gcc(unite, ajouter=False)
     journalise(a.symbole, score, gardee)
 
     if score is None:

@@ -1,0 +1,106 @@
+#!/usr/bin/env python3
+"""Le compilateur C de la voie GCC, sous l'interface que `mwccgap` attend de MWCC.
+
+    ee_gcc_cc -c <options> -o sortie.o source.c
+
+`mwccgap` appelle « le compilateur » ainsi ; ce script le fait tenir par `ee-gcc`. La
+version se choisit par l'environnement (`EE_GCC`, `ee-gcc2.9-991111-01` par défaut) et les
+options passent telles quelles (`-O2 -G0` en tête de ce que le Makefile donne).
+
+**Pourquoi un script et non l'appel direct.** Les `ee-gcc` 2.9x sont des binaires i386
+32 bits dont le `stat` échoue sur les numéros d'inode du montage Windows (« Value too large
+for defined data type »). Le compilateur, ses en-têtes (`include/gcc/`) et la source sont
+donc copiés dans `/tmp` avant de compiler. La copie du compilateur se garde d'un appel à
+l'autre (`/tmp/ee-gcc-cache/<version>`), sans quoi chaque unité paierait 2 Mo de copie.
+"""
+
+import os
+import shutil
+import subprocess
+import sys
+import tempfile
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[2]
+CACHE = Path("/tmp/ee-gcc-cache")
+
+
+def compilateur(nom: str) -> Path:
+    cible = CACHE / nom
+    if cible.exists():
+        return cible
+    CACHE.mkdir(parents=True, exist_ok=True)
+    partiel = Path(tempfile.mkdtemp(dir=CACHE, prefix=nom + "."))
+    shutil.copytree(ROOT / "tools" / "compilers" / nom, partiel / "c")
+    try:
+        (partiel / "c").rename(cible)      # atomique : deux unités peuvent arriver ensemble
+    except OSError:
+        pass                                # l'autre a gagné
+    shutil.rmtree(partiel, ignore_errors=True)
+    return cible
+
+
+# Les dossiers de newlib qu'une unité peut inclure : les en-têtes publics, et ceux que
+# chaque famille de sources garde à côté d'elle (`local.h` de stdio, `fdlibm.h` de la libm).
+NEWLIB = ROOT / "tools" / "newlib" / "newlib-1_9_0"
+NEWLIB_DOSSIERS = ["libc/include", "libc/stdio", "libc/stdlib", "libc/string",
+                   "libc/reent", "libc/locale", "libc/time", "libm/common", "libm/math"]
+
+
+def newlib() -> list[str]:
+    """Les `-I` de newlib, copiés une fois dans `/tmp` (même raison que le compilateur)."""
+    if not NEWLIB.exists():
+        return []
+    cible = CACHE / "newlib"
+    if not cible.exists():
+        CACHE.mkdir(parents=True, exist_ok=True)
+        partiel = Path(tempfile.mkdtemp(dir=CACHE, prefix="newlib."))
+        for d in NEWLIB_DOSSIERS:
+            if (NEWLIB / d).exists():
+                shutil.copytree(NEWLIB / d, partiel / "c" / d)
+        try:
+            (partiel / "c").rename(cible)
+        except OSError:
+            pass
+        shutil.rmtree(partiel, ignore_errors=True)
+    return [f"-I{cible / d}" for d in NEWLIB_DOSSIERS if (cible / d).exists()]
+
+
+def main(argv: list[str]) -> int:
+    sortie = None
+    source = None
+    options: list[str] = []
+    i = 0
+    while i < len(argv):
+        a = argv[i]
+        if a == "-o":
+            sortie = Path(argv[i + 1]); i += 2; continue
+        if a == "-c":
+            i += 1; continue
+        if not a.startswith("-"):
+            source = Path(a); i += 1; continue
+        options.append(a); i += 1
+    if sortie is None or source is None:
+        print("usage : ee_gcc_cc -c <options> -o sortie.o source.c", file=sys.stderr)
+        return 2
+
+    racine = compilateur(os.environ.get("EE_GCC", "ee-gcc2.9-991111-01"))
+    bib = sorted((racine / "lib" / "gcc-lib" / "ee").glob("*"))[0]
+    with tempfile.TemporaryDirectory(dir="/tmp") as tmp:
+        tmp = Path(tmp)
+        shutil.copytree(ROOT / "include" / "gcc", tmp / "inc")
+        copie = tmp / source.name
+        shutil.copy(source, copie)
+        objet = tmp / "sortie.o"
+        commande = [str(racine / "bin" / "ee-gcc"), f"-B{bib}/", f"-B{racine}/ee/bin/",
+                    "-x", "c", *options, f"-I{tmp / 'inc'}", *newlib(), "-c", "-o", str(objet), str(copie)]
+        r = subprocess.run(commande, cwd=tmp, capture_output=True, text=True)
+        sys.stderr.write(r.stdout + r.stderr)
+        if r.returncode != 0 or not objet.exists():
+            return r.returncode or 1
+        shutil.copy(objet, sortie)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

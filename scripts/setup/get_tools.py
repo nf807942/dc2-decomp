@@ -133,6 +133,11 @@ def main() -> int:
                 print(f"échec : {error}")
                 continue
             print(f"→ {destination.relative_to(ROOT)}")
+        # Les sources et les en-têtes de newlib, que les unités de la voie GCC incluent.
+        sys.path.insert(0, str(ROOT / "scripts" / "build"))
+        import newlib_source
+        if not (ROOT / "tools" / "newlib" / "newlib-1_9_0").exists():
+            newlib_source.indexe("newlib-1_9_0")
 
     wanted = CANDIDATES if args.all else CANDIDATES[:1]
     for name in wanted:

@@ -1,11 +1,17 @@
-/* Fonctions libres — à décrire.
+/* copysign — sign of y, magnitude of x.
  *
- * Unité découpée par `make carve` : 1 fonctions, 68 octets, de
- * 0x0011D820 à 0x0011D868. Chacune garde les instructions du disque
- * jusqu'à ce qu'elle soit écrite en C++, et l'ordre est celui des adresses,
- * que l'éditeur de liens attend.
- */
+ * Unité de la voie GCC (`config/gcc_units.txt`) : newlib 1.9.0, `s_copysign.c`,
+ * compilé par ee-gcc 2.9-991111 en -O2 -G0. Le binaire porte la fonction telle que
+ * la source de newlib la donne, sans modification (mesuré : 100 %). */
 
 #include "common.h"
+#include "ieee754.h"
 
-INCLUDE_ASM("nonmatchings/runtime/copysign", copysign);
+double copysign(double x, double y)
+{
+    __uint32_t hx, hy;
+    GET_HIGH_WORD(hx, x);
+    GET_HIGH_WORD(hy, y);
+    SET_HIGH_WORD(x, (hx & 0x7fffffff) | (hy & 0x80000000));
+    return x;
+}
