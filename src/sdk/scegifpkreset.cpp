@@ -8,4 +8,11 @@
 
 #include "common.h"
 
-INCLUDE_ASM("nonmatchings/sdk/scegifpkreset", sceGifPkReset);
+typedef struct { unsigned *p; unsigned *base; unsigned n; unsigned *tag; } Pk;
+void sceGifPkReset(Pk *p)
+{
+    unsigned *b = p->base;
+    p->n = 0;
+    p->p = b;
+}
+

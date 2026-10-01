@@ -128,6 +128,25 @@ premier coup, **en traduisant le désassemblage ligne à ligne**. Les pièges re
   pas la faire. `soumettre` l'écrit (code 6) ; `--sdk` ne le contourne pas proprement.
 - **`newlib_source.py --fonction`** rend un corps en `_DEFUN`, à réécrire en C simple.
 
+### Fournée K2 (SDK : libkernl, libgifpk, libgraph, libmpeg ; 28 sur 30)
+
+- **Le type de retour décide de l'appel terminal.** `_sceFsSigSema` ne rend le `j SignalSema` que
+  avec un retour `void` (`SignalSema(_fs_semid);`) ; avec `return SignalSema(...)`, GCC émet un
+  prologue et un `jal` (0 %).
+- **L'ordre émis n'est pas l'ordre de la source** : l'ordonnanceur de GCC réordonne les `sw`.
+  Pour une suite de stockages sur une structure, on écrit **l'ordre des champs**, non celui du
+  désassemblage (`_alalcInit` : 99,40 % en recopiant l'ordre du binaire, 100 % dans l'ordre
+  naturel) — ou, quand l'ordonnanceur place un `sw` dans le créneau de délai, une structure locale
+  cible avec les champs dans l'ordre inverse (`sceMpegSetDecodeMode` : une permutation sur cinq).
+- **`(*(T *)(base + off))` répété recharge la base** (un `lw` avant chaque stockage) ; une
+  variable locale pour la base n'y change rien, une structure locale cible oui.
+- **Un `u128` s'écrit `typedef int u128 __attribute__((mode(TI)))`** et rend le `sq`
+  (`sceGifPkOpenGifTag` : seule la forme `p->tag = p->p; *p->p++ = t;` rend 100 %).
+- **`soumettre` laisse dans l'unité les `typedef` et `#define` d'un essai.** Un nom déjà pris
+  échoue (« conflicting types ») : un nom de type distinct par fonction (`D1`, `S2`).
+- **`gcc_essai.py` hors unité n'est pas fiable pour un champ de structure défini ailleurs** :
+  `soumettre` rend la vraie mesure.
+
 ## Ce qui n'est pas encore prouvé
 
 - Les unités **partiellement écrites** (une partie des fonctions en `INCLUDE_ASM`) greffent

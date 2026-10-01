@@ -14,7 +14,13 @@ INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", get_iob);
 INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", _sceFs_Rcv_Intr);
 INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", _sceFsSemInit);
 INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", _sceFsWaitS);
-INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", _sceFsSigSema);
+extern int _fs_semid;
+extern int SignalSema(int);
+void _sceFsSigSema(void)
+{
+    SignalSema(_fs_semid);
+}
+
 INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", scePowerOffHandler);
 INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", _sceFs_Poff_Intr);
 INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", sceFsInit);
@@ -28,22 +34,47 @@ INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", sceWrite);
 INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", sceIoctl);
 INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", sceIoctl2);
 INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", _sceCallCode);
-INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", sceRemove);
+extern int _sceCallCode(const char *, int);
+int sceRemove(const char *a)
+{
+    return _sceCallCode(a, 6);
+}
+
 INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", sceMkdir);
-INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", sceRmdir);
+extern int _sceCallCode(const char *, int);
+int sceRmdir(const char *a)
+{
+    return _sceCallCode(a, 8);
+}
+
 INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", sceFormat);
 INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", sceAddDrv);
-INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", sceDelDrv);
+extern int _sceCallCode(const char *, int);
+int sceDelDrv(const char *a)
+{
+    return _sceCallCode(a, 0x10);
+}
+
 INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", sceDopen);
 INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", sceDclose);
 INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", sceDread);
 INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", sceGetstat);
 INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", sceChstat);
 INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", sceRename);
-INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", sceChdir);
+extern int _sceCallCode(const char *, int);
+int sceChdir(const char *a)
+{
+    return _sceCallCode(a, 0x12);
+}
+
 INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", sceSync);
 INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", sceMount);
-INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", sceUmount);
+extern int _sceCallCode(const char *, int);
+int sceUmount(const char *a)
+{
+    return _sceCallCode(a, 0x15);
+}
+
 INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", sceLseek64);
 INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", sceDevctl);
 INCLUDE_ASM("nonmatchings/sdk/scefs_rcv_intr", sceSymlink);

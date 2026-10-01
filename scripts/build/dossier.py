@@ -126,6 +126,12 @@ def section_gcc(nom: str, src: Path, asm: Path | None) -> str:
 
 def dossier(nom: str) -> str:
     table = functions()
+    if len(table) < 7000:
+        # Deux agents ont reçu « symbole inconnu » pour des symboles qui existent : une table
+        # lue incomplète ne doit pas passer pour un nom faux.
+        return (f"table de symboles incomplète ({len(table)} fonctions au lieu de ~7 840) : "
+                "config/elf_symbol_addrs.txt est illisible ou en cours d'écriture — "
+                "relancez dans quelques secondes.\n")
     if nom not in table:
         return f"symbole inconnu : {nom}\n"
     f = table[nom]

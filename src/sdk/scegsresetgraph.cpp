@@ -9,4 +9,5 @@
 #include "common.h"
 
 INCLUDE_ASM("nonmatchings/sdk/scegsresetgraph", sceGsResetGraph);
-INCLUDE_ASM("nonmatchings/sdk/scegsresetgraph", sceGsGetGParam);
+extern char gp_6[];
+void *sceGsGetGParam(void) { return gp_6; }

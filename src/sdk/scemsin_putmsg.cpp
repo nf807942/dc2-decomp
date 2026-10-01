@@ -9,8 +9,8 @@
 #include "common.h"
 
 INCLUDE_ASM("nonmatchings/sdk/scemsin_putmsg", sceMSIn_Init);
-INCLUDE_ASM("nonmatchings/sdk/scemsin_putmsg", sceMSIn_ATick);
-INCLUDE_ASM("nonmatchings/sdk/scemsin_putmsg", sceMSIn_Load);
+int sceMSIn_ATick(void) { return 0; }
+int sceMSIn_Load(void) { return 0; }
 INCLUDE_ASM("nonmatchings/sdk/scemsin_putmsg", put_message);
 INCLUDE_ASM("nonmatchings/sdk/scemsin_putmsg", sceMSIn_PutMsg);
 INCLUDE_ASM("nonmatchings/sdk/scemsin_putmsg", sceMSIn_PutExcMsg);

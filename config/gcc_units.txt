@@ -26,3 +26,10 @@ sdk/scedmaputenv
 sdk/dintr
 runtime/fabsf
 runtime/rand
+sdk/scempegcreate
+sdk/scefs_rcv_intr
+sdk/scegsresetgraph
+sdk/scegifpkreset
+sdk/scemsin_putmsg
+sdk/scegifpkinit
+sdk/scegifpkopengiftag
