@@ -212,7 +212,14 @@ def dossier(nom: str) -> str:
         sortie.append("\n## désassemblage\n" + asm_lisible(asm))
 
     if src is not None and src.parent.name in ("sdk", "runtime"):
-        sortie.append(section_gcc(nom, src, asm))
+        # `.mwcats` dit qui a compilé la fonction : celles de `csound.cpp` ou de `std::`
+        # sont rangées sous ces dossiers mais passent par MWCC, comme le jeu.
+        import provenance
+        if f.address in provenance.compilees():
+            sortie.append("\n## voie MWCC (la fonction est dans `.mwcats` : du C++ comme le jeu, "
+                          "non du C d'`ee-gcc`)")
+        else:
+            sortie.append(section_gcc(nom, src, asm))
 
     sortie.append(
         "\n## vérifier\n"

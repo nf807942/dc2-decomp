@@ -8,4 +8,6 @@
 
 #include "common.h"
 
-INCLUDE_ASM("nonmatchings/sdk/scegifpkreserve", sceGifPkReserve);
+typedef struct { unsigned *p; unsigned *base; unsigned n; unsigned *tag; } Pk;
+unsigned *sceGifPkReserve(Pk *p, int n){ unsigned *q = p->p; p->p = q + n; return q; }
+

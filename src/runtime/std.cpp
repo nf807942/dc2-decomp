@@ -31,10 +31,16 @@ INCLUDE_ASM("nonmatchings/runtime/std", __construct_array);
 INCLUDE_ASM("nonmatchings/runtime/std", __construct_new_array);
 INCLUDE_ASM("nonmatchings/runtime/std", __dl__FPv);
 INCLUDE_ASM("nonmatchings/runtime/std", __dt__Q23std9exceptionFv);
-INCLUDE_ASM("nonmatchings/runtime/std", what__Q23std9exceptionCFv);
+extern "C" char _204[];
+extern "C" char *what__Q23std9exceptionCFv(void *objet) {
+    return _204;
+}
 INCLUDE_ASM("nonmatchings/runtime/std", default_new_handler__3stdFv);
 INCLUDE_ASM("nonmatchings/runtime/std", __dt__Q23std9bad_allocFv);
-INCLUDE_ASM("nonmatchings/runtime/std", what__Q23std9bad_allocCFv);
+extern "C" char _47_00363618[];
+extern "C" char *what__Q23std9bad_allocCFv(void *objet) {
+    return _47_00363618;
+}
 INCLUDE_ASM("nonmatchings/runtime/std", __nw__FUi);
 INCLUDE_ASM("nonmatchings/runtime/std", __throw_catch_compare);
 INCLUDE_ASM("nonmatchings/runtime/std", unexpected__3stdFv);
@@ -54,7 +60,10 @@ INCLUDE_ASM("nonmatchings/runtime/std", FindMostRecentException__FP12ThrowContex
 INCLUDE_ASM("nonmatchings/runtime/std", UnwindStack__FP12ThrowContextP13ExceptionInfoPc);
 INCLUDE_ASM("nonmatchings/runtime/std", NextAction__FP14ActionIterator);
 INCLUDE_ASM("nonmatchings/runtime/std", FindExceptionRecord__FPcP13ExceptionInfo);
-INCLUDE_ASM("nonmatchings/runtime/std", what__Q23std13bad_exceptionCFv);
+extern "C" char _1073_003637F8[];
+extern "C" char *what__Q23std13bad_exceptionCFv(void *objet) {
+    return _1073_003637F8;
+}
 INCLUDE_ASM("nonmatchings/runtime/std", __TransferControl__FP12ThrowContextP13ExceptionInfoPc);
 INCLUDE_ASM("nonmatchings/runtime/std", __throw);
 extern "C" s32 __DecodeUnsignedNumber__FPcPUi(...);

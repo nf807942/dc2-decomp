@@ -10,7 +10,17 @@
 
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0ApplyMatrix);
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0MulMatrix);
-INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0OuterProduct);
+void sceVu0OuterProduct(float *d, float *a, float *b)
+{
+    __asm__ volatile (
+        "lqc2 $vf4,0(%1)\n"
+        "lqc2 $vf5,0(%2)\n"
+        "vopmula.xyz ACC,vf4,vf5\n"
+        "vopmsub.xyz vf6,vf5,vf4\n"
+        "vsub.w $vf6,$vf6,$vf6\n"
+        "sqc2 $vf6,0(%0)\n"
+        : : "r"(d), "r"(a), "r"(b) : "memory");
+}
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0InnerProduct);
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0Normalize);
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0TransposeMatrix);
@@ -18,10 +28,43 @@ INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0InversMatrix);
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0DivVector);
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0DivVectorXYZ);
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0InterVector);
-INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0AddVector);
-INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0SubVector);
-INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0MulVector);
-INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0ScaleVector);
+void sceVu0AddVector(float *d, float *a, float *b)
+{
+    __asm__ volatile (
+        "lqc2 $vf4,0(%1)\n"
+        "lqc2 $vf5,0(%2)\n"
+        "vadd.xyzw $vf6,$vf4,$vf5\n"
+        "sqc2 $vf6,0(%0)\n"
+        : : "r"(d), "r"(a), "r"(b) : "memory");
+}
+void sceVu0SubVector(float *d, float *a, float *b)
+{
+    __asm__ volatile (
+        "lqc2 $vf4,0(%1)\n"
+        "lqc2 $vf5,0(%2)\n"
+        "vsub.xyzw $vf6,$vf4,$vf5\n"
+        "sqc2 $vf6,0(%0)\n"
+        : : "r"(d), "r"(a), "r"(b) : "memory");
+}
+void sceVu0MulVector(float *d, float *a, float *b)
+{
+    __asm__ volatile (
+        "lqc2 $vf4,0(%1)\n"
+        "lqc2 $vf5,0(%2)\n"
+        "vmul.xyzw $vf6,$vf4,$vf5\n"
+        "sqc2 $vf6,0(%0)\n"
+        : : "r"(d), "r"(a), "r"(b) : "memory");
+}
+void sceVu0ScaleVector(float *d, float *a, float x)
+{
+    __asm__ volatile (
+        "lqc2 $vf4,0(%1)\n"
+        "mfc1 $8,%2\n"
+        "qmtc2.ni $8,$vf5\n"
+        "vmulx.xyzw $vf6,$vf4,$vf5x\n"
+        "sqc2 $vf6,0(%0)\n"
+        : : "r"(d), "r"(a), "f"(x) : "$8","memory");
+}
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0TransMatrix);
 typedef int u128_cv __attribute__((mode(TI)));
 void sceVu0CopyVector(u128_cv *d, u128_cv *s)
@@ -31,10 +74,38 @@ void sceVu0CopyVector(u128_cv *d, u128_cv *s)
     *d = t;
 }
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0CopyMatrix);
-INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0FTOI4Vector);
-INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0FTOI0Vector);
-INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0ITOF4Vector);
-INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0ITOF0Vector);
+void sceVu0FTOI4Vector(float *d, float *a)
+{
+    __asm__ volatile (
+        "lqc2 $vf4,0(%1)\n"
+        "vftoi4.xyzw $vf5,$vf4\n"
+        "sqc2 $vf5,0(%0)\n"
+        : : "r"(d), "r"(a) : "memory");
+}
+void sceVu0FTOI0Vector(float *d, float *a)
+{
+    __asm__ volatile (
+        "lqc2 $vf4,0(%1)\n"
+        "vftoi0.xyzw $vf5,$vf4\n"
+        "sqc2 $vf5,0(%0)\n"
+        : : "r"(d), "r"(a) : "memory");
+}
+void sceVu0ITOF4Vector(float *d, float *a)
+{
+    __asm__ volatile (
+        "lqc2 $vf4,0(%1)\n"
+        "vitof4.xyzw $vf5,$vf4\n"
+        "sqc2 $vf5,0(%0)\n"
+        : : "r"(d), "r"(a) : "memory");
+}
+void sceVu0ITOF0Vector(float *d, float *a)
+{
+    __asm__ volatile (
+        "lqc2 $vf4,0(%1)\n"
+        "vitof0.xyzw $vf5,$vf4\n"
+        "sqc2 $vf5,0(%0)\n"
+        : : "r"(d), "r"(a) : "memory");
+}
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0UnitMatrix);
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", _sceVu0ecossin);
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0RotMatrixZ);
@@ -56,7 +127,16 @@ void sceVu0CopyVectorXYZ(float *d, float *s)
     d[2] = s[2];
 }
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0InterVectorXYZ);
-INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0ScaleVectorXYZ);
+void sceVu0ScaleVectorXYZ(float *d, float *a, float x)
+{
+    __asm__ volatile (
+        "lqc2 $vf4,0(%1)\n"
+        "mfc1 $8,%2\n"
+        "qmtc2.ni $8,$vf5\n"
+        "vmulx.xyz $vf4,$vf4,$vf5x\n"
+        "sqc2 $vf4,0(%0)\n"
+        : : "r"(d), "r"(a), "f"(x) : "$8","memory");
+}
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0ClipScreen);
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0ClipScreen3);
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0ClipAll);
