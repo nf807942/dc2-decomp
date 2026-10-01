@@ -8,7 +8,11 @@
 
 #include "common.h"
 
-INCLUDE_ASM("nonmatchings/sdk/initalarm", QueryIntrContext);
+int QueryIntrContext(void) {
+  int s;
+  __asm__ volatile("mfc0 %0, $12" : "=r"(s));
+  return (s ^ 1) & 1;
+}
 INCLUDE_ASM("nonmatchings/sdk/initalarm", DisableIntc);
 INCLUDE_ASM("nonmatchings/sdk/initalarm", EnableIntc);
 INCLUDE_ASM("nonmatchings/sdk/initalarm", DisableDmac);

@@ -9,4 +9,6 @@
 #include "common.h"
 
 INCLUDE_ASM("nonmatchings/runtime/malloc", malloc);
-INCLUDE_ASM("nonmatchings/runtime/malloc", free);
+#include <reent.h>
+void _free_r(struct _reent *, void *);
+void free(void *p) { _free_r(_REENT, p); }

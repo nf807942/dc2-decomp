@@ -8,4 +8,5 @@
 
 #include "common.h"
 
-INCLUDE_ASM("nonmatchings/runtime/abs", abs);
+int abs(int i) { return (i < 0) ? -i : i; }
+

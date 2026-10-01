@@ -9,6 +9,7 @@
 #include "common.h"
 
 INCLUDE_ASM("nonmatchings/runtime/setlocale_r", _setlocale_r);
-INCLUDE_ASM("nonmatchings/runtime/setlocale_r", _localeconv_r);
+extern int lconv;
+int *_localeconv_r(void) { return &lconv; }
 INCLUDE_ASM("nonmatchings/runtime/setlocale_r", setlocale);
 INCLUDE_ASM("nonmatchings/runtime/setlocale_r", localeconv);

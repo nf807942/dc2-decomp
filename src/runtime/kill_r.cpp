@@ -9,4 +9,6 @@
 #include "common.h"
 
 INCLUDE_ASM("nonmatchings/runtime/kill_r", _kill_r);
-INCLUDE_ASM("nonmatchings/runtime/kill_r", _getpid_r);
+struct _reent;
+int getpid(void);
+int _getpid_r(struct _reent *p) { return getpid(); }

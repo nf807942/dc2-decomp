@@ -9,4 +9,11 @@
 #include "common.h"
 
 INCLUDE_ASM("nonmatchings/sdk/dintr", DIntr);
-INCLUDE_ASM("nonmatchings/sdk/dintr", EIntr);
+int EIntr(void) {
+  unsigned int s, r;
+  __asm__ volatile("mfc0 %0, $12" : "=r"(s));
+  r = s & 0x10000;
+  __asm__ volatile("ei");
+  return r != 0;
+}
+

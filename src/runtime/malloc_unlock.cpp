@@ -8,5 +8,9 @@
 
 #include "common.h"
 
-INCLUDE_ASM("nonmatchings/runtime/malloc_unlock", __malloc_lock);
-INCLUDE_ASM("nonmatchings/runtime/malloc_unlock", __malloc_unlock);
+struct _reent;
+void __malloc_lock(struct _reent *r) {}
+
+struct _reent;
+void __malloc_unlock(struct _reent *r) {}
+

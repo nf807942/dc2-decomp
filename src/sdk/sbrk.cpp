@@ -8,19 +8,24 @@
 
 #include "common.h"
 
-INCLUDE_ASM("nonmatchings/sdk/sbrk", sceResetttyinit);
+extern int ttyinit;
+void sceResetttyinit(void) { ttyinit = 0; }
 INCLUDE_ASM("nonmatchings/sdk/sbrk", VSync);
 INCLUDE_ASM("nonmatchings/sdk/sbrk", VSync2);
 INCLUDE_ASM("nonmatchings/sdk/sbrk", write);
 INCLUDE_ASM("nonmatchings/sdk/sbrk", read);
 INCLUDE_ASM("nonmatchings/sdk/sbrk", open);
-INCLUDE_ASM("nonmatchings/sdk/sbrk", close);
-INCLUDE_ASM("nonmatchings/sdk/sbrk", ioctl);
-INCLUDE_ASM("nonmatchings/sdk/sbrk", lseek);
+int close(int fd) { return -1; }
+int ioctl(int fd, int cmd, int arg) { return -1; }
+int lseek(int fd, int off, int whence) { return -1; }
 INCLUDE_ASM("nonmatchings/sdk/sbrk", sbrk);
-INCLUDE_ASM("nonmatchings/sdk/sbrk", isatty);
-INCLUDE_ASM("nonmatchings/sdk/sbrk", fstat);
-INCLUDE_ASM("nonmatchings/sdk/sbrk", getpid);
+int isatty(int fd) { return 1; }
+int fstat(int fd, char *st) {
+  *(long long *)(st + 0x48) = 0;
+  *(int *)(st + 4) = 0x2000;
+  return 0;
+}
+int getpid(void) { return 1; }
 INCLUDE_ASM("nonmatchings/sdk/sbrk", kill);
 INCLUDE_ASM("nonmatchings/sdk/sbrk", stat);
 INCLUDE_ASM("nonmatchings/sdk/sbrk", unlink);

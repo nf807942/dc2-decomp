@@ -8,7 +8,8 @@
 
 #include "common.h"
 
-INCLUDE_ASM("nonmatchings/sdk/execps2", TerminateLibrary);
+extern void InitTLB(void);
+void TerminateLibrary(void) { InitTLB(); }
 INCLUDE_ASM("nonmatchings/sdk/execps2", ExecPS2);
 INCLUDE_ASM("nonmatchings/sdk/execps2", LoadExecPS2);
 INCLUDE_ASM("nonmatchings/sdk/execps2", Exit);

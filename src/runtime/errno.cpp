@@ -8,4 +8,6 @@
 
 #include "common.h"
 
-INCLUDE_ASM("nonmatchings/runtime/errno", __errno);
+extern int *_impure_ptr;
+int *__errno(void) { return _impure_ptr; }
+

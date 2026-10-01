@@ -11,7 +11,8 @@
 INCLUDE_ASM("nonmatchings/sdk/scedmaputenv", memclr);
 INCLUDE_ASM("nonmatchings/sdk/scedmaputenv", sceDmaGetChan);
 INCLUDE_ASM("nonmatchings/sdk/scedmaputenv", sceDmaReset);
-INCLUDE_ASM("nonmatchings/sdk/scedmaputenv", sceDmaDebug);
+extern int sceDmaDebugMode;
+int sceDmaDebug(int m) { int o = sceDmaDebugMode; sceDmaDebugMode = m; return o; }
 INCLUDE_ASM("nonmatchings/sdk/scedmaputenv", sceDmaPutEnv);
 INCLUDE_ASM("nonmatchings/sdk/scedmaputenv", sceDmaGetEnv);
 INCLUDE_ASM("nonmatchings/sdk/scedmaputenv", sceDmaPutStallAddr);
@@ -24,4 +25,4 @@ INCLUDE_ASM("nonmatchings/sdk/scedmaputenv", sceDmaRecvI);
 INCLUDE_ASM("nonmatchings/sdk/scedmaputenv", sceDmaSync);
 INCLUDE_ASM("nonmatchings/sdk/scedmaputenv", sceDmaWatch);
 INCLUDE_ASM("nonmatchings/sdk/scedmaputenv", sceDmaPause);
-INCLUDE_ASM("nonmatchings/sdk/scedmaputenv", sceDmaRestart);
+int sceDmaRestart(volatile unsigned *p, unsigned v) { unsigned o = *p; *p = v; return (o >> 8) & 1; }

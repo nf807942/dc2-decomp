@@ -8,4 +8,6 @@
 
 #include "common.h"
 
-INCLUDE_ASM("nonmatchings/runtime/atof", atof);
+double strtod(const char *, char **);
+double atof(const char *s) { return strtod(s, 0); }
+

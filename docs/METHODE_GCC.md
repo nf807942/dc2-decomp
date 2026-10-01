@@ -105,6 +105,29 @@ Quinze passent avec le corps de newlib **tel quel**. Les autres leçons :
   n'exige plus le symbole tel quel dans les unités GCC ; son diff ne garde que les lignes qui
   divergent (avec trois lignes de contexte) quand il dépasse cinquante lignes.
 
+## Les petites fonctions du SDK (fournée K1 : 27 sur 30 en 30 minutes d'agent)
+
+Les fonctions de moins de 32 octets du SDK et de la libc rendent 100 % presque toutes du
+premier coup, **en traduisant le désassemblage ligne à ligne**. Les pièges rencontrés :
+
+- **Un prototype variadique fait sauvegarder les registres.** `int ioctl(int, int, ...)`, comme
+  newlib l'écrit, fait empiler `a2`–`a7` (0 %, 40 octets) ; le binaire est un `return -1;` sans
+  prologue. Pour un stub, on écrit le prototype fixe déduit du désassemblage.
+- **Le `_reent` du jeu n'est pas celui de newlib 1.9.0.** `srand` écrit 32 bits en `0x58`
+  quand newlib range `_rand_next` à `0xA8` sur 64 bits (35 %). On écrit à travers le pointeur :
+  `*(unsigned int *)((char *) _impure_ptr + 0x58) = seed;`.
+- **`fabsf`** : l'union `{float; int}` ajoute un `daddu` ; `GET_FLOAT_WORD`/`SET_FLOAT_WORD` de
+  `include/gcc/ieee754.h` rendent 100 %.
+- **Les instructions du coprocesseur 0** (`mfc0`, `ei`) se passent en `__asm__ volatile` ; l'ordre
+  émis suit celui des `asm volatile` par rapport aux calculs C (`EIntr` : calculer `s & 0x10000`
+  avant le `ei`).
+- **Un `or $a0, $zero, $zero` là où GCC écrit `daddu`** trahit de l'assembleur écrit à la main
+  (`_exit`, dans `crt0`) : on ne le force pas.
+- **Une unité mêlant MWCC et GCC est refusée** (`sdk/initseq` : `_ErrMessage`, `_initSeqAgain`).
+  Un objet n'a qu'un compilateur : il faut séparer l'unité en deux dans `config/units.txt`, ou ne
+  pas la faire. `soumettre` l'écrit (code 6) ; `--sdk` ne le contourne pas proprement.
+- **`newlib_source.py --fonction`** rend un corps en `_DEFUN`, à réécrire en C simple.
+
 ## Ce qui n'est pas encore prouvé
 
 - Les unités **partiellement écrites** (une partie des fonctions en `INCLUDE_ASM`) greffent

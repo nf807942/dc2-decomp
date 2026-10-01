@@ -32,7 +32,8 @@ INCLUDE_ASM("nonmatchings/sdk/getallrefs", _copyAddRefImage);
 INCLUDE_ASM("nonmatchings/sdk/getallrefs", _copyRefImage);
 INCLUDE_ASM("nonmatchings/sdk/getallrefs", _ipuSetMPEG1);
 INCLUDE_ASM("nonmatchings/sdk/getallrefs", _waitBdecOut);
-INCLUDE_ASM("nonmatchings/sdk/getallrefs", _dmVector);
+extern int _ipuVdec(int, int);
+int _dmVector(int a) { return _ipuVdec(a, 3); }
 INCLUDE_ASM("nonmatchings/sdk/getallrefs", _dualPrimeVector);
 INCLUDE_ASM("nonmatchings/sdk/getallrefs", _mbAddressIncrement);
 INCLUDE_ASM("nonmatchings/sdk/getallrefs", _pictureData0);
