@@ -234,8 +234,11 @@ def file_priorite() -> list[str]:
     # peut allonger l'unité de huit octets et décaler tout ce qui suit.
     hors_chaine = {n for src, ns in grafted_by_source().items()
                    if src.parent.name in ("sdk", "runtime") for n in ns}
+    # Les appels système sont de l'assembleur dans la source de Sony : terminés (`asm_origine`).
+    from lib.project import asm_origine
     restantes = [n for n in grafted_symbols()
-                 if n in table and table[n].size and n not in hors_chaine]
+                 if n in table and table[n].size and n not in hors_chaine
+                 and n not in asm_origine()]
     voisins = {}
     if SIMILAIRES.exists():
         voisins = json.loads(SIMILAIRES.read_text(encoding="utf-8"))["voisins"]

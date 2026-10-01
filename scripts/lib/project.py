@@ -126,6 +126,40 @@ _INSTRUCTION = re.compile(r"^[ \t]*/\*[^*]*\*/[ \t]+(\S+)", re.MULTILINE)
 _PADDING: set[str] | None = None
 
 
+_ASM_ORIGINE: set[str] | None = None
+
+
+def asm_origine() -> set[str]:
+    """Les fonctions dont la source d'origine EST de l'assembleur : les appels système.
+
+    L'EE n'a pas d'instruction de bibliothèque pour entrer dans le noyau : chaque appel est
+    un stub `addiu v1, zero, <n>; syscall; jr ra; nop`, écrit en assembleur dans le SDK de
+    Sony (le désassembleur le marque `handwritten instruction`). Il n'y a rien à décompiler,
+    et `INCLUDE_ASM` en est la source fidèle : ces fonctions sont terminées, non à faire.
+
+    Le critère est calculé, jamais versionné — une liste de symboles tirée du binaire n'entre
+    pas dans git. Seules les fonctions de 16 octets sont lues : c'est la taille exacte du
+    stub, et cela garde l'appel rapide.
+    """
+    global _ASM_ORIGINE
+    if _ASM_ORIGINE is not None:
+        return _ASM_ORIGINE
+    seize = {n for n, f in functions().items() if f.size == 16}
+    trouves: set[str] = set()
+    racine = ROOT / "asm" / "nonmatchings"
+    if racine.is_dir() and seize:
+        for chemin in racine.rglob("*.s"):
+            if chemin.stem not in seize:
+                continue
+            ins = re.findall(r"\*/\s+(\w+)",
+                             chemin.read_text(encoding="utf-8", errors="replace"))
+            ins = [i for i in ins if i not in ("glabel", "endlabel", "nmlabel", "jlabel")]
+            if ins == ["addiu", "syscall", "jr", "nop"]:
+                trouves.add(chemin.stem)
+    _ASM_ORIGINE = trouves
+    return trouves
+
+
 def padding_symbols() -> set[str]:
     """Les « fonctions » que le désassembleur invente sur du remplissage.
 

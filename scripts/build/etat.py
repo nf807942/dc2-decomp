@@ -39,8 +39,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from lib.mangling import demangle  # noqa: E402
-from lib.project import (ROOT, declared_units, functions,  # noqa: E402
-                         grafted_by_source, sources)
+from lib.project import (ROOT, asm_origine, declared_units,  # noqa: E402
+                         functions, grafted_by_source, sources)
 
 JOURNAL = ROOT / "progress" / "journal.jsonl"
 
@@ -71,7 +71,7 @@ def etat() -> dict:
         seau = par_provenance.setdefault(secteur, {"fn": 0, "octets": 0})
         for nom in noms:
             fonction = table.get(nom)
-            if fonction is None:
+            if fonction is None or nom in asm_origine():
                 continue
             seau["fn"] += 1
             seau["octets"] += fonction.size
@@ -84,7 +84,12 @@ def etat() -> dict:
     dedans = {nom for nom, f in table.items()
               if any(bas <= f.address < haut for bas, haut, _ in plages)}
 
-    restantes = [f for nom, f in table.items() if nom in greffees]
+    # Un appel système est de l'assembleur dans la source de Sony : `INCLUDE_ASM` y est
+    # la source, non un reste. Il compte « terminé — assembleur d'origine », à part de ce
+    # qu'on écrit en C ou en C++.
+    origine = asm_origine() & greffees
+    restantes = [f for nom, f in table.items() if nom in greffees and nom not in origine]
+    d_origine = [f for nom, f in table.items() if nom in origine]
     ecrites = [f for nom, f in table.items()
                if nom in dedans and nom not in greffees]
     dehors = [f for nom, f in table.items() if nom not in dedans]
@@ -96,6 +101,8 @@ def etat() -> dict:
         "octets": total_octets,
         "fonctions_ecrites": len(ecrites),
         "octets_ecrits": sum(f.size for f in ecrites),
+        "fonctions_asm_origine": len(d_origine),
+        "octets_asm_origine": sum(f.size for f in d_origine),
         "fonctions_restantes": len(restantes),
         "octets_restants": sum(f.size for f in restantes),
         "fonctions_dehors": len(dehors),
@@ -252,7 +259,7 @@ def classes(courant: dict) -> list[str]:
 
     octets: collections.Counter = collections.Counter()
     compte: collections.Counter = collections.Counter()
-    for nom in greffees:
+    for nom in greffees - asm_origine():
         fonction = table.get(nom)
         if fonction is None:
             continue
@@ -278,7 +285,7 @@ def cibles(courant: dict, combien: int = 30) -> list[str]:
         (fonction.size, source, nom)
         for source, noms in grafted_by_source().items()
         for nom in noms
-        if (fonction := table.get(nom)) is not None
+        if nom not in asm_origine() and (fonction := table.get(nom)) is not None
     ]
     rangs.sort(key=lambda r: -r[0])
     return [f"  {'octets':>7s}  {'unité':32s} fonction"] + [
@@ -311,6 +318,13 @@ def main(argv: list[str]) -> int:
           f"sans construction\n")
     print(f"  écrit    {courant['fonctions_ecrites']:6d} fn "
           f"{courant['octets_ecrits']:10d} o   {part_fn:6.2f} % / {part_o:6.3f} %")
+    print(f"  assembleur d'origine {courant['fonctions_asm_origine']:4d} fn "
+          f"{courant['octets_asm_origine']:10d} o   terminé : la source de Sony est de l'asm")
+    fait_fn = courant["fonctions_ecrites"] + courant["fonctions_asm_origine"]
+    fait_o = courant["octets_ecrits"] + courant["octets_asm_origine"]
+    print(f"  terminé  {fait_fn:6d} fn {fait_o:10d} o   "
+          f"{100 * fait_fn / courant['fonctions']:6.2f} % / {100 * fait_o / courant['octets']:6.3f} %"
+          f"   (écrit + assembleur d'origine)")
     print(f"  reste    {courant['fonctions_restantes']:6d} fn "
           f"{courant['octets_restants']:10d} o")
     print(f"  dehors   {courant['fonctions_dehors']:6d} fn "
