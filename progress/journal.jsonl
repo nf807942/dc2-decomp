@@ -1,13 +1,14 @@
-{"date": "2026-08-04", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 2, "octets_ecrits": 112, "unites": 1}
-{"date": "2026-08-05", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 32, "octets_ecrits": 6080, "unites": 93}
-{"date": "2026-08-06", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 32, "octets_ecrits": 6080, "unites": 93}
-{"date": "2026-08-07", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 32, "octets_ecrits": 6080, "unites": 144}
-{"date": "2026-08-08", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 39, "octets_ecrits": 10004, "unites": 319}
-{"date": "2026-08-14", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 221, "octets_ecrits": 12492, "unites": 319}
-{"date": "2026-09-02", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 616, "octets_ecrits": 27200, "unites": 319}
-{"date": "2026-09-03", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 1072, "octets_ecrits": 59164, "unites": 319}
-{"date": "2026-09-04", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 1158, "octets_ecrits": 66496, "unites": 319}
-{"date": "2026-09-06", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 1247, "octets_ecrits": 73548, "unites": 319}
-{"date": "2026-09-07", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 1295, "octets_ecrits": 78276, "unites": 319}
-{"date": "2026-09-29", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 1848, "octets_ecrits": 131944, "unites": 319}
-{"date": "2026-09-30", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 2428, "octets_ecrits": 151644, "unites": 319}
+{"date": "2026-08-04", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 2, "octets_ecrits": 112, "fonctions_asm_origine": 0, "octets_asm_origine": 0, "unites": 1}
+{"date": "2026-08-05", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 32, "octets_ecrits": 6080, "fonctions_asm_origine": 0, "octets_asm_origine": 0, "unites": 93}
+{"date": "2026-08-06", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 32, "octets_ecrits": 6080, "fonctions_asm_origine": 0, "octets_asm_origine": 0, "unites": 93}
+{"date": "2026-08-07", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 32, "octets_ecrits": 6080, "fonctions_asm_origine": 0, "octets_asm_origine": 0, "unites": 144}
+{"date": "2026-08-08", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 39, "octets_ecrits": 10004, "fonctions_asm_origine": 158, "octets_asm_origine": 2528, "unites": 319}
+{"date": "2026-08-14", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 221, "octets_ecrits": 12492, "fonctions_asm_origine": 158, "octets_asm_origine": 2528, "unites": 319}
+{"date": "2026-09-02", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 616, "octets_ecrits": 27200, "fonctions_asm_origine": 158, "octets_asm_origine": 2528, "unites": 319}
+{"date": "2026-09-03", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 1072, "octets_ecrits": 59164, "fonctions_asm_origine": 158, "octets_asm_origine": 2528, "unites": 319}
+{"date": "2026-09-04", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 1158, "octets_ecrits": 66496, "fonctions_asm_origine": 158, "octets_asm_origine": 2528, "unites": 319}
+{"date": "2026-09-06", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 1247, "octets_ecrits": 73548, "fonctions_asm_origine": 158, "octets_asm_origine": 2528, "unites": 319}
+{"date": "2026-09-07", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 1295, "octets_ecrits": 78276, "fonctions_asm_origine": 158, "octets_asm_origine": 2528, "unites": 319}
+{"date": "2026-09-29", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 1848, "octets_ecrits": 131944, "fonctions_asm_origine": 158, "octets_asm_origine": 2528, "unites": 319}
+{"date": "2026-09-30", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 2451, "octets_ecrits": 156332, "fonctions_asm_origine": 158, "octets_asm_origine": 2528, "unites": 319}
+{"date": "2026-10-01", "fonctions": 7840, "octets": 2215100, "fonctions_ecrites": 2552, "octets_ecrits": 158216, "fonctions_asm_origine": 158, "octets_asm_origine": 2528, "unites": 319}

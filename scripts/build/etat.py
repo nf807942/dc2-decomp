@@ -127,7 +127,7 @@ def journal(courant: dict) -> list[dict]:
 
     retenu = {cle: courant[cle] for cle in (
         "date", "fonctions", "octets", "fonctions_ecrites", "octets_ecrits",
-        "unites")}
+        "fonctions_asm_origine", "octets_asm_origine", "unites")}
     lignes = [l for l in lignes if l.get("date") != retenu["date"]]
     lignes.append(retenu)
     lignes.sort(key=lambda l: l["date"])
@@ -188,12 +188,18 @@ def reconstituer(courant: dict) -> list[dict]:
         ouvertes = [f for f in table.values()
                     if any(bas <= f.address < haut for bas, haut in plages)]
         ecrites = [f for f in ouvertes if f.name not in greffees]
+        # Les appels système ouverts à ce commit et encore en `INCLUDE_ASM` : leur source
+        # d'origine est de l'assembleur, ils sont terminés dès que leur unité existe.
+        d_origine = [f for f in ouvertes
+                     if f.name in greffees and f.name in asm_origine()]
         par_jour[jour] = {
             "date": jour,
             "fonctions": len(table),
             "octets": total,
             "fonctions_ecrites": len(ecrites),
             "octets_ecrits": sum(f.size for f in ecrites),
+            "fonctions_asm_origine": len(d_origine),
+            "octets_asm_origine": sum(f.size for f in d_origine),
             "unites": len(plages),
         }
 
@@ -203,7 +209,7 @@ def reconstituer(courant: dict) -> list[dict]:
     lignes = [l for l in lignes if l["date"] != courant["date"]]
     lignes.append({cle: courant[cle] for cle in (
         "date", "fonctions", "octets", "fonctions_ecrites", "octets_ecrits",
-        "unites")})
+        "fonctions_asm_origine", "octets_asm_origine", "unites")})
 
     JOURNAL.parent.mkdir(exist_ok=True)
     JOURNAL.write_text(
