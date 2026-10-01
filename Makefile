@@ -479,12 +479,13 @@ objdiff.json: config/splat.yaml $(SRC_FILES)
 reference: $(REF_O_FILES)
 
 # The progress report decomp.dev reads: objdiff compares every compiled
-# function with its reference object. CI uploads this file as the artifact
+# function with its reference object, then filter_report.py stops counting the
+# functions still grafted (they hold the disc's bytes, so they match at 100 %). CI uploads this file as the artifact
 # `<version>_report`; see .github/workflows/progress.yml.
 report: build objdiff.json reference
 	@mkdir -p progress
 	@objdiff-cli report generate -p . -o progress/report.json -f json
-	@echo "progress/report.json"
+	@$(PYTHON) scripts/build/filter_report.py progress/report.json
 
 # --------------------------------------------------------------------------
 
