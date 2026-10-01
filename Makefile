@@ -213,12 +213,17 @@ $(BUILD_DIR)/%.o: %.c $(HEADERS) $(MWCCGAP_SRC) $(UNITS) tools/.patched
 # ceux du SDK de l'epoque : -O2, donnees courtes desactivees.
 EE_GCC        ?= ee-gcc2.9-991111-01
 GCC_FLAGS     ?= -O2 -G0
-GCC_UNITS     := $(shell grep -v '^[[:space:]]*\#' config/gcc_units.txt 2>/dev/null)
+# Une ligne de `config/gcc_units.txt` est `<unité> [<version d'ee-gcc>]` : sans version, EE_GCC.
+# Le SDK n'a pas été compilé par une seule version (`sdk/sysbitflush` est de la 2.96).
+GCC_UNITS     := $(shell awk '!/^[ 	]*\#/ && NF {print $$1}' config/gcc_units.txt 2>/dev/null)
+GCC_VERSIONS  := $(shell awk '!/^[ 	]*\#/ && NF > 1 {print $$1 "=" $$2}' config/gcc_units.txt 2>/dev/null)
 GCC_OBJS     := $(addprefix $(BUILD_DIR)/$(SRC_DIR)/, $(addsuffix .o, $(GCC_UNITS)))
 GCCGAP_ARGS   := --mwcc-path scripts/build/ee_gcc_cc --as-path $(AS) \
                  --macro-inc-path $(INCLUDE_DIR)/macro.inc \
                  --asm-dir-prefix $(ASM_DIR) \
                  --as-march r5900 --as-mabi eabi
+
+$(foreach p,$(GCC_VERSIONS),$(eval $(BUILD_DIR)/$(SRC_DIR)/$(firstword $(subst =, ,$(p))).o: EE_GCC := $(lastword $(subst =, ,$(p)))))
 
 $(GCC_OBJS): $(BUILD_DIR)/%.o: %.cpp $(wildcard include/gcc/*.h) $(MWCCGAP_SRC) $(UNITS) config/gcc_units.txt scripts/build/ee_gcc_cc tools/.patched
 	@mkdir -p $(dir $@)

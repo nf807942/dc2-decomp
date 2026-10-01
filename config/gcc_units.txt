@@ -45,3 +45,4 @@ sdk/scesifloadiopheap
 sdk/scevu0dropshadowmatrix
 sdk/scegifpkreserve
 sdk/scevif1pkreserve
+sdk/sysbitflush ee-gcc2.96

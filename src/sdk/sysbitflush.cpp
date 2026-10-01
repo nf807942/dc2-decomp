@@ -9,7 +9,10 @@
 #include "common.h"
 
 INCLUDE_ASM("nonmatchings/sdk/sysbitflush", _sysbitInit);
-INCLUDE_ASM("nonmatchings/sdk/sysbitflush", _sysbitNext);
+int _sysbitNext(unsigned long long *p, int n)
+{
+    return (int)(*p >> (64 - n));
+}
 INCLUDE_ASM("nonmatchings/sdk/sysbitflush", _sysbitFlush);
 INCLUDE_ASM("nonmatchings/sdk/sysbitflush", _sysbitGet);
 INCLUDE_ASM("nonmatchings/sdk/sysbitflush", _sysbitMarker);

@@ -141,11 +141,11 @@ def fonction_mwcc(symbole: str) -> bool:
 def unites_gcc() -> set[str]:
     if not GCC_UNITES.exists():
         return set()
-    return {l.strip() for l in GCC_UNITES.read_text(encoding="utf-8").splitlines()
+    return {l.split()[0] for l in GCC_UNITES.read_text(encoding="utf-8").splitlines()
             if l.strip() and not l.lstrip().startswith("#")}
 
 
-def modifier_liste_gcc(unite: str, ajouter: bool) -> None:
+def modifier_liste_gcc(unite: str, ajouter: bool, version: str | None = None) -> None:
     """Ajoute ou retire une unité de la liste, sous un verrou court.
 
     Plusieurs agents peuvent ajouter chacun la leur au même moment : lire, changer
@@ -165,9 +165,10 @@ def modifier_liste_gcc(unite: str, ajouter: bool) -> None:
                 time.sleep(0.2)
     try:
         lignes = GCC_UNITES.read_text(encoding="utf-8").splitlines()
-        lignes = [l for l in lignes if l.strip() != unite]
+        lignes = [l for l in lignes
+                  if not l.strip() or l.lstrip().startswith("#") or l.split()[0] != unite]
         if ajouter:
-            lignes.append(unite)
+            lignes.append(unite + (f" {version}" if version else ""))
         GCC_UNITES.write_text("\n".join(lignes) + "\n", encoding="utf-8", newline="\n")
     finally:
         verrou.unlink(missing_ok=True)
@@ -226,6 +227,9 @@ def main() -> int:
     p.add_argument("essai", type=Path)
     p.add_argument("--seuil", type=float, default=100.0)
     p.add_argument("--max-essais", type=int, default=12)
+    p.add_argument("--gcc-version", metavar="BUILD",
+                   help="version d'ee-gcc pour une unité qui entre en voie GCC (ex. ee-gcc2.96) ; "
+                        "vaut pour l'unité entière, et reste dans gcc_units.txt si la fonction est gardée")
     p.add_argument("--sdk", action="store_true",
                    help="tente une fonction du SDK ou du runtime (livrés compilés)")
     p.add_argument("--table", action="store_true",
@@ -336,7 +340,7 @@ def main() -> int:
     nouveau = ligne.sub(lambda _: corps, texte, count=1)
     source.write_bytes(nouveau.encode("utf-8"))
     if ajoutee_a_la_liste:
-        modifier_liste_gcc(unite, ajouter=True)
+        modifier_liste_gcc(unite, ajouter=True, version=a.gcc_version)
     score = None
     try:
         # Dans le conteneur `make` existe déjà ; sur l'hôte on y entre par dc2.

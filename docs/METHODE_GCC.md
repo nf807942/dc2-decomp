@@ -168,6 +168,39 @@ premier coup, **en traduisant le désassemblage ligne à ligne**. Les pièges re
 - **Les cas à 98 %** (`sceGifPkReserve`, `sceVif1PkReserve` : la somme réutilise le registre de `n`)
   ont résisté à 11 et 12 formes : c'est de l'allocation de registres de GCC, pas de la source.
 
+### Le compilateur se choisit par unité (fournée K4)
+
+**Le SDK n'a pas été compilé par une seule version d'`ee-gcc`.** `_sysbitNext` (libkernl,
+`sdk/sysbitflush`) plafonne à 77,14 % sous toutes les 2.9 — la troncature 64→32 bits y est un
+`dsll32` puis un `dsra32`, et GCC n'arrive pas à glisser le second dans le créneau de délai — et
+rend **100 % sous `ee-gcc2.96`** avec la forme la plus naturelle (`int f(unsigned long long *p,
+int n) { return (int)(*p >> (64 - n)); }`). La libm de newlib, elle, est de la 2.9-ee (les 2.95 et
+2.96 sauvent par `sq`, le jeu par `sd`).
+
+- **`config/gcc_units.txt`** : une ligne est `<unité> [<version>]` ; sans version, `EE_GCC`
+  (`ee-gcc2.9-991111-01`). Exemple : `sdk/sysbitflush ee-gcc2.96`. Le `Makefile` pose `EE_GCC`
+  pour chaque unité qui en nomme une.
+- **`soumettre … --gcc-version ee-gcc2.96`** fait entrer l'unité sous cette version ; elle y reste
+  si la fonction est gardée. La version vaut pour **l'unité entière** : toutes ses fonctions sont
+  compilées ensemble.
+- **Avant de chercher une forme de source** pour une fonction qui plafonne à 77–98 %, lance
+  `gcc_essai.py` sur toutes les versions : un `nop` de délai là où le jeu a une instruction est la
+  signature d'une autre version, et aucune forme de C n'y changera rien.
+- **Un écart de registre où la somme réutilise le registre d'un paramètre** trahit un retour que la
+  source omettait (`sceGifPkReserve`, `sceVif1PkReserve` : `T *q = p->p; p->p = q + n; return q;`) :
+  une fonction « `void` » dont l'ancienne valeur est encore dans `v0` rend en fait cette valeur.
+- **COP2 en asm en ligne sous ee-gcc** (`libvu0`, les dix `sceVu0*Vector`) : un seul bloc
+  `__asm__ volatile ("lqc2 $vf4,0(%1)
+ lqc2 $vf5,0(%2)
+ vadd.xyzw $vf6,$vf4,$vf5
+ sqc2 $vf6,0(%0)
+"
+  : : "r"(d), "r"(a), "r"(b) : "memory")` rend la fonction à l'identique, sans prologue, le dernier
+  `sqc2` dans le créneau de délai. L'accumulateur s'écrit sans `$` (`vopmula.xyz ACC,vf4,vf5`),
+  comme dans l'asm MWCC de `mgmath.cpp` ; les autres registres prennent `$vf4`. Un flottant arrive
+  en `$f12` : `mfc1 $8,%2` avec la contrainte `"f"`. **Le COP2 n'est donc pas de l'assembleur à la
+  main** : la source de `libvu0` est de l'asm en ligne, que `ee-gcc` rend.
+
 ## Ce qui n'est pas encore prouvé
 
 - Les unités **partiellement écrites** (une partie des fonctions en `INCLUDE_ASM`) greffent
