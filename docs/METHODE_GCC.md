@@ -147,6 +147,27 @@ premier coup, **en traduisant le désassemblage ligne à ligne**. Les pièges re
 - **`gcc_essai.py` hors unité n'est pas fiable pour un champ de structure défini ailleurs** :
   `soumettre` rend la vraie mesure.
 
+### Fournée K3 (SDK : libsif, libvif1pk, libvu0 ; 18 sur 24) et un bug de `mwccgap`
+
+- **Une unité à étiquettes internes faisait échouer objdiff** (`Symbol data out of bounds`) :
+  `sdk/scevu0dropshadowmatrix` (42 fonctions) contient des `alabel func_…` (entrées alternatives
+  visées par un `j` du corps). `mwccgap` les copiait avec l'index de section de l'objet assemblé,
+  qui désigne le `.text` vide qu'`ee-gcc` émet toujours en tête. Corrigé par
+  `tools/patches/mwccgap-section-des-etiquettes.patch` ; la construction complète, MWCC comprise,
+  reste identique au disque.
+- **Un appel non terminal veut un `int` et des paramètres déclarés** ; `void f(void)` rend un `j`
+  (20 %). L'inverse de la règle du retour `void` pour l'appel terminal : c'est le désassemblage
+  qui dit s'il y a un prologue et un `jal`.
+- **`register u128 t __asm__("$6"); t = *s; *d = t;`** impose le registre d'un `lq`/`sq`
+  (`sceVu0CopyVector` : 96,67 % avec `*d = *s`, 100 % ainsi). Le `lq`/`sq` reste du C compilé.
+- **Pour forcer un registre de base** quand GCC replie l'adresse constante dans les `lw`/`sw`,
+  `char *s = D; __asm__("" : "+r"(s));` fige le `lui`/`addiu`.
+- **Une globale partagée garde le type de sa première déclaration dans l'unité** : les fonctions
+  suivantes la réutilisent (`char[]` et décalages), sinon « conflicting types ». Un essai qui échoue
+  à la compilation laisse son `extern` dans l'unité.
+- **Les cas à 98 %** (`sceGifPkReserve`, `sceVif1PkReserve` : la somme réutilise le registre de `n`)
+  ont résisté à 11 et 12 formes : c'est de l'allocation de registres de GCC, pas de la source.
+
 ## Ce qui n'est pas encore prouvé
 
 - Les unités **partiellement écrites** (une partie des fonctions en `INCLUDE_ASM`) greffent

@@ -23,7 +23,13 @@ INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0SubVector);
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0MulVector);
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0ScaleVector);
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0TransMatrix);
-INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0CopyVector);
+typedef int u128_cv __attribute__((mode(TI)));
+void sceVu0CopyVector(u128_cv *d, u128_cv *s)
+{
+    register u128_cv t __asm__("$6");
+    t = *s;
+    *d = t;
+}
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0CopyMatrix);
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0FTOI4Vector);
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0FTOI0Vector);
@@ -43,7 +49,12 @@ INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0ViewScreenMatrix);
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0DropShadowMatrix);
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0RotTransPersN);
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0RotTransPers);
-INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0CopyVectorXYZ);
+void sceVu0CopyVectorXYZ(float *d, float *s)
+{
+    d[0] = s[0];
+    d[1] = s[1];
+    d[2] = s[2];
+}
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0InterVectorXYZ);
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0ScaleVectorXYZ);
 INCLUDE_ASM("nonmatchings/sdk/scevu0dropshadowmatrix", sceVu0ClipScreen);

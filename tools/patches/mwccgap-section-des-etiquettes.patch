@@ -1,0 +1,50 @@
+Un symbole global défini dans le .text d'un désassemblage greffé reste dans la section de la fonction.
+
+Une fonction qui en contient une autre entrée (`alabel func_001070F8`, une étiquette globale
+que le corps vise par un `j`) définit ce symbole dans le `.text` de l'objet assemblé. mwccgap
+le copiait avec l'index de section de cet objet — 1 —, qui désigne dans l'objet compilé une
+section sans rapport. Avec MWCC, c'est la première fonction de l'unité : le symbole y tombait
+à un offset de la première fonction, sans que le lien le voie. Avec GCC, c'est le `.text` vide
+qu'il émet toujours en tête : le décalage de l'étiquette dépasse la taille de la section et
+objdiff refuse de charger l'objet (« Symbol data out of bounds: 0x0..0x30 »), ce qui bloquait
+l'unité `sdk/scevu0dropshadowmatrix` (42 fonctions, dont trois fonctions à étiquette interne).
+
+Le symbole prend désormais l'index de la section de la fonction qu'il appartient. La section
+du `.s` assemblé se reconnaît à son type (`TextSection`) : son nom n'y est plus.
+
+diff --git a/mwccgap/mwccgap.py b/mwccgap/mwccgap.py
+--- a/mwccgap/mwccgap.py
++++ b/mwccgap/mwccgap.py
+@@ -226,6 +226,11 @@
+ 
+         reloc_symbols = set()
+ 
++        assembled_text_index = next(
++            (i for i, sec in enumerate(assembled_elf.sections) if isinstance(sec, TextSection)),
++            None,
++        )
++
+         initial_sh_info_value = compiled_elf.symtab.sh_info
+         local_syms_inserted = 0
+ 
+@@ -244,6 +249,20 @@
+ 
+                 if symbol.bind == 0:
+                     local_syms_inserted += 1
++
++                # A global label inside the function (`alabel`, an alternate entry
++                # that a jump from the body targets) is defined in the .text of the
++                # assembled object. Left as it is, it keeps that object's section
++                # index, which names an unrelated section of the compiled object —
++                # the empty .text GCC always emits first, whose size the label's
++                # offset exceeds ("Symbol data out of bounds").
++                if (
++                    has_text
++                    and symbol.bind != 0
++                    and symbol.st_shndx != 0
++                    and symbol.st_shndx == assembled_text_index
++                ):
++                    symbol.st_shndx = text_section_index
+ 
+                 if has_text and i == 0:
+                     force = False

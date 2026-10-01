@@ -42,3 +42,4 @@ sdk/scesifinitcmd
 sdk/scevif1pkinit
 sdk/scevif1pkopengiftag
 sdk/scesifloadiopheap
+sdk/scevu0dropshadowmatrix
