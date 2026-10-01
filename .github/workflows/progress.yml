@@ -60,9 +60,9 @@ jobs:
       - name: Install tools, split, build and report
         if: env.HAS_PRIVATE == 'true'
         run: |
-          scripts/host/dc2 make tools TOOLS_ARGS=--gcc
-          scripts/host/dc2 make setup
-          scripts/host/dc2 make report
+          bash scripts/host/dc2 make tools TOOLS_ARGS=--gcc
+          bash scripts/host/dc2 make setup
+          bash scripts/host/dc2 make report
 
       - name: Upload the progress report
         if: env.HAS_PRIVATE == 'true'
