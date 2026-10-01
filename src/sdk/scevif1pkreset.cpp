@@ -8,4 +8,11 @@
 
 #include "common.h"
 
-INCLUDE_ASM("nonmatchings/sdk/scevif1pkreset", sceVif1PkReset);
+typedef struct { unsigned *p; unsigned *base; unsigned n; unsigned *tag; } V1Pk;
+void sceVif1PkReset(V1Pk *p)
+{
+    unsigned *b = p->base;
+    p->n = 0;
+    p->p = b;
+}
+

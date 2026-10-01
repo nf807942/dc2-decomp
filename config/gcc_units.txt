@@ -33,3 +33,12 @@ sdk/scegifpkreset
 sdk/scemsin_putmsg
 sdk/scegifpkinit
 sdk/scegifpkopengiftag
+sdk/scevif1pkreset
+sdk/scesdc
+sdk/scesdremote
+sdk/scesifloadmodule
+sdk/scesifcallrpc
+sdk/scesifinitcmd
+sdk/scevif1pkinit
+sdk/scevif1pkopengiftag
+sdk/scesifloadiopheap

@@ -11,7 +11,8 @@
 INCLUDE_ASM("nonmatchings/sdk/scesifcallrpc", sceSifInitRpc);
 INCLUDE_ASM("nonmatchings/sdk/scesifcallrpc", sceSifExitRpc);
 INCLUDE_ASM("nonmatchings/sdk/scesifcallrpc", _sceRpcGetPacket);
-INCLUDE_ASM("nonmatchings/sdk/scesifcallrpc", _sceRpcFreePacket);
+typedef struct { int p0, p4, p8, pc; unsigned flags; int p14; int clr; } K7RP;
+void _sceRpcFreePacket(K7RP *p) { p->clr = 0; p->flags &= 0xFFFFFFFE; }
 INCLUDE_ASM("nonmatchings/sdk/scesifcallrpc", _sceRpcGetFPacket);
 INCLUDE_ASM("nonmatchings/sdk/scesifcallrpc", _sceRpcGetFPacket2);
 INCLUDE_ASM("nonmatchings/sdk/scesifcallrpc", _request_end);

@@ -8,4 +8,8 @@
 
 #include "common.h"
 
-INCLUDE_ASM("nonmatchings/sdk/scevif1pkinit", sceVif1PkInit);
+typedef struct { unsigned *p; unsigned *base; unsigned n; } K8I;
+void sceVif1PkInit(K8I *p, unsigned *b)
+{
+    p->n = 0; p->base = b; p->p = b;
+}

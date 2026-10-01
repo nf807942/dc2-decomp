@@ -10,5 +10,6 @@
 
 INCLUDE_ASM("nonmatchings/sdk/scesdremote", sceSdRemoteInit);
 INCLUDE_ASM("nonmatchings/sdk/scesdremote", sceSdTransToIOP);
-INCLUDE_ASM("nonmatchings/sdk/scesdremote", sceSdCallBack);
+extern void *sceSd_gEnd_func;
+void *sceSdCallBack(void *f) { void *o = sceSd_gEnd_func; sceSd_gEnd_func = f; return o; }
 INCLUDE_ASM("nonmatchings/sdk/scesdremote", sceSdRemote);

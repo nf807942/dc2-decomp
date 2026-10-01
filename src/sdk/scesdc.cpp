@@ -10,7 +10,11 @@
 
 INCLUDE_ASM("nonmatchings/sdk/scesdc", _sceSDC);
 INCLUDE_ASM("nonmatchings/sdk/scesdc", SyncDCache);
-INCLUDE_ASM("nonmatchings/sdk/scesdc", iSyncDCache);
+extern void _sceSDC(unsigned a, unsigned b);
+void iSyncDCache(unsigned a, unsigned b) { _sceSDC(a & 0xFFFFFFC0, b & 0xFFFFFFC0); }
+
 INCLUDE_ASM("nonmatchings/sdk/scesdc", _sceIDC);
 INCLUDE_ASM("nonmatchings/sdk/scesdc", InvalidDCache);
-INCLUDE_ASM("nonmatchings/sdk/scesdc", iInvalidDCache);
+extern void _sceIDC(unsigned a, unsigned b);
+void iInvalidDCache(unsigned a, unsigned b) { _sceIDC(a & 0xFFFFFFC0, b & 0xFFFFFFC0); }
+

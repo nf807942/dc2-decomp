@@ -12,5 +12,9 @@ INCLUDE_ASM("nonmatchings/sdk/scesifloadiopheap", sceSifInitIopHeap);
 INCLUDE_ASM("nonmatchings/sdk/scesifloadiopheap", sceSifAllocIopHeap);
 INCLUDE_ASM("nonmatchings/sdk/scesifloadiopheap", sceSifAllocSysMemory);
 INCLUDE_ASM("nonmatchings/sdk/scesifloadiopheap", sceSifFreeSysMemory);
-INCLUDE_ASM("nonmatchings/sdk/scesifloadiopheap", sceSifFreeIopHeap);
+extern int sceSifFreeSysMemory(void *);
+int sceSifFreeIopHeap(void *a)
+{
+    return sceSifFreeSysMemory(a);
+}
 INCLUDE_ASM("nonmatchings/sdk/scesifloadiopheap", sceSifLoadIopHeap);

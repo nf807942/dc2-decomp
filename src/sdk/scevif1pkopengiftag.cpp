@@ -8,4 +8,11 @@
 
 #include "common.h"
 
-INCLUDE_ASM("nonmatchings/sdk/scevif1pkopengiftag", sceVif1PkOpenGifTag);
+typedef int k8u128 __attribute__((mode(TI)));
+typedef struct { k8u128 *p; unsigned *base; unsigned n; unsigned k8x; unsigned k8y; k8u128 *tag; } K8O;
+void sceVif1PkOpenGifTag(K8O *p, k8u128 t)
+{
+    p->tag = p->p;
+    *p->p++ = t;
+}
+
