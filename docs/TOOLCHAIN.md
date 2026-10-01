@@ -184,9 +184,10 @@ GCC lessons (each measured):
 ## 5. Progress report
 
 - `objdiff.json` depends on sources (`src/<unit>.cpp` gives a unit its `base_path`) as well as the
-  split. A grafted function matches at 100 % by construction, so objdiff alone overstates progress
-  (61 % shown vs 0.274 % source-based at 72 open units): `make etat` counts from sources;
-  `make report` is the finer measurement.
+  split. A grafted function matches at 100 % by construction (the object holds the disc's bytes), so
+  objdiff alone overstates progress: `make report` runs `scripts/build/filter_report.py`, which zeroes
+  functions still under `INCLUDE_ASM` (except original hand-written assembly, which cannot be
+  decompiled) and recomputes the unit, category and total measures. `make etat` counts from sources.
 - Function count and byte count differ (2.84 % vs 0.57 % early on): the 975 functions of ≥ 512 bytes
   hold 59 % of the code.
 - **decomp.dev** reads a GitHub Actions artifact `<version>_report` of a public repository,
