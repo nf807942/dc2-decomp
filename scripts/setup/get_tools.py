@@ -33,9 +33,9 @@ BASE_URL = ("https://github.com/decompme/compilers/releases/download/compilers/"
 # compilateur que MWLD numérote 2.4.1.01, et les versions 2.4 comme 3.0.x
 # portent ce numéro.
 CANDIDATES = [
+    "mwcps2-3.0-011126",
     "mwcps2-3.0.1-020123",
     "mwcps2-2.4-001213",
-    "mwcps2-3.0-011126",
     "mwcps2-3.0.3-020716",
     "mwcps2-2.3.3-000906",
     "mwcps2-3.0b38-030307",
