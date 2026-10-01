@@ -57,12 +57,24 @@ jobs:
           cp -r .private/rom/. rom/
           rm -rf .private
 
-      - name: Install tools, split, build and report
+      - name: Build the toolchain image
+        if: env.HAS_PRIVATE == 'true'
+        run: docker build -q -t dc2decomp .
+
+      - name: Install the compilers
         if: env.HAS_PRIVATE == 'true'
         run: |
           bash scripts/host/dc2 make tools TOOLS_ARGS=--gcc
-          bash scripts/host/dc2 make setup
-          bash scripts/host/dc2 make report
+          ls tools/compilers
+          test -f tools/compilers/mwcps2-3.0-011126/mwccps2.exe
+
+      - name: Split the disassembly
+        if: env.HAS_PRIVATE == 'true'
+        run: bash scripts/host/dc2 make setup
+
+      - name: Build and report
+        if: env.HAS_PRIVATE == 'true'
+        run: bash scripts/host/dc2 make report
 
       - name: Upload the progress report
         if: env.HAS_PRIVATE == 'true'
