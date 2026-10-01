@@ -123,6 +123,21 @@ def nom_unite(source: Path) -> str:
     return source.relative_to(ROOT / "src").with_suffix("").as_posix()
 
 
+def fonction_mwcc(symbole: str) -> bool:
+    """MWCC a-t-il compilé cette fonction ? `.mwcats` le dit, le dossier de l'unité non.
+
+    Des fonctions du jeu (`csound.cpp`) et de l'exécution C++ (`std::exception::what`) sont
+    rangées sous `src/sdk/` et `src/runtime/` : c'est le classement par dossier, une
+    heuristique. Elles passent par MWCC comme tout le jeu ; seules celles que `.mwcats` ne
+    liste pas relèvent d'`ee-gcc`.
+    """
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+    import provenance
+    from lib.project import functions
+    f = functions().get(symbole)
+    return f is not None and f.address in provenance.compilees()
+
+
 def unites_gcc() -> set[str]:
     if not GCC_UNITES.exists():
         return set()
@@ -252,7 +267,13 @@ def main() -> int:
     # que MWCC a compilé : le compiler autrement changerait ce qui est déjà écrit.
     unite = nom_unite(source)
     ajoutee_a_la_liste = False
-    if source.parent.name in ("sdk", "runtime") and unite not in unites_gcc():
+
+    verrouille(source)
+    # Décidé SOUS le verrou de l'unité : deux soumissions de la même unité peuvent attendre
+    # ensemble, et celle qui calculait avant le verrou retirait de la liste une unité que
+    # l'autre venait de garder (la fonction gardée aurait alors été compilée par MWCC).
+    if (source.parent.name in ("sdk", "runtime") and not fonction_mwcc(a.symbole)
+            and unite not in unites_gcc()):
         code = re.sub(r'INCLUDE_ASM\s*\([^)]*\)', "", source.read_text(encoding="utf-8"))
         if re.search(r"\)\s*\{", code) and not a.sdk:
             print(f"{a.symbole} : l'unité {unite} contient déjà du code compilé par MWCC ; "
@@ -260,7 +281,6 @@ def main() -> int:
             return 6
         ajoutee_a_la_liste = True
 
-    verrouille(source)
     original = source.read_bytes()
     texte = original.decode("utf-8")
     ligne = re.compile(
