@@ -1,5 +1,12 @@
 # Dark Chronicle Decompilation Project
 
+[![Code PAL Progress]](https://decomp.dev/nf807942/dc2-decomp/pal)
+
+[Code PAL Progress]: https://decomp.dev/nf807942/dc2-decomp/pal.svg?mode=shield&label=PAL&measure=matched_code_percent
+[progress_link]: https://decomp.dev/nf807942/dc2-decomp/pal
+
+[<img src="https://decomp.dev/nf807942/dc2-decomp/pal.svg?w=512&h=256" width="512" height="256" alt="Progress">][progress_link]
+
 *Matching* decompilation of **Dark Chronicle** (*Dark Cloud 2*) for the PlayStation 2,
 PAL version `SCES-51190`, in C++.
 
@@ -10,10 +17,7 @@ of [decomp.wiki][wiki].
 | | |
 |---|---|
 | Build identical to the disc | **yes** — 2,608,512 bytes, sha1 `eca0c93d5d6a25fcbf8f1fa41aa811a6f4b7aca8` |
-| Functions rebuilt in C++ | 2,552 of 7,837 (158,216 bytes) |
-| Original hand-written assembly (counted as done) | 158 functions (syscall stubs, `crt0`) |
 | Compilers | `mwcps2-3.0-011126 -O4,p` (game), `ee-gcc 2.9x` (Sony SDK and libc) |
-| Split | 319 units, filed by provenance under `src/` |
 
 This repository contains **no game data**: no disc, no executable, no disassembly. All of
 it is regenerated from your own copy of the disc.

@@ -173,7 +173,7 @@ GCC lessons (each measured):
   zero words; keep the whole symbol. One table per unit tightens an over-wide range. Predicates on
   migration are tested against the disassembly, not a rebuild.
 - **`make carve`** cuts the game from end to end: aims at a size, picks the boundary leaving fewest
-  classes straddling, cuts at every contribution boundary — 325 units, 99.7 % of `.text`. 988
+  classes straddling, cuts at every contribution boundary. 988
   functions outside the game's ranges occupy only 182 contributions.
 - **Data and bss**: one `bss` subsegment from the file end (absolute symbols 2,503 → 55); `.vutext` is
   bounded at its first sized symbol; splat declares undefined what spimdisasm defines (`normalize.py`
