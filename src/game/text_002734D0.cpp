@@ -13,7 +13,7 @@
 INCLUDE_ASM("nonmatchings/game/text_002734D0", _CMRS_MOVE_REF__FP12RS_STACKDATAi);
 extern "C" u8 CameraSeq[2832];
 extern "C" s32 InitPas__12CSceneCmrSeqFv(void *);
-/* Pose par `make forge`, qui a compose les reparations connues et verifie l'image entiere. Voir docs/IDIOMES_MWCC.md pour le detail de chacune. */
+/* Pose par `make forge`, qui a compose les reparations connues et verifie l'image entiere. Voir docs/IDIOMS.md pour le detail de chacune. */
 extern "C" s32 _CMRS_INIT_PAS__FP12RS_STACKDATAi(RS_STACKDATA *arg0, s32 arg1) {
     InitPas__12CSceneCmrSeqFv(&CameraSeq);
     return 1;

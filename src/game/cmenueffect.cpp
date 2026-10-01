@@ -35,7 +35,7 @@ typedef struct CMenuEffect_infere {
     /* 0x10 */ s32 unk10;                           /* inferred */
 } CMenuEffect_infere;                                      /* size >= 0x14 */
 extern "C" s32 Alloc__9mgCMemoryFi(void *, s32);
-/* Pose par `make forge`, qui a compose les reparations connues et verifie l'image entiere. Voir docs/IDIOMES_MWCC.md pour le detail de chacune. */
+/* Pose par `make forge`, qui a compose les reparations connues et verifie l'image entiere. Voir docs/IDIOMS.md pour le detail de chacune. */
 extern "C" void SetMemory__11CMenuEffectFP9mgCMemory(CMenuEffect_infere *objet, mgCMemory *arg0) {
     u32 temp_v1;
     u32 var_v0;

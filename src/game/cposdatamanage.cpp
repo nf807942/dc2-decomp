@@ -23,7 +23,7 @@ typedef struct CPosDataManage_infere {
     /* 0x1C */ s16 unk1C;                           /* inferred */
     /* 0x1E */ s8 unk1E;                            /* inferred */
 } CPosDataManage_infere;                                   /* size >= 0x1F */
-/* Pose par `make forge`, qui a compose les reparations connues et verifie l'image entiere. Voir docs/IDIOMES_MWCC.md pour le detail de chacune. */
+/* Pose par `make forge`, qui a compose les reparations connues et verifie l'image entiere. Voir docs/IDIOMS.md pour le detail de chacune. */
 extern "C" void Initialize__14CPosDataManageFv(CPosDataManage_infere *objet) {
     objet->unk0 = 0;
     objet->unk4 = 0;

@@ -1,260 +1,79 @@
-# dc2decomp
+# Dark Chronicle Decompilation Project
 
-Décompilation *matching* de **Dark Chronicle** (*Dark Cloud 2*), version PAL
-`SCES-51190`, en C++ — dans la méthode que [decomp.wiki][wiki] décrit et que
-les projets de [decomp.dev][dev] pratiquent.
+*Matching* decompilation of **Dark Chronicle** (*Dark Cloud 2*) for the PlayStation 2,
+PAL version `SCES-51190`, in C++.
 
-Le but n'est pas d'écrire un programme qui ressemble au jeu : c'est d'écrire
-le C++ qui, recompilé par le compilateur d'époque, rend **les octets du
-disque**. Le verdict est binaire et se mesure à chaque construction.
-
-Projet parallèle à [darkchronicles](../darkchronicles), qui recompile le même
-jeu statiquement en Rust. Les deux partagent leur objet et rien d'autre : là
-où la recompilation traduit des instructions sans jamais retrouver
-d'intention, la décompilation reconstruit une source dont la preuve est le
-binaire lui-même.
-
-## État
+The goal is to write the C++ that, recompiled by the period compiler, gives **the exact
+bytes of the disc**. The verdict is binary and measured at every build. The method is that
+of [decomp.wiki][wiki].
 
 | | |
 |---|---|
-| Construction identique au disque | **oui** — 2 608 512 octets, sha1 `eca0c93d5d6a25fcbf8f1fa41aa811a6f4b7aca8` |
-| Code reconstruit en C++ | 6 080 octets sur 2 215 100 — 32 fonctions sur 7 837 |
-| Compilateur | `mwcps2-3.0-011126`, `-O4,p` — départagé en mesurant les 21 versions |
-| Découpage | 325 unités, 7 788 fonctions — 99,7 % des octets de `.text`, rangées par provenance |
+| Build identical to the disc | **yes** — 2,608,512 bytes, sha1 `eca0c93d5d6a25fcbf8f1fa41aa811a6f4b7aca8` |
+| Functions rebuilt in C++ | 2,552 of 7,837 (158,216 bytes) |
+| Original hand-written assembly (counted as done) | 158 functions (syscall stubs, `crt0`) |
+| Compilers | `mwcps2-3.0-011126 -O4,p` (game), `ee-gcc 2.9x` (Sony SDK and libc) |
+| Split | 319 units, filed by provenance under `src/` |
 
-La construction part du désassemblage entier et le réassemble ; chaque fonction
-passée en C++ en remplace une part, et la construction doit rester identique.
-Une unité ouverte n'est pas du code reconstruit : ses fonctions gardent les
-octets du disque jusqu'à ce qu'on les écrive, et c'est ce que les deux lignes
-ci-dessus distinguent. `make carve` a découpé le code du jeu de bout en bout ;
-ce qui reste hors des unités est du code de bibliothèque, livré compilé.
+This repository contains **no game data**: no disc, no executable, no disassembly. All of
+it is regenerated from your own copy of the disc.
 
-La marche à suivre est dans [docs/MARCHE_A_SUIVRE.md](docs/MARCHE_A_SUIVRE.md),
-ce qui reste à faire dans [ROADMAP.md](ROADMAP.md). Ce que le sondage du binaire
-a établi se lit dans [docs/IDIOMES_MWCC.md](docs/IDIOMES_MWCC.md) — ce que le
-compilateur fait d'une forme de C — et dans
-[docs/BINAIRE_ET_CHAINE.md](docs/BINAIRE_ET_CHAINE.md) — l'ELF, le découpage et
-la chaîne qui le reconstruit.
+## Building
 
-## Prérequis
-
-* Docker ou Podman — toute la chaîne y vit, rien ne s'installe sur l'hôte.
-* Le disque PAL de Dark Chronicle, posé dans `rom/`. Rien d'autre ne le
-  fournit, et rien de ce qui en dérive n'entre dans ce dépôt.
-* Le compilateur Metrowerks CodeWarrior for PlayStation 2 — voir plus bas.
-
-## Démarrage
+1. Install Docker or Podman. The whole toolchain lives there.
+2. Clone the repository: `git clone --recurse-submodules <url> && cd <repository>`
+3. Put the PAL disc image in `rom/`, e.g. `rom/Dark Chronicle (Europe).iso`.
+4. Run:
 
 ```sh
-git clone --recurse-submodules <ce dépôt> && cd darkcloud2
-cp "Dark Chronicle (Europe).iso" rom/
-
-scripts/host/dc2 make tools    # installe le compilateur Metrowerks
-scripts/host/dc2 make setup    # extrait le disque, écrit la config, désassemble
-scripts/host/dc2 make build    # assemble, lie, compare au disque
+scripts/host/dc2 make tools    # installs the compilers
+scripts/host/dc2 make setup    # extracts the disc, writes the config, disassembles
+scripts/host/dc2 make build    # assembles, links, compares to the disc
 ```
 
-La première invocation construit l'image ; les suivantes sont incrémentales.
-L'arbre est monté dans le conteneur, jamais copié.
+`make build` must print "identique au disque" (identical to the disc). Anything else is a
+regression.
 
-## Travailler sur une fonction
+## Working on a function
 
 ```sh
-scripts/host/dc2 make decompile S=Close__8CGamePadFv   # premier jet de C++
-scripts/host/dc2 make diff      S=Close__8CGamePadFv   # verdict contre le commerce
+scripts/host/dc2 make etat                              # what remains to be written
+scripts/host/dc2 make decompile S=Close__8CGamePadFv    # first draft from m2c
+scripts/host/dc2 make diff      S=Close__8CGamePadFv    # verdict against retail
 ```
 
-Les symboles s'écrivent manglés, comme le binaire les porte —
-`Close__8CGamePadFv` est `CGamePad::Close(void)`. `config/elf_symbol_addrs.txt`
-les liste tous.
+Symbols are written mangled, as the binary carries them: `Close__8CGamePadFv` is
+`CGamePad::Close(void)`. `make diff` compares the function to the original with
+[objdiff][objdiff]; `100 %` means it is rebuilt.
 
-`make diff` affiche les deux suites d'instructions côte à côte et le taux
-d'appariement qu'objdiff calcule ; `100 %` veut dire que la fonction est
-reconstruite.
+`make report` writes `progress/report.json`, the objdiff report that [decomp.dev][dev]
+reads; `.github/workflows/progress.yml` publishes it on every push.
 
-### Ouvrir une unité
+## Documentation
 
-Une unité de travail se déclare dans `config/units.txt` — début, fin, nom :
+* [docs/IDIOMS.md](docs/IDIOMS.md) — what MWCC does with each form of C
+* [docs/TOOLCHAIN.md](docs/TOOLCHAIN.md) — the binary, the compilers (MWCC, ee-gcc), the split, the link
 
-```
-0x0014A650 0x0014B500 gamepad
-```
+## Contributing
 
-`make setup` en fait alors un sous-segment confié à `src/gamepad.cpp`, écrit le
-désassemblage de la plage **par fonction** sous `asm/nonmatchings/gamepad/`, et
-fait attendre au script de lien l'objet compilé à la place de l'assemblé.
+Do not version anything derived from the game: `.gitignore` and the pre-commit hook
+(`git config core.hooksPath .githooks`) refuse it, and must not be bypassed. A function
+counts as progress only if `make build` stays identical to the disc.
 
-Les frontières des 49 unités d'origine ne sont pas dans le binaire — deux objets
-y portent 91 % du code —, donc elles se décident : une plage se délimite par ce
-que les symboles montrent, une classe et les fonctions libres qui
-l'accompagnent. Le binaire reste identique tant que l'ordre des fonctions est
-conservé, ce que `make build` vérifie à chaque fois.
+## License
 
-Le reste de l'unité n'a pas à attendre : `INCLUDE_ASM` garde une fonction sous
-sa forme d'origine à l'intérieur d'une source par ailleurs compilée.
+[MIT](LICENSE). Dark Chronicle belongs to its publisher; this project is neither affiliated
+with nor endorsed by it, and distributes none of its files.
 
-```cpp
-#include "common.h"
+## References
 
-INCLUDE_ASM("nonmatchings/gamepad", UpDate__8CGamePadFv);  // pas encore reconstruite
-
-void CGamePad::Close() {                              // celle-ci l'est
-    scePadPortClose(0, 0);
-    scePadPortClose(1, 0);
-    scePadEnd();
-}
-```
-
-MWCC émet le texte d'une unité d'un seul bloc et n'accepte d'assembleur
-qu'entièrement défini : une fonction non reconstruite ne peut donc pas venir
-d'un objet voisin. [mwccgap][mwccgap] la remplace par autant de `nop`, assemble
-le `.s` de référence à part, puis greffe le résultat en réparant les
-relocations. C'est ce qui rend le remplacement fonction par fonction possible.
-
-Les fonctions sont données dans l'ordre des adresses : c'est celui que
-l'éditeur de liens attend.
-
-### Deux désassemblages, et pourquoi
-
-`ref/asm/` porte le binaire entier en assembleur, `asm/` seulement ce qui reste
-à faire. La raison est que le désassembleur cesse d'extraire une fonction dès
-qu'une source la définit : sans cette copie complète, une fonction reconstruite
-perdrait l'original contre lequel on la mesure. `ref/` est donc la cible
-d'objdiff, et `make reference` l'assemble.
-
-[mwccgap]: https://github.com/mkst/mwccgap
-
-## Retoucher une fonction sans toucher aux sources
-
-Quand on veut une version modifiée pour la jouer, pas une source qui rend les
-octets du disque, `make mod` patche l'exécutable construit sans rien écrire
-dans `src/` :
-
-```sh
-scripts/host/dc2 make mod M="IsLevelUp__13CGameDataUsedFv=1"
-scripts/host/dc2 make iso    # porte le résultat dans l'image
-```
-
-Chaque `SYMBOLE=VALEUR` remplace le corps de la fonction par un retour de la
-constante — un `jr $ra` suivi de `addiu $v0, $zero, valeur` — et le reste de la
-fonction devient du remplissage pour garder sa taille. On peut en donner
-plusieurs d'un coup, séparées par des espaces. Les symboles s'écrivent manglés,
-comme `make decompile` les attend.
-
-La taille reste constante par nécessité : les symboles du désassemblage sont
-placés à leur adresse absolue, et la moindre fonction plus grande décale les
-données sous les relocations `%gp_rel`. Ce qui vit dans `build/SCES_511.90`
-est un fichier produit, jamais versionné — `make build` repart du disque et
-l'efface.
-
-## Voir l'avancement
-
-```sh
-scripts/host/dc2 make report    # puis ouvrir progress/index.html
-```
-
-La même vue que [decomp.dev][dev] — carte du code proportionnelle aux octets,
-avancement par secteur, recherche par fonction — dans une page autonome de
-450 Kio qu'on ouvre depuis le disque. Aucun dépôt public, aucun service tiers,
-aucune requête sortante. La mesure vient d'`objdiff-cli report`, qui compare
-l'objet compilé à l'objet de référence fonction par fonction ; la page n'en
-change pas les chiffres, elle les rend lisibles.
-
-La carte se lit à deux échelles. **Par fonction** est celle qui sert : le
-binaire s'y répartit vraiment, et c'est l'unité de travail. **Par unité**
-montre pourquoi — deux objets portent 91 % du code, parce que les frontières
-des 49 unités de traduction du jeu ne sont pas encore retrouvées.
-
-`make progress` donne le même chiffre en une ligne, sans passer par objdiff.
-
-### Pourquoi une page à nous plutôt que decomp.dev
-
-decomp.dev [s'auto-héberge][ddsrc] — Rust, npm, SQLite, sur `localhost:3000` —,
-mais c'est un **bot GitHub** avant d'être un site : un projet y est désigné par
-l'identifiant numérique de son dépôt GitHub, les rapports sont lus dans les
-**artefacts de GitHub Actions**, et aucune route n'accepte qu'on lui en remette
-un. Un dépôt git local n'a pas d'identifiant GitHub.
-
-Ce n'est pas le disque qui manquerait : un rapport objdiff compare des objets,
-donc le désassemblage et les sources y suffisent. [DCDecomp][dc1] produit ainsi
-le sien en intégration continue — au prix de versionner son désassemblage et
-son compilateur, ce que ce dépôt ne fait pas. La même voie nous demanderait de
-publier soit le désassemblage entier, soit le seul `report.json`, qui ne porte
-que des noms de fonctions et des tailles. Le choix reste ouvert ; en attendant,
-la page locale ne demande rien.
-
-### L'interface objdiff, pour le travail à la fonction
-
-`make objdiff` écrit `objdiff.json`, que lit l'[application objdiff][objdiff] —
-la même que tous les projets decomp emploient. Installée sur l'hôte, elle liste
-les unités et leur avancement, affiche le diff instruction par instruction, et
-reconstruit à chaque sauvegarde. C'est l'outil d'itération ; la page est la vue
-d'ensemble.
-
-## Le compilateur
-
-`make tools` l'installe depuis [`decompme/compilers`][compilers], le dépôt qui
-alimente decomp.me : ces paquets portent le gestionnaire de licence qui laisse
-`mwccps2.exe` démarrer, là où l'installateur d'origine réclame une licence
-FLEXlm et refuse de compiler sans elle.
-
-Le binaire porte `MW MIPS C Compiler (2.4.1.01)`, mais cette chaîne est écrite
-par **MWLD** et plusieurs versions l'écrivent à l'identique. La mesure a
-tranché : `mwcps2-3.0-011126` rend **100 %** sur les huit méthodes de
-`CDngFloorManager`, là où `3.0.1-020123` et `3.0.3` plafonnent à 97 et 98 %, les
-bêtas de 2003-2006 sous 85 %, et les 2.3.3 comme 2.4 à 77 %.
-
-`make tools TOOLS_ARGS=--all` installe les vingt et une versions publiées ;
-`MWCC_VERSION=mwcps2-3.0.3-020716 make …` en choisit une autre. Quand une
-fonction plafonne alors que sa taille est juste, les mesurer toutes est le
-réflexe qui tranche.
-
-[compilers]: https://github.com/decompme/compilers
-
-## Ce que le binaire donne, et qui change tout
-
-`SCES_511.90` n'est pas strippé. Là où un projet de décompilation ordinaire
-devine ses frontières, celui-ci les lit :
-
-* **17 298 symboles**, dont 7 837 fonctions et 8 201 objets, avec adresse et
-  taille exactes ;
-* **316 symboles de section** — un par contribution d'objet, dont 192 pour
-  `.text` : ce sont les frontières de fichiers, données plutôt que cherchées ;
-* **99 876 relocations**, qui disent quel mot est une adresse ;
-* les **49 unités de traduction** du jeu, nommées par leurs initialiseurs
-  statiques `__sinit_*.cpp`.
-
-## Structure
-
-```
-config/    découpage et tables de symboles (engendrés, sauf symbol_addrs.txt)
-asm/       désassemblage de référence — engendré, jamais versionné
-src/       le C++ reconstruit — c'est le dépôt
-include/   en-têtes reconstruits
-scripts/   setup, construction, comparaison
-tools/     compilateur, m2c, decomp-permuter
-rom/       le disque et ce qu'on en extrait — jamais versionné
-```
-
-## Ce qui n'entre pas dans git
-
-Rien de dérivé du jeu : ni image disque, ni exécutable, ni désassemblage, ni
-tables tirées du binaire. Tout cela se régénère par `make setup` depuis le
-disque de chacun. Le `.gitignore` et `.githooks/pre-commit` l'appliquent ;
-installez le hook par `git config core.hooksPath .githooks`.
-
-## Références
-
-* [Decompedia][wiki] — la méthode, les compilateurs, les plateformes
-* [DCDecomp][dc1] — Dark Cloud 1, même éditeur, même compilateur, projet mûr
-* [splat][splat], [spimdisasm][spim], [objdiff][objdiff], [m2c][m2c]
+[Decompedia][wiki] · [DCDecomp][dc1] (Dark Cloud 1) · [splat][splat] · [objdiff][objdiff] ·
+[m2c][m2c] · [mwccgap][mwccgap]
 
 [wiki]: https://decomp.wiki/
-[ddsrc]: https://github.com/encounter/decomp.dev
 [dev]: https://decomp.dev/
 [dc1]: https://github.com/Adubbz/DCDecomp
 [splat]: https://github.com/ethteck/splat
-[spim]: https://github.com/Decompollaborate/spimdisasm
 [objdiff]: https://github.com/encounter/objdiff
 [m2c]: https://github.com/matt-kempster/m2c
+[mwccgap]: https://github.com/mkst/mwccgap

@@ -55,7 +55,7 @@ typedef struct CCollision_infere {
     /* 0x20 */ f32 unk20;                           /* inferred */
 } CCollision_infere;                                       /* size >= 0x24 */
 extern "C" s32 mgClipBoxVertex__FPfPfPf(f32 *, f32 *, f32 *);
-/* Pose par `make forge`, qui a compose les reparations connues et verifie l'image entiere. Voir docs/IDIOMES_MWCC.md pour le detail de chacune. */
+/* Pose par `make forge`, qui a compose les reparations connues et verifie l'image entiere. Voir docs/IDIOMS.md pour le detail de chacune. */
 extern "C" s32 InsidePoint__10CCollisionFPf(CCollision_infere *objet, f32 *arg0) {
     return mgClipBoxVertex__FPfPfPf(arg0, &objet->unk10, &objet->unk20) != 0;
 }

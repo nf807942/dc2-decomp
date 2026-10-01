@@ -1,0 +1,73 @@
+# decomp.dev integration.
+#
+# decomp.dev reads one objdiff report per release, uploaded as an artifact
+# named "<version>_report" (here "pal_report"). The job builds it from scratch
+# on every push.
+#
+# The repository holds nothing derived from the game, so the job needs the
+# disc image. It comes from a private repository (owner/name in the
+# PRIVATE_REPOSITORY Actions variable) holding the image under rom/, checked
+# out with a read-only deploy key (the PRIVATE_REPO_SSH_KEY secret). Only
+# report.json leaves the runner; neither the checkout nor rom/ is ever cached.
+# Without the variable or the key (pull requests from forks get neither) the
+# job reports that it was skipped instead of failing.
+#
+# The repository must also be registered once by hand at
+# https://decomp.dev/manage/new; this workflow alone does not add it.
+name: Progress report
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  report:
+    name: Progress report (PAL)
+    runs-on: ubuntu-latest
+    env:
+      HAS_PRIVATE: ${{ secrets.PRIVATE_REPO_SSH_KEY != '' && vars.PRIVATE_REPOSITORY != '' }}
+      PRIVATE_REPOSITORY: ${{ vars.PRIVATE_REPOSITORY }}
+
+    steps:
+      - name: Skip without access to the private repository
+        if: env.HAS_PRIVATE != 'true'
+        run: echo "::notice::PRIVATE_REPOSITORY or PRIVATE_REPO_SSH_KEY is not set; no progress report."
+
+      - uses: actions/checkout@v4
+        if: env.HAS_PRIVATE == 'true'
+        with:
+          submodules: recursive
+
+      - name: Check out the private repository
+        if: env.HAS_PRIVATE == 'true'
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.PRIVATE_REPOSITORY }}
+          path: .private
+          ssh-key: ${{ secrets.PRIVATE_REPO_SSH_KEY }}
+          persist-credentials: false
+
+      - name: Copy in the disc image
+        if: env.HAS_PRIVATE == 'true'
+        run: |
+          cp -r .private/rom/. rom/
+          rm -rf .private
+
+      - name: Install tools, split, build and report
+        if: env.HAS_PRIVATE == 'true'
+        run: |
+          scripts/host/dc2 make tools TOOLS_ARGS=--gcc
+          scripts/host/dc2 make setup
+          scripts/host/dc2 make report
+
+      - name: Upload the progress report
+        if: env.HAS_PRIVATE == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pal_report
+          path: progress/report.json
+          if-no-files-found: error

@@ -135,7 +135,7 @@ O_FILES   := $(addprefix $(BUILD_DIR)/, $(S_FILES:.s=.o) $(BIN_FILES:.bin=.o) \
              $(addsuffix .o, $(basename $(SRC_FILES))))
 
 .PHONY: soumettre similaires dossier all setup tools patch split build objects check diff decompile measure \
-        atlas carve clean distclean contexte injecte provenance chaine affinage ecarts classes lot banc forge tailles vtables champs entetes contexte_prouve taux instructions controle ci etat progress report
+        atlas carve clean distclean contexte injecte provenance chaine affinage ecarts classes lot banc forge tailles vtables champs entetes contexte_prouve taux instructions controle ci etat report
 
 all: build
 
@@ -466,10 +466,6 @@ ci: controle
 etat:
 	@$(PYTHON) scripts/build/etat.py $(ARGS)
 
-# Part des octets qui viennent de source compilée plutôt que du désassemblage.
-progress:
-	@$(PYTHON) scripts/build/progress.py
-
 # La configuration qu'objdiff lit : une unité par objet, avec son secteur.
 #
 # Les sources en sont une dépendance autant que le découpage : c'est leur
@@ -482,10 +478,13 @@ objdiff.json: config/splat.yaml $(SRC_FILES)
 # Les objets de référence, contre lesquels chaque fonction se mesure.
 reference: $(REF_O_FILES)
 
-# Rapport d'avancement en page web autonome, à ouvrir depuis le disque.
-# objdiff lit les objets de référence, donc ils doivent exister.
-report: objdiff.json reference
-	@$(PYTHON) scripts/build/report.py
+# The progress report decomp.dev reads: objdiff compares every compiled
+# function with its reference object. CI uploads this file as the artifact
+# `<version>_report`; see .github/workflows/progress.yml.
+report: build objdiff.json reference
+	@mkdir -p progress
+	@objdiff-cli report generate -p . -o progress/report.json -f json
+	@echo "progress/report.json"
 
 # --------------------------------------------------------------------------
 

@@ -120,7 +120,7 @@ struct temp_v0_champs_fd5b88 {
     char pad0[0x324];
     /* 0x324 */ s32 unk324;
 };
-/* Pose par `make forge`, qui a compose les reparations connues et verifie l'image entiere. Voir docs/IDIOMES_MWCC.md pour le detail de chacune. */
+/* Pose par `make forge`, qui a compose les reparations connues et verifie l'image entiere. Voir docs/IDIOMS.md pour le detail de chacune. */
 extern "C" s32 GetePartsInfoAtPlaceID__8CEditMapFi(CEditMap *objet, s32 arg0) {
     struct temp_v0_champs_fd5b88 *temp_v0;
 

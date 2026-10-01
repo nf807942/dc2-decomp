@@ -11,7 +11,7 @@ l'avait écrite. Mesuré : le pas de pointeur a rendu trois fonctions dans sa
 classe et **neuf de plus hors d'elle**. Une réparation n'appartient pas à sa
 classe ; la classe dit seulement où la chercher.
 
-Chacune vient d'un écart mesuré, et `docs/IDIOMES_MWCC.md` en porte la preuve et
+Chacune vient d'un écart mesuré, et `docs/IDIOMS.md` en porte la preuve et
 le chiffre.
 """
 

@@ -46,7 +46,7 @@ struct unkF4_champs_a42004 {
     char pad0[0x18];
     /* 0x18 */ s32 unk18;
 };
-/* Pose par `make forge`, qui a compose les reparations connues et verifie l'image entiere. Voir docs/IDIOMES_MWCC.md pour le detail de chacune. */
+/* Pose par `make forge`, qui a compose les reparations connues et verifie l'image entiere. Voir docs/IDIOMS.md pour le detail de chacune. */
 extern "C" void MenuRoboPartsLightOff__FP8mgCFrame(mgCFrame *arg0) {
     struct temp_v0_champs_a42004 *temp_v0;
 

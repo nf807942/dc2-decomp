@@ -94,7 +94,7 @@ typedef struct ClsMes {
     /* 0x013C */ char pad13C[0x1D14];               /* maybe part of unk138[0x746]void */
     /* 0x1E50 */ s32 unk1E50;                       /* inferred */
 } ClsMes;                                           /* size >= 0x1E54 */
-/* Pose par `make forge`, qui a compose les reparations connues et verifie l'image entiere. Voir docs/IDIOMES_MWCC.md pour le detail de chacune. */
+/* Pose par `make forge`, qui a compose les reparations connues et verifie l'image entiere. Voir docs/IDIOMS.md pour le detail de chacune. */
 extern "C" void CalcCenteringXY__6ClsMesFPiPi(ClsMes *objet, s32 *arg0, s32 *arg1) {
     s32 temp_a3;
     s32 var_v1;

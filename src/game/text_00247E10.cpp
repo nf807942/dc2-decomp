@@ -473,7 +473,7 @@ INCLUDE_ASM("nonmatchings/game/text_00247E10", MenuItemDebugKey__Fv);
  * `mgCCameraFollow`. Le commerce n'emploie qu'un registre de travail et comble
  * l'écriture-après-lecture par le `mtc1 zero` du troisième argument ; nous en
  * employons deux, `$v1` et `$a0`, apparions les `lui` et rejetons le zéro en
- * queue. `docs/IDIOMES_MWCC.md` en donne la preuve — un registre d'argument
+ * queue. `docs/IDIOMS.md` en donne la preuve — un registre d'argument
  * occupé suffit à rendre la forme du commerce —, les deux comptages qui la
  * bornent, et la liste de ce qui a été éprouvé en vain. */
 #if 0
